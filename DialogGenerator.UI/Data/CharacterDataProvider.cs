@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System.Collections.ObjectModel;
+using System.Threading.Tasks;
 using DialogGenerator.Core;
 using DialogGenerator.DataAccess;
 using DialogGenerator.Model;
@@ -16,19 +17,29 @@ namespace DialogGenerator.UI.Data
             mCharacterRepository = _characterRepository;
         }
 
-        public void Add(Character character)
+        public Task AddAsync(Character character)
         {
-            mCharacterRepository.Add(character);
+            return mCharacterRepository.AddAsync(character);
         }
 
-        public IEnumerable<Character> GetAll()
+        public Task SaveAsync(Character character)
+        {
+            return mCharacterRepository.SaveAsync(character);
+        }
+
+        public ObservableCollection<Character> GetAll()
         {
             return mCharacterRepository.GetAll();
         }
 
-        public Character GetByName(string name)
+        public Character GetByInitials(string initials)
         {
-            return mCharacterRepository.GetByName(name);
+            return mCharacterRepository.GetByInitials(initials);
+        }
+
+        public Task Remove(Character character,string _imageFileName)
+        {
+            return mCharacterRepository.Remove(character,_imageFileName);
         }
     }
 }

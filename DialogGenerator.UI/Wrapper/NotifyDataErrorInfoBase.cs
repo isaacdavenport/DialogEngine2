@@ -1,4 +1,4 @@
-﻿using GalaSoft.MvvmLight;
+﻿using Prism.Mvvm;
 using System;
 using System.Collections;
 using System.Collections.Generic;
@@ -7,7 +7,7 @@ using System.Linq;
 
 namespace DialogGenerator.UI.Wrapper
 {
-    public class NotifyDataErrorInfoBase : ViewModelBase, INotifyDataErrorInfo
+    public class NotifyDataErrorInfoBase : BindableBase, INotifyDataErrorInfo
     {
         private Dictionary<string, List<string>> mErrorsByPropertyName
             = new Dictionary<string, List<string>>();

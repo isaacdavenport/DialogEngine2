@@ -1,15 +1,19 @@
-﻿using Autofac;
+﻿using Microsoft.Practices.Unity;
+using Prism.Modularity;
 
 namespace DialogGenerator.Utilities
 {
-    public class UtilitiesModule:Module
+    public class UtilitiesModule:IModule
     {
-        protected override void Load(ContainerBuilder builder)
-        {
-            builder.RegisterType<MP3Player>().As<IMP3Player>()
-                .SingleInstance();
+        private IUnityContainer mContainer;
 
-            base.Load(builder);
+        public UtilitiesModule(IUnityContainer container)
+        {
+            mContainer = container;
+        }
+        public void Initialize()
+        {
+            mContainer.RegisterType<IMP3Player, MP3Player>();
         }
     }
 }

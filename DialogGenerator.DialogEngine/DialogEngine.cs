@@ -1,4 +1,6 @@
-﻿using DialogGenerator.Core;
+﻿using DialogGenerator.CharacterSelection;
+using DialogGenerator.Core;
+using DialogGenerator.DataAccess;
 using DialogGenerator.DialogEngine.Model;
 using DialogGenerator.DialogEngine.Workflow;
 using DialogGenerator.Events;
@@ -26,6 +28,9 @@ namespace DialogGenerator.DialogEngine
         private ILogger mLogger;
         private IEventAggregator mEventAggregator;
         private IMP3Player mPlayer;
+        private ICharacterSelection mCharacterSelection;
+        private ICharacterRepository mCharacterRepository;
+        private IDialogModelRepository mDialogModelRepository;
         private int mPriorCharacter1Num = 100;
         private int mPriorCharacter2Num = 100;
         private int mCharacter1Num = 0;
@@ -33,7 +38,6 @@ namespace DialogGenerator.DialogEngine
         private int mIndexOfCurrentDialogModel;
         private double mDialogModelPopularitySum;
         private bool mSameCharactersAsLast;
-        private bool mIsForcedDialogModel= false;
         private DialogEngineWorkflow mWorkflow;
         private States mCurrentState;
         private SelectedCharactersPairEventArgs mRandomSelectionDataCached;
@@ -51,11 +55,15 @@ namespace DialogGenerator.DialogEngine
 
         #region - constructor -
 
-        public DialogEngine(ILogger logger,IEventAggregator _eventAggregator, IMP3Player player)
+        public DialogEngine(ILogger logger,IEventAggregator _eventAggregator, IMP3Player player,ICharacterSelection _characterSelection,
+            ICharacterRepository _characterRepository,IDialogModelRepository _dialogModelRepository)
         {
             mLogger = logger;
             mEventAggregator = _eventAggregator;
             mPlayer = player;
+            mCharacterSelection = _characterSelection;
+            mCharacterRepository = _characterRepository;
+            mDialogModelRepository = _dialogModelRepository;
 
             mWorkflow = new DialogEngineWorkflow(() => { });
 
@@ -65,7 +73,6 @@ namespace DialogGenerator.DialogEngine
 
         private void _subscribeForEvents()
         {
-            //EventAggregator.Instance.GetEvent<DialogDataLoadedEvent>().Subscribe(_onDialogDataLoaded);
             //EventAggregator.Instance.GetEvent<DialogModelChangedEvent>().Subscribe(_onDialogModelChanged);
             mEventAggregator.GetEvent<SelectedCharactersPairChangedEvent>().Subscribe(_onSelectedCharactersPairChanged);
             //EventAggregator.Instance.GetEvent<ChangedCharactersStateEvent>().Subscribe(_onChangedCharacterState);
@@ -77,6 +84,17 @@ namespace DialogGenerator.DialogEngine
 
         private void _sessionPropertyChanged(object sender, System.ComponentModel.PropertyChangedEventArgs e)
         {
+            switch (e.PropertyName)
+            {
+                case Constants.SELECTED_DLG_MODEL:
+                    {
+                        break;
+                    }
+                case Constants.FORCED_CH_COUNT:
+                    {
+                        break;
+                    }
+            }
         }
 
         private void _mWorkflow_PropertyChanged(object sender, System.ComponentModel.PropertyChangedEventArgs e)
@@ -95,55 +113,34 @@ namespace DialogGenerator.DialogEngine
                 mCharacter1Num = obj.Character1Index;
                 mCharacter2Num = obj.Character2Index;
 
-                if (mCurrentState != States.Idle)
+                if (mCurrentState != States.PreparingDialogParameters)
                 {
                     mStateMachineTaskTokenSource.Cancel();
-                    mWorkflow.Fire(Triggers.WaitForNewCharacters);
+                    mWorkflow.Fire(Triggers.PrepareDialogParameters);
                 }
-
-                mEventWaitHandle.Set();
             }
             else
             {
                 mRandomSelectionDataCached = obj;
-
-                if (mCurrentState == States.Idle)
-                {
-                    mEventWaitHandle.Set();
-                }
             }
         }
 
         private void _configureWorkflow()
         {
             mWorkflow.Configure(States.Start)
-                .Permit(Triggers.Initialize, States.Init);
-
-            mWorkflow.Configure(States.Init)
-                .OnEntry(t => _initialize())
-                .Permit(Triggers.WaitForNewCharacters, States.Idle);
-
-            mWorkflow.Configure(States.Idle)
-                .Permit(Triggers.PrepareDialogParameters, States.PreparingDialogParameters)
-                .Permit(Triggers.FinishDialog, States.DialogFinished);
-
-            mWorkflow.Configure(States.GenerateADialog)
-                .Permit(Triggers.WaitForNewCharacters, States.Idle)
-                .Permit(Triggers.FinishDialog, States.DialogFinished);
+                .Permit(Triggers.PrepareDialogParameters, States.PreparingDialogParameters);
 
             mWorkflow.Configure(States.PreparingDialogParameters)
-                .SubstateOf(States.GenerateADialog)
-                .Permit(Triggers.WaitForNewCharacters, States.Idle)
+                .PermitReentry(Triggers.PrepareDialogParameters)
                 .Permit(Triggers.StartDialog, States.DialogStarted)
                 .Permit(Triggers.FinishDialog, States.DialogFinished);
 
             mWorkflow.Configure(States.DialogStarted)
-                .SubstateOf(States.GenerateADialog)
-                .Permit(Triggers.WaitForNewCharacters, States.Idle)
+                .Permit(Triggers.PrepareDialogParameters, States.PreparingDialogParameters)
                 .Permit(Triggers.FinishDialog, States.DialogFinished);
 
             mWorkflow.Configure(States.DialogFinished)
-                .Permit(Triggers.WaitForNewCharacters, States.Idle);
+                .Permit(Triggers.PrepareDialogParameters, States.PreparingDialogParameters);
         }
 
         #endregion
@@ -167,36 +164,6 @@ namespace DialogGenerator.DialogEngine
         #endregion
 
         #region - private functions -
-
-        private void _initialize()
-        {
-            var _dialogModelInfoList = Session.Get<ObservableCollection<ModelDialogInfo>>(Constants.DIALOG_MODELS);
-            mCharactersList = Session.Get<ObservableCollection<Character>>(Constants.CHARACTERS);
-            mCharactersList.CollectionChanged += _charactersList_CollectionChanged;
-
-            foreach (ModelDialogInfo _modelDialogInfo in _dialogModelInfoList)
-            {
-                mDialogModelPopularitySum += _modelDialogInfo.ArrayOfDialogModels.Sum(_modelDialogItem => _modelDialogItem.Popularity);
-
-                foreach (ModelDialog _dialogModel in _modelDialogInfo.ArrayOfDialogModels)
-                {
-                    mDialogModelsList.Add(_dialogModel);
-                }
-            }
-
-            foreach (Character character in mCharactersList)
-            {
-                _initializeCharacter(character);
-            }
-
-            // Fill the queue with greeting dialogs
-            for (var _i = 0; _i < DialogEngineConstants.RecentDialogsQueSize; _i++)
-            {
-                mRecentDialogs.Enqueue(0); // Fill the que with greeting dialogs
-            }
-        }
-
-
 
         private void _initializeCharacter(Character character)
         {
@@ -256,14 +223,12 @@ namespace DialogGenerator.DialogEngine
                     bool _isPlaying = false;
                     Thread.Sleep(300);
 
-                   // Dispatcher.Invoke(() => {
-                        var _playSuccess = mPlayer.Play(_pathAndFileName);
+                    var _playSuccess = mPlayer.Play(_pathAndFileName);
 
-                        if (_playSuccess != 0)
-                        {
-                            AddItem(new ErrorMessage("MP3 Play Error  ---  " + _playSuccess));
-                        }
-                    //});
+                    if (_playSuccess != 0)
+                    {
+                        AddItem(new ErrorMessage("MP3 Play Error  ---  " + _playSuccess));
+                    }
 
                     do
                     {
@@ -276,12 +241,12 @@ namespace DialogGenerator.DialogEngine
                     }
                     while (_isPlaying && i < 400);  // don't get stuck,, 40 seconds max phrase
 
-                    Thread.Sleep(800); // wait around a second after the audio is done for between phrase pause
+                    Thread.Sleep(Session.Get<int>(Constants.DIALOG_SPEED)); // wait around a second after the audio is done for between phrase pause
                 }
                 else
                 {
                     AddItem(new ErrorMessage("Could not find: " + _pathAndFileName));
-                    Thread.Sleep(3000);
+                    Thread.Sleep(Session.Get<int>(Constants.DIALOG_SPEED));
                 }
             }
             catch (Exception ex)
@@ -649,12 +614,6 @@ namespace DialogGenerator.DialogEngine
             return false;
         }
 
-        private Triggers _waitForNewCharacters()
-        {
-            // TODO dead code we no longer want to wait for new characters return next state at once
-            return Triggers.PrepareDialogParameters;
-        }
-
 
         private Triggers _prepareDialogParameters(CancellationToken token)
         {
@@ -663,11 +622,11 @@ namespace DialogGenerator.DialogEngine
                 token.ThrowIfCancellationRequested();
 
                 if (!_setNextCharacters())
-                    return Triggers.WaitForNewCharacters;
+                    return Triggers.PrepareDialogParameters;
 
                 token.ThrowIfCancellationRequested();
 
-                mIndexOfCurrentDialogModel = mIsForcedDialogModel ?
+                mIndexOfCurrentDialogModel = Session.Get<int>(Constants.SELECTED_DLG_MODEL) >= 0?
                                              mIndexOfCurrentDialogModel
                                             : _pickAWeightedDialog();
 
@@ -679,13 +638,13 @@ namespace DialogGenerator.DialogEngine
 
                 return Triggers.StartDialog;
             }
-            catch (OperationCanceledException ex) { }
+            catch (OperationCanceledException) { }
             catch (Exception ex)
             {
                 mLogger.Error("_prepareDialogParameters " + ex.Message);
             }
 
-            return Triggers.WaitForNewCharacters;
+            return Triggers.PrepareDialogParameters;
         }
 
 
@@ -695,8 +654,12 @@ namespace DialogGenerator.DialogEngine
             {
                 var _speakingCharacter = mCharacter1Num;
                 var _selectedPhrase = mCharactersList[_speakingCharacter].Phrases[0]; //initialize to unused placeholder phrase
+
                 mLogger.Debug("_startDialog " + mCharactersList[mCharacter1Num].CharacterPrefix + " and " +
                     mCharactersList[mCharacter2Num].CharacterPrefix + " " + mDialogModelsList[mIndexOfCurrentDialogModel].Name);
+
+                mEventAggregator.GetEvent<ActiveCharactersEvent>().
+                    Publish($" {mCharactersList[mCharacter1Num].CharacterName} , {mCharactersList[mCharacter2Num].CharacterName} ");
 
                 foreach (var _currentPhraseType in mDialogModelsList[mIndexOfCurrentDialogModel].PhraseTypeSequence)
                 {
@@ -729,7 +692,7 @@ namespace DialogGenerator.DialogEngine
                         {
                             mEventAggregator.GetEvent<NewDialogLineEvent>().Publish(new NewDialogLineEventArgs
                             {
-                                CharacterName = mCharactersList[_speakingCharacter].CharacterName,
+                                Character = mCharactersList[_speakingCharacter],
                                 DialogLine = _selectedPhrase.DialogStr
                             });
                         }
@@ -738,9 +701,9 @@ namespace DialogGenerator.DialogEngine
 
                         _addPhraseToHistory(_selectedPhrase, _speakingCharacter);
 
-                        var _pathAndFileName = ApplicationData.Instance.AudioDirectory
-                                              + mCharactersList[_speakingCharacter].CharacterPrefix
-                                              + "_" + _selectedPhrase.FileName + ".mp3";
+                        var _pathAndFileName = Path.Combine(ApplicationData.Instance.AudioDirectory,
+                                               mCharactersList[_speakingCharacter].CharacterPrefix
+                                              + "_" + _selectedPhrase.FileName + ".mp3");
                         Debug.WriteLine(_selectedPhrase.DialogStr + " started");
                         _playAudio(_pathAndFileName); // vb: code stops here so commented out for debugging purpose
 
@@ -749,7 +712,7 @@ namespace DialogGenerator.DialogEngine
                         //&& DialogViewModel.NumberOfCharactersSetToOn == 0)
                         {
                             mSameCharactersAsLast = false;
-                            return Triggers.WaitForNewCharacters; // the characters have moved  TODO break into charactersSame() and use also with prior
+                            return Triggers.PrepareDialogParameters; // the characters have moved  TODO break into charactersSame() and use also with prior
                         }
                         //Toggle character
                         if (_speakingCharacter == mCharacter1Num) //toggle which character is speaking next
@@ -776,19 +739,49 @@ namespace DialogGenerator.DialogEngine
                 mLogger.Error("_startDialog " + ex.Message);
             }
 
-            return Triggers.WaitForNewCharacters;
+            return Triggers.PrepareDialogParameters;
         }
 
         #endregion
 
         #region - public functions -
 
+        public void Initialize()
+        {
+            var _dialogModelInfoList = mDialogModelRepository.GetAll();
+            mCharactersList = mCharacterRepository.GetAll();
+            mCharactersList.CollectionChanged += _charactersList_CollectionChanged;
+
+            foreach (ModelDialogInfo _modelDialogInfo in _dialogModelInfoList)
+            {
+                mDialogModelPopularitySum += _modelDialogInfo.ArrayOfDialogModels.Sum(_modelDialogItem => _modelDialogItem.Popularity);
+
+                foreach (ModelDialog _dialogModel in _modelDialogInfo.ArrayOfDialogModels)
+                {
+                    mDialogModelsList.Add(_dialogModel);
+                }
+            }
+
+            foreach (Character character in mCharactersList)
+            {
+                _initializeCharacter(character);
+            }
+
+            // Fill the queue with greeting dialogs
+            for (var _i = 0; _i < DialogEngineConstants.RecentDialogsQueSize; _i++)
+            {
+                mRecentDialogs.Enqueue(0); // Fill the que with greeting dialogs
+            }
+        }
+
         public Task StartDialogEngine()
         {
+            mCharacterSelection.StartCharacterSelection();
+
             mCancellationTokenSource = new CancellationTokenSource();
 
-            if (mCurrentState != States.Idle)
-                mWorkflow.Fire(Triggers.WaitForNewCharacters);
+            if (mCurrentState != States.PreparingDialogParameters)
+                mWorkflow.Fire(Triggers.PrepareDialogParameters);
 
             return Task.Run(() => {
 
@@ -800,16 +793,9 @@ namespace DialogGenerator.DialogEngine
 
                     switch (mWorkflow.State)
                     {
-                        case States.Idle:
-                            {
-                                Triggers _nextTrigger = _waitForNewCharacters();
-                                if (mWorkflow.CanFire(_nextTrigger))
-                                    mWorkflow.Fire(_nextTrigger);
-                                break;
-                            }
                         case States.PreparingDialogParameters:
                             {
-                                Triggers _nextTrigger =  _prepareDialogParameters(mStateMachineTaskTokenSource.Token);
+                                Triggers _nextTrigger = _prepareDialogParameters(mStateMachineTaskTokenSource.Token);
                                 if (mWorkflow.CanFire(_nextTrigger))
                                     mWorkflow.Fire(_nextTrigger);
                                 break;
@@ -829,6 +815,13 @@ namespace DialogGenerator.DialogEngine
 
         public void StopDialogEngine()
         {
+            //stop .mp3 player if playing
+            mEventAggregator.GetEvent<StopImmediatelyPlayingCurrentDialogLIne>().Publish();
+
+            // stop character selection
+            mCharacterSelection.StopCharacterSelection();
+
+            mStateMachineTaskTokenSource.Cancel();
             mCancellationTokenSource.Cancel();
 
             if (mCurrentState != States.DialogFinished)

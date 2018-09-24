@@ -160,11 +160,18 @@ namespace DialogGenerator.Utilities
         {
             try
             {
-                Debug.WriteLine(Player.Position.TotalSeconds);
+                //Debug.WriteLine(Player.Position.TotalSeconds);
                 if (mIsLoaded)
                 {
-                    return Player.Position.TotalSeconds < mDuration
-                           && !mIsPlayingStopped;
+                    bool _isPlaying = false;
+                    Player.Dispatcher.Invoke(() =>
+                    {
+                        _isPlaying = Player.Position.TotalSeconds < mDuration
+                                     && !mIsPlayingStopped;
+                    });
+
+                    return _isPlaying;
+
                 }
                 else
                 {
@@ -184,14 +191,18 @@ namespace DialogGenerator.Utilities
         {
             try
             {
+                
                 mIsPlayingStopped = false;
                 mIsLoaded = false;
                 mTimer.Change(Timeout.Infinite, Timeout.Infinite);
                 mVolumeTimer.Change(Timeout.Infinite, Timeout.Infinite);
 
-                Player.Volume = 0.8;
-                Player.Open(new Uri(path));
-                Player.Play();
+                Player.Dispatcher.Invoke(() =>
+                {
+                    Player.Volume = 0.8;
+                    Player.Open(new Uri(path));
+                    Player.Play();
+                });
 
                 mLogger.Debug(path);
                 mStartedTime = DateTime.Now.TimeOfDay;

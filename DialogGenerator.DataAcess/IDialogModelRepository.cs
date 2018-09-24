@@ -7,6 +7,8 @@ namespace DialogGenerator.DataAccess
     {
         ObservableCollection<ModelDialogInfo> GetAll();
 
+        ObservableCollection<ModelDialogInfo> GetAll(string _fileName);
+        
         ModelDialogInfo GetByName(string name);
     }
 }

@@ -6,5 +6,7 @@ namespace DialogGenerator.DialogEngine
     {
         Task StartDialogEngine();
         void StopDialogEngine();
+
+        void Initialize();
     }
 }

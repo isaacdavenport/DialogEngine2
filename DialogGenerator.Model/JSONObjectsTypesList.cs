@@ -1,4 +1,5 @@
 ﻿using Newtonsoft.Json;
+using System.Collections.Generic;
 using System.Collections.ObjectModel;
 
 namespace DialogGenerator.Model
@@ -6,7 +7,7 @@ namespace DialogGenerator.Model
     public class JSONObjectsTypesList
     {
         [JsonProperty("Wizards")]
-        public ObservableCollection<Wizard> Wizards { get; set; } = new ObservableCollection<Wizard>();
+        public List<Wizard> Wizards { get; set; } = new List<Wizard>();
 
         [JsonProperty("Characters")]
         public ObservableCollection<Character> Characters { get; set; } = new ObservableCollection<Character>();

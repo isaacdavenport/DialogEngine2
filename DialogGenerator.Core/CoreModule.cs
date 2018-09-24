@@ -1,15 +1,22 @@
-﻿using Autofac;
+﻿using Microsoft.Practices.Unity;
+using Prism.Events;
+using Prism.Modularity;
 
 namespace DialogGenerator.Core
 {
-    public class CoreModule:Module
+    public class CoreModule:IModule
     {
-        protected override void Load(ContainerBuilder builder)
-        {
-            builder.RegisterType<Logger>().As<ILogger>()
-                .SingleInstance();
+        private IUnityContainer mContainer;
 
-            base.Load(builder);
+        public CoreModule(IUnityContainer container)
+        {
+            mContainer = container;
+        }
+
+        public void Initialize()
+        {
+            mContainer.RegisterType<ILogger,Logger>(new ContainerControlledLifetimeManager());
+            mContainer.RegisterType<IEventAggregator, EventAggregator>();
         }
     }
 }

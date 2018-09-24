@@ -7,9 +7,6 @@ namespace DialogGenerator.DialogEngine.Workflow
     public enum States
     {
         Start,
-        Init,
-        Idle,
-        GenerateADialog,
         PreparingDialogParameters,
         DialogStarted,
         DialogFinished
@@ -18,9 +15,6 @@ namespace DialogGenerator.DialogEngine.Workflow
     public enum Triggers
     {
         Start,
-        Initialize,
-        WaitForNewCharacters,
-        GenerateADialog,
         PrepareDialogParameters,
         StartDialog,
         FinishDialog

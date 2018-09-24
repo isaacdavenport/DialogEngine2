@@ -1,5 +1,7 @@
 ﻿using DialogGenerator.Core;
 using DialogGenerator.DataAccess;
+using DialogGenerator.Events;
+using DialogGenerator.Events.EventArgs;
 using DialogGenerator.Model.Enum;
 using Prism.Events;
 using System;
@@ -101,70 +103,79 @@ namespace DialogGenerator.CharacterSelection
 
             return Task.Run(() =>
             {
-                Thread.CurrentThread.Name = "OccasionallyChangeToRandNewCharacterAsyncThread";
+            Thread.CurrentThread.Name = "OccasionallyChangeToRandNewCharacterAsyncThread";
 
-                // used for computers with no serial input radio for random, or forceCharacter mode
-                // TODO is this still true?  does not include final character the silent schoolhouse, not useful in noSerial mode 
+            // used for computers with no serial input radio for random, or forceCharacter mode
+            // TODO is this still true?  does not include final character the silent schoolhouse, not useful in noSerial mode 
 
-                try
+            try
+            {
+                bool _isNewCharacterSelected;
+                DateTime _nextCharacterSwapTime = DateTime.Now;
+
+                while (true)
                 {
-                    bool _isNewCharacterSelected;
-                    DateTime _nextCharacterSwapTime = DateTime.Now;
+                    mCancellationTokenSource.Token.ThrowIfCancellationRequested();
 
-                    while (true)
+                    _isNewCharacterSelected = false;
+
+                    Thread.Sleep(1000);
+
+                    if (_nextCharacterSwapTime.CompareTo(DateTime.Now) < 0)
                     {
-                        mCancellationTokenSource.Token.ThrowIfCancellationRequested();
-
-                        _isNewCharacterSelected = false;
-
-                        Thread.Sleep(1000);
-
-                        if (_nextCharacterSwapTime.CompareTo(DateTime.Now) < 0)
+                        switch (Session.Get<int>(Constants.FORCED_CH_COUNT))
                         {
-                            switch (Session.Get<int>(Constants.FORCED_CH_COUNT))
-                            {
-                                case 0:
-                                    {
-                                        int _nextCharacter1Index = GetNextCharacter();
-                                        int _nextCharacter2Index = GetNextCharacter(_nextCharacter1Index >= 0 ? _nextCharacter1Index : NextCharacter1);
+                            case 0:
+                                {
+                                    int _nextCharacter1Index = GetNextCharacter();
+                                    int _nextCharacter2Index = GetNextCharacter(_nextCharacter1Index >= 0 ? _nextCharacter1Index : NextCharacter1);
 
-                                        NextCharacter1 = _nextCharacter1Index >= 0 ? _nextCharacter1Index : NextCharacter1; //lower bound inclusive, upper exclusive
-                                        NextCharacter2 = _nextCharacter2Index >= 0 ? _nextCharacter2Index : NextCharacter2; //lower bound inclusive, upper exclusive
+                                    NextCharacter1 = _nextCharacter1Index >= 0 ? _nextCharacter1Index : NextCharacter1; //lower bound inclusive, upper exclusive
+                                    NextCharacter2 = _nextCharacter2Index >= 0 ? _nextCharacter2Index : NextCharacter2; //lower bound inclusive, upper exclusive
 
-                                        _nextCharacterSwapTime = DateTime.Now.AddSeconds(4 + msRandom.Next(0, 2));
+                                    _nextCharacterSwapTime = DateTime.Now.AddSeconds(4 + msRandom.Next(0, 2));
 
-                                        _isNewCharacterSelected = true;
+                                    _isNewCharacterSelected = true;
 
-                                        break;
-                                    }
-                                case 1:
-                                    {
-                                        NextCharacter1 = Session.Get<int>(Constants.FORCED_CH_1);
-                                        int _nextCharacter2Index = GetNextCharacter(NextCharacter1);
+                                    break;
+                                }
+                            case 1:
+                                {
+                                    NextCharacter1 = Session.Get<int>(Constants.FORCED_CH_1);
+                                    int _nextCharacter2Index = GetNextCharacter(NextCharacter1);
 
-                                        NextCharacter2 = _nextCharacter2Index >= 0 ? _nextCharacter2Index : NextCharacter2;
+                                    NextCharacter2 = _nextCharacter2Index >= 0 ? _nextCharacter2Index : NextCharacter2;
 
-                                        _nextCharacterSwapTime = DateTime.Now.AddSeconds(4 + msRandom.Next(0, 2));
+                                    _nextCharacterSwapTime = DateTime.Now.AddSeconds(4 + msRandom.Next(0, 2));
 
-                                        _isNewCharacterSelected = true;
+                                    _isNewCharacterSelected = true;
 
-                                        break;
-                                    }
-                                default:
-                                    {
-                                        _nextCharacterSwapTime = DateTime.Now.AddSeconds(4 + msRandom.Next(0, 2));
-                                        _isNewCharacterSelected = false;
-                                        break;
-                                    }
-                            }
+                                    break;
+                                }
+                            default:
+                                {
+                                    _nextCharacterSwapTime = DateTime.Now.AddSeconds(4 + msRandom.Next(0, 2));
+                                    _isNewCharacterSelected = false;
+                                    break;
+                                }
                         }
+
+
+                    }
 
                         if (_isNewCharacterSelected)
                         {
+                                mEventAggregator.GetEvent<SelectedCharactersPairChangedEvent>().Publish(new SelectedCharactersPairEventArgs
+                                    {
+                                        Character1Index = NextCharacter1,
+                                        Character2Index = NextCharacter2
+                                    }
+                            );
+
                             Session.Set(Constants.NEXT_CH_1, NextCharacter1);
                             Session.Set(Constants.NEXT_CH_2, NextCharacter2);
                         }
-                    }
+                }
                 }
                 catch (OperationCanceledException ex)
                 {

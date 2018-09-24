@@ -12,6 +12,7 @@ namespace DialogGenerator.Model
     public class ModelDialogInfo:INotifyPropertyChanged
     {
         private ModelDialogState mState;
+        private int mSelectedModelDialogIndex=-1;
 
         [JsonProperty("ArrayOfDialogModels")]
         public List<ModelDialog> ArrayOfDialogModels { get; set; }
@@ -23,7 +24,15 @@ namespace DialogGenerator.Model
         /// Index of selected dialog model from dialog .json file
         /// </summary>
         [JsonIgnore]
-        public int SelectedModelDialogIndex { get; set; } = -1;
+        public int SelectedModelDialogIndex
+        {
+            get { return mSelectedModelDialogIndex; }
+            set
+            {
+                mSelectedModelDialogIndex = value;
+                OnPropertyChanged("SelectedModelDialogIndex");
+            }
+        }
 
         /// <summary>
         /// Represents state of dialog .json file

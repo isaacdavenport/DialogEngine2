@@ -1,5 +1,6 @@
 ﻿using DialogGenerator.Model;
 using System.Collections.ObjectModel;
+using System.Threading.Tasks;
 
 namespace DialogGenerator.DataAccess
 {
@@ -7,7 +8,11 @@ namespace DialogGenerator.DataAccess
     {
         ObservableCollection<Character> GetAll();
 
-        Character GetByName(string name);
-        void Add(Character character);
+        Character GetByInitials(string initials);
+        Task AddAsync(Character character);
+
+        Task SaveAsync(Character character);
+
+        Task Remove(Character character,string _imageFileName);
     }
 }

@@ -1,14 +1,20 @@
-﻿using Autofac;
+﻿using Microsoft.Practices.Unity;
+using Prism.Modularity;
 
 namespace DialogGenerator.DialogEngine
 {
-    public class DialogEngineModule:Module
+    public class DialogEngineModule:IModule
     {
-        protected override void Load(ContainerBuilder builder)
+        private IUnityContainer mContainer;
+
+        public DialogEngineModule(IUnityContainer container)
         {
-            builder.RegisterType<DialogEngine>().As<IDialogEngine>()
-                .SingleInstance();
-            base.Load(builder);
+            mContainer = container;
+        }
+
+        public void Initialize()
+        {
+            mContainer.RegisterType<IDialogEngine, DialogEngine>( new ContainerControlledLifetimeManager());
         }
     }
 }

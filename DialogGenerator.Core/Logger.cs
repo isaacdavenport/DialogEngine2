@@ -12,12 +12,10 @@ namespace DialogGenerator.Core
         private readonly ILog mcLogDialog = LogManager.GetLogger(ApplicationData.Instance.DialogLoggerKey);
         private readonly ILog mcDefaultLog = LogManager.GetLogger(ApplicationData.Instance.DefaultLoggerKey);
 
-
         public Logger()
         {
             XmlConfigurator.Configure(new FileInfo("log4net.config"));
         }
-
 
         // returns logger depends on type
         private ILog _getLogger(string type)

@@ -1,17 +1,22 @@
-﻿using Autofac;
+﻿using Microsoft.Practices.Unity;
+using Prism.Modularity;
 
 namespace DialogGenerator.DataAccess
 {
-    public class DataAccessModule:Module
+    public class DataAccessModule:IModule
     {
-        protected override void Load(ContainerBuilder builder)
-        {
-            builder.RegisterType<DialogDataRepository>().As<IDialogDataRepository>();
-            builder.RegisterType<CharacterRepository>().As<ICharacterRepository>();
-            builder.RegisterType<DialogModelRepository>().As<IDialogModelRepository>();
-            builder.RegisterType<WizardRepository>().As<IWizardRepository>();
+        private IUnityContainer mContainer;
 
-            base.Load(builder);
+        public DataAccessModule(IUnityContainer container)
+        {
+            mContainer = container;
+        }
+        public void Initialize()
+        {
+            mContainer.RegisterType<IDialogDataRepository, DialogDataRepository>();
+            mContainer.RegisterType<ICharacterRepository,CharacterRepository>();
+            mContainer.RegisterType<IDialogModelRepository,DialogModelRepository>();
+            mContainer.RegisterType<IWizardRepository,WizardRepository>();
         }
     }
 }

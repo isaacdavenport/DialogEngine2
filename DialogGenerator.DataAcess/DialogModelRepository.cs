@@ -12,6 +12,15 @@ namespace DialogGenerator.DataAccess
             return Session.Get<ObservableCollection<ModelDialogInfo>>(Constants.DIALOG_MODELS);
         }
 
+        public ObservableCollection<ModelDialogInfo> GetAll(string _fileName)
+        {
+            var result = GetAll().Where(dm => dm.FileName.Equals(_fileName))
+                .Select(dm => dm)
+                .OrderBy(dm => dm.JsonArrayIndex);
+
+            return  new ObservableCollection<ModelDialogInfo>(result);
+        }
+
         public ModelDialogInfo GetByName(string name)
         {
             var _dialogModelInfo = Session.Get<ObservableCollection<ModelDialogInfo>>(Constants.DIALOG_MODELS)

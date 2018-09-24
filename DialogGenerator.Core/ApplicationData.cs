@@ -19,6 +19,8 @@ namespace DialogGenerator.Core
         private string mVideoDirectory;
         private string mTutorialDirectory;
         private string mAudioDirectory;
+        private string mImagesDirectory;
+        private string mDeletedDirectory;
 
         static ApplicationData()
         {
@@ -95,6 +97,7 @@ namespace DialogGenerator.Core
         public string DecimaSeriallLoggerKey { get; set; } = "DecimalSerialLog";
         public string DialogLoggerKey { get; set; } = "LogDialog";
         public string DefaultLoggerKey { get; set; } = "DefaultLog";
+        public string DefaultImage { get; set; } = "avatar.png";
 
         public int NumberOfRadios { get; set; } = 6;
 
@@ -214,5 +217,18 @@ namespace DialogGenerator.Core
             }
         }
 
+        [XmlIgnore]
+        public string ImagesDirectory
+        {
+            get
+            {
+                if (string.IsNullOrEmpty(mImagesDirectory))
+                {
+                    mImagesDirectory = Path.Combine(Instance.RootDirectory, "Images");
+                }
+
+                return mImagesDirectory;
+            }
+        }
     }
 }

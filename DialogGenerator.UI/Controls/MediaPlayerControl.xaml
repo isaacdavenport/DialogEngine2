@@ -1,0 +1,79 @@
+﻿<UserControl x:Class="DialogGenerator.UI.Controls.MediaPlayerControl"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
+             xmlns:local="clr-namespace:DialogGenerator.UI.Controls"
+             xmlns:materialDesign="http://materialdesigninxaml.net/winfx/xaml/themes"
+             xmlns:covnerters="clr-namespace:DialogGenerator.UI.Converters"
+             mc:Ignorable="d" 
+             d:DesignHeight="450" d:DesignWidth="800">
+
+    <UserControl.Resources>
+        <ResourceDictionary>
+            <covnerters:IsMediaPlayerPlayBtnEnabledValueConverter x:Key="IsMediaPlayerPlayBtnEnabledValueConverter" />
+            <covnerters:IsMediaPlayerStopBtnEnabledValueConverter x:Key="IsMediaPlayerStopBtnEnabledValueConverter" />
+        </ResourceDictionary>
+    </UserControl.Resources>
+    <Grid HorizontalAlignment="Stretch" VerticalAlignment="Stretch" Background="#FF595959">
+        <Grid.RowDefinitions>
+            <RowDefinition Height="*" />
+            <RowDefinition Height="auto"/>
+        </Grid.RowDefinitions>
+
+        <Border Grid.Row="0" Background="#FF333333" CornerRadius="2,2,2,2" BorderThickness="0" Margin="2,2,2,2">
+            <MediaElement   x:Name="VideoPlayer" Stretch="Fill" LoadedBehavior="Manual" ScrubbingEnabled="True"
+                            Source="{Binding Path=FilePath, RelativeSource={RelativeSource Mode=FindAncestor, AncestorType={x:Type UserControl}}}"
+                            HorizontalAlignment="Stretch" VerticalAlignment="Stretch"  />
+        </Border>
+
+        <Grid Grid.Row="1">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="auto" />
+                <ColumnDefinition Width="*" />
+            </Grid.ColumnDefinitions>
+
+            <StackPanel x:Name="ToolbarSP"
+                    Grid.Row="1"
+                    Orientation="Horizontal"
+                    Visibility="Visible"
+                    Background="#FF595959"
+                    HorizontalAlignment="Stretch" 
+                    VerticalAlignment="Bottom">
+                <Button Width="25"
+                    x:Name="StartBtn"
+                    Height="25"
+                    IsEnabled="{Binding State,RelativeSource={RelativeSource Mode=FindAncestor, AncestorType=local:MediaPlayerControl},
+                                              Converter={StaticResource IsMediaPlayerPlayBtnEnabledValueConverter}, ConverterParameter=ReadyForUserAction}"
+                    Command="{Binding StartVideoCommand}"
+                    Margin="10,10,10,10">
+                    <Button.Content>
+                        <materialDesign:PackIcon Kind="Play" />
+                    </Button.Content>
+                </Button>
+                <Button Width="25" 
+                    Height="25"
+                    Command="{Binding PauseVideoCommand}"
+                    Margin="10,10,10,10">
+                    <Button.Content>
+                        <materialDesign:PackIcon Kind="Pause" />
+                    </Button.Content>
+                    <Button.IsEnabled>
+                        <MultiBinding Converter="{StaticResource IsMediaPlayerStopBtnEnabledValueConverter}" ConverterParameter="VideoPlayerPlaying">
+                            <Binding  Path="State" 
+                                      RelativeSource="{RelativeSource Mode=FindAncestor, AncestorType=local:MediaPlayerControl}" />
+                            <Binding Path="IsPlaying" />
+                        </MultiBinding>
+                    </Button.IsEnabled>
+                </Button>
+            </StackPanel>
+
+            <!--<Slider VerticalAlignment="Center"
+                x:Name="VideoPlayerSlider"
+                Grid.Column="1"
+                HorizontalAlignment="Stretch"
+                Margin="10,0,10,0"
+                IsMoveToPointEnabled="False" />-->
+        </Grid>
+    </Grid>
+</UserControl>

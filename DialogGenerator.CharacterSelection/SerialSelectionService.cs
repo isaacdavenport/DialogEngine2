@@ -2,14 +2,11 @@
 using DialogGenerator.CharacterSelection.Model.Exceptions;
 using DialogGenerator.CharacterSelection.Workflow;
 using DialogGenerator.Core;
+using DialogGenerator.DataAccess;
 using DialogGenerator.Events;
 using DialogGenerator.Events.EventArgs;
-using DialogGenerator.Model;
-using DialogGenerator.UI.View.Dialogs;
-using DialogGenerator.UI.View.Services;
 using Prism.Events;
 using System;
-using System.Collections.ObjectModel;
 using System.IO;
 using System.IO.Ports;
 using System.Linq;
@@ -25,7 +22,8 @@ namespace DialogGenerator.CharacterSelection
 
         private ILogger mLogger;
         private IEventAggregator mEventAggregator;
-        private IMessageDialogService mDialogService;
+        //private IMessageDialogService mDialogService;
+        private ICharacterRepository mCharacterRepository;
         public const int StrongRssiBufDepth = 12;
         private int mTempCh1;
         private int mRowNum;
@@ -51,11 +49,12 @@ namespace DialogGenerator.CharacterSelection
 
         #region - constructor -
 
-        public SerialSelectionService(ILogger logger,IEventAggregator _eventAggregator,IMessageDialogService _dialogService)
+        public SerialSelectionService(ILogger logger,IEventAggregator _eventAggregator,ICharacterRepository _characterRepository)
         {
             mLogger = logger;
             mEventAggregator = _eventAggregator;
-            mDialogService = _dialogService;
+            //mDialogService = _dialogService;
+            mCharacterRepository = _characterRepository;
             mWorkflow = new SerialSelectionWorkflow(() => { });
 
             _configureWorkflow();
@@ -69,7 +68,6 @@ namespace DialogGenerator.CharacterSelection
 
         private void _heatMapUpdateTimer_Tick(object sender, EventArgs e)
         {
-            throw new NotImplementedException();
         }
 
 
@@ -182,32 +180,36 @@ namespace DialogGenerator.CharacterSelection
 
         private  Triggers _usbDisconectedError()
         {
-            var result = mDialogService.ShowOKCancelDialog("USB disconected.Please check connection and try again.",
-                "Error","Try again","Finish dialog");
+            //var result = mDialogService.ShowOKCancelDialog("USB disconected.Please check connection and try again.",
+            //    "Error","Try again","Finish dialog");
 
-            if (result == MessageDialogResult.OK)
-                return Triggers.Initialize;
-            else
+            //if (result == MessageDialogResult.OK)
+            //    return Triggers.Initialize;
+            //else
             {
                 StopCharacterSelection();
 
                 return Triggers.Finish;
             }
+
+            
         }
 
 
         private Triggers _serialPortError()
         {
-            var result = mDialogService.ShowDedicatedDialog(DialogConstants.COM_PORT_ERROR_DLG);
+            //var result = mDialogService.ShowDedicatedDialog(DialogConstants.COM_PORT_ERROR_DLG);
 
-            if (result == MessageDialogResult.OK)
-            {
-                return Triggers.Initialize;
-            }
-            else
-            {
-                return Triggers.Start;
-            }
+            //if (result == MessageDialogResult.OK)
+            //{
+            //    return Triggers.Initialize;
+            //}
+            //else
+            //{
+            //    return Triggers.Start;
+            //}
+
+            return Triggers.Start;
         }
 
 
@@ -313,7 +315,7 @@ namespace DialogGenerator.CharacterSelection
                 // if we find character return its index , or throw exception if there is no character with 
                 //specified radio assigned.  First() - throws exception if no items found
                 // FirstOrDefault() - returns first value or default value (for reference type it is null)
-                int index = Session.Get<ObservableCollection<Character>>(Constants.CHARACTERS)
+                int index = mCharacterRepository.GetAll()
                     .Select((c, i) => new { Character = c, Index = i })
                     .Where(x => x.Character.RadioNum == _radioNum)
                     .Select(x => x.Index)

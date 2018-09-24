@@ -1,0 +1,93 @@
+﻿<UserControl x:Class="DialogGenerator.UI.Views.MenuView"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             xmlns:materialDesign="http://materialdesigninxaml.net/winfx/xaml/themes"
+             xmlns:prism="http://prismlibrary.com/"            
+             prism:ViewModelLocator.AutoWireViewModel="True"
+             xmlns:view="clr-namespace:DialogGenerator.UI.Views"
+             xmlns:inf="clr-namespace:DialogGenerator.Infrastructure;assembly=DialogGenerator.Infrastructure"
+             xmlns:converters="clr-namespace:DialogGenerator.UI.Converters"
+             mc:Ignorable="d"
+             d:DesignHeight="450" d:DesignWidth="800">
+    <UserControl.Resources>
+        <ResourceDictionary>
+            <converters:CloneValuesConverter x:Key="CloneValuesConverter" />
+        </ResourceDictionary>
+    </UserControl.Resources>
+    
+    <Grid >
+        <Menu  FontSize="13" Height="40" Grid.Row="0"  VerticalContentAlignment="Center" Background="LightGray">
+            <Menu.ItemsPanel>
+                <ItemsPanelTemplate>
+                    <DockPanel HorizontalAlignment="Stretch" />
+                </ItemsPanelTemplate>
+            </Menu.ItemsPanel>
+
+            <MenuItem Header="_View" VerticalAlignment="Center">
+                <MenuItem Header="_Show characters" 
+                          Command="NavigationCommands.GoToPage">
+                    <MenuItem.CommandParameter>
+                        <MultiBinding Converter="{StaticResource CloneValuesConverter}">
+                            <Binding Source="{x:Static inf:RegionNames.NavigationRegion}" />
+                            <Binding Source="{x:Type view:CharactersNavigationView}" />
+                        </MultiBinding>
+                    </MenuItem.CommandParameter>
+                </MenuItem>
+
+                <MenuItem Header="_Show dialog models"                        
+                          Command="NavigationCommands.GoToPage">
+                    <MenuItem.CommandParameter>
+                        <MultiBinding Converter="{StaticResource CloneValuesConverter}">
+                            <Binding Source="{x:Static inf:RegionNames.NavigationRegion}"/>
+                            <Binding Source="{x:Type view:DialogModelsNavigationView}" />
+                        </MultiBinding>
+                    </MenuItem.CommandParameter>
+                </MenuItem>
+            </MenuItem>
+
+            <MenuItem Header="_Tools" VerticalAlignment="Center">
+                <MenuItem Header="_Settings" Command="{Binding OpenSettingsDialogCommand}">
+                    <MenuItem.Icon>
+                        <materialDesign:PackIcon Kind="Settings" />
+                    </MenuItem.Icon>
+                </MenuItem>
+            </MenuItem>
+
+            <MenuItem Header="_Tutorial" VerticalAlignment="Center">
+                <MenuItem Header="_Read tutorial" Command="{Binding ReadTutorialCommand}">
+                    <MenuItem.Icon>
+                        <materialDesign:PackIcon Kind="MessageTextOutline" />
+                    </MenuItem.Icon>
+                </MenuItem>
+
+                <MenuItem IsEnabled="False" Header="_Video tutorial" >
+                    <MenuItem.Icon>
+                        <materialDesign:PackIcon Kind="Video" />
+                    </MenuItem.Icon>
+                </MenuItem>
+            </MenuItem>
+
+            <MenuItem Header="_Help" VerticalAlignment="Center">
+                <MenuItem IsEnabled="False" Header="_Report a problem">
+                    <MenuItem.Icon>
+                        <materialDesign:PackIcon Kind="Help" />
+                    </MenuItem.Icon>
+                </MenuItem>
+                <MenuItem Header="_About Toys2Life" Command="{Binding AboutToys2LifeCommand}">
+                    <MenuItem.Icon>
+                        <materialDesign:PackIcon Kind="InformationOutline" />
+                    </MenuItem.Icon>
+                </MenuItem>
+            </MenuItem>
+
+            <MenuItem HorizontalAlignment="Right" VerticalAlignment="Center"  HorizontalContentAlignment="Center"  VerticalContentAlignment="Center">
+                <MenuItem.Icon>
+                    <materialDesign:PackIcon Height="15" Width="15" HorizontalAlignment="Center" Padding="0" Margin="0" VerticalAlignment="Center"  Kind="Settings" />
+                </MenuItem.Icon>
+                <MenuItem Header="_Settings" Command="{Binding OpenSettingsDialogCommand}" />
+            </MenuItem>
+        </Menu>
+    </Grid>
+</UserControl>
