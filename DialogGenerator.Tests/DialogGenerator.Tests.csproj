@@ -74,6 +74,8 @@
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>
+    <Folder Include="CharacterSelection\" />
+    <Folder Include="DataAccess\" />
     <Folder Include="UI\ViewModel\" />
   </ItemGroup>
   <ItemGroup>

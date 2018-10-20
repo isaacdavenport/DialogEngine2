@@ -2,6 +2,15 @@
 {
     public static class Constants
     {
+        // region names
+
+        public static string MenuRegion = "MenuRegion";
+        public static string StatusBarRegion = "StatusBarRegions";
+        public static string NavigationRegion = "NavigationRegion";
+        public static string ContentRegion = "ContentRegion";
+
+        // session constants
+
         public const string CHARACTERS = "Characters";
         public const string DIALOG_MODELS = "DialogModels";
         public const string WIZARDS = "Wizards";

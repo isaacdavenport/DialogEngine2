@@ -1,12 +1,11 @@
 ﻿using DialogGenerator.Core;
-using DialogGenerator.Infrastructure;
 using DialogGenerator.Model;
 using DialogGenerator.UI.Controls.VoiceRecorder;
 using DialogGenerator.UI.Data;
 using DialogGenerator.UI.Views;
 using DialogGenerator.UI.Views.Dialogs;
-using DialogGenerator.UI.Views.Services;
 using DialogGenerator.UI.Workflow.WizardWorkflow;
+using DialogGenerator.Utilities;
 using Prism.Commands;
 using Prism.Mvvm;
 using Prism.Regions;
@@ -374,8 +373,8 @@ namespace DialogGenerator.UI.ViewModels
 
         private void _goBackToDialog()
         {
-            mRegionManager.RequestNavigate(RegionNames.NavigationRegion, typeof(CharactersNavigationView).FullName);
-            var _contentRegion = mRegionManager.Regions[RegionNames.ContentRegion];
+            mRegionManager.RequestNavigate(Constants.NavigationRegion, typeof(CharactersNavigationView).FullName);
+            var _contentRegion = mRegionManager.Regions[Constants.ContentRegion];
             _contentRegion.NavigationService.Journal.GoBack();
 
             Reset();
@@ -463,7 +462,7 @@ namespace DialogGenerator.UI.ViewModels
             {
                 CurrentWizard = mWizardDataProvider.GetByIndex(result.Value);
 
-                Character = mRegionManager.Regions[RegionNames.ContentRegion].Context as Character;
+                Character = mRegionManager.Regions[Constants.ContentRegion].Context as Character;
 
                 _setDataForTutorialStep(CurrentStepIndex);
 

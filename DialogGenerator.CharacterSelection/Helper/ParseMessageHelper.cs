@@ -12,7 +12,7 @@ namespace DialogGenerator.CharacterSelection.Helper
     {
         #region - Fields -
 
-        public static List<ReceivedMessage> ReceivedMessages = new List<ReceivedMessage>();
+        public static List<ReceivedMessage> ReceivedMessages = new List<ReceivedMessage>();  
 
         #endregion
 
@@ -77,17 +77,17 @@ namespace DialogGenerator.CharacterSelection.Helper
                 {
                     if (Session.Get<Dictionary<int,Character>>(Constants.CH_RADIO_RELATIONSHIP)[_rowNum]!= null)
                     {
-                        SerialSelectionService.HeatMap[_rowNum, _k] = _newRow[_k];
+                        BLESelectionService.HeatMap[_rowNum, _k] = _newRow[_k];
                     }
                     else
                     {
-                        SerialSelectionService.HeatMap[_rowNum, _k] = 0;
+                        BLESelectionService.HeatMap[_rowNum, _k] = 0;
                     }
                 }
 
                 var _currentDateTime = DateTime.Now;
 
-                SerialSelectionService.CharactersLastHeatMapUpdateTime[_rowNum] = _currentDateTime;
+                BLESelectionService.CharactersLastHeatMapUpdateTime[_rowNum] = _currentDateTime;
 
                 _addMessageToReceivedBuffer(_rowNum, _newRow, _currentDateTime);
             }
@@ -106,18 +106,39 @@ namespace DialogGenerator.CharacterSelection.Helper
                 // rssiRow also has seqNum from FW at end
                 int _rowNumber = -1;
 
-                if (_message.StartsWith("ff") && _message.Contains("a5") && _message.Length == 19)
+                if (_message.IndexOf("a5",StringComparison.OrdinalIgnoreCase) < 0)
+                    return _rowNumber;
+
+                if (_message.StartsWith(CharacterSelectionConstants.WIN_BLE))
                 {
-                    for (int _i = 0; _i < ApplicationData.Instance.NumberOfRadios; _i++)
+                    string[] parts = _message.Split(':')[1].Split('-');
+
+                    if (parts.Count() < ApplicationData.Instance.NumberOfRadios)
+                        return _rowNumber;
+
+                    for(int i = 0; i < ApplicationData.Instance.NumberOfRadios; i++)
                     {
-                        string _subMessage = _message.Substring(_i * 2 + 2, 2);
-                        _rssiRow[_i] = int.Parse(_subMessage, System.Globalization.NumberStyles.HexNumber);
-                        if (_rssiRow[_i] == 0xFF) _rowNumber = _i;
+                        _rssiRow[i] = int.Parse(parts[i], System.Globalization.NumberStyles.HexNumber);
+
+                        if (_rssiRow[i] == 0xFF) _rowNumber = i;
+                    }
+
+                    _rssiRow[ApplicationData.Instance.NumberOfRadios] = int.Parse(parts.Last(), System.Globalization.NumberStyles.HexNumber);
+                }
+                else
+                {
+                    if (_message.Length != 19 || !_message.StartsWith("ff"))
+                        return _rowNumber;
+
+                    for (int i = 0; i < ApplicationData.Instance.NumberOfRadios; i++)
+                    {
+                        string _subMessage = _message.Substring(i * 2 + 2, 2);
+                        _rssiRow[i] = int.Parse(_subMessage, System.Globalization.NumberStyles.HexNumber);
+                        if (_rssiRow[i] == 0xFF) _rowNumber = i;
                     }
 
                     // The final int after the receiver for the PC, skipping "a5" key value is sequence number
                     _rssiRow[ApplicationData.Instance.NumberOfRadios] = int.Parse(_message.Substring(ApplicationData.Instance.NumberOfRadios * 2 + 4, 2), System.Globalization.NumberStyles.HexNumber);
-
                 }
 
                 //TODO uncomment

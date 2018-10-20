@@ -47,7 +47,6 @@ namespace DialogGenerator.DataAccess
 
         private JSONObjectsTypesList _findDataForFile(string _fileName)
         {
-
             var _jsonObjectsTypesList = new JSONObjectsTypesList
             {
                 Wizards = mWizardRepository.GetAll(_fileName),

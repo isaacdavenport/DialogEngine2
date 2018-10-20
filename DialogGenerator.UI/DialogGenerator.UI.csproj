@@ -62,6 +62,7 @@
     <Reference Include="NAudio, Version=1.8.4.0, Culture=neutral, processorArchitecture=MSIL">
       <HintPath>..\packages\NAudio.1.8.4\lib\net35\NAudio.dll</HintPath>
     </Reference>
+    <Reference Include="PresentationFramework.Aero" />
     <Reference Include="Prism, Version=6.3.0.0, Culture=neutral, PublicKeyToken=40ee6c3a2184dc59, processorArchitecture=MSIL">
       <HintPath>..\packages\Prism.Core.6.3.0\lib\net45\Prism.dll</HintPath>
     </Reference>
@@ -112,12 +113,19 @@
     <Compile Include="Controls\VoiceRecorder\NAudioEngine.cs" />
     <Compile Include="Controls\VoiceRecorder\SampleAggregator.cs" />
     <Compile Include="Converters\ActiveDialogModelBtnVisibilityValueConverter.cs" />
+    <Compile Include="Converters\AssignedCharacter2NameValueConverter.cs" />
+    <Compile Include="Converters\CharacterDataTemplateSelectorValueConverter.cs" />
     <Compile Include="Converters\CharacterGenderValueConverter.cs" />
     <Compile Include="Converters\CharacterRadioNumberToTextValueConverter.cs" />
     <Compile Include="Converters\CharacterStateToColorValueConverter.cs" />
     <Compile Include="Converters\CloneValuesConverter.cs" />
+    <Compile Include="Converters\DivideBy2ValueConverter.cs" />
+    <Compile Include="Converters\DollStatusColorValueConverter.cs" />
+    <Compile Include="Converters\DollStatusValueConverter.cs" />
     <Compile Include="Converters\ImageToFullPathValueConverter.cs" />
     <Compile Include="Converters\IncrementValueConverter.cs" />
+    <Compile Include="Converters\InvertValueConverter.cs" />
+    <Compile Include="Converters\InvertVisibilityValueConverter.cs" />
     <Compile Include="Converters\IsActiveModelDialogValueConverter.cs" />
     <Compile Include="Converters\IsEnabledCancelBtnConverter.cs" />
     <Compile Include="Converters\IsEnabledSaveAndNextBtnConverter.cs" />
@@ -125,14 +133,18 @@
     <Compile Include="Converters\IsMediaPlayerStopBtnEnabledValueConverter.cs" />
     <Compile Include="Converters\IsRecordingEnabledValueConverter.cs" />
     <Compile Include="Converters\IsSkipStepBtnEnabledConverter.cs" />
+    <Compile Include="Converters\IsDialogBtnVisibleValueConverter.cs" />
     <Compile Include="Converters\IsVoiceRecorderPlayingEnabledValueConverter.cs" />
     <Compile Include="Converters\ListBoxItemTextAndIndexValueConverter.cs" />
+    <Compile Include="Converters\MatrixCellValueToBackgroundColorConverter.cs" />
+    <Compile Include="Converters\MatrixToDataViewConverter.cs" />
     <Compile Include="Converters\ModelDialogStateToColorValueConverter.cs" />
     <Compile Include="Converters\IsPlayInContextEnabledValueConverter.cs" />
     <Compile Include="Converters\PlayInContextBtnContentValueConverter.cs" />
     <Compile Include="Converters\PlayStopChangeIconValueConverter.cs" />
     <Compile Include="Converters\RadioNumberToDisplayNameValueConverter.cs" />
     <Compile Include="Converters\SaveAndNextBtnContentConverter.cs" />
+    <Compile Include="Converters\StarWidthConverter.cs" />
     <Compile Include="Data\CharacterDataProvider.cs" />
     <Compile Include="Data\DialogModelDataProvider.cs" />
     <Compile Include="Data\ICharacterDataProvider.cs" />
@@ -143,6 +155,7 @@
     <Compile Include="ViewModels\AssignCharactersToDollsViewModel.cs" />
     <Compile Include="ViewModels\CharacterDetailViewModel.cs" />
     <Compile Include="ViewModels\CharactersNavigationViewModel.cs" />
+    <Compile Include="ViewModels\DebugViewModel.cs" />
     <Compile Include="ViewModels\DialogModelDetailViewModel.cs" />
     <Compile Include="ViewModels\DialogModelsNavigationViewModel.cs" />
     <Compile Include="ViewModels\DialogViewModel.cs" />
@@ -158,6 +171,7 @@
     <Compile Include="Views\CharacterDetailView.xaml.cs">
       <DependentUpon>CharacterDetailView.xaml</DependentUpon>
     </Compile>
+    <Compile Include="Views\CharactersDataTemplateSelector.cs" />
     <Compile Include="Views\CharactersNavigationView.xaml.cs">
       <DependentUpon>CharactersNavigationView.xaml</DependentUpon>
     </Compile>
@@ -170,11 +184,8 @@
     <Compile Include="Views\DialogModelsNavigationView.xaml.cs">
       <DependentUpon>DialogModelsNavigationView.xaml</DependentUpon>
     </Compile>
-    <Compile Include="Views\Dialogs\MessageDialog.xaml.cs">
-      <DependentUpon>MessageDialog.xaml</DependentUpon>
-    </Compile>
-    <Compile Include="Views\Dialogs\OKCancelDialog.xaml.cs">
-      <DependentUpon>OKCancelDialog.xaml</DependentUpon>
+    <Compile Include="Views\Dialogs\BusyDialog.xaml.cs">
+      <DependentUpon>BusyDialog.xaml</DependentUpon>
     </Compile>
     <Compile Include="Views\Dialogs\SettingsDialog.xaml.cs">
       <DependentUpon>SettingsDialog.xaml</DependentUpon>
@@ -188,11 +199,6 @@
     <Compile Include="Views\MenuView.xaml.cs">
       <DependentUpon>MenuView.xaml</DependentUpon>
     </Compile>
-    <Compile Include="Views\Services\IMessageDialogService.cs" />
-    <Compile Include="Views\Services\MessageDialogService.cs" />
-    <Compile Include="Views\SplashScreenView.xaml.cs">
-      <DependentUpon>SplashScreenView.xaml</DependentUpon>
-    </Compile>
     <Compile Include="Views\ToolbarView.xaml.cs">
       <DependentUpon>ToolbarView.xaml</DependentUpon>
     </Compile>
@@ -202,9 +208,6 @@
     <Compile Include="Workflow\WizardWorkflow.cs" />
     <Compile Include="Wrapper\ApplicationDataWrapper.cs" />
     <Compile Include="Wrapper\CharacterWrapper.cs" />
-    <Compile Include="Wrapper\ModelWrapper.cs" />
-    <Compile Include="Wrapper\NotifyDataErrorInfoBase.cs" />
-    <Compile Include="Helper\VisualHelper.cs" />
     <Page Include="Controls\MediaPlayerControl.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
@@ -214,6 +217,18 @@
       <Generator>MSBuild:Compile</Generator>
     </Page>
     <Page Include="Themes\Generic.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="Themes\MaterialDesignThemes.Overrides.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="Themes\ScrollBarStyle.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="Themes\TabControlStyle.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
@@ -245,11 +260,7 @@
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
-    <Page Include="Views\Dialogs\MessageDialog.xaml">
-      <SubType>Designer</SubType>
-      <Generator>MSBuild:Compile</Generator>
-    </Page>
-    <Page Include="Views\Dialogs\OKCancelDialog.xaml">
+    <Page Include="Views\Dialogs\BusyDialog.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
@@ -266,10 +277,6 @@
       <Generator>MSBuild:Compile</Generator>
     </Page>
     <Page Include="Views\MenuView.xaml">
-      <SubType>Designer</SubType>
-      <Generator>MSBuild:Compile</Generator>
-    </Page>
-    <Page Include="Views\SplashScreenView.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
@@ -320,20 +327,20 @@
       <Name>DialogGenerator.DataAccess</Name>
     </ProjectReference>
     <ProjectReference Include="..\DialogGenerator.DialogEngine\DialogGenerator.DialogEngine.csproj">
-      <Project>{C15DC761-8854-4E68-812B-B82F9F8D13D4}</Project>
+      <Project>{c15dc761-8854-4e68-812b-b82f9f8d13d4}</Project>
       <Name>DialogGenerator.DialogEngine</Name>
     </ProjectReference>
     <ProjectReference Include="..\DialogGenerator.Events\DialogGenerator.Events.csproj">
       <Project>{a7052ea1-7219-4600-b0d9-0a8bf03c2faa}</Project>
       <Name>DialogGenerator.Events</Name>
     </ProjectReference>
-    <ProjectReference Include="..\DialogGenerator.Infrastructure\DialogGenerator.Infrastructure.csproj">
-      <Project>{35da7937-47c3-4db5-922e-8cca5a1309f6}</Project>
-      <Name>DialogGenerator.Infrastructure</Name>
-    </ProjectReference>
     <ProjectReference Include="..\DialogGenerator.Model\DialogGenerator.Model.csproj">
       <Project>{8900af0a-e911-4e26-b60a-47453f1c1e36}</Project>
       <Name>DialogGenerator.Model</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\DialogGenerator.UI.Core\DialogGenerator.UI.Core.csproj">
+      <Project>{2eebf715-d90c-4da5-a29f-a304c4a12b79}</Project>
+      <Name>DialogGenerator.UI.Core</Name>
     </ProjectReference>
     <ProjectReference Include="..\DialogGenerator.Utilities\DialogGenerator.Utilities.csproj">
       <Project>{CA4D11CB-882D-44A3-AFF2-03083D106BCE}</Project>

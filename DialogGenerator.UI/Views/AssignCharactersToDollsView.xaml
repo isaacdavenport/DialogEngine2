@@ -3,15 +3,36 @@
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             xmlns:view="clr-namespace:DialogGenerator.UI.Views"
              xmlns:converters ="clr-namespace:DialogGenerator.UI.Converters"
              xmlns:prism="http://prismlibrary.com/"
+             xmlns:materialDesign="http://materialdesigninxaml.net/winfx/xaml/themes"
              prism:ViewModelLocator.AutoWireViewModel="True"
-             xmlns:i="clr-namespace:System.Windows.Interactivity;assembly=System.Windows.Interactivity"
              mc:Ignorable="d" 
              d:DesignHeight="450" d:DesignWidth="800">
     <UserControl.Resources>
         <ResourceDictionary>
             <converters:RadioNumberToDisplayNameValueConverter x:Key="RadioNumberToDisplayNameValueConverter" />
+            <converters:AssignedCharacter2NameValueConverter x:Key="AssignedCharacter2NameValueConverter" />
+            <converters:CloneValuesConverter x:Key="CloneValuesConverter" />
+            <converters:CharacterDataTemplateSelectorValueConverter x:Key="CharacterDataTemplateSelectorValueConverter" />
+            <converters:DollStatusColorValueConverter x:Key="DollStatusColorValueConverter" />
+            <converters:DollStatusValueConverter x:Key="DollStatusValueConverter" />
+            <converters:ImageToFullPathValueConverter x:Key="ImageToFullPathValueConverter" />
+
+            <DataTemplate x:Key="AssignedCharacterTemplate">
+                <Grid>
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="*" />
+                        <ColumnDefinition Width="auto"/>
+                    </Grid.ColumnDefinitions>
+                    <TextBlock Text="{Binding Path=CharacterName}"/>
+                    <TextBlock HorizontalAlignment="Right" Grid.Column="1" Margin="10,0,0,0" Text="{Binding Path=RadioNum}" Foreground="Orange"/>
+                </Grid>
+            </DataTemplate>
+            <DataTemplate x:Key="UnassignedCharacterTemplate">
+                <TextBlock Text="{Binding}" />
+            </DataTemplate>
         </ResourceDictionary>
     </UserControl.Resources>
     <Grid>
@@ -21,119 +42,136 @@
         </Grid.RowDefinitions>
 
         <Border Grid.Row="0" BorderBrush="LightGray"  BorderThickness="0,0,0,1">
-            <Label Content="Assign character to doll" FontWeight="SemiBold" Height="60" HorizontalAlignment="Center" VerticalContentAlignment="Center"/>
+            <Label Content="Configure dolls" FontWeight="SemiBold" Height="60" 
+                   HorizontalAlignment="Center" VerticalContentAlignment="Center"/>
         </Border>
 
         <Grid HorizontalAlignment="Center" Grid.Row="1" Margin="10,0,10,0"  VerticalAlignment="Center" >
-            <Grid.ColumnDefinitions>
-                <ColumnDefinition />
-                <ColumnDefinition Width="70" />
-                <ColumnDefinition Width="auto" />
-            </Grid.ColumnDefinitions>
 
-            <Border Grid.Column="0" CornerRadius="2" VerticalAlignment="Center" BorderBrush="LightGray" BorderThickness="1">
-                <StackPanel Background="WhiteSmoke">
-                    
-                    <Label Content="Characters" 
-                           HorizontalContentAlignment="Stretch" 
-                           Height="30" 
-                           VerticalAlignment="Center" 
-                           FontWeight="SemiBold" 
-                           HorizontalAlignment="Center"/>
-                    
-                    <ListBox Grid.Column="0"
-                         MinWidth="200"
-                         Background="White"
-                         VerticalAlignment="Center" 
-                         ItemsSource="{Binding Characters}"
-                         BorderBrush="WhiteSmoke"
-                         BorderThickness="0,1,0,0"
-                         ScrollViewer.VerticalScrollBarVisibility="Visible"
-                         HorizontalAlignment="Center">
-                        <ListBox.ItemTemplate>
-                            <DataTemplate>
-                                <Grid HorizontalAlignment="Stretch">
-                                    <Grid.ColumnDefinitions>
-                                        <ColumnDefinition Width="auto" />
-                                        <ColumnDefinition Width="*" />
-                                        <ColumnDefinition Width="auto" />
-                                    </Grid.ColumnDefinitions>
- 
-                                    <TextBlock Margin="10,0,0,0" VerticalAlignment="Center" Text="{Binding Path=CharacterName}" />
-                                    <Label HorizontalAlignment="Right" VerticalAlignment="Center" Grid.Column="2">
-                                        <Run Foreground="Red" FontWeight="SemiBold"  Text="{Binding RadioNum, Converter={StaticResource RadioNumberToDisplayNameValueConverter}}" />
-                                    </Label>
-                                </Grid>
-                            </DataTemplate>
-                        </ListBox.ItemTemplate>
-                        
-                        <ListBox.ItemContainerStyle>
-                            <Style TargetType="ListBoxItem">
-                                <Setter Property="HorizontalContentAlignment" Value="Stretch" />
-                            </Style>
-                        </ListBox.ItemContainerStyle>
-
-                        <i:Interaction.Triggers>
-                            <i:EventTrigger EventName="PreviewMouseLeftButtonDown">
-                                <prism:InvokeCommandAction  Command="{Binding PreviewMouseLeftButtonDownCommand}"  />
-                            </i:EventTrigger>
-
-                            <i:EventTrigger EventName="PreviewMouseMove">
-                                <prism:InvokeCommandAction Command="{Binding PreviewMouseMoveCommand}" />
-                            </i:EventTrigger>
-                        </i:Interaction.Triggers>
-                    </ListBox>
-                </StackPanel>
-            </Border>
-
-            <ItemsControl Grid.Column="2" VerticalAlignment="Center" AlternationCount="10000" 
-                          AllowDrop="True" ItemsSource="{Binding CharacterRadioRelationshipList}">
+            <ItemsControl HorizontalAlignment="Center" x:Name="ItemsControl" VerticalAlignment="Center" ItemsSource="{Binding CharacterRadioRelationshipList}">
+                <ItemsControl.ItemsPanel>
+                    <ItemsPanelTemplate>
+                        <WrapPanel />
+                    </ItemsPanelTemplate>
+                </ItemsControl.ItemsPanel>
                 <ItemsControl.ItemTemplate>
                     <DataTemplate>
-                        <Border BorderThickness="1"  
-                                BorderBrush="LightGray" 
-                                Width="200" 
-                                Height="60" 
-                                CornerRadius="2" 
-                                Margin="10,10,0,10">
-                            
-                            <Grid Tag="{Binding Path=(ItemsControl.AlternationIndex), RelativeSource={RelativeSource Mode=TemplatedParent}}">
-                                <Grid.RowDefinitions>
-                                    <RowDefinition />
-                                    <RowDefinition Height="auto" />
-                                    <RowDefinition />
-                                </Grid.RowDefinitions>
-                                <Border Background="WhiteSmoke">
-                                    <TextBlock HorizontalAlignment="Center" VerticalAlignment="Center">
-                                        <Run FontWeight="SemiBold" Text="Doll " />
-                                        <Run Text="{Binding Path=Key, Mode=OneWay}" />
-                                    </TextBlock>
-                                </Border>
-                                <Border BorderThickness="0,1,0,0" Grid.Row="1" BorderBrush="WhiteSmoke" />
-                                <TextBlock Grid.Row="2" 
-                                           VerticalAlignment="Center" 
-                                           HorizontalAlignment="Center" 
-                                           Text="{Binding Path=Value}" />
-                            </Grid>
-                        </Border>
+                        <Grid>
+                            <Grid.RowDefinitions>
+                                <RowDefinition Height="auto" />
+                                <RowDefinition Height="auto" />
+                            </Grid.RowDefinitions>
+
+                            <Grid>
+                                <Image Stretch="Fill" Source="{Binding DataContext.DollFileName,RelativeSource={RelativeSource Mode=FindAncestor,AncestorType=view:AssignCharactersToDollsView}}" Height="150" Width="100" >
+                                    <!--<Image.Source>
+                                        <BitmapImage  UriSource="{Binding DollFileName}" />
+                                    </Image.Source>-->
+                                </Image>
+                                <TextBlock Text="{Binding Value, Converter={StaticResource DollStatusValueConverter}}" Foreground="{Binding Value, Converter={StaticResource DollStatusColorValueConverter}}" 
+                                           FontSize="16" Margin="0,50,0,0" FontWeight="SemiBold" HorizontalAlignment="Center" VerticalAlignment="Center">
+                                    <TextBlock.Effect>
+                                        <DropShadowEffect ShadowDepth="0" Color="LightGray" BlurRadius="10" />
+                                    </TextBlock.Effect>
+                                </TextBlock>
+                                <StackPanel Orientation="Horizontal"  VerticalAlignment="Bottom" HorizontalAlignment="Center">
+                                    <TextBlock Text="Doll" FontWeight="SemiBold" HorizontalAlignment="Center" VerticalAlignment="Bottom"/>
+                                    <TextBlock Text="{Binding Key}" FontWeight="SemiBold" Margin="5,0,0,0" />
+                                </StackPanel>
+                            </Grid>    
+                            <Border Grid.Row="1" Margin="20" BorderBrush="LightGray"  BorderThickness="1" CornerRadius="5">
+                                <StackPanel Orientation="Horizontal"   HorizontalAlignment="Center">
+                                    <TextBlock Text="{Binding Value, Converter={StaticResource AssignedCharacter2NameValueConverter}}" MinWidth="100" 
+                                               HorizontalAlignment="Center"  Margin="7" VerticalAlignment="Center" x:Name="CharacterTb" />
+                                    <Border BorderThickness="1,0,0,0" Background="WhiteSmoke" CornerRadius="0" BorderBrush="LightGray">
+                                        <materialDesign:PopupBox Width="25"
+                                                     Margin="0,0,0,0"
+                                                     Padding="0"
+                                                     x:Name="Popup"
+                                                     StaysOpen="True"
+                                                     Opened="_popup_Opened"
+                                                     PlacementMode="BottomAndAlignCentres"
+                                                     VerticalAlignment="Center"
+                                                     HorizontalAlignment="Center"
+                                                     Style="{DynamicResource MaterialDesignToolForegroundPopupBox}">
+                                            <materialDesign:PopupBox.ToggleContent>
+                                                <materialDesign:PackIcon Kind="Pencil" ToolTip="Edit" Foreground="{DynamicResource PrimaryHueMidBrush}"  Height="20" Width="20"/>
+                                            </materialDesign:PopupBox.ToggleContent>
+
+                                            <GroupBox x:Name="groupBox" 
+                                                      BorderThickness="0"
+                                                      Background="Transparent"
+                                                      Style="{DynamicResource MaterialDesignGroupBox}"  
+                                                      UseLayoutRounding="True" 
+                                                      SnapsToDevicePixels="True">
+                                                <GroupBox.HeaderTemplate>
+                                                    <DataTemplate>
+                                                        <Grid>
+                                                            <TextBlock Text="Configure doll" HorizontalAlignment="Center" VerticalAlignment="Center" />
+                                                        </Grid>
+                                                    </DataTemplate>
+                                                </GroupBox.HeaderTemplate>
+
+                                                <Grid Margin="20,10,20,10">
+                                                    <Grid.RowDefinitions>
+                                                        <RowDefinition />
+                                                        <RowDefinition />
+                                                        <RowDefinition />
+                                                    </Grid.RowDefinitions>
+                                                    <Grid.ColumnDefinitions>
+                                                        <ColumnDefinition />
+                                                        <ColumnDefinition Width="auto"/>
+                                                    </Grid.ColumnDefinitions>
+
+                                                    <Label Content="Doll enabled:" HorizontalAlignment="Right" />
+                                                    <ToggleButton Grid.Column="1" Margin="10,0,0,0" HorizontalAlignment="Left" />
+
+                                                    <Label Content="Assign character:" HorizontalAlignment="Right" Grid.Row="1" />
+                                                    <ComboBox ItemsSource="{Binding DataContext.Characters,
+                                                              RelativeSource={RelativeSource Mode=FindAncestor, AncestorType=view:AssignCharactersToDollsView}}"
+                                                              MinWidth="100" SelectedValue="{Binding Path=Value, Mode=OneWay}" x:Name="CharactersCbx"
+                                                              ItemTemplateSelector="{Binding Key,Converter={StaticResource CharacterDataTemplateSelectorValueConverter}}"
+                                                              Margin="10,0,0,0" HorizontalAlignment="Left" Grid.Row="1" Grid.Column="1" />
+
+                                                    <Button Content="Save" Style="{DynamicResource MaterialDesignRaisedButton}"   
+                                                            Grid.ColumnSpan="2"
+                                                            Grid.Row="2" Command="{Binding DataContext.SaveConfigurationCommand,
+                                                            RelativeSource={RelativeSource Mode=FindAncestor, AncestorType=view:AssignCharactersToDollsView}}" 
+                                                            HorizontalAlignment="Center" VerticalAlignment="Center" Margin="0,20,0,0">
+                                                        <Button.CommandParameter>
+                                                            <MultiBinding Converter="{StaticResource CloneValuesConverter}">
+                                                                <Binding Path="Key" />
+                                                                <Binding Path="SelectedIndex" ElementName="CharactersCbx" />
+                                                                <Binding Path="." ElementName="ItemsControl" />
+                                                                <Binding Path="." ElementName="Popup" />
+                                                            </MultiBinding>
+                                                        </Button.CommandParameter>
+                                                    </Button>
+                                                </Grid>
+                                            </GroupBox>
+                                        </materialDesign:PopupBox>
+                                    </Border>
+                                    <Border Background="WhiteSmoke" CornerRadius="0,5,5,0" Width="25" BorderThickness="1,0,0,0" BorderBrush="LightGray" >
+                                        <materialDesign:PackIcon Kind="CloseCircle" Foreground="Red" HorizontalAlignment="Center" Height="20" Width="20" VerticalAlignment="Center" />
+                                        <Border.InputBindings>
+                                            <MouseBinding MouseAction="LeftClick" Command="{Binding DataContext.UnbindCharacterCommand, RelativeSource={RelativeSource Mode=FindAncestor, AncestorType=view:AssignCharactersToDollsView}}">
+                                                <MouseBinding.CommandParameter>
+                                                    <MultiBinding Converter="{StaticResource CloneValuesConverter}">
+                                                        <Binding Path="Key" />
+                                                        <Binding Path="." ElementName="ItemsControl" />
+                                                    </MultiBinding>
+                                                </MouseBinding.CommandParameter>
+                                            </MouseBinding>
+                                        </Border.InputBindings>
+                                    </Border>
+                                </StackPanel>
+                            </Border>
+                        </Grid>
+                        
                     </DataTemplate>
                 </ItemsControl.ItemTemplate>
-
-                <i:Interaction.Triggers>
-                    <i:EventTrigger EventName="PreviewDragEnter">
-                        <prism:InvokeCommandAction Command="{Binding DragEnterCommand}" />
-                    </i:EventTrigger>
-
-                    <i:EventTrigger EventName="PreviewDrop">
-                        <prism:InvokeCommandAction Command="{Binding DropCommand}" />
-                    </i:EventTrigger>
-
-                    <i:EventTrigger EventName="PreviewDragOver">
-                        <prism:InvokeCommandAction Command="{Binding DragOverCommand}"/>
-                    </i:EventTrigger>
-                </i:Interaction.Triggers>
             </ItemsControl>
-
+            
         </Grid>
     </Grid>
 </UserControl>

@@ -5,7 +5,7 @@ using System.Collections.Generic;
 using System.ComponentModel;
 using System.Linq;
 
-namespace DialogGenerator.UI.Wrapper
+namespace DialogGenerator.UI.Core
 {
     public class NotifyDataErrorInfoBase : BindableBase, INotifyDataErrorInfo
     {

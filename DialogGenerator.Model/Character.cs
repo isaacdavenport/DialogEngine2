@@ -15,6 +15,7 @@ namespace DialogGenerator.Model
         private string mCharacterName;
         private CharacterState mState;
         private List<PhraseEntry> mPhrases;
+        private int mRadioNum =-1;
         private PhraseEntry mPhraseTotals;
         private string mCharacterImage = ApplicationData.Instance.DefaultImage;
 
@@ -93,7 +94,6 @@ namespace DialogGenerator.Model
 
         [JsonIgnore]
         public Queue<PhraseEntry> RecentPhrases = new Queue<PhraseEntry>();
-
         [JsonIgnore]
         public const int RecentPhrasesQueueSize = 8;
 
@@ -105,7 +105,15 @@ namespace DialogGenerator.Model
         /// Default value is unassigned ( -1 )
         /// </summary>
         [JsonIgnore]
-        public int RadioNum { get; set; } = -1;
+        public int RadioNum
+        {
+            get { return mRadioNum; }
+            set
+            {
+                mRadioNum = value;
+                OnPropertyChanged("RadioNum");
+            }
+        }
 
         /// <summary>
         /// Represents state of character

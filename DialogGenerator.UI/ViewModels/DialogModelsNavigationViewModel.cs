@@ -19,7 +19,6 @@ namespace DialogGenerator.UI.ViewModels
         private IEventAggregator mEventAggregator;
         private IDialogModelDataProvider mDialogModelDataProvider;
         private string mFilterText;
-        private int mSelectedDialogModelIndex;
         private ModelDialogInfo mSelectedDialogModelInfo;
         private CollectionViewSource mDialogModelsInfoCollection;
 
@@ -33,8 +32,12 @@ namespace DialogGenerator.UI.ViewModels
             mLogger = logger;
             mEventAggregator = _eventAggregator;
             mDialogModelDataProvider = _dialogModelDataProvider;
+
             mDialogModelsInfoCollection = new CollectionViewSource();
+            FilterText = "";
+
             mDialogModelsInfoCollection.Filter += _mDialogModelsInfoCollection_Filter;
+
             _bindCommands();
         }
 
@@ -43,7 +46,6 @@ namespace DialogGenerator.UI.ViewModels
         #region - Commands -
 
         public DelegateCommand<object> ChangeModelDialogStatusCommand { get; set; }
-        public DelegateCommand ActivateDialogModelCommand { get; set; }
 
         #endregion
 
@@ -134,7 +136,7 @@ namespace DialogGenerator.UI.ViewModels
             set
             {
                 mFilterText = value;
-                mDialogModelsInfoCollection.View.Refresh();
+                mDialogModelsInfoCollection.View?.Refresh();
                 RaisePropertyChanged();
             }
         }

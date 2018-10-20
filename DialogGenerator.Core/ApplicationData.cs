@@ -20,7 +20,6 @@ namespace DialogGenerator.Core
         private string mTutorialDirectory;
         private string mAudioDirectory;
         private string mImagesDirectory;
-        private string mDeletedDirectory;
 
         static ApplicationData()
         {

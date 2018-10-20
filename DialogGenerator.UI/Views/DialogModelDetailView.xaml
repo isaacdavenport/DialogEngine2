@@ -19,119 +19,146 @@
     <Grid>
         <Grid.RowDefinitions>
             <RowDefinition Height="auto" />
-            <RowDefinition Height="auto" />
             <RowDefinition Height="*" />
         </Grid.RowDefinitions>
 
         <Border Grid.Row="0" BorderBrush="LightGray" BorderThickness="0,0,0,1">
             <DockPanel   Height="60" HorizontalAlignment="Stretch">
-                <StackPanel HorizontalAlignment="Left" VerticalAlignment="Center" Margin="20,0,0,0" DockPanel.Dock="Left" Orientation="Horizontal">
+                <StackPanel HorizontalAlignment="Left" VerticalAlignment="Center" Margin="0,0,0,0" DockPanel.Dock="Left" Orientation="Horizontal">
                     <Label VerticalAlignment="Center" Margin="10,0,0,0" Content="{Binding DialogModel.ModelsCollectionName}" />
-                    <Label VerticalAlignment="Center" Margin="10,0,0,0" FontWeight="SemiBold" Content="{Binding DialogModel.State}" 
+                    <Label VerticalAlignment="Center" Margin="10,0,0,0" Content="{Binding DialogModel.State}" 
                            Foreground="{Binding DialogModel.State, Converter={StaticResource ModelDialogStateToColorValueConverter}}" />
                 </StackPanel>
             </DockPanel>
         </Border>
 
-        <Border Grid.Row="2" Margin="30" BorderBrush="LightGray" CornerRadius="3" BorderThickness="1" HorizontalAlignment="Center" VerticalAlignment="Stretch" MinWidth="400">
-            <Grid >
-                <Grid.RowDefinitions>
-                    <RowDefinition Height="auto"/>
-                    <RowDefinition Height="auto"/>
-                    <RowDefinition Height="*" />
-                </Grid.RowDefinitions>
+        <ListView Grid.Row="1"
+                  Background="WhiteSmoke"
+                  x:Name="DialogModelsListView"
+                  ScrollViewer.VerticalScrollBarVisibility="Auto"
+                  ScrollViewer.HorizontalScrollBarVisibility="Auto"
+                  SelectedIndex="{Binding SelectedDialogModelIndex,Mode=TwoWay}"
+                  ItemsSource="{Binding DialogModelCollection}">
+            <ListView.ItemTemplate>
+                <DataTemplate>
+                    <Grid Height="50">
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="auto" />
+                            <ColumnDefinition Width="*" />
+                            <ColumnDefinition Width="auto"/>
+                        </Grid.ColumnDefinitions>
+                        <TextBlock Margin="10,0,0,0" Grid.Column="0" VerticalAlignment="Center" Text="{Binding Path=Name}" />
 
-                <TextBox Style="{x:Null}" 
-                     Margin="10,10,10,10" 
-                     Text="{Binding FilterText, UpdateSourceTrigger=PropertyChanged}" 
-                     materialDesign:HintAssist.Hint="Search">
-                    <TextBox.Template>
-                        <ControlTemplate TargetType="{x:Type TextBox}">
-                            <Border BorderThickness="1" Background="WhiteSmoke" x:Name="tbBorder" BorderBrush="DarkGray" CornerRadius="3" Padding="10">
-                                <Grid>
-                                    <Grid.ColumnDefinitions>
-                                        <ColumnDefinition Width="auto" />
-                                        <ColumnDefinition Width="*" />
-                                    </Grid.ColumnDefinitions>
+                        <Border Grid.Column="2"  BorderBrush="LightGray" Width="40" ToolTip="Select dialog model" Background="WhiteSmoke" CornerRadius="3" BorderThickness="1" Margin="10,10,16,10">
+                            <Border.Visibility>
+                                <MultiBinding Converter="{StaticResource ActiveDialogModelBtnVisibilityValueConverter}">
+                                    <Binding />
+                                    <Binding Path="DataContext.ActiveDialogModel" 
+                                             RelativeSource="{RelativeSource Mode=FindAncestor,AncestorType=view:DialogModelDetailView}" />
+                                </MultiBinding>
+                            </Border.Visibility>
+                            <Border.InputBindings>
+                                <MouseBinding MouseAction="LeftClick" CommandParameter="{Binding}"
+                                              Command="{Binding DataContext.SetActiveDialogModel,RelativeSource={RelativeSource Mode=FindAncestor,AncestorType=view:DialogModelDetailView}}"/>
+                            </Border.InputBindings>
+                            <materialDesign:PackIcon HorizontalAlignment="Center"  VerticalAlignment="Center" Foreground="{DynamicResource PrimaryHueMidBrush}" Kind="Check"/>
+                        </Border>
+                    </Grid>
+                </DataTemplate>
+            </ListView.ItemTemplate>
+            <ListView.ItemContainerStyle>
+                <Style TargetType="ListViewItem">
+                    <Setter Property="HorizontalContentAlignment" Value="Stretch" />
+                    <Setter Property="BorderBrush" Value="LightGray" />
+                    <Setter Property="BorderThickness" Value="0,0,0,1" />
+                </Style>
+            </ListView.ItemContainerStyle>
+            
+            <ListView.ItemsPanel>
+                <ItemsPanelTemplate>
+                    <VirtualizingStackPanel />
+                </ItemsPanelTemplate>
+            </ListView.ItemsPanel>
+            
+            <ListView.Template>
+                <ControlTemplate TargetType="ListView">
+                    <Grid>
+                        <Grid.RowDefinitions>
+                            <RowDefinition Height="auto" />
+                            <RowDefinition Height="*"/>
+                        </Grid.RowDefinitions>
 
-                                    <materialDesign:PackIcon Kind="Magnify" Width="20" Margin="0,0,5,0" Grid.Column="0" />
-                                    <ContentPresenter Grid.Column="1" Content="{TemplateBinding Text}" />
-                                </Grid>
-                            </Border>
-                            <ControlTemplate.Triggers>
-                                <Trigger Property="IsMouseOver" Value="true">
-                                    <Setter TargetName="tbBorder" Property="BorderBrush" Value="Black" />
-                                </Trigger>
-                            </ControlTemplate.Triggers>
-                        </ControlTemplate>
-                    </TextBox.Template>
-                </TextBox>
-                
-                <Grid Grid.Row="1" VerticalAlignment="Top">
-                    <Label Content="{Binding ActiveDialogModel.Name}" VerticalAlignment="Center" Margin="10,0,0,0" FontWeight="SemiBold" Grid.Row="1" />
-                    <Button  Margin="10,0,10,10" Background="WhiteSmoke" Foreground="Red" HorizontalAlignment="Right" 
-                            Style="{DynamicResource MaterialDesignRaisedButton}" BorderThickness="0" Command="{Binding ResetActiveDialogModel}">
-                        <Button.Content>
-                            <materialDesign:PackIcon Kind="CloseCircle" />
-                        </Button.Content>
-                    </Button>
-                </Grid>
+                        <Border BorderBrush="LightGray" BorderThickness="0,0,0,1" Grid.Row="0">
+                            <Grid>
+                                <TextBox Margin="15,10,15,10" VerticalContentAlignment="Center" >
+                                    <TextBox.Template>
+                                        <ControlTemplate TargetType="{x:Type TextBox}">
+                                            <Border BorderThickness="1" x:Name="tbBorder" MinHeight="30" Background="WhiteSmoke" BorderBrush="LightGray" CornerRadius="5" >
+                                                <Grid>
+                                                    <Grid.ColumnDefinitions>
+                                                        <ColumnDefinition Width="auto" />
+                                                        <ColumnDefinition Width="*" />
+                                                    </Grid.ColumnDefinitions>
 
-                <ListView Grid.Row="2"
-                      Background="WhiteSmoke"
-                      x:Name="DialogModelsListView"
-                      ScrollViewer.VerticalScrollBarVisibility="Auto"
-                      ScrollViewer.HorizontalScrollBarVisibility="Auto"
-                      SelectedIndex="{Binding SelectedDialogModelIndex,Mode=TwoWay}"
-                      ItemsSource="{Binding DialogModelCollection}">
-                    <ListView.ItemTemplate>
-                        <DataTemplate>
-                            <Grid Height="40">
-                                <Grid.ColumnDefinitions>
-                                    <ColumnDefinition Width="auto" />
-                                    <ColumnDefinition Width="*" />
-                                    <ColumnDefinition Width="auto"/>
-                                </Grid.ColumnDefinitions>
-                                <TextBlock Margin="10,0,0,0" Grid.Column="0" VerticalAlignment="Center" Text="{Binding Path=Name}" />
-
-                                    <Button 
-                                                Grid.Column="2"
-                                                BorderBrush="White"
-                                                Foreground="Green"
-                                                Margin="10,0,6,0"
-                                                Background="WhiteSmoke" 
-                                                Style="{DynamicResource MaterialDesignRaisedButton}"  
-                                                CommandParameter="{Binding}"  
-                                                Command="{Binding DataContext.SetActiveDialogModel,
-                                                RelativeSource={RelativeSource Mode=FindAncestor, AncestorType=view:DialogModelDetailView}}">
-                                            <Button.Visibility>
-                                                <MultiBinding Converter="{StaticResource ActiveDialogModelBtnVisibilityValueConverter}">
-                                                    <Binding />
-                                                    <Binding Path="DataContext.ActiveDialogModel" RelativeSource="{RelativeSource Mode=FindAncestor,AncestorType=view:DialogModelDetailView}" />
-                                                </MultiBinding>
-                                            </Button.Visibility>
-                                        <Button.Content>
-                                            <materialDesign:PackIcon Kind="Check"  />
-                                        </Button.Content>
-                                    </Button>
+                                                    <materialDesign:PackIcon Kind="Magnify" Foreground="DarkGray"  HorizontalAlignment="Left" 
+                                                             VerticalAlignment="Center" Padding="0" Width="15" Height="15" Margin="10,0,10,0" Grid.Column="0" />
+                                                    <TextBox Style="{x:Null}" VerticalAlignment="Center" Text="{Binding FilterText, UpdateSourceTrigger=PropertyChanged}"
+                                                             Background="{TemplateBinding Background}" BorderThickness="0" Grid.Column="1" />
+                                                </Grid>
+                                            </Border>
+                                            <ControlTemplate.Triggers>
+                                                <Trigger Property="IsMouseOver" Value="true">
+                                                    <Setter TargetName="tbBorder" Property="BorderBrush" Value="{DynamicResource PrimaryHueMidBrush}" />
+                                                </Trigger>
+                                            </ControlTemplate.Triggers>
+                                        </ControlTemplate>
+                                    </TextBox.Template>
+                                </TextBox>
+                                <TextBlock IsHitTestVisible="False" Text="Search dialog models..." VerticalAlignment="Center" HorizontalAlignment="Left" Margin="53,0,0,0" Foreground="DarkGray">
+                                    <TextBlock.Style>
+                                        <Style TargetType="{x:Type TextBlock}">
+                                            <Setter Property="Visibility" Value="Collapsed"/>
+                                            <Style.Triggers>
+                                                <DataTrigger Binding="{Binding FilterText}" Value="">
+                                                    <Setter Property="Visibility" Value="Visible"/>
+                                                </DataTrigger>
+                                            </Style.Triggers>
+                                        </Style>
+                                    </TextBlock.Style>
+                                </TextBlock>
                             </Grid>
-                        </DataTemplate>
-                    </ListView.ItemTemplate>
-                    <ListView.ItemContainerStyle>
-                        <Style TargetType="ListViewItem">
-                            <Setter Property="HorizontalContentAlignment" Value="Stretch" />
-                            <Setter Property="BorderBrush" Value="LightGray" />
-                            <Setter Property="BorderThickness" Value="0,1,0,0" />
-                        </Style>
-                    </ListView.ItemContainerStyle>
-                    <ListView.ItemsPanel>
-                        <ItemsPanelTemplate>
-                            <VirtualizingStackPanel HorizontalAlignment="Stretch"/>
-                        </ItemsPanelTemplate>
-                    </ListView.ItemsPanel>
-                </ListView>
-            </Grid>
-        </Border>
+                        </Border>
+                        <ScrollViewer Grid.Row="1">
+                            <Grid>
+                                <Grid.RowDefinitions>
+                                    <RowDefinition Height="53"/>
+                                    <RowDefinition Height="*" />
+                                </Grid.RowDefinitions>
+                                <Border BorderThickness="0,0,0,1" Grid.Row="0" BorderBrush="LightGray">
+                                    <Grid Margin="0,0,10,0">
+                                        <TextBlock  FontWeight="SemiBold"
+                                                    x:Name="SelectedDialogModelTb"
+                                                    Text="{Binding DataContext.ActiveDialogModel,
+                                                    RelativeSource={RelativeSource Mode=FindAncestor,AncestorType=view:DialogModelDetailView}}" 
+                                                    Margin="10,0,0,0" VerticalAlignment="Center" />
+                                        <Border   BorderBrush="LightGray" Width="40" ToolTip="Unselect dialog model" IsEnabled="{Binding ElementName=SelectedDialogModelTb, Path=Text.Length}"  HorizontalAlignment="Right" 
+                                                  Background="WhiteSmoke" CornerRadius="3" BorderThickness="1" Margin="10">
+                                                 <materialDesign:PackIcon HorizontalAlignment="Center"  VerticalAlignment="Center" Foreground="Red" Kind="RadioboxBlank"/>
+                                                 <Border.InputBindings>
+                                                    <MouseBinding MouseAction="LeftClick" CommandParameter="{Binding}"
+                                                                  Command="{Binding DataContext.ResetActiveDialogModel,
+                                                    RelativeSource={RelativeSource Mode=FindAncestor, AncestorType=view:DialogModelDetailView}}"/>
+                                                 </Border.InputBindings>
+                                        </Border>
+                                    </Grid>
+                                </Border>
+                                <ItemsPresenter Grid.Row="1" />
+                            </Grid>
+                        </ScrollViewer>
+                    </Grid>
+                </ControlTemplate>
+            </ListView.Template>
+        </ListView>
 
     </Grid>
 </UserControl>

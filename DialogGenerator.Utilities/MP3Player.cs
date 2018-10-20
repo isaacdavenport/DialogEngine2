@@ -4,7 +4,9 @@ using Prism.Events;
 using System;
 using System.Diagnostics;
 using System.Threading;
+using System.Windows;
 using System.Windows.Media;
+using System.Windows.Threading;
 
 namespace DialogGenerator.Utilities
 {
@@ -75,21 +77,20 @@ namespace DialogGenerator.Utilities
             try
             {
                 Thread.CurrentThread.Name = "volume timer thread";
-                // TODO uncomment
-                //Application.Current.Dispatcher.BeginInvoke(DispatcherPriority.Send,(Action)(() =>
-                //{
-                //    if (Player.Volume == 0)
-                //    {
-                //        mVolumeTimer.Change(Timeout.Infinite, Timeout.Infinite);
-                //        Player.Stop();
-                //        mIsPlayingStopped = true;
-                //        return;
-                //    }
-                //    else
-                //    {
-                //        Player.Volume -= 0.2; // percentage
-                //    }
-                //}));
+                Application.Current.Dispatcher.BeginInvoke(DispatcherPriority.Send, (Action)(() =>
+                 {
+                     if (Player.Volume == 0)
+                     {
+                         mVolumeTimer.Change(Timeout.Infinite, Timeout.Infinite);
+                         Player.Stop();
+                         mIsPlayingStopped = true;
+                         return;
+                     }
+                     else
+                     {
+                         Player.Volume -= 0.2; // percentage
+                     }
+                 }));
             }
             catch (Exception ex)
             {
@@ -103,10 +104,6 @@ namespace DialogGenerator.Utilities
             if (Player.NaturalDuration.HasTimeSpan)
             {
                 mDuration = Player.NaturalDuration.TimeSpan.TotalSeconds;
-            }
-            else
-            {
-                Debug.WriteLine("Automatic duration automatic");
             }
 
             Debug.WriteLine("loaded + " + mDuration);

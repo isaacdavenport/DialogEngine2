@@ -3,6 +3,7 @@ using DialogGenerator.DataAccess;
 using DialogGenerator.Events;
 using DialogGenerator.Events.EventArgs;
 using DialogGenerator.Model.Enum;
+using DialogGenerator.Utilities;
 using Prism.Events;
 using System;
 using System.Collections.Generic;
@@ -17,6 +18,7 @@ namespace DialogGenerator.CharacterSelection
         private ILogger mLogger;
         private IEventAggregator mEventAggregator;
         private ICharacterRepository mCharacterRepository;
+        private IMessageDialogService mMessageDialogService;
         private static Random msRandom = new Random();
         public static int NextCharacter1 = 1;
         public static int NextCharacter2 = 2;
@@ -24,11 +26,12 @@ namespace DialogGenerator.CharacterSelection
 
 
         public RandomSelectionService(ILogger logger,IEventAggregator _eventAggregator,
-            ICharacterRepository _characterRepository)
+            ICharacterRepository _characterRepository,IMessageDialogService _messageDialogService)
         {
             mLogger = logger;
             mEventAggregator = _eventAggregator;
             mCharacterRepository = _characterRepository;
+            mMessageDialogService = _messageDialogService;
         }
 
 
@@ -37,7 +40,7 @@ namespace DialogGenerator.CharacterSelection
         /// </summary>
         /// <param name="_indexToSkip"> Number which must be ignored, so we can avoid the same index of selected characters </param>
         /// <returns> Character index or -1 if there is not available characters </returns>
-        public  int GetNextCharacter(params int[] _indexToSkip)
+        public async Task<int> GetNextCharacter(params int[] _indexToSkip)
         {
             int index;
             int result = -1;
@@ -48,11 +51,11 @@ namespace DialogGenerator.CharacterSelection
                 .Where(x => x.Character.State == CharacterState.Available)
                 .Select(x => x.Index).ToList();
 
-
             switch (_allowedIndexes.Count)
             {
                 case 0:  // no avaialbe characters
                     {
+                        await mMessageDialogService.ShowMessage("Warning", "No available characters. Please change characters settings.");
                         //TODO uncomment
                         //MessageBox.Show("No available characters. Please change characters settings.");
                         break;
@@ -70,7 +73,6 @@ namespace DialogGenerator.CharacterSelection
                         }
                         break;
                     }
-
                 default:  // more than 1 available characters 
                     {
                         Random random = new Random();
@@ -97,28 +99,21 @@ namespace DialogGenerator.CharacterSelection
             return result;
         }
 
-        public Task StartCharacterSelection()
+        public async Task StartCharacterSelection()
         {
             mCancellationTokenSource = new CancellationTokenSource();
 
-            return Task.Run(() =>
+            await Task.Run(async () =>
             {
-            Thread.CurrentThread.Name = "OccasionallyChangeToRandNewCharacterAsyncThread";
+                Thread.CurrentThread.Name = "OccasionallyChangeToRandNewCharacterAsyncThread";
 
-            // used for computers with no serial input radio for random, or forceCharacter mode
-            // TODO is this still true?  does not include final character the silent schoolhouse, not useful in noSerial mode 
+                // used for computers with no serial input radio for random, or forceCharacter mode
+                // TODO is this still true?  does not include final character the silent schoolhouse, not useful in noSerial mode 
 
-            try
-            {
-                bool _isNewCharacterSelected;
                 DateTime _nextCharacterSwapTime = DateTime.Now;
 
-                while (true)
+                while (!mCancellationTokenSource.Token.IsCancellationRequested)
                 {
-                    mCancellationTokenSource.Token.ThrowIfCancellationRequested();
-
-                    _isNewCharacterSelected = false;
-
                     Thread.Sleep(1000);
 
                     if (_nextCharacterSwapTime.CompareTo(DateTime.Now) < 0)
@@ -127,66 +122,49 @@ namespace DialogGenerator.CharacterSelection
                         {
                             case 0:
                                 {
-                                    int _nextCharacter1Index = GetNextCharacter();
-                                    int _nextCharacter2Index = GetNextCharacter(_nextCharacter1Index >= 0 ? _nextCharacter1Index : NextCharacter1);
+                                    int _nextCharacter1Index = await GetNextCharacter();
+                                    int _nextCharacter2Index = await GetNextCharacter(_nextCharacter1Index >= 0 ? _nextCharacter1Index : NextCharacter1);
 
                                     NextCharacter1 = _nextCharacter1Index >= 0 ? _nextCharacter1Index : NextCharacter1; //lower bound inclusive, upper exclusive
                                     NextCharacter2 = _nextCharacter2Index >= 0 ? _nextCharacter2Index : NextCharacter2; //lower bound inclusive, upper exclusive
 
                                     _nextCharacterSwapTime = DateTime.Now.AddSeconds(4 + msRandom.Next(0, 2));
 
-                                    _isNewCharacterSelected = true;
-
                                     break;
                                 }
                             case 1:
                                 {
                                     NextCharacter1 = Session.Get<int>(Constants.FORCED_CH_1);
-                                    int _nextCharacter2Index = GetNextCharacter(NextCharacter1);
+                                    int _nextCharacter2Index = await GetNextCharacter(NextCharacter1);
 
                                     NextCharacter2 = _nextCharacter2Index >= 0 ? _nextCharacter2Index : NextCharacter2;
 
                                     _nextCharacterSwapTime = DateTime.Now.AddSeconds(4 + msRandom.Next(0, 2));
 
-                                    _isNewCharacterSelected = true;
-
                                     break;
                                 }
-                            default:
+                            case 2:
                                 {
                                     _nextCharacterSwapTime = DateTime.Now.AddSeconds(4 + msRandom.Next(0, 2));
-                                    _isNewCharacterSelected = false;
+                                    NextCharacter1 = Session.Get<int>(Constants.FORCED_CH_1);
+                                    NextCharacter2 = Session.Get<int>(Constants.FORCED_CH_2);
                                     break;
                                 }
                         }
-
-
                     }
 
-                        if (_isNewCharacterSelected)
-                        {
-                                mEventAggregator.GetEvent<SelectedCharactersPairChangedEvent>().Publish(new SelectedCharactersPairEventArgs
-                                    {
-                                        Character1Index = NextCharacter1,
-                                        Character2Index = NextCharacter2
-                                    }
-                            );
+                    Session.Set(Constants.NEXT_CH_1, NextCharacter1);
+                    Session.Set(Constants.NEXT_CH_2, NextCharacter2);
 
-                            Session.Set(Constants.NEXT_CH_1, NextCharacter1);
-                            Session.Set(Constants.NEXT_CH_2, NextCharacter2);
-                        }
+                    mEventAggregator.GetEvent<SelectedCharactersPairChangedEvent>().
+                        Publish(new SelectedCharactersPairEventArgs
+                        {
+                            Character1Index = NextCharacter1,
+                            Character2Index = NextCharacter2
+                        });
+
                 }
-                }
-                catch (OperationCanceledException ex)
-                {
-                    mLogger.Debug("OccasionallyChangeToRandNewCharacterAsync " + ex.Message);
-                }
-                catch (Exception ex)
-                {
-                    mLogger.Error("OccasionallyChangeToRandNewCharacterAsync " + ex.Message);
-                    // DODO uncomment
-                    //DialogDataHelper.AddMessage(new ErrorMessage("Error in random selection of characters."));
-                }
+
             });
         }
 

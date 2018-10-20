@@ -1,5 +1,9 @@
-﻿using Microsoft.Practices.Unity;
+﻿using DialogGenerator.CharacterSelection.Data;
+using DialogGenerator.CharacterSelection.Model;
+using DialogGenerator.Model.Enum;
+using Microsoft.Practices.Unity;
 using Prism.Modularity;
+using System;
 
 namespace DialogGenerator.CharacterSelection
 {
@@ -14,7 +18,22 @@ namespace DialogGenerator.CharacterSelection
 
         public void Initialize()
         {
-            mContainer.RegisterType<ICharacterSelection, RandomSelectionService>();
+            mContainer.RegisterType<IBLEDataProvider, SerialPortDataProvider>(BLEDataProviderType.Serial.ToString());
+            mContainer.RegisterType<IBLEDataProvider, WinBLEWatcherDataProivder>(BLEDataProviderType.WinBLEWatcher.ToString());
+
+            Func<BLEDataProviderType, IBLEDataProvider> _dataProviderFactory = (_providerType) =>
+                 mContainer.Resolve<IBLEDataProvider>(_providerType.ToString());
+            var _dataProviderfactoryInstance = new BLEDataProviderFactory(_dataProviderFactory);
+            mContainer.RegisterInstance<IBLEDataProviderFactory>(_dataProviderfactoryInstance);
+
+            mContainer.RegisterType<ICharacterSelection, BLESelectionService>(SelectionMode.SerialSelectionMode.ToString());
+            mContainer.RegisterType<ICharacterSelection, RandomSelectionService>(SelectionMode.RandomSelectionModel.ToString());
+
+            Func<SelectionMode, ICharacterSelection> _selectionFactory = (_selectionType) =>
+            mContainer.Resolve<ICharacterSelection>(_selectionType.ToString());
+
+            var _selectionFactoryInstance = new CharacterSelectionFactory(_selectionFactory);
+            mContainer.RegisterInstance<ICharacterSelectionFactory>(_selectionFactoryInstance);
         }
     }
 }

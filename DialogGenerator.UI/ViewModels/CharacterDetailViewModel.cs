@@ -2,8 +2,10 @@
 using DialogGenerator.Events;
 using DialogGenerator.Model;
 using DialogGenerator.UI.Data;
-using DialogGenerator.UI.Views.Services;
+using DialogGenerator.UI.Views.Dialogs;
 using DialogGenerator.UI.Wrapper;
+using DialogGenerator.Utilities;
+using MaterialDesignThemes.Wpf;
 using Prism.Commands;
 using Prism.Events;
 using Prism.Mvvm;
@@ -13,6 +15,7 @@ using System.Diagnostics;
 using System.IO;
 using System.IO.Compression;
 using System.Linq;
+using System.Threading;
 using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Input;
@@ -96,7 +99,9 @@ namespace DialogGenerator.UI.ViewModels
 
                     await Task.Run(() =>
                     {
-                        File.Copy(_filePath, Path.Combine(ApplicationData.Instance.ImagesDirectory, _newFileName));
+                        Thread.CurrentThread.Name = "_chooseImage_Execute";
+
+                        File.Copy(_filePath, Path.Combine(ApplicationData.Instance.ImagesDirectory, _newFileName),true);
 
                         if (!_chCurrentImageFilePath.Equals(ApplicationData.Instance.DefaultImage))
                         {
@@ -125,9 +130,35 @@ namespace DialogGenerator.UI.ViewModels
         {
             try
             {
+                System.Windows.Forms.SaveFileDialog _saveFileDialog = new System.Windows.Forms.SaveFileDialog
+                {
+                    Filter = "Zip file(*.zip)|*.zip",
+                    FileName = Path.GetFileNameWithoutExtension(Character.Model.FileName)
+                };
+
+                System.Windows.Forms.DialogResult result = System.Windows.Forms.DialogResult.Cancel;
+
+                result = _saveFileDialog.ShowDialog();
+
+                if (result == System.Windows.Forms.DialogResult.OK)
+                {
+                    if (File.Exists(_saveFileDialog.FileName))
+                    {
+                        File.Delete(_saveFileDialog.FileName);
+                    }
+                }
+                else
+                {
+                    return;
+                }
+
+                var busyDialog = new BusyDialog();
+                mMessageDialogService.ShowDedicatedDialogAsync<bool>(busyDialog);
+
                 await Task.Run(() =>
                 {
-                    _generateZIPFile(Character.Model);
+                    Thread.CurrentThread.Name = "_exportCharacterCommand_Execute";
+                    _generateZIPFile(Character.Model,_saveFileDialog.FileName);
 
                     // clear temp directory
                     DirectoryInfo _directoryInfo = new DirectoryInfo(ApplicationData.Instance.TempDirectory);
@@ -137,6 +168,8 @@ namespace DialogGenerator.UI.ViewModels
                         file.Delete();
                     }
                 });
+
+                DialogHost.CloseDialogCommand.Execute(null, busyDialog);
             }
             catch (Exception ex)
             {
@@ -149,13 +182,10 @@ namespace DialogGenerator.UI.ViewModels
             return mIsEditing;
         }
 
-        private async void _editWithJSONEditorCommand_Execute()
+        private void _editWithJSONEditorCommand_Execute()
         {
-            await Task.Run(() =>
-            {
-                Process.Start(Path.Combine(ApplicationData.Instance.TutorialDirectory, ApplicationData.Instance.JSONEditorExeFileName),
-                    Path.Combine(ApplicationData.Instance.DataDirectory, Character.Model.FileName));
-            });
+            Process.Start(Path.Combine(ApplicationData.Instance.TutorialDirectory, ApplicationData.Instance.JSONEditorExeFileName),
+                Path.Combine(ApplicationData.Instance.DataDirectory, Character.Model.FileName));
         }
 
         private bool _deleteCommand_CanExecute()
@@ -220,7 +250,7 @@ namespace DialogGenerator.UI.ViewModels
         }
 
 
-        private void _generateZIPFile(Character _selectedCharacter)
+        private void _generateZIPFile(Character _selectedCharacter,string path)
         {
             string _fileName = _selectedCharacter.FileName;
             string _fileAbsolutePath = Path.Combine(ApplicationData.Instance.DataDirectory, _fileName);
@@ -239,29 +269,7 @@ namespace DialogGenerator.UI.ViewModels
                 }
             }
 
-            System.Windows.Forms.SaveFileDialog _saveFileDialog = new System.Windows.Forms.SaveFileDialog
-            {
-                Filter = "Zip file(*.zip)|*.zip",
-                FileName = Path.GetFileNameWithoutExtension(_selectedCharacter.FileName)
-            };
-
-            System.Windows.Forms.DialogResult result = System.Windows.Forms.DialogResult.Cancel;
-
-            // send to application dispatcher(main thread)
-            Application.Current.Dispatcher.Invoke(() =>
-            {
-                result = _saveFileDialog.ShowDialog();
-            });
-
-            if (result == System.Windows.Forms.DialogResult.OK)
-            {
-                if (File.Exists(_saveFileDialog.FileName))
-                {
-                    File.Delete(_saveFileDialog.FileName);
-                }
-
-                ZipFile.CreateFromDirectory(ApplicationData.Instance.TempDirectory, _saveFileDialog.FileName);
-            }
+            ZipFile.CreateFromDirectory(ApplicationData.Instance.TempDirectory, path);
         }
 
         #endregion

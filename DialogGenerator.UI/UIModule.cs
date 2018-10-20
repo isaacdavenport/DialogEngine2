@@ -1,9 +1,7 @@
-﻿using DialogGenerator.Infrastructure;
+﻿using DialogGenerator.Core;
 using DialogGenerator.UI.Data;
 using DialogGenerator.UI.ViewModels;
 using DialogGenerator.UI.Views;
-using DialogGenerator.UI.Views.Dialogs;
-using DialogGenerator.UI.Views.Services;
 using Microsoft.Practices.Unity;
 using Prism.Modularity;
 using Prism.Regions;
@@ -22,7 +20,6 @@ namespace DialogGenerator.UI
         }
         public void Initialize()
         {
-            mContainer.RegisterType<IMessageDialogService,MessageDialogService>();
             mContainer.RegisterType<ICharacterDataProvider, CharacterDataProvider>();
             mContainer.RegisterType<IDialogModelDataProvider, DialogModelDataProvider>();
             mContainer.RegisterType<IWizardDataProvider, WizardDataProvider>();
@@ -39,9 +36,9 @@ namespace DialogGenerator.UI
             mContainer.RegisterType<CharacterDetailViewModel>(new ContainerControlledLifetimeManager());
             mContainer.RegisterType<DialogModelDetailViewModel>(new ContainerControlledLifetimeManager());
 
-            mRegionManager.RegisterViewWithRegion(RegionNames.MenuRegion, typeof(MenuView));
-            mRegionManager.RegisterViewWithRegion(RegionNames.ContentRegion, typeof(DialogView));
-            mRegionManager.RegisterViewWithRegion(RegionNames.NavigationRegion, typeof(CharactersNavigationView));
+            mRegionManager.RegisterViewWithRegion(Constants.MenuRegion, typeof(MenuView));
+            mRegionManager.RegisterViewWithRegion(Constants.ContentRegion, typeof(DialogView));
+            mRegionManager.RegisterViewWithRegion(Constants.NavigationRegion, typeof(CharactersNavigationView));
         }
     }
 }

@@ -1,4 +1,4 @@
-﻿using DialogGenerator.Infrastructure;
+﻿using DialogGenerator.Core;
 using DialogGenerator.Model;
 using DialogGenerator.UI.Views;
 using Prism.Regions;
@@ -40,7 +40,7 @@ namespace DialogGenerator.Views
 
             if (parameters != null)
             {
-                var activeView = mRegionManager.Regions[RegionNames.ContentRegion].ActiveViews.FirstOrDefault();
+                var activeView = mRegionManager.Regions[Constants.ContentRegion].ActiveViews.FirstOrDefault();
 
                 if(activeView != null && activeView.GetType().FullName.Equals(typeof(WizardView).FullName))
                 {
@@ -49,8 +49,8 @@ namespace DialogGenerator.Views
 
                 if (parameters[1].ToString().Contains(typeof(WizardView).Name))
                 {
-                    mRegionManager.Regions[RegionNames.NavigationRegion].RemoveAll();
-                    mRegionManager.Regions[RegionNames.ContentRegion].Context = parameters[2] as Character;
+                    mRegionManager.Regions[Constants.NavigationRegion].RemoveAll();
+                    mRegionManager.Regions[Constants.ContentRegion].Context = parameters[2] as Character;
                 }
 
                 mRegionManager.RequestNavigate(parameters[0].ToString(), parameters[1].ToString());

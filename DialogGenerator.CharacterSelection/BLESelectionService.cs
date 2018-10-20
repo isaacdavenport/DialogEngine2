@@ -1,5 +1,6 @@
-﻿using DialogGenerator.CharacterSelection.Helper;
-using DialogGenerator.CharacterSelection.Model.Exceptions;
+﻿using DialogGenerator.CharacterSelection.Data;
+using DialogGenerator.CharacterSelection.Helper;
+using DialogGenerator.CharacterSelection.Model;
 using DialogGenerator.CharacterSelection.Workflow;
 using DialogGenerator.Core;
 using DialogGenerator.DataAccess;
@@ -7,30 +8,30 @@ using DialogGenerator.Events;
 using DialogGenerator.Events.EventArgs;
 using Prism.Events;
 using System;
-using System.IO;
-using System.IO.Ports;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using System.Windows.Threading;
+using Windows.Devices.Bluetooth;
 
 namespace DialogGenerator.CharacterSelection
 {
-    public class SerialSelectionService : ICharacterSelection
+    public class BLESelectionService : ICharacterSelection
     {
         #region - fields -
 
         private ILogger mLogger;
         private IEventAggregator mEventAggregator;
-        //private IMessageDialogService mDialogService;
         private ICharacterRepository mCharacterRepository;
+        private IBLEDataProviderFactory mBLEDataProviderFactory;
+        private IBLEDataProvider mCurrentDataProvider;
+        private States mCurrentState;
         public const int StrongRssiBufDepth = 12;
         private int mTempCh1;
         private int mRowNum;
         private int mTempch2;
         private int[,] mStrongRssiCharacterPairBuf = new int[2, StrongRssiBufDepth];
         private int[] mNewRow = new int[ApplicationData.Instance.NumberOfRadios + 1];
-        private SerialPort mSerialPort;
         private CancellationTokenSource mCancellationTokenSource;
         private SerialSelectionWorkflow mWorkflow;
         private readonly DispatcherTimer mcHeatMapUpdateTimer = new DispatcherTimer();
@@ -49,17 +50,28 @@ namespace DialogGenerator.CharacterSelection
 
         #region - constructor -
 
-        public SerialSelectionService(ILogger logger,IEventAggregator _eventAggregator,ICharacterRepository _characterRepository)
+        public BLESelectionService(ILogger logger, IEventAggregator _eventAggregator,
+            ICharacterRepository _characterRepository, IBLEDataProviderFactory _BLEDataProviderFactory)
         {
             mLogger = logger;
             mEventAggregator = _eventAggregator;
-            //mDialogService = _dialogService;
-            mCharacterRepository = _characterRepository;
+            mCharacterRepository =  _characterRepository ;
+            mBLEDataProviderFactory = _BLEDataProviderFactory;
+
             mWorkflow = new SerialSelectionWorkflow(() => { });
+            mWorkflow.PropertyChanged += _mWorkflow_PropertyChanged;
 
             _configureWorkflow();
             mcHeatMapUpdateTimer.Interval = TimeSpan.FromSeconds(3);
             mcHeatMapUpdateTimer.Tick += _heatMapUpdateTimer_Tick;
+        }
+
+        private void _mWorkflow_PropertyChanged(object sender, System.ComponentModel.PropertyChangedEventArgs e)
+        {
+            if (e.PropertyName.Equals("State"))
+            {
+                CurrentState = mWorkflow.State;
+            }
         }
 
         #endregion
@@ -68,12 +80,7 @@ namespace DialogGenerator.CharacterSelection
 
         private void _heatMapUpdateTimer_Tick(object sender, EventArgs e)
         {
-        }
-
-
-        private void _serialPort_ErrorReceived(object sender, SerialErrorReceivedEventArgs e)
-        {
-            mLogger.Error("_serialPort_ErrorReceived " + e.EventType != null ? e.EventType.ToString() : "");
+            mEventAggregator.GetEvent<HeatMapUpdateEvent>().Publish(HeatMap);
         }
 
         #endregion
@@ -82,156 +89,74 @@ namespace DialogGenerator.CharacterSelection
 
         private void _configureWorkflow()
         {
-            mWorkflow.Configure(States.Start)
+            mWorkflow.Configure(States.Waiting)
                 .Permit(Triggers.Initialize, States.Init);
 
             mWorkflow.Configure(States.Init)
-                .Permit(Triggers.ReadMessage, States.ReadMessage)
-                .Permit(Triggers.SerialPortNameError, States.SerialPortNameError)
+                .Permit(Triggers.ProcessMessage, States.MessageProcessing)
                 .Permit(Triggers.Finish, States.Finish);
 
-            mWorkflow.Configure(States.Idle)
-                .Permit(Triggers.ReadMessage, States.ReadMessage)
-                .Permit(Triggers.Finish, States.Finish);
-
-            mWorkflow.Configure(States.SerialPortNameError)
-                .Permit(Triggers.Initialize, States.Init)
-                .Permit(Triggers.Start, States.Start);
-
-            mWorkflow.Configure(States.USB_disconnectedError)
-                .Permit(Triggers.Initialize, States.Init)
-                .Permit(Triggers.Finish, States.Finish);
-
-            mWorkflow.Configure(States.ReadMessage)
-                .Permit(Triggers.FindClosestPair, States.FindClosestPair)
-                .Permit(Triggers.USB_disconnectedError, States.USB_disconnectedError)
-                .Permit(Triggers.Idle, States.Idle)
-                .Permit(Triggers.Finish, States.Finish);
+            mWorkflow.Configure(States.MessageProcessing)
+                .PermitReentry(Triggers.ProcessMessage)
+                .Permit(Triggers.FindClosestPair, States.FindClosestPair);
 
             mWorkflow.Configure(States.FindClosestPair)
-                .Permit(Triggers.ReadMessage, States.ReadMessage)
+                .Permit(Triggers.ProcessMessage, States.MessageProcessing)
                 .Permit(Triggers.SelectNextCharacters, States.SelectNextCharacters)
                 .Permit(Triggers.Finish, States.Finish);
 
             mWorkflow.Configure(States.SelectNextCharacters)
-                .Permit(Triggers.ReadMessage, States.ReadMessage)
+                .Permit(Triggers.ProcessMessage, States.MessageProcessing)
                 .Permit(Triggers.Finish, States.Finish);
 
             mWorkflow.Configure(States.Finish)
                 .OnEntry(t => _finishSelection())
-                .Permit(Triggers.Start, States.Start);
+                .Permit(Triggers.Wait, States.Waiting);
         }
 
 
-
-        private Triggers _initSerial()
+        private async Task<Triggers> _initialize()
         {
-            try
-            {
-                NextCharacter1 = 0;
-                NextCharacter2 = 0;
+            var _localAdapter = await BluetoothAdapter.GetDefaultAsync();
 
-                mSerialPort = new SerialPort();
-                mSerialPort.ErrorReceived += _serialPort_ErrorReceived;
-                mSerialPort.PortName = ApplicationData.Instance.ComPortName;
-                mSerialPort.BaudRate = 460800;
-                mSerialPort.Handshake = Handshake.None;
-                mSerialPort.ReadTimeout = 500;
-                mSerialPort.Open();
-                mSerialPort.DiscardInBuffer();
+            if (_localAdapter.IsLowEnergySupported)
+            {
+                mCurrentDataProvider = mBLEDataProviderFactory.Create(BLEDataProviderType.WinBLEWatcher);
+            }
+            else
+            {
+                mCurrentDataProvider = mBLEDataProviderFactory.Create(BLEDataProviderType.Serial);
+            }
 
-                mcHeatMapUpdateTimer.Start();
-
-                return Triggers.ReadMessage;
-            }
-            catch (InvalidOperationException ex)  // Instance of SerialPort is already open and wi will redirect for reading messages
-            {
-                mLogger.Error("InvalidOperationException _initSerial  " + ex.Message);
-                return Triggers.ReadMessage;
-            }
-            catch (ArgumentException ex) // invalid port name (name is not formed as COM + digit)
-            {
-                mLogger.Error("ArgumentException _initSerial  " + ex.Message);
-                return Triggers.SerialPortNameError;
-            }
-            catch (IOException ex) // com port doesn't exists (usb is disconnected or not valid COM port name)
-            {
-                mLogger.Error("IOException _initSerial " + ex.Message);
-                return Triggers.SerialPortNameError;
-            }
+            return Triggers.ProcessMessage;
         }
-
 
         private void _finishSelection()
         {
-            try
-            {
-                mSerialPort.Close();  // Close() method calls Dispose() se we don't need to call Dispose()
-                mcHeatMapUpdateTimer.Stop();
-            }
-            catch (IOException ex)
-            {
-                mLogger.Error("_finishSelection " + ex.Message);
-            }
-
-            mWorkflow.Fire(Triggers.Start);
+            mcHeatMapUpdateTimer.Stop();
+            mWorkflow.Fire(Triggers.Wait);
         }
 
 
-        private  Triggers _usbDisconectedError()
-        {
-            //var result = mDialogService.ShowOKCancelDialog("USB disconected.Please check connection and try again.",
-            //    "Error","Try again","Finish dialog");
-
-            //if (result == MessageDialogResult.OK)
-            //    return Triggers.Initialize;
-            //else
-            {
-                StopCharacterSelection();
-
-                return Triggers.Finish;
-            }
-
-            
-        }
-
-
-        private Triggers _serialPortError()
-        {
-            //var result = mDialogService.ShowDedicatedDialog(DialogConstants.COM_PORT_ERROR_DLG);
-
-            //if (result == MessageDialogResult.OK)
-            //{
-            //    return Triggers.Initialize;
-            //}
-            //else
-            //{
-            //    return Triggers.Start;
-            //}
-
-            return Triggers.Start;
-        }
-
-
-        private Triggers _readMessage()
+        private Triggers _processMessage()
         {
             try
             {
                 _resetData();
                 string message = null;
 
-                message = _readSerialInLine();
+                message = mCurrentDataProvider.GetMessage();
 
                 if (message == null)
                 {
-                    return Triggers.Idle;
+                    return Triggers.ProcessMessage;
                 }
 
                 mRowNum = ParseMessageHelper.Parse(message, ref mNewRow);
 
                 if (mRowNum < 0 || mRowNum >= ApplicationData.Instance.NumberOfRadios)
                 {
-                    return Triggers.Idle;
+                    return Triggers.ProcessMessage;
                 }
                 else
                 {
@@ -239,25 +164,10 @@ namespace DialogGenerator.CharacterSelection
                     return Triggers.FindClosestPair;
                 }
             }
-            catch (COMPortClosedException ex)
-            {
-                mLogger.Error("_readMessage ");
-                return Triggers.USB_disconnectedError;
-            }
-            catch (TimeoutException ex)
-            {
-                mLogger.Error("_readMessage  " + ex.Message);
-                return Triggers.Idle;
-            }
-            catch (InvalidOperationException ex) // port is closed
-            {
-                mLogger.Error("_readMessage  " + ex.Message);
-                return Triggers.Initialize;
-            }
             catch (Exception ex)
             {
                 mLogger.Error("_readMessage " + ex.Message);
-                return Triggers.Idle;
+                return Triggers.ProcessMessage;
             }
         }
 
@@ -425,13 +335,13 @@ namespace DialogGenerator.CharacterSelection
                 }
                 else
                 {
-                    return Triggers.ReadMessage;
+                    return Triggers.ProcessMessage;
                 }
             }
             catch (Exception ex)
             {
                 mLogger.Error("_findBiggestRssiPair " + ex.Message);
-                return Triggers.ReadMessage;
+                return Triggers.ProcessMessage;
             }
         }
 
@@ -440,18 +350,18 @@ namespace DialogGenerator.CharacterSelection
         {
             try
             {
-                bool _charactersAssigned = _assignNextCharacters(mTempCh1, mTempch2);
-
-                if (_charactersAssigned)
+                if (_assignNextCharacters(mTempCh1, mTempch2))
                 {
-
-                        mEventAggregator.GetEvent<SelectedCharactersPairChangedEvent>().
-                            Publish(new SelectedCharactersPairEventArgs { Character1Index = NextCharacter1, Character2Index = NextCharacter2 });
-
-                    mEventAggregator.GetEvent<StopPlayingCurrentDialogLineEvent>().Publish();
+                    Session.Set(Constants.NEXT_CH_1, NextCharacter1);
+                    Session.Set(Constants.NEXT_CH_2, NextCharacter2);
 
                     CurrentCharacter1 = NextCharacter1;
                     CurrentCharacter2 = NextCharacter2;
+
+                    mEventAggregator.GetEvent<SelectedCharactersPairChangedEvent>().
+                        Publish(new SelectedCharactersPairEventArgs { Character1Index = CurrentCharacter1, Character2Index = CurrentCharacter2 });
+
+                    mEventAggregator.GetEvent<StopPlayingCurrentDialogLineEvent>().Publish();
                 }
             }
             catch (Exception ex)
@@ -459,58 +369,78 @@ namespace DialogGenerator.CharacterSelection
                 mLogger.Error("_selectNextCharacters " + ex.Message);
             }
 
-            return Triggers.ReadMessage;
+            return Triggers.ProcessMessage;
         }
 
-
-        private string _readSerialInLine()
-        {
-            string _message = null;
-
-            try
-            {
-                if (!mSerialPort.IsOpen)
-                    throw new COMPortClosedException();
-
-                if (mSerialPort.BytesToRead > 18)
-                {
-                    _message = mSerialPort.ReadLine();
-
-                    if (mSerialPort.BytesToRead > 1000)
-                    {
-                        // got behind for some reason
-                        mSerialPort.DiscardInBuffer();
-
-                        mLogger.Debug("serial buffer over run.");
-                    }
-                }
-            }
-            catch (COMPortClosedException ex)
-            {
-                throw ex;
-            }
-            catch (TimeoutException ex)
-            {
-                throw ex;
-            }
-            catch (InvalidOperationException ex)  // port is not open
-            {
-                throw ex;
-            }
-
-            return _message;
-        }
 
         #endregion
 
-        public Task StartCharacterSelection()
+        #region - public functions - 
+
+        public async Task StartCharacterSelection()
         {
-            throw new System.NotImplementedException();
+            mCancellationTokenSource = new CancellationTokenSource();
+
+            await Task.Run(async() =>
+            {
+                Thread.CurrentThread.Name = "StartCharacterSelection";
+
+                mWorkflow.Fire(Triggers.Initialize);
+                mcHeatMapUpdateTimer.Start();
+                Triggers next = await _initialize();
+                Task _BLEDataReaderTask = mCurrentDataProvider.StartReadingData();
+
+                do
+                {
+                    switch (next)
+                    {
+                        case Triggers.Initialize:
+                            {
+                                next = await _initialize();
+                                break;
+                            }
+                        case Triggers.ProcessMessage:
+                            {
+                                next = _processMessage();
+                                break;
+                            }
+                        case Triggers.FindClosestPair:
+                            {
+                                next = _findBiggestRssiPair();
+                                break;
+                            }
+                        case Triggers.SelectNextCharacters:
+                            {
+                                next = _selectNextCharacters();
+                                break;
+                            }
+                    }
+
+                    mWorkflow.Fire(next);
+                }
+                while (!mCancellationTokenSource.IsCancellationRequested);
+
+                await _BLEDataReaderTask;
+                mWorkflow.Fire(Triggers.Finish);
+            });          
         }
 
         public void StopCharacterSelection()
         {
-            throw new System.NotImplementedException();
+            mcHeatMapUpdateTimer.Stop();
+            mCancellationTokenSource.Cancel();
         }
+
+        #endregion
+
+        #region - properties -
+
+        public States CurrentState
+        {
+            get { return mCurrentState; }
+            set { mCurrentState = value; }
+        }
+
+        #endregion
     }
 }

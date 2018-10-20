@@ -162,10 +162,6 @@
       <Project>{a7052ea1-7219-4600-b0d9-0a8bf03c2faa}</Project>
       <Name>DialogGenerator.Events</Name>
     </ProjectReference>
-    <ProjectReference Include="..\DialogGenerator.Infrastructure\DialogGenerator.Infrastructure.csproj">
-      <Project>{35da7937-47c3-4db5-922e-8cca5a1309f6}</Project>
-      <Name>DialogGenerator.Infrastructure</Name>
-    </ProjectReference>
     <ProjectReference Include="..\DialogGenerator.Model\DialogGenerator.Model.csproj">
       <Project>{8900af0a-e911-4e26-b60a-47453f1c1e36}</Project>
       <Name>DialogGenerator.Model</Name>
@@ -179,9 +175,13 @@
       <Name>DialogGenerator.Utilities</Name>
     </ProjectReference>
   </ItemGroup>
-  <ItemGroup />
   <ItemGroup>
-    <Resource Include="Resources\avatar.png" />
+    <Resource Include="Resources\doll.jpg" />
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="Resources\avatar.png">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Resource>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <PropertyGroup>
@@ -193,6 +193,6 @@ if not exist "$(OutputDir)Audio" mkdir "$(OutputDir)Audio"
 if not exist "$(OutputDir)Tutorial" mkdir "$(OutputDir)Tutorial"
 
 if not exist "$(OutputDir)Images\avatar.png" copy "$(ProjectDir)Resources\avatar.png" "$(OutputDir)Images"
-</PostBuildEvent>
+if not exist "$(OutputDir)Images\doll.jpg" copy "$(ProjectDir)Resources\doll.jpg" "$(OutputDir)Images"</PostBuildEvent>
   </PropertyGroup>
 </Project>

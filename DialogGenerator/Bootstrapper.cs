@@ -10,12 +10,12 @@ using DialogGenerator.Views;
 using DialogGenerator.UI;
 using DialogGenerator.Utilities;
 using DialogGenerator.CharacterSelection;
+using Prism.Events;
 
 namespace DialogGenerator
 {
     public class Bootstrapper: UnityBootstrapper
     {
-
         protected override DependencyObject CreateShell()
         {
             return Container.Resolve<Shell>();
@@ -31,7 +31,7 @@ namespace DialogGenerator
         protected override void ConfigureContainer()
         {
             base.ConfigureContainer();
-
+            Container.RegisterType<IEventAggregator, EventAggregator>(new ContainerControlledLifetimeManager());
             Container.RegisterType<AppInitializer>();
             Container.RegisterType<Shell>();
         }
@@ -87,8 +87,6 @@ namespace DialogGenerator
                 ModuleType = _uiModuleType.AssemblyQualifiedName,
                 InitializationMode = InitializationMode.WhenAvailable
             });
-
-
         }
 
     }

@@ -9,6 +9,7 @@
              prism:ViewModelLocator.AutoWireViewModel="True"
              xmlns:converters="clr-namespace:DialogGenerator.UI.Converters"
              xmlns:s="clr-namespace:System;assembly=mscorlib"
+             xmlns:views="clr-namespace:DialogGenerator.UI.Views"
              TextElement.FontWeight="Regular"
              TextElement.FontSize="13"
              TextOptions.TextFormattingMode="Ideal" 
@@ -16,23 +17,31 @@
              TextElement.Foreground="{DynamicResource MaterialDesignBody}"
              mc:Ignorable="d" 
              d:DesignHeight="450" d:DesignWidth="800">
+    
     <UserControl.Resources>
         <ResourceDictionary>
             <converters:ImageToFullPathValueConverter x:Key="ImageToFullPathValueConverter" />
+            <converters:IsDialogBtnVisibleValueConverter x:Key="IsDialogBtnVisibleValueConverter" />
+            <converters:DivideBy2ValueConverter x:Key="DivideBy2ValueConverter" />
+            <converters:InvertVisibilityValueConverter x:Key="InvertVisibilityValueConverter" />
         </ResourceDictionary>
     </UserControl.Resources>
+    
     <Grid>
         <Grid.RowDefinitions>
-            <RowDefinition />
+            <RowDefinition Height="*"/>
             <RowDefinition Height="Auto" />
-        </Grid.RowDefinitions>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="60" />
+        </Grid.RowDefinitions> 
 
         <ItemsControl   x:Name="TextOutput"
                         ScrollViewer.VerticalScrollBarVisibility="Auto" 
                         HorizontalContentAlignment="Stretch"  
                         SnapsToDevicePixels="True"
                         Grid.Row="0"
-                        Margin="0,20,0,20"
+                        Margin="0,0,0,0"
+                        Padding="0,20,0,20"
                         Background="White"
                         VerticalAlignment="Stretch" 
                         HorizontalAlignment="Stretch"
@@ -52,18 +61,9 @@
                                 </Ellipse.Fill>
                             </Ellipse>                            
                             <StackPanel Grid.Column="1">
-                                <TextBlock Padding="8,10,4,4" 
-                                           TextWrapping="Wrap" 
-                                           FontWeight="SemiBold"
-                                           Text="{Binding Character.CharacterName }" 
-                                           Width="auto" 
-                                           HorizontalAlignment="Left"  />
-
-                                <TextBlock Padding="8,4,4,4" 
-                                           TextWrapping="Wrap" 
-                                           Text="{Binding Path=DialogLine }" 
-                                           Width="auto" 
-                                           HorizontalAlignment="Left"  />
+                                <TextBlock Padding="8,10,4,4" TextWrapping="Wrap" FontWeight="Bold"
+                                           Text="{Binding Character.CharacterName }" Width="auto" HorizontalAlignment="Left"  />
+                                <TextBlock Padding="8,4,4,4" TextWrapping="Wrap" Text="{Binding Path=DialogLine }" Width="auto" HorizontalAlignment="Left"  />
                             </StackPanel>
                         </Grid>
                     </DockPanel>
@@ -100,9 +100,9 @@
 
             <ItemsControl.ContextMenu>
                 <ContextMenu Background="White">
-                    <MenuItem Header="Clear All" Command="{Binding ClearAllMessages}" CommandParameter="DialogLinesCollection"  Background="White" >
+                    <MenuItem Header="Clear All" Command="{Binding ClearAllMessagesCommand}"   Background="White" >
                         <MenuItem.Icon>
-                            <Image Source="pack://application:,,,/Resources/Images/clearAll.png" />
+                            <materialDesign:PackIcon Kind="DeleteEmpty" Foreground="Red" />
                         </MenuItem.Icon>
                     </MenuItem>
                 </ContextMenu>
@@ -110,7 +110,22 @@
 
         </ItemsControl>
 
-        <Border  Grid.Row="1"  Background="White" Height="60" BorderBrush="LightGray" BorderThickness="0,1,0,0">
+        <GridSplitter Grid.Row="1" HorizontalAlignment="Stretch" Visibility="{Binding IsDebugViewVisible}" Height="10"  VerticalAlignment="Center" >
+            <GridSplitter.Template>
+                <ControlTemplate TargetType="{x:Type GridSplitter}">
+                    <Grid>
+                        <Label Content="..." Height="10" Foreground="Red"/>
+                    </Grid>
+                </ControlTemplate>
+            </GridSplitter.Template>
+        </GridSplitter>
+
+        <Border Grid.Row="2" BorderBrush="LightGray" HorizontalAlignment="Stretch" 
+                Visibility="{Binding IsDebugViewVisible}" VerticalAlignment="Stretch" BorderThickness="0,1,0,0" >
+            <views:DebugView HorizontalAlignment="Stretch" VerticalAlignment="Stretch" />
+        </Border>
+
+        <Border  Grid.Row="3"  Background="White" Height="60" BorderBrush="LightGray" BorderThickness="0,1,0,0">
             <Grid>
                 <StackPanel Orientation="Horizontal" HorizontalAlignment="Center" Margin="10">
                     <Button>
@@ -121,32 +136,20 @@
                             </StackPanel>
                         </Button.Content>
                     </Button>
-                    <Button Content="{Binding BtnContent}" Command="{Binding StartOrStopDialogCommand}" Margin="20,0,0,0"  VerticalAlignment="Center"/>
+                    <Button Visibility="{Binding IsDialogStarted, Converter={StaticResource IsDialogBtnVisibleValueConverter},ConverterParameter=StartDialog}" 
+                            Command="{Binding StartDialogCommand}" Margin="20,0,0,0"  VerticalAlignment="Center" Content="Start dialog" x:Name="StartDialogBtn"/>
+                    <Button Content="Stop dialog" Visibility="{Binding IsDialogStarted,Converter={StaticResource IsDialogBtnVisibleValueConverter},ConverterParameter=StopDialog}" 
+                            IsEnabled="{Binding IsStopBtnEnabled}" Command="{Binding StopDialogCommand}"  Margin="20,0,0,0" VerticalAlignment="Center" />
                 </StackPanel>
 
-                <Button HorizontalAlignment="Right" Background="LightGray" BorderThickness="1" BorderBrush="DarkGray" Foreground="Black" Margin="0,0,10,0" Padding="5">
-                    <Button.Content>
-                        <materialDesign:PopupBox Margin="0,0,0,0"
-                                                 HorizontalAlignment="Center"
-                                                 Style="{DynamicResource MaterialDesignToolForegroundPopupBox}"  
-                                                 Background="Red">
-                            
-                            <materialDesign:PopupBox.ToggleContent>
-                                <StackPanel Orientation="Horizontal">
-                                    <materialDesign:PackIcon Margin="0,0,5,0" Kind="AndroidDebugBridge" />
-                                    <TextBlock Text="Debug" />
-                                </StackPanel>
-                            </materialDesign:PopupBox.ToggleContent>
-                            
-                            <StackPanel>
-                                <Button Content="Show errors" />
-                                <Button Content="Show warnings" />
-                                <Button Content="Show info" />
-                                <Button Content="Heatmap" />
-                            </StackPanel>
-                        </materialDesign:PopupBox>
-                    </Button.Content>
-                </Button>
+                <StackPanel Orientation="Horizontal" VerticalAlignment="Center" Margin="0,0,5,0" HorizontalAlignment="Right">
+                    <Button HorizontalAlignment="Right" Command="{Binding ChangeDebugVisibilityCommand}" 
+                            Visibility="{Binding IsDebugViewVisible, Converter={StaticResource InvertVisibilityValueConverter}}" 
+                            Content="Show debug view" Background="DarkGray" BorderBrush="DarkGray" Foreground="{DynamicResource MaterialDesignBody}" Margin="0,0,10,0" Padding="5">
+                    </Button>
+                    <Button Content="Hide debug view" Visibility="{Binding IsDebugViewVisible}" Command="{Binding ChangeDebugVisibilityCommand}" 
+                            BorderBrush="DarkGray" Background="DarkGray" Foreground="{DynamicResource MaterialDesignBody}" Margin="0,0,10,0" Padding="5" />
+                </StackPanel>
             </Grid>
         </Border>
     </Grid>

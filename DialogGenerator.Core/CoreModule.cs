@@ -16,7 +16,7 @@ namespace DialogGenerator.Core
         public void Initialize()
         {
             mContainer.RegisterType<ILogger,Logger>(new ContainerControlledLifetimeManager());
-            mContainer.RegisterType<IEventAggregator, EventAggregator>();
+            //mContainer.RegisterType<IEventAggregator, EventAggregator>(new ContainerControlledLifetimeManager());
         }
     }
 }

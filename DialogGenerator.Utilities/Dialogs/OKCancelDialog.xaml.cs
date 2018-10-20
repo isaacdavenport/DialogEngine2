@@ -1,6 +1,6 @@
 ﻿using System.Windows.Controls;
 
-namespace DialogGenerator.UI.Views.Dialogs
+namespace DialogGenerator.Utilities.Dialogs
 {
     /// <summary>
     /// Interaction logic for OKCancelDialog.xaml

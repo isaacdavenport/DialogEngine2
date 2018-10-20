@@ -2,12 +2,14 @@
 using DialogGenerator.Model;
 using DialogGenerator.UI.Data;
 using DialogGenerator.UI.Helper;
+using MaterialDesignThemes.Wpf;
 using Prism.Commands;
 using Prism.Events;
 using Prism.Mvvm;
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
+using System.IO;
 using System.Linq;
 using System.Windows;
 using System.Windows.Controls;
@@ -18,18 +20,17 @@ namespace DialogGenerator.UI.ViewModels
 {
     public class AssignCharactersToDollsViewModel : BindableBase
     {
-
         #region - fields -
 
         private ILogger mLogger;
         private IEventAggregator mEventAggregator;
         private ICharacterDataProvider mCharacterDataProvider;
-        private Point mStartPosition;
+        private string mDollFileName = "doll.jpg";
 
         #endregion
 
         #region - constructor -
-        public AssignCharactersToDollsViewModel(ILogger _logger,IEventAggregator _eventAggregator,
+        public AssignCharactersToDollsViewModel(ILogger _logger, IEventAggregator _eventAggregator,
             ICharacterDataProvider _characterDataProvider)
         {
             mLogger = _logger;
@@ -43,11 +44,8 @@ namespace DialogGenerator.UI.ViewModels
 
         #region - commands -
 
-        public DelegateCommand<MouseButtonEventArgs> PreviewMouseLeftButtonDownCommand { get; set; }
-        public DelegateCommand<MouseEventArgs> PreviewMouseMoveCommand { get; set; }
-        public DelegateCommand<DragEventArgs> DragEnterCommand { get; set; }
-        public DelegateCommand<DragEventArgs> DropCommand { get; set; }
-        public DelegateCommand<DragEventArgs> DragOverCommand { get; set; }
+        public DelegateCommand<object> UnbindCharacterCommand { get; set; }
+        public DelegateCommand<object> SaveConfigurationCommand { get; set; }
 
         #endregion
 
@@ -55,140 +53,58 @@ namespace DialogGenerator.UI.ViewModels
 
         private void _bindCommands()
         {
-            PreviewMouseLeftButtonDownCommand = new DelegateCommand<MouseButtonEventArgs>(_previewMouseLeftButtonDownCommand_Execute);
-            PreviewMouseMoveCommand = new DelegateCommand<MouseEventArgs>(_previewMouseMoveCommand_Execute);
-            DragEnterCommand = new DelegateCommand<DragEventArgs>(_dragEnterCommand_Execute);
-            DropCommand = new DelegateCommand<DragEventArgs>(_dropCommand_Execute);
-            DragOverCommand = new DelegateCommand<DragEventArgs>(_dragOverCommand_Execute);
+            UnbindCharacterCommand = new DelegateCommand<object>(_unbindCharacterCommand_Execute);
+            SaveConfigurationCommand = new DelegateCommand<object>(_saveConfigurationCommand_Execute);
         }
 
-        private void _dragOverCommand_Execute(DragEventArgs obj)
+        private void _saveConfigurationCommand_Execute(object param)
         {
-            obj.Handled = true;
+            object[] parametes = (object[])param;
+            int _indexOfSelectedCharacter = int.Parse(parametes[1].ToString());
+            var popup = parametes[3] as PopupBox;
+
+            if (_indexOfSelectedCharacter < 0)
+            {
+                popup.IsPopupOpen = false;
+                return;
+            }
+
+            int _currentDoll = int.Parse(parametes[0].ToString());
+            var _itemsControl = parametes[2] as ItemsControl;
+
+            var _selectedCharacter = mCharacterDataProvider.GetAll()[_indexOfSelectedCharacter];
+
+            if(_selectedCharacter.RadioNum >= 0)
+            {
+                CharacterRadioRelationshipList[_selectedCharacter.RadioNum] = null;
+            }
+
+            if(CharacterRadioRelationshipList[_currentDoll] != null)
+            {
+                var _oldCharacter = mCharacterDataProvider.GetAll().Where(c => c.RadioNum == _currentDoll).First();
+                _oldCharacter.RadioNum = -1;
+            }
+
+            _selectedCharacter.RadioNum = _currentDoll;
+            CharacterRadioRelationshipList[_currentDoll] = _selectedCharacter;
+
+            popup.IsPopupOpen = false;
+            _itemsControl.Items.Refresh();
         }
 
-        private void _dropCommand_Execute(DragEventArgs obj)
+        private void _unbindCharacterCommand_Execute(object parameters)
         {
-            try
-            {
-                if (obj.Data.GetDataPresent("characterFormat"))
-                {
-                    Character _draggedCharacter = obj.Data.GetData("characterFormat") as Character;
-                    var _objectSource = obj.OriginalSource is Run ? (obj.OriginalSource as Run).Parent : obj.OriginalSource;
-                    Grid grid = VisualHelper.GetNearestContainer<Grid>(_objectSource as DependencyObject);
-                    int _currentDollIndex = int.Parse(grid.Tag.ToString());
-                    Character _assignedCharacter = CharacterRadioRelationshipList[_currentDollIndex];
+            var args = (object[])parameters;
+            int _dollNumber = int.Parse(args[0].ToString());
+            var _itemsControl = args[1] as ItemsControl;
 
-                    if (_assignedCharacter == null)
-                    {
-                        var key = CharacterRadioRelationshipList
-                            .Where(pair => pair.Value != null && pair.Value.Equals(_draggedCharacter))
-                            .Select(pair => pair.Key);
+            if (CharacterRadioRelationshipList[_dollNumber] == null)
+                return;
 
-                        if (key.Any())
-                        {
-                            CharacterRadioRelationshipList[key.First()] = null;
-                        }
+            CharacterRadioRelationshipList[_dollNumber].RadioNum = -1;
+            CharacterRadioRelationshipList[_dollNumber] = null;
 
-                        _draggedCharacter.RadioNum = _currentDollIndex;
-                        CharacterRadioRelationshipList[_currentDollIndex] = _draggedCharacter;
-                    }
-                    else
-                    {
-                        if (_assignedCharacter.Equals(_draggedCharacter))
-                        {
-                            obj.Handled = true;
-                            return;
-                        }
-                        else
-                        {
-                            var key = CharacterRadioRelationshipList
-                                .Where(pair => pair.Value != null && pair.Value.Equals(_draggedCharacter))
-                                .Select(pair => pair.Key);
-
-                            if (key.Any())
-                            {
-                                CharacterRadioRelationshipList[key.First()] = null;
-                            }
-
-                            _assignedCharacter.RadioNum = -1;
-                            _draggedCharacter.RadioNum = _currentDollIndex;
-
-                            CharacterRadioRelationshipList[_currentDollIndex] = _draggedCharacter;
-                        }
-                    }
-
-                    var _itemsControl = obj.Source as ItemsControl;
-                    _itemsControl.Items.Refresh();
-
-                    var _listbox = VisualHelper.GetVisualChild<ListBox>(_itemsControl.Parent as Grid);
-                    _listbox.Items.Refresh();
-                }
-            }
-            catch (Exception ex)
-            {
-                mLogger.Error("Error during executing drop command. " + ex.Message);
-            }
-            finally
-            {
-                obj.Handled = true;
-            }
-        }
-
-        private void _dragEnterCommand_Execute(DragEventArgs obj)
-        {
-            try
-            {
-                if (!obj.Data.GetDataPresent("characterFormat") || !(obj.Source is ItemsControl))
-                    obj.Effects = DragDropEffects.None;
-                else
-                    obj.Effects = DragDropEffects.Copy;
-            }
-            catch (Exception ex)
-            {
-                mLogger.Error("Drag enter command. " + ex.Message);
-            }
-            finally
-            {
-                obj.Handled = true;
-            }
-        }
-
-        private void _previewMouseMoveCommand_Execute(MouseEventArgs obj)
-        {
-            try
-            {
-                Point _mousePos = obj.GetPosition(null);
-                Vector diff = mStartPosition - _mousePos;
-
-                if ((obj.LeftButton == MouseButtonState.Pressed)
-                    && (Math.Abs(diff.X) > SystemParameters.MinimumHorizontalDragDistance
-                    || Math.Abs(diff.Y) > SystemParameters.MinimumVerticalDragDistance))
-                {
-                    ListBox _listBox = obj.Source as ListBox;
-                    ListBoxItem _listBoxItem = VisualHelper.GetNearestContainer<ListBoxItem>((DependencyObject)obj.OriginalSource);
-
-                    Character character = (Character)_listBox.ItemContainerGenerator.ItemFromContainer(_listBoxItem);
-
-                    DataObject _dragData = new DataObject("characterFormat", character);
-
-                    DragDrop.DoDragDrop(_listBoxItem, _dragData, DragDropEffects.Copy);
-                }
-
-            }
-            catch (Exception ex)
-            {
-                mLogger.Error("Error during preview mosue down. " + ex.Message);
-            }
-            finally
-            {
-                obj.Handled = true;
-            }
-        }
-
-        private void _previewMouseLeftButtonDownCommand_Execute(MouseButtonEventArgs obj)
-        {
-            mStartPosition = obj.GetPosition(null);
+            _itemsControl.Items.Refresh();
         }
 
         #endregion
@@ -197,12 +113,17 @@ namespace DialogGenerator.UI.ViewModels
 
         public ObservableCollection<Character> Characters
         {
-            get { return Session.Get<ObservableCollection<Character>>(Constants.CHARACTERS); }
+            get { return mCharacterDataProvider.GetAll(); }
         }
 
         public Dictionary<int,Character> CharacterRadioRelationshipList
         {
             get { return Session.Get<Dictionary<int, Character>>(Constants.CH_RADIO_RELATIONSHIP); }
+        }
+
+        public string DollFileName
+        {
+            get { return Path.Combine(ApplicationData.Instance.ImagesDirectory, mDollFileName); }
         }
 
         #endregion

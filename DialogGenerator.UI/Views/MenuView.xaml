@@ -7,7 +7,7 @@
              xmlns:prism="http://prismlibrary.com/"            
              prism:ViewModelLocator.AutoWireViewModel="True"
              xmlns:view="clr-namespace:DialogGenerator.UI.Views"
-             xmlns:inf="clr-namespace:DialogGenerator.Infrastructure;assembly=DialogGenerator.Infrastructure"
+             xmlns:inf="clr-namespace:DialogGenerator.Core;assembly=DialogGenerator.Core"
              xmlns:converters="clr-namespace:DialogGenerator.UI.Converters"
              mc:Ignorable="d"
              d:DesignHeight="450" d:DesignWidth="800">
@@ -17,8 +17,14 @@
         </ResourceDictionary>
     </UserControl.Resources>
     
-    <Grid >
-        <Menu  FontSize="13" Height="40" Grid.Row="0"  VerticalContentAlignment="Center" Background="LightGray">
+    <Grid Background="LightGray">
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="auto" />
+            <ColumnDefinition Width="*" />
+            <ColumnDefinition Width="auto" />
+        </Grid.ColumnDefinitions>
+        
+        <Menu  FontSize="13" Height="40"  Grid.Column="0" x:Name="Menu" Background="LightGray">
             <Menu.ItemsPanel>
                 <ItemsPanelTemplate>
                     <DockPanel HorizontalAlignment="Stretch" />
@@ -30,7 +36,7 @@
                           Command="NavigationCommands.GoToPage">
                     <MenuItem.CommandParameter>
                         <MultiBinding Converter="{StaticResource CloneValuesConverter}">
-                            <Binding Source="{x:Static inf:RegionNames.NavigationRegion}" />
+                            <Binding Source="{x:Static inf:Constants.NavigationRegion}" />
                             <Binding Source="{x:Type view:CharactersNavigationView}" />
                         </MultiBinding>
                     </MenuItem.CommandParameter>
@@ -40,7 +46,7 @@
                           Command="NavigationCommands.GoToPage">
                     <MenuItem.CommandParameter>
                         <MultiBinding Converter="{StaticResource CloneValuesConverter}">
-                            <Binding Source="{x:Static inf:RegionNames.NavigationRegion}"/>
+                            <Binding Source="{x:Static inf:Constants.NavigationRegion}"/>
                             <Binding Source="{x:Type view:DialogModelsNavigationView}" />
                         </MultiBinding>
                     </MenuItem.CommandParameter>
@@ -81,13 +87,30 @@
                     </MenuItem.Icon>
                 </MenuItem>
             </MenuItem>
-
-            <MenuItem HorizontalAlignment="Right" VerticalAlignment="Center"  HorizontalContentAlignment="Center"  VerticalContentAlignment="Center">
-                <MenuItem.Icon>
-                    <materialDesign:PackIcon Height="15" Width="15" HorizontalAlignment="Center" Padding="0" Margin="0" VerticalAlignment="Center"  Kind="Settings" />
-                </MenuItem.Icon>
-                <MenuItem Header="_Settings" Command="{Binding OpenSettingsDialogCommand}" />
-            </MenuItem>
         </Menu>
+
+        <StackPanel Grid.Column="2" Orientation="Horizontal" Height="40" Background="LightGray" VerticalAlignment="Center">
+            <TextBlock VerticalAlignment="Center" FontSize="12" Foreground="Orange" Text="{Binding SelectionMode}" />
+            <Label VerticalAlignment="Center" Margin="10,0,10,0">
+                <Label.Content>
+                    <materialDesign:PackIcon Height="15" Width="15" HorizontalAlignment="Right" Kind="Settings" />
+                </Label.Content>
+                <Label.Template>
+                    <ControlTemplate TargetType="{x:Type Label}">
+                        <ContentPresenter HorizontalAlignment="{TemplateBinding HorizontalContentAlignment}"
+                                          VerticalAlignment="{TemplateBinding VerticalContentAlignment}" />
+                        <ControlTemplate.Triggers>
+                            <Trigger Property="IsMouseOver" Value="true">
+                                <Setter Property="Foreground" Value="DarkGray" />
+                            </Trigger>
+                        </ControlTemplate.Triggers>
+                    </ControlTemplate>
+                </Label.Template>
+                <Label.InputBindings>
+                    <MouseBinding MouseAction="LeftClick" Command="{Binding OpenSettingsDialogCommand}" />
+                </Label.InputBindings>
+            </Label>
+        </StackPanel>
+        
     </Grid>
 </UserControl>

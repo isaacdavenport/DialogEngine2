@@ -6,12 +6,9 @@ namespace DialogGenerator.CharacterSelection.Workflow
 {
     public enum States
     {
-        Start,
+        Waiting,
         Init,
-        Idle,
-        SerialPortNameError,
-        USB_disconnectedError,
-        ReadMessage,
+        MessageProcessing,
         FindClosestPair,
         SelectNextCharacters,
         Finish
@@ -19,12 +16,9 @@ namespace DialogGenerator.CharacterSelection.Workflow
 
     public enum Triggers
     {
-        Start,
+        Wait,
         Initialize,
-        Idle,
-        SerialPortNameError,
-        USB_disconnectedError,
-        ReadMessage,
+        ProcessMessage,
         FindClosestPair,
         SelectNextCharacters,
         Finish
@@ -34,7 +28,7 @@ namespace DialogGenerator.CharacterSelection.Workflow
     {
         public event PropertyChangedEventHandler PropertyChanged;
 
-        public SerialSelectionWorkflow(Action action):base(States.Start)
+        public SerialSelectionWorkflow(Action action):base(States.Waiting)
         {
             OnTransitioned
             (

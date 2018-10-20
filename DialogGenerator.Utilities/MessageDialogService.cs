@@ -1,10 +1,10 @@
-﻿using DialogGenerator.UI.Views.Dialogs;
+﻿using DialogGenerator.Utilities.Dialogs;
 using MaterialDesignThemes.Wpf;
 using System;
 using System.Threading.Tasks;
 using System.Windows;
 
-namespace DialogGenerator.UI.Views.Services
+namespace DialogGenerator.Utilities
 {
     public enum MessageDialogResult
     {

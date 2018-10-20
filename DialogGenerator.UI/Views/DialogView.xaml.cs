@@ -1,6 +1,4 @@
-﻿using System;
-using System.Collections.Specialized;
-using System.Windows;
+﻿using System.Collections.Specialized;
 using System.Windows.Controls;
 using System.Windows.Media;
 

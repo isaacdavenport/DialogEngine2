@@ -4,15 +4,18 @@ using DialogGenerator.Events;
 using DialogGenerator.Model;
 using DialogGenerator.Model.Enum;
 using DialogGenerator.UI.Data;
+using DialogGenerator.UI.Views.Dialogs;
+using DialogGenerator.Utilities;
+using MaterialDesignThemes.Wpf;
 using Prism.Commands;
 using Prism.Events;
 using Prism.Mvvm;
 using System;
-using System.Collections.ObjectModel;
 using System.ComponentModel;
 using System.IO;
 using System.IO.Compression;
 using System.Linq;
+using System.Threading;
 using System.Threading.Tasks;
 using System.Windows.Data;
 
@@ -23,6 +26,7 @@ namespace DialogGenerator.UI.ViewModels
         #region - fields -
 
         private ILogger mLogger;
+        private IMessageDialogService mMessageDialogService;
         private IDialogDataRepository mDialogDataRepository;
         private ICharacterDataProvider mCharacterDataProvider;
         private IDialogModelDataProvider mDialogModelDataProvider;
@@ -37,17 +41,22 @@ namespace DialogGenerator.UI.ViewModels
         #region - constructor -
 
         public CharactersNavigationViewModel(ILogger logger,IEventAggregator _eventAggregator,IWizardDataProvider _wizardDataProvider,
-            IDialogModelDataProvider _dialogModelDataProvider,ICharacterDataProvider _characterDataProvider, IDialogDataRepository _dialogDataRepository)
+            IDialogModelDataProvider _dialogModelDataProvider,ICharacterDataProvider _characterDataProvider, 
+            IDialogDataRepository _dialogDataRepository,IMessageDialogService _messageDialogService)
         {
-            mCharactersViewSource = new CollectionViewSource();
             mEventAggregator = _eventAggregator;
             mLogger = logger;
+            mMessageDialogService = _messageDialogService;
             mDialogDataRepository = _dialogDataRepository;
             mCharacterDataProvider = _characterDataProvider;
             mDialogModelDataProvider = _dialogModelDataProvider;
             mWizardDataProvider = _wizardDataProvider;
 
+            mCharactersViewSource = new CollectionViewSource();
+            FilterText = "";
+
             mCharactersViewSource.Filter += _mCharacterViewSource_Filter;
+
             _bindCommands();
         }
 
@@ -138,6 +147,12 @@ namespace DialogGenerator.UI.ViewModels
                         {
                             Session.Set(Constants.FORCED_CH_1, -1);
                             Session.Set(Constants.FORCED_CH_COUNT, _forcedCharactersCount - 1);
+
+                            if(Session.Get<int>(Constants.FORCED_CH_COUNT) == 1)
+                            {
+                                Session.Set(Constants.FORCED_CH_1, Session.Get<int>(Constants.FORCED_CH_2));
+                                Session.Set(Constants.FORCED_CH_2, -1);
+                            }
                         }
 
                         if (Session.Get<int>(Constants.FORCED_CH_2) == index)
@@ -150,7 +165,8 @@ namespace DialogGenerator.UI.ViewModels
 
                 character.State = _newState;
 
-
+                mEventAggregator.GetEvent<ChangedCharacterStateEvent>().Publish();
+                mEventAggregator.GetEvent<StopPlayingCurrentDialogLineEvent>().Publish();
             }
             catch (Exception ex)
             {
@@ -167,8 +183,12 @@ namespace DialogGenerator.UI.ViewModels
 
                 if (_openFileDialog.ShowDialog() == System.Windows.Forms.DialogResult.OK)
                 {
+                    var dialog = new BusyDialog();
+                    mMessageDialogService.ShowDedicatedDialogAsync<MessageDialogResult>(dialog);
+
                     await Task.Run(() =>
                     {
+                        Thread.CurrentThread.Name = "_importCharacterCommand_Execute";
                         ZipFile.ExtractToDirectory(_openFileDialog.FileName, ApplicationData.Instance.TempDirectory);
 
                         _processExtractedFiles();
@@ -180,9 +200,33 @@ namespace DialogGenerator.UI.ViewModels
 
                         foreach (FileInfo file in _directoryInfo.GetFiles())
                         {
-                            file.Delete();
+                            bool _isDeleted = false;
+                            int counter = 0;
+
+                            do
+                            {
+                                try
+                                {
+                                    File.Delete(file.FullName);
+
+                                    _isDeleted = true;
+                                }
+                                catch (Exception)
+                                {
+                                    Thread.Sleep(500);
+                                    counter++;
+                                }
+                            }
+                            while (!_isDeleted && counter <= 16); // wait 8 seconds to delete file 
+
+                            if (!_isDeleted)
+                            {
+                                throw new Exception("Error during deleting file.");
+                            }
                         }
                     });
+
+                    DialogHost.CloseDialogCommand.Execute(null, dialog);
                 }
             }
             catch (Exception ex)
@@ -291,7 +335,7 @@ namespace DialogGenerator.UI.ViewModels
             set
             {
                 mFilterText = value;
-                mCharactersViewSource.View.Refresh();
+                mCharactersViewSource.View?.Refresh();
                 RaisePropertyChanged();
             }
         }

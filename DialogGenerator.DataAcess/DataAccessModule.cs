@@ -6,7 +6,6 @@ namespace DialogGenerator.DataAccess
     public class DataAccessModule:IModule
     {
         private IUnityContainer mContainer;
-
         public DataAccessModule(IUnityContainer container)
         {
             mContainer = container;

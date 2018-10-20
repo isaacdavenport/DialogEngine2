@@ -1,6 +1,6 @@
 ﻿using System.Threading.Tasks;
 
-namespace DialogGenerator.UI.Views.Services
+namespace DialogGenerator.Utilities
 {
     public interface IMessageDialogService
     {

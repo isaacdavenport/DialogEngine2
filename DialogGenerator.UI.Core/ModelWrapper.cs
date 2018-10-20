@@ -2,7 +2,7 @@
 using System.ComponentModel.DataAnnotations;
 using System.Runtime.CompilerServices;
 
-namespace DialogGenerator.UI.Wrapper
+namespace DialogGenerator.UI.Core
 {
     public class ModelWrapper<T> : NotifyDataErrorInfoBase
     {
@@ -23,7 +23,7 @@ namespace DialogGenerator.UI.Wrapper
 
         private void _validateDataAnnotations(string _propertyName, object _currentValue)
         {
-            var results = new List<ValidationResult>();
+            var results = new List<System.ComponentModel.DataAnnotations.ValidationResult>();
             var context = new ValidationContext(Model) { MemberName = _propertyName };
             Validator.TryValidateProperty(_currentValue, context, results);
 

@@ -1,5 +1,5 @@
-﻿using DialogGenerator.Events;
-using DialogGenerator.Infrastructure;
+﻿using DialogGenerator.Core;
+using DialogGenerator.Events;
 using DialogGenerator.UI.Views;
 using Prism.Events;
 using Prism.Mvvm;
@@ -46,21 +46,21 @@ namespace DialogGenerator.ViewModels
 
         private void _onOpenDialogModelDetailView(string obj)
         {
-            var _activeView = mRegionManager.Regions[RegionNames.ContentRegion].GetView(typeof(DialogModelDetailView).FullName);
+            var _activeView = mRegionManager.Regions[Constants.ContentRegion].GetView(typeof(DialogModelDetailView).FullName);
 
             if (_activeView == null)
             {
-                mRegionManager.RequestNavigate(RegionNames.ContentRegion, typeof(DialogModelDetailView).FullName);
+                mRegionManager.RequestNavigate(Constants.ContentRegion, typeof(DialogModelDetailView).FullName);
             }
         }
 
         private void _onOpenCharacterDetailView(string obj)
         {
-            var _activeView = mRegionManager.Regions[RegionNames.ContentRegion].GetView(typeof(CharacterDetailView).FullName);
+            var _activeView = mRegionManager.Regions[Constants.ContentRegion].GetView(typeof(CharacterDetailView).FullName);
 
             if(_activeView == null)
             {
-                mRegionManager.RequestNavigate(RegionNames.ContentRegion, typeof(CharacterDetailView).FullName);
+                mRegionManager.RequestNavigate(Constants.ContentRegion, typeof(CharacterDetailView).FullName);
             }
         }
 

@@ -31,6 +31,7 @@ namespace DialogGenerator
 
         private void _appInit_Completed(object sender, EventArgs e)
         {
+            
             SplashScreenManager.Close();
             Current.MainWindow.Show();
         }

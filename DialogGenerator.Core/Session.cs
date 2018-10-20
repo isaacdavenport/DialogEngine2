@@ -51,7 +51,7 @@ namespace DialogGenerator.Core
                 msDictionary.Add(key, value);
             }
 
-            //SessionPropertyChanged(null, key);
+            _onSessionPropertyChagned(key);
         }
 
         /// <summary>

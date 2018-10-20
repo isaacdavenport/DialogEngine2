@@ -3,9 +3,354 @@
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             xmlns:prism="http://prismlibrary.com/"            
+             prism:ViewModelLocator.AutoWireViewModel="True"
+             xmlns:i="clr-namespace:System.Windows.Interactivity;assembly=System.Windows.Interactivity"            
+             xmlns:materialDesign="http://materialdesigninxaml.net/winfx/xaml/themes"
+             xmlns:converters="clr-namespace:DialogGenerator.UI.Converters"
+             xmlns:views="clr-namespace:DialogGenerator.UI.Views"
              mc:Ignorable="d" 
              d:DesignHeight="450" d:DesignWidth="800">
+    <UserControl.Resources>
+        <ResourceDictionary>
+            <ResourceDictionary.MergedDictionaries>
+                <ResourceDictionary>
+                    <converters:MatrixToDataViewConverter x:Key="MatrixToDataViewConverter" />
+                    <converters:MatrixCellValueToBackgroundColorConverter x:Key="MatrixCellValueToBackgroundColorConverter" />
+                    <converters:StarWidthConverter x:Key="StarWidthConverter" />
+                </ResourceDictionary>
+                <!--<ResourceDictionary Source="pack://application:,,,/DialogGenerator.UI;component/Themes/TabControlStyle.xaml" />-->
+            </ResourceDictionary.MergedDictionaries>
+        </ResourceDictionary>
+    </UserControl.Resources>
     <Grid>
-            
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition />
+            <ColumnDefinition Width="auto" />
+        </Grid.ColumnDefinitions>
+
+        <TabControl  Grid.Row="2" 
+                     BorderThickness="0,0,0,1"
+                     BorderBrush="LightGray"
+                     HorizontalAlignment="Stretch" 
+                     TabStripPlacement="Bottom"
+                     Padding="0"
+                     MinHeight="10"
+                     Margin="1,0,0,0"
+                     VerticalAlignment="Stretch"
+                     Background="White"
+                     Style="{x:Null}"
+                     x:Name="LoggerMessagesTabControl">
+            <TabControl.Resources>
+                <Style TargetType="TabItem">
+                    <Setter Property="Template">
+                        <Setter.Value>
+                            <ControlTemplate TargetType="TabItem">
+                                <Grid Name="Panel">
+                                    <Grid.RowDefinitions>
+                                        <RowDefinition />
+                                    </Grid.RowDefinitions>
+                                    <ContentPresenter   Grid.Row="0" x:Name="ContentSite" VerticalAlignment="Center"
+                                                        HorizontalAlignment="Center" ContentSource="Header" Height="auto" Margin="10,3,10,3"/>
+                                </Grid>
+                                <ControlTemplate.Triggers>
+                                    <Trigger Property="IsSelected" Value="True">
+                                        <Setter TargetName="Panel" Property="Background" Value="{DynamicResource PrimaryHueMidBrush}" />
+                                        <Setter Property="Foreground" Value="White" />
+                                    </Trigger>
+                                    <Trigger Property="IsMouseOver" Value="True">
+                                        <Setter TargetName="Panel" Property="Background" Value="{DynamicResource SecondaryAccentBrush}" />
+                                        <Setter Property="Foreground" Value="White" />
+                                    </Trigger>
+                                </ControlTemplate.Triggers>
+                            </ControlTemplate>
+                        </Setter.Value>
+                    </Setter>
+                </Style>
+            </TabControl.Resources>
+
+            <i:Interaction.Triggers>
+                <i:EventTrigger EventName="SelectionChanged">
+                    <prism:InvokeCommandAction Command="{Binding RefreshTabItemCommand}" />
+                </i:EventTrigger>
+            </i:Interaction.Triggers>
+
+            <TabItem Tag="Errors" BorderThickness="0">
+                <TabItem.ContextMenu>
+                    <ContextMenu Background="White">
+                        <MenuItem Header="Clear All" Command="{Binding ClearAllMessages}" CommandParameter="ErrorMessagesCollection" Background="White" >
+                            <MenuItem.Icon>
+                                <materialDesign:PackIcon Kind="CloseCircle" />
+                            </MenuItem.Icon>
+                        </MenuItem>
+                    </ContextMenu>
+                </TabItem.ContextMenu>
+                <TabItem.Header>
+                    <StackPanel Orientation="Horizontal" VerticalAlignment="Center" >
+                        <materialDesign:PackIcon Kind="CloseCircle" Foreground="Red" VerticalAlignment="Center" />
+                        <TextBlock Margin="2,0,0,0" Foreground="{DynamicResource MaterialDesignBody}" Text="{Binding ErrorMessagesCollection.Count}"/>
+                        <TextBlock Margin="5,0,0,0" Foreground="{DynamicResource MaterialDesignBody}" Text="Errors"/>
+                    </StackPanel>
+                </TabItem.Header>
+                <ListView Margin="0,0,1,0" 
+                              BorderBrush="LightGray" 
+                              x:Name="ErrorsList" 
+                              HorizontalContentAlignment="Stretch" 
+                              HorizontalAlignment="Stretch"              
+                              materialDesign:DataGridAssist.CellPadding="4 2 2 2"                                                   
+                              materialDesign:DataGridAssist.ColumnHeaderPadding="4 4 4 4"
+                              VerticalAlignment="Stretch"
+                              ScrollViewer.CanContentScroll="True"
+                              ScrollViewer.HorizontalScrollBarVisibility="Visible"
+                              ScrollViewer.VerticalScrollBarVisibility="Visible"
+                              ItemsSource="{Binding ErrorMessagesCollection}">
+                    <ListView.ItemContainerStyle>
+                        <Style TargetType="{x:Type ListViewItem}">
+                            <Setter Property="ToolTip">
+                                <Setter.Value>
+                                    <TextBlock TextWrapping="Wrap" MaxWidth="500" Text="{Binding Message}" />
+                                </Setter.Value>
+                            </Setter>
+                        </Style>
+                    </ListView.ItemContainerStyle>
+                    <ListView.View>
+                        <GridView >
+                            <GridViewColumn x:Name="ErrorGridViewColumn" Header="Description"
+                                            Width="{Binding RelativeSource={RelativeSource 
+                                                            Mode=FindAncestor, 
+                                                            AncestorType=ListView}, 
+                                                            Converter={StaticResource StarWidthConverter}}"                                               
+                                            DisplayMemberBinding="{Binding Message}" />
+                            <GridViewColumn Header="File" Width="200"  DisplayMemberBinding="{Binding SourceFile}" />
+                            <GridViewColumn Header="Line" Width="100" DisplayMemberBinding="{Binding Line}" />
+                        </GridView>
+                    </ListView.View>
+                </ListView>
+            </TabItem>
+
+            <TabItem Tag = "Warnings" >
+                <TabItem.ContextMenu>
+                    <ContextMenu Background="White">
+                        <MenuItem Header="Clear All" Command="{Binding ClearAllMessages}" CommandParameter="WarningMessagesCollection" Background="White" >
+                            <MenuItem.Icon>
+                                <materialDesign:PackIcon Kind="CloseCircle" />
+                            </MenuItem.Icon>
+                        </MenuItem>
+                    </ContextMenu>
+                </TabItem.ContextMenu>
+
+                <TabItem.Header>
+                    <StackPanel Orientation="Horizontal" VerticalAlignment="Center" >
+                        <materialDesign:PackIcon Kind="Alert" Foreground="Orange" VerticalAlignment="Center" />
+                        <TextBlock Margin="2,0,0,0" Foreground="{DynamicResource MaterialDesignBody}" Text="{Binding WarningMessagesCollection.Count}"/>
+                        <TextBlock Margin="5,0,0,0" Foreground="{DynamicResource MaterialDesignBody}" Text="Warnings"/>
+                    </StackPanel>
+
+                </TabItem.Header>
+
+                <ListView Margin="0,0,1,0" 
+                          BorderBrush="LightGray"  
+                          x:Name="WarningsList"
+                          ScrollViewer.CanContentScroll="True" 
+                          ScrollViewer.VerticalScrollBarVisibility="Visible"
+                          ScrollViewer.HorizontalScrollBarVisibility="Visible"
+                          HorizontalContentAlignment="Stretch" 
+                          HorizontalAlignment="Stretch"
+                          materialDesign:DataGridAssist.CellPadding="4 2 2 2"                                                   
+                          materialDesign:DataGridAssist.ColumnHeaderPadding="4 4 4 4"
+                          VerticalAlignment="Stretch" 
+                          ItemsSource="{Binding WarningMessagesCollection}">
+                    <ListView.ItemContainerStyle>
+                        <Style TargetType="{x:Type ListViewItem}">
+                            <Setter Property="ToolTip">
+                                <Setter.Value>
+                                    <TextBlock TextWrapping="Wrap" MaxWidth="500" Text="{Binding Message}" />
+                                </Setter.Value>
+                            </Setter>
+                        </Style>
+
+                    </ListView.ItemContainerStyle>
+                    <ListView.View>
+                        <GridView >
+                            <GridViewColumn x:Name="WarningGridViewColumn" Header="Description"
+                                                Width="{Binding RelativeSource={RelativeSource Mode=FindAncestor,
+                                                                AncestorType=ListView}, 
+                                                                Converter={StaticResource StarWidthConverter}}" 
+                                                DisplayMemberBinding="{Binding Message}" />
+
+                            <GridViewColumn Header="File" Width="200" DisplayMemberBinding="{Binding SourceFile}" />
+                            <GridViewColumn Header="Line" Width="100" DisplayMemberBinding="{Binding Line}" />
+                        </GridView>
+                    </ListView.View>
+                </ListView>
+            </TabItem>
+
+            <TabItem  Tag="Info"  >
+                <TabItem.ContextMenu>
+                    <ContextMenu Background="White">
+                        <MenuItem Header="Clear All" Command="{Binding ClearAllMessages}" CommandParameter="InfoMessagesCollection" Background="White" >
+                            <MenuItem.Icon>
+                                <materialDesign:PackIcon Kind="CloseCircle" />
+                            </MenuItem.Icon>
+                        </MenuItem>
+                    </ContextMenu>
+                </TabItem.ContextMenu>
+
+                <TabItem.Header>
+                    <StackPanel  Orientation="Horizontal"  VerticalAlignment="Center" >
+                        <materialDesign:PackIcon Kind="Information" Foreground="LightBlue" VerticalAlignment="Center" />
+                        <TextBlock Margin="2,0,0,0" Foreground="{DynamicResource MaterialDesignBody}" Text="{Binding InfoMessagesCollection.Count}"/>
+                        <TextBlock Margin="5,0,0,0" Foreground="{DynamicResource MaterialDesignBody}" Text="Info"/>
+                    </StackPanel>
+                </TabItem.Header>
+
+                <ListView Margin="0,0,1,0" 
+                          BorderBrush="LightGray"  
+                          x:Name="InfoList" 
+                          ScrollViewer.CanContentScroll="True" 
+                          ScrollViewer.VerticalScrollBarVisibility="Visible"
+                          ScrollViewer.HorizontalScrollBarVisibility="Visible"
+                          HorizontalContentAlignment="Stretch" 
+                          HorizontalAlignment="Stretch"
+                          materialDesign:DataGridAssist.CellPadding="4 2 2 2"                                                   
+                          materialDesign:DataGridAssist.ColumnHeaderPadding="4 4 4 4"
+                          VerticalAlignment="Stretch"
+                          ItemsSource="{Binding InfoMessagesCollection}">
+                    <ListView.ItemContainerStyle>
+                        <Style TargetType="{x:Type ListViewItem}">
+                            <Setter Property="ToolTip">
+                                <Setter.Value>
+                                    <TextBlock TextWrapping="Wrap" MaxWidth="500" Text="{Binding Message}" />
+                                </Setter.Value>
+                            </Setter>
+                        </Style>
+                    </ListView.ItemContainerStyle>
+                    <ListView.View>
+                        <GridView>
+                            <GridViewColumn x:Name="InfoGridViewColumn" Header="Description" DisplayMemberBinding="{Binding Message}"
+                                            Width="{Binding RelativeSource={RelativeSource Mode=FindAncestor, AncestorType=ListView}, Converter={StaticResource StarWidthConverter}}">
+                                <GridViewColumn.CellTemplate>
+                                    <DataTemplate>
+                                        <TextBlock Text="{Binding Message}" >
+                                            <TextBlock.ToolTip>
+                                                <TextBlock Text="{Binding Message}" />
+                                            </TextBlock.ToolTip>
+                                            </TextBlock>
+                                    </DataTemplate>
+                                </GridViewColumn.CellTemplate>
+                            </GridViewColumn>
+                            <GridViewColumn Header="File" Width="200"  DisplayMemberBinding="{Binding SourceFile}" />
+                            <GridViewColumn Header="Line" Width="100" DisplayMemberBinding="{Binding Line}" />
+                        </GridView>
+                    </ListView.View>
+                </ListView>
+            </TabItem>
+
+            <TabItem Tag="HeatMapUpdate" >
+                <TabItem.Header>
+                    <StackPanel  Orientation="Horizontal" VerticalAlignment="Center" >
+                        <materialDesign:PackIcon Kind="RadioTower"  VerticalAlignment="Center" />
+                        <TextBlock Margin="5,0,0,0" Foreground="{DynamicResource MaterialDesignBody}" Text="HeatMapUpdate" VerticalAlignment="Center" />
+                    </StackPanel>
+                </TabItem.Header>
+
+                <Grid HorizontalAlignment="Stretch" Background="White" VerticalAlignment="Stretch">
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="auto"></RowDefinition>
+                        <RowDefinition Height="*"></RowDefinition>
+                    </Grid.RowDefinitions>
+
+                    <StackPanel Orientation="Horizontal" Grid.Row="0">
+                        <DataGrid   Margin="5,5,5,0" x:Name="DebugGrid" Width="auto" GridLinesVisibility="All"
+                                    Height="auto" Background="White" VerticalGridLinesBrush="LightGray" HorizontalGridLinesBrush="LightGray" 
+                                    BorderBrush="LightGray" BorderThickness="1,1,0,0" HeadersVisibility="Column" CanUserAddRows="False"
+                                    IsReadOnly="True" IsHitTestVisible="False" ItemsSource="{Binding HeatMap, Converter={StaticResource MatrixToDataViewConverter}}">
+
+                            <DataGrid.ColumnHeaderStyle>
+                                <Style TargetType="DataGridColumnHeader">
+                                    <Setter Property="Background" Value="WhiteSmoke" />
+                                    <Setter Property="HorizontalContentAlignment" Value="Center" />
+                                    <Setter Property="BorderThickness" Value="0,0,1,0" />
+                                    <Setter Property="BorderBrush" Value="LightGray"/>
+                                </Style>
+                            </DataGrid.ColumnHeaderStyle>
+                            <DataGrid.CellStyle>
+                                <Style TargetType="DataGridCell">
+                                    <Setter Property="Background">
+                                        <Setter.Value>
+                                            <MultiBinding Converter="{StaticResource MatrixCellValueToBackgroundColorConverter}">
+                                                <Binding RelativeSource="{RelativeSource Self}" />
+                                                <Binding Path="DataContext.HeatMap" RelativeSource="{RelativeSource Mode=FindAncestor, AncestorType=views:DebugView}" />
+                                            </MultiBinding>
+                                        </Setter.Value>
+                                    </Setter>
+                                    <Setter Property="BorderThickness" Value="0" />
+                                    <Setter Property="TextBlock.TextAlignment" Value="Center" />
+                                </Style>
+                            </DataGrid.CellStyle>
+                        </DataGrid>
+                        <Grid Width="200" Height="auto">
+
+                            <Grid.RowDefinitions>
+                                <RowDefinition />
+                                <RowDefinition />
+                                <RowDefinition />
+                                <RowDefinition />
+                            </Grid.RowDefinitions>
+
+                            <Grid Grid.Row="0">
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="*"/>
+                                    <ColumnDefinition Width="*"/>
+                                </Grid.ColumnDefinitions>
+
+                                <Label HorizontalAlignment="Right" VerticalAlignment="Center" Grid.Column="0" Content="Character 1:" />
+                                <TextBlock Grid.Column="1" VerticalAlignment="Center" TextAlignment="Left"   IsEnabled="False" >                                    
+                                        <Run FontWeight="Bold" Foreground="Black" Text="{Binding Character1Prefix }" />
+                                </TextBlock>
+                            </Grid>
+
+                            <Grid Grid.Row="1">
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="*"/>
+                                    <ColumnDefinition Width="*" />
+                                </Grid.ColumnDefinitions>
+
+                                <Label HorizontalAlignment="Right" VerticalAlignment="Center" Grid.Column="0" Content="Character 2:" />
+                                <TextBlock Grid.Column="1" VerticalAlignment="Center" HorizontalAlignment="Left" IsEnabled="False" >                                   
+                                        <Run FontWeight="Bold" Foreground="Black" Text="{Binding Character2Prefix}" />
+                                </TextBlock>
+                            </Grid>
+
+                            <Grid Grid.Row="2">
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="*" />
+                                    <ColumnDefinition Width="*" />
+                                </Grid.ColumnDefinitions>
+
+                                <Label HorizontalAlignment="Right" Grid.Column="0" VerticalAlignment="Center" 
+                                       HorizontalContentAlignment="Right" VerticalContentAlignment="Center" Content="RSSIsum:" />
+                                <TextBlock Grid.Column="1" TextAlignment="Left" VerticalAlignment="Center" HorizontalAlignment="Left" IsEnabled="False" >                                   
+                                        <Run FontWeight="Bold" Foreground="Black" Text="{Binding RSSIsum}" />
+                                </TextBlock>
+                            </Grid>
+
+                            <Grid Grid.Row="3">
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="*" />
+                                    <ColumnDefinition Width="*"/>
+                                </Grid.ColumnDefinitions>
+
+                                <Label HorizontalAlignment="Right" VerticalAlignment="Center" VerticalContentAlignment="Center"  
+                                       HorizontalContentAlignment="Right" Grid.Column="0" Content="RSSIstable:" />
+                                <TextBlock Grid.Column="1" VerticalAlignment="Center" HorizontalAlignment="Left" Grid.Row="0" IsEnabled="False" >                                  
+                                        <Run FontWeight="Bold" Foreground="Black" Text="{Binding RSSIstable}" />
+                                </TextBlock>
+                            </Grid>
+                        </Grid>
+                    </StackPanel>
+                </Grid>
+            </TabItem>
+            </TabControl> 
     </Grid>
 </UserControl>

@@ -13,7 +13,9 @@ namespace DialogGenerator.Utilities
         }
         public void Initialize()
         {
-            mContainer.RegisterType<IMP3Player, MP3Player>();
+            mContainer.RegisterType<IMP3Player, MP3Player>(new ContainerControlledLifetimeManager());
+            mContainer.RegisterType<IMessageDialogService, MessageDialogService>(new ContainerControlledLifetimeManager());
+            mContainer.RegisterType<IUserLogger, UserLogger>(new ContainerControlledLifetimeManager());
         }
     }
 }

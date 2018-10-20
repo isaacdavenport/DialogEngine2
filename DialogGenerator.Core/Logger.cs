@@ -36,22 +36,26 @@ namespace DialogGenerator.Core
             return null;
         }
 
-        public void Error(string _loggerType = null, string _message = null, [CallerFilePath] string _file = "", [CallerLineNumber] int _line = 0)
+        public void Error(string _loggerType = null, string _message = null, 
+            [CallerFilePath] string _file = "", [CallerLineNumber] int _line = 0)
         {
             _getLogger(_loggerType)?.Error(_file + " " + _line + " Message : " + _message);
         }
 
-        public void Info(string _loggerType = null, string _message = null, [CallerFilePath] string _file = "", [CallerLineNumber] int _line = 0)
+        public void Info(string _loggerType = null, string _message = null, 
+            [CallerFilePath] string _file = "", [CallerLineNumber] int _line = 0)
         {
             _getLogger(_loggerType)?.Error(_file + " " + _line + " Message : " + _message);
         }
 
-        public void Warning(string _loggerType = null, string _message = null, [CallerFilePath] string _file = "", [CallerLineNumber] int _line = 0)
+        public void Warning(string _loggerType = null, string _message = null, 
+            [CallerFilePath] string _file = "", [CallerLineNumber] int _line = 0)
         {
             _getLogger(_loggerType)?.Error(_file + " " + _line + " Message : " + _message);
         }
 
-        public void Debug(string _loggerType = null, string _message = null, [CallerFilePath] string _file = "", [CallerLineNumber] int _line = 0)
+        public void Debug(string _loggerType = null, string _message = null, 
+            [CallerFilePath] string _file = "", [CallerLineNumber] int _line = 0)
         {
             _getLogger(_loggerType)?.Debug(_file + " " + _line + " Message : " + _message);
         }

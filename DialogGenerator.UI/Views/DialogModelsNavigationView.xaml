@@ -23,46 +23,56 @@
     <Grid>
         <Grid.RowDefinitions>
             <RowDefinition Height="auto" />
-            <RowDefinition Height="60" />
+            <RowDefinition Height="auto" />
             <RowDefinition Height="*" />
         </Grid.RowDefinitions>
 
         <view:ToolbarView Grid.Row="0" />
 
         <Border Grid.Row="1" BorderThickness="0,0,0,1" BorderBrush="LightGray">
-            <TextBox Style="{x:Null}"   
-                 Margin="10,0,10,0" 
-                 VerticalAlignment="Center" 
-                 HorizontalAlignment="Stretch" 
-                 Text="{Binding FilterText, UpdateSourceTrigger=PropertyChanged}" 
-                 materialDesign:HintAssist.Hint="Search">
-                <TextBox.Template>
-                    <ControlTemplate TargetType="{x:Type TextBox}">
-                        <Border BorderThickness="1" x:Name="tbBorder" Background="WhiteSmoke" BorderBrush="DarkGray" CornerRadius="3" Padding="10">
-                            <Grid>
-                                <Grid.ColumnDefinitions>
-                                    <ColumnDefinition Width="auto" />
-                                    <ColumnDefinition Width="*" />
-                                </Grid.ColumnDefinitions>
+            <Grid>
+                <TextBox Margin="15,10,15,10" VerticalContentAlignment="Center" >
+                    <TextBox.Template>
+                        <ControlTemplate TargetType="{x:Type TextBox}">
+                            <Border BorderThickness="1" x:Name="tbBorder" MinHeight="30" Background="WhiteSmoke" BorderBrush="LightGray" CornerRadius="5" >
+                                <Grid>
+                                    <Grid.ColumnDefinitions>
+                                        <ColumnDefinition Width="auto" />
+                                        <ColumnDefinition Width="*" />
+                                    </Grid.ColumnDefinitions>
 
-                                <materialDesign:PackIcon Kind="Magnify" Width="20" Margin="0,0,5,0" Grid.Column="0" />
-                                <ContentPresenter Grid.Column="1" Content="{TemplateBinding Text}" />
-                            </Grid>
-                        </Border>
-                        <ControlTemplate.Triggers>
-                            <Trigger Property="IsMouseOver" Value="true">
-                                <Setter TargetName="tbBorder" Property="BorderBrush" Value="Black" />
-                            </Trigger>
-                        </ControlTemplate.Triggers>
-                    </ControlTemplate>
-                </TextBox.Template>
-            </TextBox>
+                                    <materialDesign:PackIcon Kind="Magnify" Foreground="DarkGray"  HorizontalAlignment="Left" 
+                                                             VerticalAlignment="Center" Padding="0" Width="15" Height="15" Margin="10,0,10,0" Grid.Column="0" />
+                                    <TextBox Style="{x:Null}" VerticalAlignment="Center" Text="{Binding FilterText, UpdateSourceTrigger=PropertyChanged}"
+                                             Background="{TemplateBinding Background}" BorderThickness="0" Grid.Column="1" />
+                                </Grid>
+                            </Border>
+                            <ControlTemplate.Triggers>
+                                <Trigger Property="IsMouseOver" Value="true">
+                                    <Setter TargetName="tbBorder" Property="BorderBrush" Value="{DynamicResource PrimaryHueMidBrush}" />
+                                </Trigger>
+                            </ControlTemplate.Triggers>
+                        </ControlTemplate>
+                    </TextBox.Template>
+                </TextBox>
+                <TextBlock IsHitTestVisible="False" Text="Search dialog model groups..." VerticalAlignment="Center" HorizontalAlignment="Left" Margin="53,0,0,0" Foreground="DarkGray">
+                    <TextBlock.Style>
+                        <Style TargetType="{x:Type TextBlock}">
+                            <Setter Property="Visibility" Value="Collapsed"/>
+                            <Style.Triggers>
+                                <DataTrigger Binding="{Binding FilterText}" Value="">
+                                    <Setter Property="Visibility" Value="Visible"/>
+                                </DataTrigger>
+                            </Style.Triggers>
+                        </Style>
+                    </TextBlock.Style>
+                </TextBlock>
+            </Grid>
         </Border>
 
         <ListView Grid.Row="2"
                   ItemsSource="{Binding ModelsDialogInfoCollection}"
                   HorizontalAlignment="Stretch"
-                  BorderThickness="20"
                   Margin="0"
                   Padding="0"
                   BorderBrush="WhiteSmoke"
@@ -75,11 +85,12 @@
                             <ColumnDefinition Width="*" />
                         </Grid.ColumnDefinitions>
 
-                        <StackPanel Margin="10,0,0,0" VerticalAlignment="Center" HorizontalAlignment="Stretch" Orientation="Horizontal">
-                            <materialDesign:PackIcon Kind="Check" Visibility="{Binding SelectedModelDialogIndex,Converter={StaticResource IsActiveModelDialogValueConverter}}" Foreground="Red" />
-                            <TextBlock Margin="10,0,0,0" Text="{Binding Path=ModelsCollectionName}" />
+                        <StackPanel Margin="0,0,0,0" VerticalAlignment="Center" HorizontalAlignment="Stretch" Orientation="Horizontal">
+                            <materialDesign:PackIcon Kind="Check" Margin="0,0,10,0" 
+                                                     Visibility="{Binding SelectedModelDialogIndex,Converter={StaticResource IsActiveModelDialogValueConverter}}" Foreground="Orange" />
+                            <TextBlock Text="{Binding Path=ModelsCollectionName}" HorizontalAlignment="Left" />
                         </StackPanel>
-                        <StackPanel HorizontalAlignment="Right" Grid.Column="2" Orientation="Horizontal" VerticalAlignment="Center">
+                        <StackPanel HorizontalAlignment="Right" Grid.Column="2" Margin="0,0,10,0" Orientation="Horizontal" VerticalAlignment="Center">
                             <Ellipse Fill="{Binding Path=State, Converter={StaticResource ModelDialogStateToColorValueConverter}}" 
                                      Width="10" Height="10" Grid.Column="2" Margin="0,0,0,0" HorizontalAlignment="Center" VerticalAlignment="Center"/>
                             <materialDesign:PopupBox Width="25"

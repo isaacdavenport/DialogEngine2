@@ -22,7 +22,8 @@ namespace DialogGenerator.UI.ViewModels
         private IEventAggregator mEventAggregator;
         private IDialogEngine mDialogEngine;
         private bool mIsDialogStarted;
-        private string mBtnContent = "Start dialog";
+        private bool mIsStopBtnEnabled;
+        private Visibility mIsDebugViewVisible = Visibility.Collapsed;
 
         #endregion
 
@@ -35,7 +36,7 @@ namespace DialogGenerator.UI.ViewModels
             mDialogEngine = _dialogEngine;
 
             mEventAggregator.GetEvent<NewDialogLineEvent>().Subscribe(_onNewDialogLine);
-            mEventAggregator.GetEvent<ActiveCharactersEvent>().Subscribe(_onActiveCharacters);
+            mEventAggregator.GetEvent<ActiveCharactersEvent>().Subscribe(_onNewActiveCharacters);
 
             _bindCommands();
         }
@@ -44,8 +45,11 @@ namespace DialogGenerator.UI.ViewModels
 
         #region - commands -
 
-        public ICommand StartOrStopDialogCommand { get; set; }
+        public ICommand StartDialogCommand { get; set; }
+        public ICommand StopDialogCommand { get; set; }
         public ICommand ConfigureDialogCommand { get; set; } 
+        public ICommand ClearAllMessagesCommand { get; set; }
+        public ICommand ChangeDebugVisibilityCommand { get; set; }
 
         #endregion
 
@@ -53,33 +57,52 @@ namespace DialogGenerator.UI.ViewModels
 
         public void _bindCommands()
         {
-            StartOrStopDialogCommand = new DelegateCommand(_startOrStopDialogCommand_Execute);
+            StartDialogCommand = new DelegateCommand(_startDialogCommand_Execute);
+            StopDialogCommand = new DelegateCommand(_stopDialogCommand_Execute);
             ConfigureDialogCommand = new DelegateCommand(_configureDialogCommand_Execute);
+            ClearAllMessagesCommand = new DelegateCommand(_clearAllMessages_Execute);
+            ChangeDebugVisibilityCommand = new DelegateCommand(_changeDebugVisibilityCommand_Execute);
+        }
+
+        private void _changeDebugVisibilityCommand_Execute()
+        {
+            IsDebugViewVisible = IsDebugViewVisible == Visibility.Visible
+                ? Visibility.Collapsed
+                : Visibility.Visible;
+        }
+
+        private void _stopDialogCommand_Execute()
+        {
+            mDialogEngine.StopDialogEngine();
+            IsStopBtnEnabled = false;
+        }
+
+        private void _clearAllMessages_Execute()
+        {
+            DialogLinesCollection.Clear();
         }
 
         private void _configureDialogCommand_Execute()
         {
         }
 
-        private async void _startOrStopDialogCommand_Execute()
+        private async void _startDialogCommand_Execute()
         {
             try
             {
-                if (mIsDialogStarted)
-                {
-                    mIsDialogStarted = !mIsDialogStarted;
-                    mDialogEngine.StopDialogEngine();
-                    BtnContent = "Start dialog";
-                }
-                else
-                {
-                    mIsDialogStarted = !mIsDialogStarted;
-                    BtnContent = "Stop dialog";
-                    await mDialogEngine.StartDialogEngine();
-                }
+                IsDialogStarted = true;
+                IsStopBtnEnabled = true;
+                mEventAggregator.GetEvent<CharacterSelectionActionChangedEvent>().Publish(true);
+                await mDialogEngine.StartDialogEngine();
+
+                IsDialogStarted = false;
+                mEventAggregator.GetEvent<CharacterSelectionActionChangedEvent>().Publish(false);
             }
             catch (Exception ex)
             {
+                mDialogEngine.StopDialogEngine();
+                IsDialogStarted = false;
+                mEventAggregator.GetEvent<CharacterSelectionActionChangedEvent>().Publish(false);
                 mLogger.Error("_startOrStopDialogCommand_Execute " + ex.Message);
             }
         }
@@ -105,7 +128,7 @@ namespace DialogGenerator.UI.ViewModels
             }
         }
 
-        private void _onActiveCharacters(string info)
+        private void _onNewActiveCharacters(string info)
         {
             if (Application.Current.Dispatcher.CheckAccess())
             {
@@ -143,12 +166,32 @@ namespace DialogGenerator.UI.ViewModels
             }
         }
 
-        public string BtnContent
+        public bool IsDialogStarted
         {
-            get { return mBtnContent; }
+            get { return mIsDialogStarted; }
             set
             {
-                mBtnContent = value;
+                mIsDialogStarted = value;
+                RaisePropertyChanged();
+            }
+        }
+
+        public bool IsStopBtnEnabled
+        {
+            get { return mIsStopBtnEnabled; }
+            set
+            {
+                mIsStopBtnEnabled = value;
+                RaisePropertyChanged();
+            }
+        }
+
+        public Visibility IsDebugViewVisible
+        {
+            get { return mIsDebugViewVisible; }
+            set
+            {
+                mIsDebugViewVisible = value;
                 RaisePropertyChanged();
             }
         }

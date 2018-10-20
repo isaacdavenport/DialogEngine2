@@ -6,7 +6,7 @@
              xmlns:prism="http://prismlibrary.com/"
              prism:ViewModelLocator.AutoWireViewModel="True"
              xmlns:materialDesign="http://materialdesigninxaml.net/winfx/xaml/themes"
-             xmlns:inf="clr-namespace:DialogGenerator.Infrastructure;assembly=DialogGenerator.Infrastructure"
+             xmlns:inf="clr-namespace:DialogGenerator.Core;assembly=DialogGenerator.Core"
              xmlns:view="clr-namespace:DialogGenerator.UI.Views"
              xmlns:converters="clr-namespace:DialogGenerator.UI.Converters"
              mc:Ignorable="d" 
@@ -18,6 +18,25 @@
             <converters:CharacterStateToColorValueConverter x:Key="CharacterStateToColorValueConverter" />
             <converters:CloneValuesConverter x:Key="CloneValuesConverter" />
             <converters:ImageToFullPathValueConverter x:Key="ImageToFullPathValueConverter" />
+
+            <Style TargetType="{x:Type Button}">
+                <Setter Property="Template">
+                    <Setter.Value>
+                        <ControlTemplate TargetType="Button">
+                            <Border x:Name="btnBorder" CornerRadius="5">
+                                <ContentPresenter HorizontalAlignment="Center" VerticalAlignment="Center" />
+                            </Border>
+                            <ControlTemplate.Triggers>
+                                <Trigger Property="IsMouseOver" Value="true">
+                                    <Setter TargetName="btnBorder" Property="BorderBrush" Value="LightGray" />
+                                    <Setter TargetName="btnBorder" Property="BorderThickness" Value="1" />
+                                    <Setter TargetName="btnBorder" Property="Background" Value="WhiteSmoke" />
+                                </Trigger>
+                            </ControlTemplate.Triggers>
+                        </ControlTemplate>
+                    </Setter.Value>
+                </Setter>
+            </Style>
         </ResourceDictionary>
     </UserControl.Resources>
     <Grid>
@@ -48,7 +67,6 @@
                 
                 <Label VerticalAlignment="Center" 
                        Margin="10,0,0,0"
-                       FontWeight="SemiBold"
                        Content="{Binding Character.State}" 
                        Foreground="{Binding Character.State, Converter={StaticResource CharacterStateToColorValueConverter}}" />
                 
@@ -57,7 +75,6 @@
             <StackPanel HorizontalAlignment="Right" Orientation="Horizontal" Margin="0,0,20,0">
                     <Button Margin="0,0,10,0" 
                             Command="{Binding ExportCharacterCommand}" 
-                            Style="{x:Null}" 
                             Foreground="{DynamicResource PrimaryHueMidBrush}" 
                             BorderThickness="0"
                             ToolTip="Export character to .zip file"
@@ -70,7 +87,6 @@
                     </Button.Content>
                 </Button>
                     <Button Foreground="{DynamicResource PrimaryHueMidBrush}" 
-                        Style="{x:Null}" 
                         BorderThickness="0"
                         ToolTip="Run wizard over character"
                         Background="White" 
@@ -84,7 +100,7 @@
                         </Button.Content>
                         <Button.CommandParameter>
                             <MultiBinding Converter="{StaticResource CloneValuesConverter}">
-                                <Binding Source="{x:Static inf:RegionNames.ContentRegion}" />
+                                <Binding Source="{x:Static inf:Constants.ContentRegion}" />
                                 <Binding Source="{x:Type view:WizardView}" />
                                 <Binding Path="Character.CharacterModel" />
                             </MultiBinding>
@@ -93,7 +109,6 @@
                     <Button Margin="10,0,0,0" 
                             Command="{Binding EditWithJSONEditorCommand}"  
                             Foreground="{DynamicResource PrimaryHueMidBrush}" 
-                            Style="{x:Null}"
                             ToolTip="Edit with JSON editor"
                             BorderThickness="0" 
                             Background="White" 
@@ -204,14 +219,9 @@
                 </TextBlock>
             </StackPanel>
 
-            <StackPanel HorizontalAlignment="Center" 
-                        Margin="0,40,0,0" 
-                        Orientation="Horizontal" 
-                        Grid.Row="6" 
-                        Grid.ColumnSpan="2">
-                
-                <Button x:Name="DeleteBtn" Content="Delete" Command="{Binding DeleteCommand}" Margin="0,0,10,0" />
-                <Button Content="Save" Command="{Binding SaveCommand}" Margin="10,0,0,0" />
+            <StackPanel HorizontalAlignment="Center" Margin="0,40,0,0" Orientation="Horizontal" Grid.Row="6" Grid.ColumnSpan="2">
+                <Button x:Name="DeleteBtn" Content="Delete" Style="{DynamicResource MaterialDesignRaisedButton}" Command="{Binding DeleteCommand}" Margin="0,0,10,0" />
+                <Button Content="Save" Command="{Binding SaveCommand}" Style="{DynamicResource MaterialDesignRaisedButton}"  Margin="10,0,0,0" />
             </StackPanel>
         </Grid>
 

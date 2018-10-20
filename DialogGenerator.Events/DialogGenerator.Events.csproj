@@ -53,8 +53,11 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="ActiveCharactersEvent.cs" />
+    <Compile Include="ChangedCharacterStateEvent.cs" />
+    <Compile Include="CharacterSelectionActionChangedEvent.cs" />
     <Compile Include="EventArgs\NewDialogLineEventArgs.cs" />
     <Compile Include="EventArgs\SelectedCharactersPairEventArgs.cs" />
+    <Compile Include="HeatMapUpdateEvent.cs" />
     <Compile Include="NewDialogLineEvent.cs" />
     <Compile Include="OpenCharacterDetailViewEvent.cs" />
     <Compile Include="OpenDialogModeldetailViewEvent.cs" />

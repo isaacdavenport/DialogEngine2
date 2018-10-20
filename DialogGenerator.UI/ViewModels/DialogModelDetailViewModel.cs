@@ -32,10 +32,11 @@ namespace DialogGenerator.UI.ViewModels
         {
             mEventAggregator = _eventAggregator;
             mDialogModelDataProvider = _dialogModelDataProvider;
-            mEventAggregator.GetEvent<OpenDialogModelDetailViewEvent>()
-                .Subscribe(_onOpenDialogModelDetail);
 
             mDialogModelsCollection = new CollectionViewSource();
+            FilterText = "";
+
+            mEventAggregator.GetEvent<OpenDialogModelDetailViewEvent>().Subscribe(_onOpenDialogModelDetail);
             mDialogModelsCollection.Filter += _mDialogModelsCollection_Filter;
 
             _bindCommands();
@@ -91,8 +92,7 @@ namespace DialogGenerator.UI.ViewModels
             int result = -1;
             var _dialogModelInfoList = mDialogModelDataProvider.GetAll();
             int _selectedIndex = _dialogModelInfoList.IndexOf(DialogModel);
-            var _modelDialogInfo = _dialogModelInfoList.Where(dmi => dmi.SelectedModelDialogIndex > -1)
-                                          .FirstOrDefault();
+            var _modelDialogInfo = _dialogModelInfoList.Where(dmi => dmi.SelectedModelDialogIndex > -1).FirstOrDefault();
 
             if (_modelDialogInfo != null)
             {
@@ -119,7 +119,7 @@ namespace DialogGenerator.UI.ViewModels
         {
             var _dialogModelInfoList = mDialogModelDataProvider.GetAll();
             var _modelDialogInfo = _dialogModelInfoList.Where(dmi => dmi.SelectedModelDialogIndex > -1)
-                                          .FirstOrDefault();
+                                                       .FirstOrDefault();
 
             if (_modelDialogInfo != null)
             {
@@ -167,7 +167,7 @@ namespace DialogGenerator.UI.ViewModels
             set
             {
                 mActiveDialogModel = value;
-                ((DelegateCommand)ResetActiveDialogModel).RaiseCanExecuteChanged();
+                ResetActiveDialogModel.RaiseCanExecuteChanged();
                 RaisePropertyChanged();
             }
         }
@@ -196,7 +196,7 @@ namespace DialogGenerator.UI.ViewModels
             set
             {
                 mFilterText = value;
-                this.mDialogModelsCollection.View.Refresh();
+                this.mDialogModelsCollection.View?.Refresh();
                 RaisePropertyChanged();
             }
         }

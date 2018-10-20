@@ -1,10 +1,12 @@
 ﻿using DialogGenerator.Core;
+using DialogGenerator.UI.Core;
 
 namespace DialogGenerator.UI.Wrapper
 {
     public class ApplicationDataWrapper : ModelWrapper<ApplicationData>
     {
-        public ApplicationDataWrapper(ApplicationData _applicationData): base(_applicationData)
+        public ApplicationDataWrapper(ApplicationData _applicationData): 
+            base(_applicationData)
         {
 
         }
