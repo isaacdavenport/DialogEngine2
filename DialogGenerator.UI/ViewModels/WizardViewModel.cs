@@ -24,12 +24,14 @@ namespace DialogGenerator.UI.ViewModels
     {
         #region - fields -
 
+        #region - constants-
+        private const string mCurrentLineName = "USR_CurrentLine";
+        #endregion
         private ILogger mLogger;
         private IWizardDataProvider mWizardDataProvider;
         private IMessageDialogService mMessageDialogService;
         private ICharacterDataProvider mCharacterDataProvider;
         private IRegionManager mRegionManager;
-        private const string mCurrentLineName = "USR_CurrentLine";
         private int mCurrentStepIndex;
         private string mCurrentVideoFilePath;
         private string mDialogStr;
@@ -364,7 +366,7 @@ namespace DialogGenerator.UI.ViewModels
             }
             else
             {
-                string _mp3FilePath = Character.CharacterPrefix + "_" + _videoFileName;
+                string _mp3FilePath = $"{Character.CharacterPrefix}_{_videoFileName}";
 
                 return _mp3FilePath;
             }
@@ -427,7 +429,7 @@ namespace DialogGenerator.UI.ViewModels
 
         #region - state machine functions -
 
-        private async void _cancel()
+        private  void _cancel()
         {
             try
             {

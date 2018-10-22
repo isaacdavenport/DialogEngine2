@@ -183,6 +183,17 @@
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Resource>
   </ItemGroup>
+  <ItemGroup>
+    <COMReference Include="IWshRuntimeLibrary">
+      <Guid>{F935DC20-1CF0-11D0-ADB9-00C04FD58A0B}</Guid>
+      <VersionMajor>1</VersionMajor>
+      <VersionMinor>0</VersionMinor>
+      <Lcid>0</Lcid>
+      <WrapperTool>tlbimp</WrapperTool>
+      <Isolated>False</Isolated>
+      <EmbedInteropTypes>True</EmbedInteropTypes>
+    </COMReference>
+  </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <PropertyGroup>
     <PostBuildEvent>if not exist "$(OutputDir)Temp" mkdir "$(OutputDir)Temp"
@@ -193,6 +204,8 @@ if not exist "$(OutputDir)Audio" mkdir "$(OutputDir)Audio"
 if not exist "$(OutputDir)Tutorial" mkdir "$(OutputDir)Tutorial"
 
 if not exist "$(OutputDir)Images\avatar.png" copy "$(ProjectDir)Resources\avatar.png" "$(OutputDir)Images"
-if not exist "$(OutputDir)Images\doll.jpg" copy "$(ProjectDir)Resources\doll.jpg" "$(OutputDir)Images"</PostBuildEvent>
+if not exist "$(OutputDir)Images\doll.jpg" copy "$(ProjectDir)Resources\doll.jpg" "$(OutputDir)Images"
+
+powershell.exe -NoProfile -ExecutionPolicy RemoteSigned -file  $(SolutionDir)shortcut.ps1 -solutionDir  $(SolutionDir) -outDir  $(TargetDir)</PostBuildEvent>
   </PropertyGroup>
 </Project>

@@ -43,10 +43,14 @@
                 <Button Width="25"
                     x:Name="StartBtn"
                     Height="25"
-                    IsEnabled="{Binding State,RelativeSource={RelativeSource Mode=FindAncestor, AncestorType=local:MediaPlayerControl},
-                                              Converter={StaticResource IsMediaPlayerPlayBtnEnabledValueConverter}, ConverterParameter=ReadyForUserAction}"
                     Command="{Binding StartVideoCommand}"
                     Margin="10,10,10,10">
+                    <Button.IsEnabled>
+                        <MultiBinding Converter="{StaticResource IsMediaPlayerPlayBtnEnabledValueConverter}" ConverterParameter="ReadyForUserAction">
+                            <Binding Path="State" RelativeSource="{RelativeSource Mode=FindAncestor, AncestorType=local:MediaPlayerControl}" />
+                            <Binding Path="FilePath" RelativeSource="{RelativeSource Mode=FindAncestor, AncestorType=local:MediaPlayerControl}" />
+                        </MultiBinding>
+                    </Button.IsEnabled>
                     <Button.Content>
                         <materialDesign:PackIcon Kind="Play" />
                     </Button.Content>
