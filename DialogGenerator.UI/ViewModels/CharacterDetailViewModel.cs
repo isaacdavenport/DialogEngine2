@@ -17,7 +17,6 @@ using System.IO.Compression;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
-using System.Windows;
 using System.Windows.Input;
 
 namespace DialogGenerator.UI.ViewModels
@@ -195,6 +194,8 @@ namespace DialogGenerator.UI.ViewModels
 
         private async  void _deleteCommand_Execute()
         {
+            var busyDialog = new BusyDialog();
+
             try
             {
                 var result = await mMessageDialogService
@@ -202,16 +203,21 @@ namespace DialogGenerator.UI.ViewModels
 
                 if (result == MessageDialogResult.OK)
                 {
+                    mMessageDialogService.ShowDedicatedDialogAsync<bool>(busyDialog);
+
                     string _imageFileName = Character.CharacterImage;
                     Character.CharacterImage = ApplicationData.Instance.DefaultImage;
                     await mCharacterDataProvider.Remove(Character.Model,_imageFileName);
 
                     Load("");
+
+                    DialogHost.CloseDialogCommand.Execute(null, busyDialog);
                 }
             }
             catch (Exception ex)
             {
                 mLogger.Error("_deleteCommand_Execute " + ex.Message);
+                DialogHost.CloseDialogCommand.Execute(null, busyDialog);
                 await mMessageDialogService.ShowMessage("Error", "Error occured during deleting character.");
                 Load(Character.CharacterPrefix);
             }

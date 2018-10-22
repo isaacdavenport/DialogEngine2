@@ -9,6 +9,7 @@ using System.Windows;
 using DialogGenerator.Core;
 using DialogGenerator.DataAccess.Helper;
 using DialogGenerator.Model;
+using Microsoft.VisualBasic.FileIO;
 
 namespace DialogGenerator.DataAccess
 {
@@ -77,12 +78,12 @@ namespace DialogGenerator.DataAccess
 
         public ObservableCollection<Character> GetAll()
         {
-            return Session.Get<ObservableCollection<Character>>(Constants.CHARACTERS);
+            return Session.Get<ObservableCollection<Character>>(Core.Constants.CHARACTERS);
         }
 
         public Character GetByInitials(string initials)
         {
-            Character character = Session.Get<ObservableCollection<Character>>(Constants.CHARACTERS)
+            Character character = Session.Get<ObservableCollection<Character>>(Core.Constants.CHARACTERS)
                 .Where(c => c.CharacterPrefix.Equals(initials))
                 .FirstOrDefault();
 
@@ -94,8 +95,7 @@ namespace DialogGenerator.DataAccess
             //TODO change array index for rest of characters after deleting 
             return Task.Run(() =>
             {
-
-                string _fileName = character.CharacterName.Replace(" ", string.Empty) + ".json";
+                string _fileName = character.FileName;
 
                 Application.Current.Dispatcher.Invoke(() =>
                 {
@@ -103,7 +103,7 @@ namespace DialogGenerator.DataAccess
                     GetAll().Remove(character);
                     // clear radio bindings for this character 
 
-                    var bindings = Session.Get <Dictionary<int, Character>>(Constants.CH_RADIO_RELATIONSHIP);
+                    var bindings = Session.Get <Dictionary<int, Character>>(Core.Constants.CH_RADIO_RELATIONSHIP);
 
                     if (bindings.ContainsKey(character.RadioNum))
                     {
@@ -122,7 +122,10 @@ namespace DialogGenerator.DataAccess
                 }
                 else
                 {
-                    File.Delete(Path.Combine(ApplicationData.Instance.DataDirectory, _fileName));
+                    FileSystem.DeleteFile(Path.Combine(ApplicationData.Instance.DataDirectory, _fileName),
+                        UIOption.OnlyErrorDialogs,
+                        RecycleOption.SendToRecycleBin);
+                    //File.Delete(Path.Combine(ApplicationData.Instance.DataDirectory, _fileName));
                 }
 
                 //remove character's image if image is not default
@@ -141,7 +144,10 @@ namespace DialogGenerator.DataAccess
                     {
                         try
                         {
-                            File.Delete(Path.Combine(ApplicationData.Instance.ImagesDirectory, _imageFileName));
+                            FileSystem.DeleteFile(Path.Combine(ApplicationData.Instance.ImagesDirectory, _imageFileName)
+                                , UIOption.OnlyErrorDialogs
+                                , RecycleOption.SendToRecycleBin);
+                            //File.Delete(Path.Combine(ApplicationData.Instance.ImagesDirectory, _imageFileName));
 
                             _isDeleted = true;
                         }
@@ -165,7 +171,11 @@ namespace DialogGenerator.DataAccess
 
                 foreach(var _fileInfo in _mp3Files)
                 {
-                    _fileInfo.Delete();
+                    FileSystem.DeleteFile(_fileInfo.FullName
+                        , UIOption.OnlyErrorDialogs
+                        , RecycleOption.SendToRecycleBin);
+
+                    //_fileInfo.Delete();
                 }
             });
         }

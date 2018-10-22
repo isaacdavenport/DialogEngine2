@@ -1,20 +1,15 @@
 ﻿using DialogGenerator.Core;
 using DialogGenerator.Model;
 using DialogGenerator.UI.Data;
-using DialogGenerator.UI.Helper;
 using MaterialDesignThemes.Wpf;
 using Prism.Commands;
 using Prism.Events;
 using Prism.Mvvm;
-using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.IO;
 using System.Linq;
-using System.Windows;
 using System.Windows.Controls;
-using System.Windows.Documents;
-using System.Windows.Input;
 
 namespace DialogGenerator.UI.ViewModels
 {
@@ -25,7 +20,7 @@ namespace DialogGenerator.UI.ViewModels
         private ILogger mLogger;
         private IEventAggregator mEventAggregator;
         private ICharacterDataProvider mCharacterDataProvider;
-        private string mDollFileName = "doll.jpg";
+        private const string mDollFileName = "doll.jpg";
 
         #endregion
 
