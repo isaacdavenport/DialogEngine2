@@ -69,9 +69,11 @@
     <Reference Include="WindowsBase" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="CharactersManager.cs" />
     <Compile Include="DialogEngineConstants.cs" />
     <Compile Include="DialogEngine.cs" />
     <Compile Include="DialogEngineModule.cs" />
+    <Compile Include="DialogModelsManager.cs" />
     <Compile Include="IDialogEngine.cs" />
     <Compile Include="Model\HistoricalDialog.cs" />
     <Compile Include="Model\HistoricalPhrase.cs" />

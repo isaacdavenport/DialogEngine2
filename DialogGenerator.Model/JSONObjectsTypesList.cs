@@ -6,6 +6,9 @@ namespace DialogGenerator.Model
 {
     public class JSONObjectsTypesList
     {
+        [JsonProperty("Version")]
+        public string Version { get; set; }
+
         [JsonProperty("Wizards")]
         public List<Wizard> Wizards { get; set; } = new List<Wizard>();
 

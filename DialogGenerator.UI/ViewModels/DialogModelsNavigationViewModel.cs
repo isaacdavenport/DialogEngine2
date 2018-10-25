@@ -6,6 +6,7 @@ using DialogGenerator.UI.Data;
 using Prism.Commands;
 using Prism.Events;
 using Prism.Mvvm;
+using System;
 using System.ComponentModel;
 using System.Windows.Data;
 
@@ -19,6 +20,7 @@ namespace DialogGenerator.UI.ViewModels
         private IEventAggregator mEventAggregator;
         private IDialogModelDataProvider mDialogModelDataProvider;
         private string mFilterText;
+        private bool mIsDialogStarted;
         private ModelDialogInfo mSelectedDialogModelInfo;
         private CollectionViewSource mDialogModelsInfoCollection;
 
@@ -36,9 +38,16 @@ namespace DialogGenerator.UI.ViewModels
             mDialogModelsInfoCollection = new CollectionViewSource();
             FilterText = "";
 
+            mEventAggregator.GetEvent<CharacterSelectionActionChangedEvent>()
+                .Subscribe(_onCharacterSelectionActionChanged);
             mDialogModelsInfoCollection.Filter += _mDialogModelsInfoCollection_Filter;
 
             _bindCommands();
+        }
+
+        private void _onCharacterSelectionActionChanged(bool _isDialogStarted)
+        {
+            IsDialogStarted = _isDialogStarted;
         }
 
         #endregion
@@ -88,7 +97,25 @@ namespace DialogGenerator.UI.ViewModels
             if (_modelDialogInfo.State == _newState)
                 return;
 
+            if (_newState == ModelDialogState.Off)
+            {
+                var _availableDialogModels = mDialogModelDataProvider.GetAllByState(ModelDialogState.On);
+
+                if (_availableDialogModels.Count == 1)
+                    return;
+
+                if(_modelDialogInfo.SelectedModelDialogIndex >= 0)
+                {
+                    _modelDialogInfo.SelectedModelDialogIndex = -1;
+                    Session.Set(Constants.SELECTED_DLG_MODEL, -1);
+
+                    mEventAggregator.GetEvent<OpenDialogModelDetailViewEvent>()
+                        .Publish(_modelDialogInfo.ModelsCollectionName);
+                }
+            }
+
             _modelDialogInfo.State = _newState;
+            mEventAggregator.GetEvent<ChangedDialogModelStateEvent>().Publish();
         }
 
         #endregion
@@ -137,6 +164,16 @@ namespace DialogGenerator.UI.ViewModels
             {
                 mFilterText = value;
                 mDialogModelsInfoCollection.View?.Refresh();
+                RaisePropertyChanged();
+            }
+        }
+
+        public bool IsDialogStarted
+        {
+            get { return mIsDialogStarted; }
+            set
+            {
+                mIsDialogStarted = value;
                 RaisePropertyChanged();
             }
         }

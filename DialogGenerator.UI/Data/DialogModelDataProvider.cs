@@ -1,6 +1,7 @@
 ﻿using System.Collections.ObjectModel;
 using DialogGenerator.DataAccess;
 using DialogGenerator.Model;
+using DialogGenerator.Model.Enum;
 
 namespace DialogGenerator.UI.Data
 {
@@ -16,6 +17,11 @@ namespace DialogGenerator.UI.Data
         public ObservableCollection<ModelDialogInfo> GetAll()
         {
             return mDialogModelRepository.GetAll();
+        }
+
+        public ObservableCollection<ModelDialogInfo> GetAllByState(ModelDialogState state)
+        {
+            return mDialogModelRepository.GetAllByState(state);
         }
 
         public ModelDialogInfo GetByName(string name)

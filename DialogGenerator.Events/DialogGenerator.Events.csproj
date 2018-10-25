@@ -54,6 +54,7 @@
   <ItemGroup>
     <Compile Include="ActiveCharactersEvent.cs" />
     <Compile Include="ChangedCharacterStateEvent.cs" />
+    <Compile Include="ChangedDialogModelStateEvent.cs" />
     <Compile Include="CharacterSelectionActionChangedEvent.cs" />
     <Compile Include="EventArgs\NewDialogLineEventArgs.cs" />
     <Compile Include="EventArgs\SelectedCharactersPairEventArgs.cs" />

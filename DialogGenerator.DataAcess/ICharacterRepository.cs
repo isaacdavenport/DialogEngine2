@@ -9,6 +9,8 @@ namespace DialogGenerator.DataAccess
         ObservableCollection<Character> GetAll();
 
         Character GetByInitials(string initials);
+
+        Character GetByAssignedRadio(int _radioNum);
         Task AddAsync(Character character);
 
         Task SaveAsync(Character character);

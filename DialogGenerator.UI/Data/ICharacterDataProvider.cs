@@ -10,6 +10,8 @@ namespace DialogGenerator.UI.Data
 
         Character GetByInitials(string initials);
 
+        Character GetByAssignedRadio(int _radionNum);
+
         Task AddAsync(Character character);
 
         Task SaveAsync(Character character);

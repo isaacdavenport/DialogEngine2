@@ -13,6 +13,9 @@ namespace DialogGenerator.UI.Converters
 
             double width = ((_listview.Parent as TabItem).Parent as TabControl).ActualWidth;
 
+            if (width == 0)
+                return 0;
+
             GridView _gridView = _listview.View as GridView;
 
             for (int i = 1; i < _gridView.Columns.Count; i++)

@@ -104,7 +104,7 @@ namespace DialogGenerator.UI.ViewModels
             ChangeCharacterStatusCommand = new DelegateCommand<object>( (p) => _changeCharacterStatusCommand_Execute(p));
         }
 
-        private void _changeCharacterStatusCommand_Execute(object obj)
+        private async void _changeCharacterStatusCommand_Execute(object obj)
         {
             try
             {
@@ -164,6 +164,8 @@ namespace DialogGenerator.UI.ViewModels
                 }
 
                 character.State = _newState;
+
+                await mCharacterDataProvider.SaveAsync(character);
 
                 mEventAggregator.GetEvent<ChangedCharacterStateEvent>().Publish();
                 mEventAggregator.GetEvent<StopPlayingCurrentDialogLineEvent>().Publish();

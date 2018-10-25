@@ -62,23 +62,6 @@ namespace DialogGenerator.Model
         [JsonProperty("CharacterPrefix")]
         public string CharacterPrefix { get; set; } = "";
 
-        [JsonProperty("Phrases")]
-        public List<PhraseEntry> Phrases
-        {
-            get
-            {
-                if (mPhrases == null)
-                    mPhrases = new List<PhraseEntry>();
-
-                return mPhrases;
-            }
-
-            set
-            {
-                mPhrases = value;
-            }
-        }
-
         [JsonProperty("CharacterImage")]
         public string CharacterImage
         {
@@ -90,21 +73,11 @@ namespace DialogGenerator.Model
             }
         }
 
-        // json ignore properties
-
-        [JsonIgnore]
-        public Queue<PhraseEntry> RecentPhrases = new Queue<PhraseEntry>();
-        [JsonIgnore]
-        public const int RecentPhrasesQueueSize = 8;
-
-        public event PropertyChangedEventHandler PropertyChanged;
-
-
         /// <summary>
         /// Radio number assigned to character
         /// Default value is unassigned ( -1 )
         /// </summary>
-        [JsonIgnore]
+        [JsonProperty("RadioNum")]
         public int RadioNum
         {
             get { return mRadioNum; }
@@ -123,7 +96,7 @@ namespace DialogGenerator.Model
         /// On - character is forced in selection
         /// Off - character can't be selected
         /// </summary>
-        [JsonIgnore]
+        [JsonProperty("State")]
         public CharacterState State
         {
             get { return mState; }
@@ -133,6 +106,32 @@ namespace DialogGenerator.Model
                 OnPropertyChanged("State");
             }
         }
+
+        [JsonProperty("Phrases")]
+        public List<PhraseEntry> Phrases
+        {
+            get
+            {
+                if (mPhrases == null)
+                    mPhrases = new List<PhraseEntry>();
+
+                return mPhrases;
+            }
+
+            set
+            {
+                mPhrases = value;
+            }
+        }
+
+        // json ignore properties
+
+        [JsonIgnore]
+        public Queue<PhraseEntry> RecentPhrases = new Queue<PhraseEntry>();
+        [JsonIgnore]
+        public const int RecentPhrasesQueueSize = 8;
+
+        public event PropertyChangedEventHandler PropertyChanged;
 
         [JsonIgnore]
         public string FileName { get; set; }

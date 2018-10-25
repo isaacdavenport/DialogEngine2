@@ -88,9 +88,8 @@ namespace DialogGenerator.UI.ViewModels
         private void _setActiveDialogModelCommand_Execute(ModelDialog obj)
         {
             SelectedDialogModelIndex = DialogModel.ArrayOfDialogModels.IndexOf(obj);
-
-            int result = -1;
-            var _dialogModelInfoList = mDialogModelDataProvider.GetAll();
+            int result = SelectedDialogModelIndex;
+            var _dialogModelInfoList = mDialogModelDataProvider.GetAllByState(ModelDialogState.On);
             int _selectedIndex = _dialogModelInfoList.IndexOf(DialogModel);
             var _modelDialogInfo = _dialogModelInfoList.Where(dmi => dmi.SelectedModelDialogIndex > -1).FirstOrDefault();
 
@@ -101,8 +100,7 @@ namespace DialogGenerator.UI.ViewModels
 
             for (int i = 0; i < _selectedIndex; i++)
             {
-                if (_dialogModelInfoList[i].State == ModelDialogState.On)
-                    result += _dialogModelInfoList[i].ArrayOfDialogModels.Count;
+                result += _dialogModelInfoList[i].ArrayOfDialogModels.Count;
             }
 
             ActiveDialogModel = DialogModel.ArrayOfDialogModels[SelectedDialogModelIndex];
@@ -143,6 +141,10 @@ namespace DialogGenerator.UI.ViewModels
         {
             DialogModel = mDialogModelDataProvider.GetByName(name);
             mDialogModelsCollection.Source = DialogModel.ArrayOfDialogModels;
+            ActiveDialogModel = DialogModel.SelectedModelDialogIndex >= 0
+                ? DialogModel.ArrayOfDialogModels[DialogModel.SelectedModelDialogIndex]
+                : null;
+            SelectedDialogModelIndex = DialogModel.SelectedModelDialogIndex;
 
             RaisePropertyChanged("DialogModelCollection");
         }

@@ -52,7 +52,7 @@ namespace DialogGenerator.UI.ViewModels
             SaveConfigurationCommand = new DelegateCommand<object>(_saveConfigurationCommand_Execute);
         }
 
-        private void _saveConfigurationCommand_Execute(object param)
+        private async void _saveConfigurationCommand_Execute(object param)
         {
             object[] parametes = (object[])param;
             int _indexOfSelectedCharacter = int.Parse(parametes[1].ToString());
@@ -76,18 +76,22 @@ namespace DialogGenerator.UI.ViewModels
 
             if(CharacterRadioRelationshipList[_currentDoll] != null)
             {
-                var _oldCharacter = mCharacterDataProvider.GetAll().Where(c => c.RadioNum == _currentDoll).First();
+                var _oldCharacter = mCharacterDataProvider.GetByAssignedRadio(_currentDoll);
                 _oldCharacter.RadioNum = -1;
+
+                await mCharacterDataProvider.SaveAsync(_oldCharacter);
             }
 
             _selectedCharacter.RadioNum = _currentDoll;
             CharacterRadioRelationshipList[_currentDoll] = _selectedCharacter;
 
+            await mCharacterDataProvider.SaveAsync(_selectedCharacter);
+
             popup.IsPopupOpen = false;
             _itemsControl.Items.Refresh();
         }
 
-        private void _unbindCharacterCommand_Execute(object parameters)
+        private async void _unbindCharacterCommand_Execute(object parameters)
         {
             var args = (object[])parameters;
             int _dollNumber = int.Parse(args[0].ToString());
@@ -97,6 +101,9 @@ namespace DialogGenerator.UI.ViewModels
                 return;
 
             CharacterRadioRelationshipList[_dollNumber].RadioNum = -1;
+
+            await mCharacterDataProvider.SaveAsync(CharacterRadioRelationshipList[_dollNumber]);
+
             CharacterRadioRelationshipList[_dollNumber] = null;
 
             _itemsControl.Items.Refresh();

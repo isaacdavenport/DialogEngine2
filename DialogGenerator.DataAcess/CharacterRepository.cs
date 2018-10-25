@@ -37,7 +37,9 @@ namespace DialogGenerator.DataAccess
 
         private void _serializeCharacter(Character character)
         {
-            string _fileName = character.CharacterName.Replace(" ", string.Empty) + ".json";
+            string _fileName = string.IsNullOrEmpty(character.FileName)
+                ? character.CharacterName.Replace(" ", string.Empty) + ".json"
+                : character.FileName;
 
             character.FileName = _fileName;
 
@@ -68,6 +70,7 @@ namespace DialogGenerator.DataAccess
 
         public async Task AddAsync(Character character)
         {
+            // add character to list of characters, so we can grab its data to serialize to file
             GetAll().Add(character);
 
             await Task.Run(() =>
@@ -85,6 +88,18 @@ namespace DialogGenerator.DataAccess
         {
             Character character = Session.Get<ObservableCollection<Character>>(Core.Constants.CHARACTERS)
                 .Where(c => c.CharacterPrefix.Equals(initials))
+                .FirstOrDefault();
+
+            return character;
+        }
+
+        public Character GetByAssignedRadio(int _radioNum)
+        {
+            if (_radioNum < 0)
+                return null;
+
+            var character = Session.Get<ObservableCollection<Character>>(Constants.CHARACTERS)
+                .Where(c => c.RadioNum == _radioNum)
                 .FirstOrDefault();
 
             return character;
@@ -140,6 +155,7 @@ namespace DialogGenerator.DataAccess
                     bool _isDeleted = false;
                     int counter = 0;
 
+                    // used because it can happen that image is not released by application instantly
                     do
                     {
                         try
@@ -171,8 +187,7 @@ namespace DialogGenerator.DataAccess
 
                 foreach(var _fileInfo in _mp3Files)
                 {
-                    FileSystem.DeleteFile(_fileInfo.FullName
-                        , UIOption.OnlyErrorDialogs
+                    FileSystem.DeleteFile(_fileInfo.FullName, UIOption.OnlyErrorDialogs
                         , RecycleOption.SendToRecycleBin);
 
                     //_fileInfo.Delete();

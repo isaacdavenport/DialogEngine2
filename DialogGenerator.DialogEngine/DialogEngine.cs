@@ -27,6 +27,7 @@ namespace DialogGenerator.DialogEngine
         #region - fields -
 
         private ILogger mLogger;
+        private IUserLogger mUserLogger;
         private IEventAggregator mEventAggregator;
         private IMP3Player mPlayer;
         private ICharacterSelectionFactory mCharacterSelectionFactory;
@@ -58,10 +59,14 @@ namespace DialogGenerator.DialogEngine
 
         #region - constructor -
 
-        public DialogEngine(ILogger logger,IEventAggregator _eventAggregator, IMP3Player player,ICharacterSelectionFactory _characterSelectionFactory,
-            ICharacterRepository _characterRepository,IDialogModelRepository _dialogModelRepository)
+        public DialogEngine(ILogger logger,IUserLogger _userLogger,IEventAggregator _eventAggregator, 
+            IMP3Player player,
+            ICharacterSelectionFactory _characterSelectionFactory,
+            ICharacterRepository _characterRepository,
+            IDialogModelRepository _dialogModelRepository)
         {
             mLogger = logger;
+            mUserLogger = _userLogger;
             mEventAggregator = _eventAggregator;
             mPlayer = player;
             mCharacterSelectionFactory = _characterSelectionFactory;
@@ -78,9 +83,14 @@ namespace DialogGenerator.DialogEngine
         {
             mEventAggregator.GetEvent<SelectedCharactersPairChangedEvent>().Subscribe(_onSelectedCharactersPairChanged);
             mEventAggregator.GetEvent<ChangedCharacterStateEvent>().Subscribe(_onChangedCharacterState);
-            mCharactersList.CollectionChanged += _charactersList_CollectionChanged;
+            mEventAggregator.GetEvent<ChangedDialogModelStateEvent>().Subscribe(_onChangedDialogModelState);
             mWorkflow.PropertyChanged += _mWorkflow_PropertyChanged;
             Session.SessionPropertyChanged += _sessionPropertyChanged;
+        }
+
+        private void _onChangedDialogModelState()
+        {
+            InitializeDialogModels();
         }
 
         private void _onChangedCharacterState()
@@ -667,7 +677,10 @@ namespace DialogGenerator.DialogEngine
                 mLogger.Debug("_startDialog " + mCharactersList[mCharacter1Num].CharacterPrefix + " and " +
                     mCharactersList[mCharacter2Num].CharacterPrefix + " " + mDialogModelsList[mIndexOfCurrentDialogModel].Name);
 
-                if(!mSameCharactersAsLast)
+                mUserLogger.Info("_startDialog " + mCharactersList[mCharacter1Num].CharacterPrefix + " and " +
+                    mCharactersList[mCharacter2Num].CharacterPrefix + " " + mDialogModelsList[mIndexOfCurrentDialogModel].Name);
+
+                if (!mSameCharactersAsLast)
                 {
                     mEventAggregator.GetEvent<ActiveCharactersEvent>().
                         Publish($" {mCharactersList[mCharacter1Num].CharacterName} , {mCharactersList[mCharacter2Num].CharacterName} ");
@@ -761,11 +774,12 @@ namespace DialogGenerator.DialogEngine
 
         #region - public functions -
 
-        public void Initialize()
+        public void InitializeDialogModels()
         {
-            var _dialogModelInfoList = mDialogModelRepository.GetAll();
-            mCharactersList = mCharacterRepository.GetAll();
-            mCharactersList.CollectionChanged += _charactersList_CollectionChanged;
+            if (mDialogModelsList.Count > 0)
+                mDialogModelsList.Clear();
+
+            var _dialogModelInfoList = mDialogModelRepository.GetAllByState(ModelDialogState.On);
 
             foreach (ModelDialogInfo _modelDialogInfo in _dialogModelInfoList)
             {
@@ -776,6 +790,14 @@ namespace DialogGenerator.DialogEngine
                     mDialogModelsList.Add(_dialogModel);
                 }
             }
+        }
+
+        public void Initialize()
+        {
+            InitializeDialogModels();
+
+            mCharactersList = mCharacterRepository.GetAll();
+            mCharactersList.CollectionChanged += _charactersList_CollectionChanged;
 
             foreach (Character character in mCharactersList)
             {

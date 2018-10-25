@@ -84,7 +84,7 @@ namespace DialogGenerator
 
             if (_loadedData.DialogModels.Count == 0)
             {
-                // todo process error
+                // TODO process error
                 //mWorkflow.Fire(Triggers.ProcessError);
             }
 
@@ -96,19 +96,13 @@ namespace DialogGenerator
         }
 
 
-        private void _bindCharacter2Radio()
+        private  void _bindCharacter2Radio()
         {
             var _character2RadioBindingDict = new Dictionary<int, Character>();
 
-            var characters = mCharacterRepository.GetAll();
-            int _characterCount = characters.Count;
-
             for (int i = 0; i < ApplicationData.Instance.NumberOfRadios; i++)
             {
-                Character character = _characterCount > i ? characters[i] : null;
-
-                if (character != null)
-                    character.RadioNum = i;
+                var character = mCharacterRepository.GetByAssignedRadio(i);
 
                 _character2RadioBindingDict.Add(i, character);
             }

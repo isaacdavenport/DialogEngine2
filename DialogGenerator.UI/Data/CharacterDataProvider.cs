@@ -37,6 +37,11 @@ namespace DialogGenerator.UI.Data
             return mCharacterRepository.GetByInitials(initials);
         }
 
+        public Character GetByAssignedRadio(int _radionNum)
+        {
+            return mCharacterRepository.GetByAssignedRadio(_radionNum);
+        }
+
         public Task Remove(Character character,string _imageFileName)
         {
             return mCharacterRepository.Remove(character,_imageFileName);

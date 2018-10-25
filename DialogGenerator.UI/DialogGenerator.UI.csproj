@@ -134,6 +134,7 @@
     <Compile Include="Converters\IsRecordingEnabledValueConverter.cs" />
     <Compile Include="Converters\IsSkipStepBtnEnabledConverter.cs" />
     <Compile Include="Converters\IsDialogBtnVisibleValueConverter.cs" />
+    <Compile Include="Converters\IsStatesEqualValueConverter.cs" />
     <Compile Include="Converters\IsVoiceRecorderPlayingEnabledValueConverter.cs" />
     <Compile Include="Converters\ListBoxItemTextAndIndexValueConverter.cs" />
     <Compile Include="Converters\MatrixCellValueToBackgroundColorConverter.cs" />

@@ -2,6 +2,7 @@
 using System.Linq;
 using DialogGenerator.Core;
 using DialogGenerator.Model;
+using DialogGenerator.Model.Enum;
 
 namespace DialogGenerator.DataAccess
 {
@@ -19,6 +20,15 @@ namespace DialogGenerator.DataAccess
                 .OrderBy(dm => dm.JsonArrayIndex);
 
             return  new ObservableCollection<ModelDialogInfo>(result);
+        }
+
+        public ObservableCollection<ModelDialogInfo> GetAllByState(ModelDialogState state)
+        {
+            var result = Session.Get<ObservableCollection<ModelDialogInfo>>(Constants.DIALOG_MODELS)
+                .Where(dm => dm.State == state)
+                .OrderBy(dm => dm.JsonArrayIndex);
+
+            return new ObservableCollection<ModelDialogInfo>(result);
         }
 
         public ModelDialogInfo GetByName(string name)

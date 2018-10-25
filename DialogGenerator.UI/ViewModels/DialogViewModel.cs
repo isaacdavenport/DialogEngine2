@@ -10,6 +10,7 @@ using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Linq;
 using System.Windows;
+using System.Windows.Controls;
 using System.Windows.Input;
 
 namespace DialogGenerator.UI.ViewModels
@@ -49,7 +50,7 @@ namespace DialogGenerator.UI.ViewModels
         public ICommand StopDialogCommand { get; set; }
         public ICommand ConfigureDialogCommand { get; set; } 
         public ICommand ClearAllMessagesCommand { get; set; }
-        public ICommand ChangeDebugVisibilityCommand { get; set; }
+        public DelegateCommand<object> ChangeDebugVisibilityCommand { get; set; }
 
         #endregion
 
@@ -61,14 +62,22 @@ namespace DialogGenerator.UI.ViewModels
             StopDialogCommand = new DelegateCommand(_stopDialogCommand_Execute);
             ConfigureDialogCommand = new DelegateCommand(_configureDialogCommand_Execute);
             ClearAllMessagesCommand = new DelegateCommand(_clearAllMessages_Execute);
-            ChangeDebugVisibilityCommand = new DelegateCommand(_changeDebugVisibilityCommand_Execute);
+            ChangeDebugVisibilityCommand = new DelegateCommand<object>(_changeDebugVisibilityCommand_Execute);
         }
 
-        private void _changeDebugVisibilityCommand_Execute()
+        private void _changeDebugVisibilityCommand_Execute(object param)
         {
+            var _itemsControl = param as ItemsControl;
+
             IsDebugViewVisible = IsDebugViewVisible == Visibility.Visible
                 ? Visibility.Collapsed
                 : Visibility.Visible;
+
+            // workaround for hiding debugView in dialogView 
+            if(IsDebugViewVisible == Visibility.Collapsed)
+                (_itemsControl.Parent as Grid).RowDefinitions[2].Height = new GridLength(0);
+            else
+                (_itemsControl.Parent as Grid).RowDefinitions[2].Height = new GridLength(150);
         }
 
         private void _stopDialogCommand_Execute()

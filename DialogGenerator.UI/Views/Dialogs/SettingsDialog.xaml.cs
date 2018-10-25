@@ -1,7 +1,11 @@
 ﻿using DialogGenerator.Core;
 using DialogGenerator.UI.Wrapper;
+using MaterialDesignThemes.Wpf;
+using Prism.Commands;
+using System;
 using System.ComponentModel;
 using System.Windows.Controls;
+using System.Windows.Input;
 
 namespace DialogGenerator.UI.Views.Dialogs
 {
@@ -15,9 +19,19 @@ namespace DialogGenerator.UI.Views.Dialogs
         public SettingsDialog()
         {
             DataContext = this;
+            CloseCommand = new DelegateCommand(_closeCommand_Execute);
+
             InitializeComponent();
 
             Settings = new ApplicationDataWrapper(ApplicationData.Instance);
+        }
+
+        public ICommand CloseCommand { get; set; }
+
+        private void _closeCommand_Execute()
+        {
+            Settings.Model.Save();
+            DialogHost.CloseDialogCommand.Execute(null,this.CloseBtn);
         }
 
         public virtual void OnPropertyChanged(string _propertyName)

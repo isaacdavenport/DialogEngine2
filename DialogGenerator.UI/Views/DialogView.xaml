@@ -40,7 +40,7 @@
                         HorizontalContentAlignment="Stretch"  
                         SnapsToDevicePixels="True"
                         Grid.Row="0"
-                        Margin="0,0,0,0"
+                        Margin="0"
                         Padding="0,20,0,20"
                         Background="White"
                         VerticalAlignment="Stretch" 
@@ -100,7 +100,7 @@
 
             <ItemsControl.ContextMenu>
                 <ContextMenu Background="White">
-                    <MenuItem Header="Clear All" Command="{Binding ClearAllMessagesCommand}"   Background="White" >
+                    <MenuItem Header="Clear All" FontSize="13" Command="{Binding ClearAllMessagesCommand}"   Background="White" >
                         <MenuItem.Icon>
                             <materialDesign:PackIcon Kind="DeleteEmpty" Foreground="Red" />
                         </MenuItem.Icon>
@@ -143,11 +143,12 @@
                 </StackPanel>
 
                 <StackPanel Orientation="Horizontal" VerticalAlignment="Center" Margin="0,0,5,0" HorizontalAlignment="Right">
-                    <Button HorizontalAlignment="Right" Command="{Binding ChangeDebugVisibilityCommand}" 
+                    <Button HorizontalAlignment="Right" Command="{Binding ChangeDebugVisibilityCommand}" CommandParameter="{Binding  ElementName=TextOutput}"
                             Visibility="{Binding IsDebugViewVisible, Converter={StaticResource InvertVisibilityValueConverter}}" 
                             Content="Show debug view" Background="DarkGray" BorderBrush="DarkGray" Foreground="{DynamicResource MaterialDesignBody}" Margin="0,0,10,0" Padding="5">
                     </Button>
-                    <Button Content="Hide debug view" Visibility="{Binding IsDebugViewVisible}" Command="{Binding ChangeDebugVisibilityCommand}" 
+                    <Button Content="Hide debug view" Visibility="{Binding IsDebugViewVisible}" Command="{Binding ChangeDebugVisibilityCommand}"
+                            CommandParameter="{Binding ElementName=TextOutput}"
                             BorderBrush="DarkGray" Background="DarkGray" Foreground="{DynamicResource MaterialDesignBody}" Margin="0,0,10,0" Padding="5" />
                 </StackPanel>
             </Grid>

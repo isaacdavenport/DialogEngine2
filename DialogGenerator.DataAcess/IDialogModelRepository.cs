@@ -1,4 +1,5 @@
 ﻿using DialogGenerator.Model;
+using DialogGenerator.Model.Enum;
 using System.Collections.ObjectModel;
 
 namespace DialogGenerator.DataAccess
@@ -8,7 +9,9 @@ namespace DialogGenerator.DataAccess
         ObservableCollection<ModelDialogInfo> GetAll();
 
         ObservableCollection<ModelDialogInfo> GetAll(string _fileName);
-        
+
+        ObservableCollection<ModelDialogInfo> GetAllByState(ModelDialogState state);
+
         ModelDialogInfo GetByName(string name);
     }
 }

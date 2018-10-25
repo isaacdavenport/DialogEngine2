@@ -9,6 +9,8 @@
              xmlns:materialDesign="http://materialdesigninxaml.net/winfx/xaml/themes"
              xmlns:converters="clr-namespace:DialogGenerator.UI.Converters"
              xmlns:views="clr-namespace:DialogGenerator.UI.Views"
+             IsVisibleChanged="_debugView_VisibleChanged"
+             SizeChanged="_debugView_SizeChanged"
              mc:Ignorable="d" 
              d:DesignHeight="450" d:DesignWidth="800">
     <UserControl.Resources>
@@ -35,6 +37,7 @@
                      HorizontalAlignment="Stretch" 
                      TabStripPlacement="Bottom"
                      Padding="0"
+                     Visibility="{Binding Path=Visibility,RelativeSource={RelativeSource Mode=FindAncestor, AncestorType=views:DebugView}}"
                      MinHeight="10"
                      Margin="1,0,0,0"
                      VerticalAlignment="Stretch"
@@ -88,7 +91,7 @@
                 <TabItem.Header>
                     <StackPanel Orientation="Horizontal" VerticalAlignment="Center" >
                         <materialDesign:PackIcon Kind="CloseCircle" Foreground="Red" VerticalAlignment="Center" />
-                        <TextBlock Margin="2,0,0,0" Foreground="{DynamicResource MaterialDesignBody}" Text="{Binding ErrorMessagesCollection.Count}"/>
+                        <TextBlock Margin="2,0,0,0" Foreground="{DynamicResource MaterialDesignBody}" Text="{Binding UserLogger.ErrorsCollection.Count}"/>
                         <TextBlock Margin="5,0,0,0" Foreground="{DynamicResource MaterialDesignBody}" Text="Errors"/>
                     </StackPanel>
                 </TabItem.Header>
@@ -103,7 +106,7 @@
                               ScrollViewer.CanContentScroll="True"
                               ScrollViewer.HorizontalScrollBarVisibility="Visible"
                               ScrollViewer.VerticalScrollBarVisibility="Visible"
-                              ItemsSource="{Binding ErrorMessagesCollection}">
+                              ItemsSource="{Binding UserLogger.ErrorsCollection}">
                     <ListView.ItemContainerStyle>
                         <Style TargetType="{x:Type ListViewItem}">
                             <Setter Property="ToolTip">
@@ -121,7 +124,7 @@
                                                             AncestorType=ListView}, 
                                                             Converter={StaticResource StarWidthConverter}}"                                               
                                             DisplayMemberBinding="{Binding Message}" />
-                            <GridViewColumn Header="File" Width="200"  DisplayMemberBinding="{Binding SourceFile}" />
+                            <GridViewColumn Header="File" Width="200"  DisplayMemberBinding="{Binding FileName}" />
                             <GridViewColumn Header="Line" Width="100" DisplayMemberBinding="{Binding Line}" />
                         </GridView>
                     </ListView.View>
@@ -142,7 +145,7 @@
                 <TabItem.Header>
                     <StackPanel Orientation="Horizontal" VerticalAlignment="Center" >
                         <materialDesign:PackIcon Kind="Alert" Foreground="Orange" VerticalAlignment="Center" />
-                        <TextBlock Margin="2,0,0,0" Foreground="{DynamicResource MaterialDesignBody}" Text="{Binding WarningMessagesCollection.Count}"/>
+                        <TextBlock Margin="2,0,0,0" Foreground="{DynamicResource MaterialDesignBody}" Text="{Binding UserLogger.WarningsCollection.Count}"/>
                         <TextBlock Margin="5,0,0,0" Foreground="{DynamicResource MaterialDesignBody}" Text="Warnings"/>
                     </StackPanel>
 
@@ -159,7 +162,7 @@
                           materialDesign:DataGridAssist.CellPadding="4 2 2 2"                                                   
                           materialDesign:DataGridAssist.ColumnHeaderPadding="4 4 4 4"
                           VerticalAlignment="Stretch" 
-                          ItemsSource="{Binding WarningMessagesCollection}">
+                          ItemsSource="{Binding UserLogger.WarningsCollection}">
                     <ListView.ItemContainerStyle>
                         <Style TargetType="{x:Type ListViewItem}">
                             <Setter Property="ToolTip">
@@ -178,7 +181,7 @@
                                                                 Converter={StaticResource StarWidthConverter}}" 
                                                 DisplayMemberBinding="{Binding Message}" />
 
-                            <GridViewColumn Header="File" Width="200" DisplayMemberBinding="{Binding SourceFile}" />
+                            <GridViewColumn Header="File" Width="200" DisplayMemberBinding="{Binding FileName}" />
                             <GridViewColumn Header="Line" Width="100" DisplayMemberBinding="{Binding Line}" />
                         </GridView>
                     </ListView.View>
@@ -199,7 +202,7 @@
                 <TabItem.Header>
                     <StackPanel  Orientation="Horizontal"  VerticalAlignment="Center" >
                         <materialDesign:PackIcon Kind="Information" Foreground="LightBlue" VerticalAlignment="Center" />
-                        <TextBlock Margin="2,0,0,0" Foreground="{DynamicResource MaterialDesignBody}" Text="{Binding InfoMessagesCollection.Count}"/>
+                        <TextBlock Margin="2,0,0,0" Foreground="{DynamicResource MaterialDesignBody}" Text="{Binding UserLogger.InformationsCollection.Count}"/>
                         <TextBlock Margin="5,0,0,0" Foreground="{DynamicResource MaterialDesignBody}" Text="Info"/>
                     </StackPanel>
                 </TabItem.Header>
@@ -215,7 +218,7 @@
                           materialDesign:DataGridAssist.CellPadding="4 2 2 2"                                                   
                           materialDesign:DataGridAssist.ColumnHeaderPadding="4 4 4 4"
                           VerticalAlignment="Stretch"
-                          ItemsSource="{Binding InfoMessagesCollection}">
+                          ItemsSource="{Binding UserLogger.InformationsCollection}">
                     <ListView.ItemContainerStyle>
                         <Style TargetType="{x:Type ListViewItem}">
                             <Setter Property="ToolTip">
@@ -239,7 +242,7 @@
                                     </DataTemplate>
                                 </GridViewColumn.CellTemplate>
                             </GridViewColumn>
-                            <GridViewColumn Header="File" Width="200"  DisplayMemberBinding="{Binding SourceFile}" />
+                            <GridViewColumn Header="File" Width="200"  DisplayMemberBinding="{Binding FileName}" />
                             <GridViewColumn Header="Line" Width="100" DisplayMemberBinding="{Binding Line}" />
                         </GridView>
                     </ListView.View>

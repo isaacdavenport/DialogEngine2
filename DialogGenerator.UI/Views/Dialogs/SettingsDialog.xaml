@@ -4,11 +4,14 @@
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
              xmlns:materialDesign="http://materialdesigninxaml.net/winfx/xaml/themes"
+             xmlns:converters="clr-namespace:DialogGenerator.UI.Converters"
              mc:Ignorable="d"
              MinWidth="450"
              d:DesignHeight="450" d:DesignWidth="800">
     <UserControl.Resources>
-        
+        <ResourceDictionary>
+            <converters:InvertValueConverter x:Key="InvertValueConverter" />
+        </ResourceDictionary>
     </UserControl.Resources>
     <GroupBox   
               BorderThickness="0" 
@@ -68,21 +71,23 @@
 
             <Label Content="Max time for playing of .mp3 file:" Margin="10" Grid.Row="3" HorizontalAlignment="Right" />
             <TextBox Grid.Row="3" MinWidth="75" Text="{Binding Settings.MaxTimeToPlayFile, UpdateSourceTrigger=PropertyChanged,Mode=TwoWay}" 
-                     HorizontalAlignment="Left" Margin="10" Grid.Column="2" />
+                     HorizontalAlignment="Left" Margin="10" Grid.Column="2" materialDesign:ValidationAssist.UsePopup="True" />
 
             <Label Content="COM port name:" HorizontalAlignment="Right" Margin="10" Grid.Row="4" />
             <TextBox Grid.Row="4" MinWidth="75" Text="{Binding Settings.ComPortName,UpdateSourceTrigger=PropertyChanged,Mode=TwoWay}" 
-                     HorizontalAlignment="Left" Margin="10" Grid.Column="2" />
+                     HorizontalAlignment="Left" Margin="10" Grid.Column="2" materialDesign:ValidationAssist.UsePopup="True" />
 
             <Label Content="Current parental rating:" Grid.Column="0" HorizontalAlignment="Right" Margin="10" Grid.Row="5" />
             <TextBox Grid.Row="5" MinWidth="75" Text="{Binding Settings.CurrentParentalRating,UpdateSourceTrigger=PropertyChanged,Mode=TwoWay}" 
-                     HorizontalAlignment="Left" Margin="10" Grid.Column="2" />
-
+                     HorizontalAlignment="Left" Margin="10" Grid.Column="2" materialDesign:ValidationAssist.UsePopup="True" />
+            
             <Button Content="Close"
+                    x:Name="CloseBtn"
                     Style="{StaticResource MaterialDesignRaisedButton}"
                     Grid.ColumnSpan="3"
                     Grid.Row="6"
-                    Command="{x:Static materialDesign:DialogHost.CloseDialogCommand}"
+                    IsEnabled="{Binding Settings.HasErrors,Converter={StaticResource InvertValueConverter}}"
+                    Command="{Binding CloseCommand}"
                     Margin="0,20,0,0"
                     HorizontalAlignment="Center" />
         </Grid>
