@@ -88,7 +88,7 @@
                         </Grid.ColumnDefinitions>
 
                         <StackPanel Margin="0,0,0,0" VerticalAlignment="Center" HorizontalAlignment="Stretch" Orientation="Horizontal">
-                            <materialDesign:PackIcon Kind="Check" Margin="0,0,10,0" Foreground="Orange"
+                            <materialDesign:PackIcon Kind="Check" Margin="0,0,10,0" Foreground="Green"
                                 Visibility="{Binding SelectedModelDialogIndex,Converter={StaticResource IsActiveModelDialogValueConverter}}"  />
                             <TextBlock Text="{Binding Path=ModelsCollectionName}" HorizontalAlignment="Left" />
                         </StackPanel>
@@ -115,7 +115,7 @@
                                         <Button.CommandParameter>
                                             <MultiBinding Converter="{StaticResource CloneValuesConverter}">
                                                 <Binding />
-                                                <Binding Source="{x:Static enums:ModelDialogState.On}" Mode="OneWay"/>
+                                                <Binding Source="{x:Static enums:ModelDialogState.Available}" Mode="OneWay"/>
                                                 <Binding Path="(ItemsControl.AlternationIndex)" 
                                                          RelativeSource="{RelativeSource Mode=FindAncestor, AncestorType=ListViewItem}" />
                                             </MultiBinding>

@@ -12,7 +12,7 @@ namespace DialogGenerator.UI.Converters
         {
             var state = (ModelDialogState)value;
 
-            return state == ModelDialogState.On ? Brushes.Green : Brushes.Red;
+            return state == ModelDialogState.Available ? Brushes.Orange : Brushes.Red;
         }
 
         public object ConvertBack(object value, Type targetType, object parameter, CultureInfo culture)

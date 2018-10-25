@@ -6,7 +6,7 @@ using DialogGenerator.Model;
 
 namespace DialogGenerator.UI.Data
 {
-    class CharacterDataProvider : ICharacterDataProvider
+    public class CharacterDataProvider : ICharacterDataProvider
     {
         private ILogger mLogger;
         private ICharacterRepository mCharacterRepository;

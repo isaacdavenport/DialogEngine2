@@ -4,10 +4,26 @@
                     xmlns:converters="clr-namespace:MaterialDesignThemes.Wpf.Converters;assembly=MaterialDesignThemes.Wpf"
                     xmlns:local="clr-namespace:DialogGenerator.UI.Themes">
 
+    <ResourceDictionary.MergedDictionaries>
+        <ResourceDictionary Source="pack://application:,,,/MaterialDesignThemes.Wpf;component/Themes/MaterialDesignTheme.TextBox.xaml" />
+    </ResourceDictionary.MergedDictionaries>
+
+    <Style x:Key="MaterialDesignFloatingHintTextBox" TargetType="{x:Type TextBox}" BasedOn="{StaticResource MaterialDesignTextBox}">
+        <Setter Property="wpf:HintAssist.IsFloating" Value="True"/>
+    </Style>
+
+    <Style x:Key="MaterialDesignTextFieldBoxTextBox" TargetType="{x:Type TextBox}" BasedOn="{StaticResource MaterialDesignFloatingHintTextBox}">
+        <Setter Property="wpf:TextFieldAssist.HasTextFieldBox" Value="True" />
+    </Style>
+
+    <Style x:Key="MaterialDesignTextAreaTextBox" TargetType="{x:Type TextBox}" BasedOn="{StaticResource MaterialDesignFloatingHintTextBox}">
+        <Setter Property="wpf:TextFieldAssist.HasTextAreaBox" Value="True" />
+    </Style>
+    
     <Style x:Key="MaterialDesignTextBox" TargetType="{x:Type TextBox}">
         <Setter Property="Foreground" Value="{Binding RelativeSource={RelativeSource AncestorType={x:Type FrameworkElement}}, Path=(TextElement.Foreground)}"/>
-        <Setter Property="BorderBrush" Value="{DynamicResource MaterialDesignTextBoxBorder}" />
-        <Setter Property="BorderThickness" Value="0 0 0 1"/>
+        <Setter Property="BorderBrush" Value="Red" />
+        <Setter Property="BorderThickness" Value="2"/>
         <Setter Property="wpf:TextFieldAssist.TextBoxViewMargin" Value="0 0 0 0" />
         <Setter Property="Background" Value="Transparent"/>
         <Setter Property="CaretBrush" Value="{DynamicResource PrimaryHueMidBrush}"/>
@@ -20,7 +36,6 @@
         <Setter Property="Stylus.IsFlicksEnabled" Value="False"/>
         <Setter Property="Validation.ErrorTemplate" Value="{StaticResource MaterialDesignValidationErrorTemplate}"/>
         <Setter Property="wpf:TextFieldAssist.IncludeSpellingSuggestions" Value="{Binding RelativeSource={RelativeSource Self}, Path=(SpellCheck.IsEnabled)}" />
-        <!-- cludge the default context menu -->
         <Setter Property="ContextMenu">
             <Setter.Value>
                 <ContextMenu>
@@ -107,12 +122,12 @@
                         </Trigger>
                         <Trigger Property="wpf:TextFieldAssist.HasTextAreaBox" Value="True">
                             <Setter Property="VerticalContentAlignment" Value="Top" />
-                            <Setter TargetName="textFieldBoxBorder" Property="Background" Value="Transparent" />
+                            <Setter TargetName="textFieldBoxBorder" Property="Background" Value="transparent" />
                             <Setter TargetName="textFieldBoxBorder" Property="CornerRadius" Value="4" />
-                            <Setter TargetName="textFieldBoxBorder" Property="BorderThickness" Value="1" />
+                            <Setter TargetName="textFieldBoxBorder" Property="BorderThickness" Value="2" />
                             <Setter TargetName="textFieldBoxBorder" Property="BorderBrush" Value="{DynamicResource MaterialDesignTextAreaBorder}" />
                             <Setter TargetName="textFieldBoxBorder" Property="Padding" Value="0,8,0,0" />
-                            <Setter TargetName="textFieldBoxBorder" Property="Margin" Value="0" />
+                            <Setter TargetName="textFieldBoxBorder" Property="Margin" Value="2" />
                             <Setter TargetName="textFieldGrid" Property="Margin" Value="16,0,16,0" />
                             <Setter TargetName="border" Property="BorderThickness" Value="0" />
                             <Setter TargetName="Underline" Property="Visibility" Value="Collapsed" />
@@ -124,7 +139,7 @@
                                 <Condition Property="IsEnabled" Value="false" />
                                 <Condition Property="wpf:TextFieldAssist.HasTextAreaBox" Value="True" />
                             </MultiTrigger.Conditions>
-                            <Setter TargetName="textFieldBoxBorder" Property="Background" Value="Red" />
+                            <Setter TargetName="textFieldBoxBorder" Property="Background" Value="WhiteSmoke" />
                             <Setter TargetName="textFieldBoxBorder" Property="BorderBrush" Value="{DynamicResource MaterialDesignTextAreaBorder}" />
                         </MultiTrigger>
                         <MultiTrigger>
@@ -158,7 +173,7 @@
                                 <Condition Property="IsMouseOver" Value="True" />
                                 <Condition Property="wpf:TextFieldAssist.HasTextAreaBox" Value="True" />
                             </MultiTrigger.Conditions>
-                            <Setter TargetName="textFieldBoxBorder" Property="Margin" Value="0" />
+                            <Setter TargetName="textFieldBoxBorder" Property="Margin" Value="2" />
                             <Setter TargetName="textFieldBoxBorder" Property="BorderThickness" Value="2" />
                         </MultiTrigger>
                         <MultiTrigger>

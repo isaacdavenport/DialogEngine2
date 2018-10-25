@@ -5,9 +5,9 @@ using DialogGenerator.Utilities;
 using Prism.Commands;
 using Prism.Events;
 using Prism.Mvvm;
-using System;
 using System.Diagnostics;
 using System.IO;
+using System.Reflection;
 using System.Windows.Input;
 
 namespace DialogGenerator.UI.ViewModels
@@ -98,6 +98,8 @@ namespace DialogGenerator.UI.ViewModels
                 RaisePropertyChanged();
             }
         }
+
+        public string Version => $"v: {Assembly.GetExecutingAssembly().GetName().Version.ToString()}";
 
         #endregion
     }

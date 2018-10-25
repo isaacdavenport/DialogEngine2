@@ -89,7 +89,7 @@ namespace DialogGenerator.UI.ViewModels
         {
             SelectedDialogModelIndex = DialogModel.ArrayOfDialogModels.IndexOf(obj);
             int result = SelectedDialogModelIndex;
-            var _dialogModelInfoList = mDialogModelDataProvider.GetAllByState(ModelDialogState.On);
+            var _dialogModelInfoList = mDialogModelDataProvider.GetAllByState(ModelDialogState.Available);
             int _selectedIndex = _dialogModelInfoList.IndexOf(DialogModel);
             var _modelDialogInfo = _dialogModelInfoList.Where(dmi => dmi.SelectedModelDialogIndex > -1).FirstOrDefault();
 
@@ -141,8 +141,8 @@ namespace DialogGenerator.UI.ViewModels
         {
             DialogModel = mDialogModelDataProvider.GetByName(name);
             mDialogModelsCollection.Source = DialogModel.ArrayOfDialogModels;
-            ActiveDialogModel = DialogModel.SelectedModelDialogIndex >= 0
-                ? DialogModel.ArrayOfDialogModels[DialogModel.SelectedModelDialogIndex]
+            ActiveDialogModel = Session.Get<int>(Constants.SELECTED_DLG_MODEL) >= 0
+                ? ActiveDialogModel
                 : null;
             SelectedDialogModelIndex = DialogModel.SelectedModelDialogIndex;
 

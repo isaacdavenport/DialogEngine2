@@ -228,37 +228,33 @@ namespace DialogGenerator.DialogEngine
         {
             try
             {
-                if (File.Exists(_pathAndFileName))
+                string _fileName = File.Exists(_pathAndFileName)
+                    ? _pathAndFileName
+                    : DialogEngineConstants.SilenceFileName;
+
+                var i = 0;
+                bool _isPlaying = false;
+                Thread.Sleep(300);
+
+                var _playSuccess = mPlayer.Play(_fileName);
+
+                if (_playSuccess != 0)
                 {
-                    var i = 0;
-                    bool _isPlaying = false;
-                    Thread.Sleep(300);
-
-                    var _playSuccess = mPlayer.Play(_pathAndFileName);
-
-                    if (_playSuccess != 0)
-                    {
-                        AddItem(new ErrorMessage("MP3 Play Error  ---  " + _playSuccess));
-                    }
-
-                    do
-                    {
-                        Thread.Sleep(800);
-
-                        _isPlaying = mPlayer.IsPlaying();
-
-                        Thread.Sleep(100);
-                        i++;
-                    }
-                    while (_isPlaying && i < 400);  // don't get stuck,, 40 seconds max phrase
-
-                    Thread.Sleep(Session.Get<int>(Constants.DIALOG_SPEED)); // wait around a second after the audio is done for between phrase pause
+                    AddItem(new ErrorMessage("MP3 Play Error  ---  " + _playSuccess));
                 }
-                else
+
+                do
                 {
-                    AddItem(new ErrorMessage("Could not find: " + _pathAndFileName));
-                    Thread.Sleep(Session.Get<int>(Constants.DIALOG_SPEED));
+                    Thread.Sleep(800);
+
+                    _isPlaying = mPlayer.IsPlaying();
+
+                    Thread.Sleep(100);
+                    i++;
                 }
+                while (_isPlaying && i < 400);  // don't get stuck,, 40 seconds max phrase
+
+                Thread.Sleep(Session.Get<int>(Constants.DIALOG_SPEED)); // wait around a second after the audio is done for between phrase pause
             }
             catch (Exception ex)
             {
@@ -779,7 +775,7 @@ namespace DialogGenerator.DialogEngine
             if (mDialogModelsList.Count > 0)
                 mDialogModelsList.Clear();
 
-            var _dialogModelInfoList = mDialogModelRepository.GetAllByState(ModelDialogState.On);
+            var _dialogModelInfoList = mDialogModelRepository.GetAllByState(ModelDialogState.Available);
 
             foreach (ModelDialogInfo _modelDialogInfo in _dialogModelInfoList)
             {

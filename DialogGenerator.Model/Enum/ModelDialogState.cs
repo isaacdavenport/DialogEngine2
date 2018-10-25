@@ -6,7 +6,7 @@
     public enum ModelDialogState
     {
         /// model dialog will be loaded
-        On,
+        Available,
         /// model dialog will be ignored
         Off
     }

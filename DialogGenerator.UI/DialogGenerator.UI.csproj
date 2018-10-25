@@ -221,15 +221,11 @@
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
-    <Page Include="Themes\MaterialDesignThemes.Overrides.xaml">
+    <Page Include="Themes\MaterialDesignThemes.GroupBox.Overrides.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
-    <Page Include="Themes\ScrollBarStyle.xaml">
-      <SubType>Designer</SubType>
-      <Generator>MSBuild:Compile</Generator>
-    </Page>
-    <Page Include="Themes\TabControlStyle.xaml">
+    <Page Include="Themes\MaterialDesignThemes.TextBox.Overrides.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>

@@ -52,7 +52,7 @@
                         <TextBlock Margin="10,0,0,0" Grid.Column="0" VerticalAlignment="Center" Text="{Binding Path=Name}" />
 
                         <Border Grid.Column="2" IsEnabled="{Binding DataContext.DialogModel.State, RelativeSource={RelativeSource Mode=FindAncestor, AncestorType=view:DialogModelDetailView},
-                            Converter={StaticResource IsStatesEqualValueConverter}, ConverterParameter={x:Static enums:ModelDialogState.On}}" 
+                            Converter={StaticResource IsStatesEqualValueConverter}, ConverterParameter={x:Static enums:ModelDialogState.Available}}" 
                             BorderBrush="LightGray" Width="40" ToolTip="Select dialog model" Background="WhiteSmoke" CornerRadius="3" BorderThickness="1" Margin="10,10,16,10">
                             <Border.Visibility>
                                 <MultiBinding Converter="{StaticResource ActiveDialogModelBtnVisibilityValueConverter}">

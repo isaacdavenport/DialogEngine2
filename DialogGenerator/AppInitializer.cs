@@ -5,6 +5,7 @@ using DialogGenerator.Model;
 using DialogGenerator.Workflow;
 using System;
 using System.Collections.Generic;
+using System.IO;
 
 namespace DialogGenerator
 {
@@ -80,6 +81,24 @@ namespace DialogGenerator
 
         private async void _loadData()
         {
+            if (File.Exists(ApplicationData.Instance.TempDirectory))
+            {
+                var _dirInfo = new DirectoryInfo(ApplicationData.Instance.TempDirectory);
+
+                foreach (FileInfo file in _dirInfo.EnumerateFiles())
+                {
+                    file.Delete();
+                }
+                foreach (DirectoryInfo dir in _dirInfo.EnumerateDirectories())
+                {
+                    dir.Delete(true);
+                }
+            }
+            else
+            {
+                Directory.CreateDirectory(ApplicationData.Instance.TempDirectory);
+            }
+
             var _loadedData = await mDialogDataRepository.LoadAsync(ApplicationData.Instance.DataDirectory);
 
             if (_loadedData.DialogModels.Count == 0)

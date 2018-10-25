@@ -99,7 +99,7 @@ namespace DialogGenerator.UI.ViewModels
 
             if (_newState == ModelDialogState.Off)
             {
-                var _availableDialogModels = mDialogModelDataProvider.GetAllByState(ModelDialogState.On);
+                var _availableDialogModels = mDialogModelDataProvider.GetAllByState(ModelDialogState.Available);
 
                 if (_availableDialogModels.Count == 1)
                     return;

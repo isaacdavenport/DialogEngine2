@@ -86,6 +86,11 @@
                         <materialDesign:PackIcon Kind="InformationOutline" />
                     </MenuItem.Icon>
                 </MenuItem>
+                <MenuItem Header="{Binding Version}" IsEnabled="False">
+                    <MenuItem.Icon>
+                        <materialDesign:PackIcon Kind="SourceBranch" />
+                    </MenuItem.Icon>
+                </MenuItem>
             </MenuItem>
         </Menu>
 
