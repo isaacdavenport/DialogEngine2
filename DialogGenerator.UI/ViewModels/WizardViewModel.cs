@@ -13,6 +13,7 @@ using System;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.IO;
+using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using System.Windows;
@@ -370,19 +371,21 @@ namespace DialogGenerator.UI.ViewModels
 
         private string _tutorialStepFilePath()
         {
-            int _indexForSplitting = CurrentTutorialStep.VideoFileName.IndexOf(mcWordForSplitting);
-            string _videoFileName = CurrentTutorialStep.VideoFileName.Substring(_indexForSplitting + 3);
+            //int _indexForSplitting = CurrentTutorialStep.PhraseWeights.Keys[0];
+            //string _videoFileName = CurrentTutorialStep.VideoFileName.Substring(_indexForSplitting + 3);
 
-            if (string.IsNullOrEmpty(_videoFileName))
-            {
-                return "";
-            }
-            else
-            {
-                string _mp3FilePath = $"{Character.CharacterPrefix}_{_videoFileName}";
+            //if (string.IsNullOrEmpty(_videoFileName))
+            //{
+            //    return "";
+            //}
+            //else
+            //{
+            //    string _mp3FilePath = $"{Character.CharacterPrefix}_{_videoFileName}";
 
-                return _mp3FilePath;
-            }
+            //    return _mp3FilePath;
+            //}
+
+            throw new  NotImplementedException();
         }
 
         private void _setDataForTutorialStep(int _currentStepIndex)
@@ -394,7 +397,7 @@ namespace DialogGenerator.UI.ViewModels
 
                 if (CurrentTutorialStep.CollectUserInput)
                 {
-                    VoiceRecorderControlViewModel.CurrentFilePath = _tutorialStepFilePath();
+                    VoiceRecorderControlViewModel.CurrentFilePath = $"{Character.CharacterPrefix}_{CurrentTutorialStep.PhraseWeights.Keys.First()}_{DateTime.Now.ToString("yyyy-dd-MM-HH-mm-ss")}";
                     PhraseEntry _currentPhrase = _findPhraseInCharacterForTutorialStep(CurrentTutorialStep);
 
                     if (_currentPhrase != null)

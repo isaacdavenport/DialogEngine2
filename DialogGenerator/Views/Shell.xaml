@@ -7,8 +7,6 @@
         Title="Toys2Life" 
         Height="450" 
         Width="800"
-        MinWidth="850"
-        MinHeight="800"
         mc:Ignorable="d"
         xmlns:prism="http://prismlibrary.com/"
         prism:ViewModelLocator.AutoWireViewModel="True"
@@ -19,7 +17,8 @@
         TextOptions.TextFormattingMode="Ideal" 
         TextOptions.TextRenderingMode="Auto"
         TextElement.Foreground="{DynamicResource MaterialDesignBody}">
-    
+
+    <ScrollViewer VerticalScrollBarVisibility="Auto" HorizontalScrollBarVisibility="Auto">
     <materialDesign:DialogHost x:Name="MainDialogHost" Identifier="MainDialogHost"  HorizontalAlignment="Stretch" VerticalAlignment="Stretch">
 
         <Grid x:Name="mainGrid" >
@@ -44,4 +43,5 @@
             <ContentControl Grid.Column="1"  Grid.Row="1" prism:RegionManager.RegionName="{x:Static inf:Constants.ContentRegion}" />
         </Grid>
     </materialDesign:DialogHost>
+    </ScrollViewer>
 </Window>
