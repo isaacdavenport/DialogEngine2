@@ -18,10 +18,9 @@
         TextOptions.TextRenderingMode="Auto"
         TextElement.Foreground="{DynamicResource MaterialDesignBody}">
 
-    <ScrollViewer VerticalScrollBarVisibility="Auto" HorizontalScrollBarVisibility="Auto">
     <materialDesign:DialogHost x:Name="MainDialogHost" Identifier="MainDialogHost"  HorizontalAlignment="Stretch" VerticalAlignment="Stretch">
 
-        <Grid x:Name="mainGrid" >
+        <Grid x:Name="mainGrid">
             <Grid.RowDefinitions>
                 <RowDefinition Height="Auto" />
                 <RowDefinition Height="*" />
@@ -41,7 +40,7 @@
 
             <!-- Content region -->
             <ContentControl Grid.Column="1"  Grid.Row="1" prism:RegionManager.RegionName="{x:Static inf:Constants.ContentRegion}" />
+
         </Grid>
     </materialDesign:DialogHost>
-    </ScrollViewer>
 </Window>
