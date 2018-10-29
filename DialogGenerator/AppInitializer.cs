@@ -126,6 +126,15 @@ namespace DialogGenerator
                 _character2RadioBindingDict.Add(i, character);
             }
 
+            //var characters = mCharacterRepository.GetAll();
+
+            //for (int i = 0; i < ApplicationData.Instance.NumberOfRadios; i++)
+            //{
+            //    characters[i].RadioNum = i;
+            //}
+
+            //foreach (var character in characters)
+            //    await mCharacterRepository.SaveAsync(character);
 
             Session.Set(Constants.CH_RADIO_RELATIONSHIP, _character2RadioBindingDict);
 
