@@ -115,7 +115,7 @@ namespace DialogGenerator
         }
 
 
-        private  void _bindCharacter2Radio()
+        private async void _bindCharacter2Radio()
         {
             var _character2RadioBindingDict = new Dictionary<int, Character>();
 
@@ -125,6 +125,7 @@ namespace DialogGenerator
 
                 _character2RadioBindingDict.Add(i, character);
             }
+
 
             Session.Set(Constants.CH_RADIO_RELATIONSHIP, _character2RadioBindingDict);
 

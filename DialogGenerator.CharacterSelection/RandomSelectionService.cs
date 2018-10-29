@@ -21,6 +21,7 @@ namespace DialogGenerator.CharacterSelection
         private IMessageDialogService mMessageDialogService;
         private static Random msRandom = new Random();
         public static int NextCharacter1 = 1;
+        public bool mIsSelectedCharactersSent;
         public static int NextCharacter2 = 2;
         private CancellationTokenSource mCancellationTokenSource;
 
@@ -32,6 +33,13 @@ namespace DialogGenerator.CharacterSelection
             mEventAggregator = _eventAggregator;
             mCharacterRepository = _characterRepository;
             mMessageDialogService = _messageDialogService;
+
+            mEventAggregator.GetEvent<ChangedCharacterStateEvent>().Subscribe(_onChangedCharacterState);
+        }
+
+        private void _onChangedCharacterState()
+        {
+            mIsSelectedCharactersSent = false;
         }
 
 
@@ -109,11 +117,11 @@ namespace DialogGenerator.CharacterSelection
 
                 // used for computers with no serial input radio for random, or forceCharacter mode
                 // TODO is this still true?  does not include final character the silent schoolhouse, not useful in noSerial mode 
-                bool _isSelectedCharactersSent = false;
+                mIsSelectedCharactersSent= false;
 
                 while (!mCancellationTokenSource.Token.IsCancellationRequested)
                 {
-                    if (!_isSelectedCharactersSent 
+                    if (!mIsSelectedCharactersSent 
                        || Session.Get<int>(Constants.COMPLETED_DLG_MODELS) >= ApplicationData.Instance.NumberOfDialogModelsCompleted
                        || (Session.Get<int>(Constants.SELECTED_DLG_MODEL) != -1 && Session.Get<int>(Constants.COMPLETED_DLG_MODELS) >=1))
                     {
@@ -155,7 +163,7 @@ namespace DialogGenerator.CharacterSelection
                                 Character1Index = NextCharacter1,
                                 Character2Index = NextCharacter2
                             });
-                        _isSelectedCharactersSent = true;
+                        mIsSelectedCharactersSent = true;
                     }
 
                     Thread.Sleep(1000);
