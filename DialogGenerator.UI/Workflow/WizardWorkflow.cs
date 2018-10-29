@@ -17,7 +17,6 @@ namespace DialogGenerator.UI.Workflow.WizardWorkflow
         VideoPlayerPlaying,
         SaveAndNext,
         SkipStep,
-        Cancel,
         Finish,
         LeaveWizard
     }
@@ -35,7 +34,6 @@ namespace DialogGenerator.UI.Workflow.WizardWorkflow
         VideoPlayerPlaying,
         SaveAndNext,
         SkipStep,
-        Cancel,
         Finish,
         LeaveWizard
     }

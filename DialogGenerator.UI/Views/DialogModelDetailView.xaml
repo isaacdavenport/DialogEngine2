@@ -151,7 +151,7 @@
                                                  <Border.InputBindings>
                                                     <MouseBinding MouseAction="LeftClick" CommandParameter="{Binding}"
                                                                   Command="{Binding DataContext.ResetActiveDialogModel,
-                                                    RelativeSource={RelativeSource Mode=FindAncestor, AncestorType=view:DialogModelDetailView}}"/>
+                                                                  RelativeSource={RelativeSource Mode=FindAncestor, AncestorType=view:DialogModelDetailView}}"/>
                                                  </Border.InputBindings>
                                         </Border>
                                     </Grid>

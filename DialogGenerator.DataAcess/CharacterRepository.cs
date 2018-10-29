@@ -9,6 +9,7 @@ using System.Windows;
 using DialogGenerator.Core;
 using DialogGenerator.DataAccess.Helper;
 using DialogGenerator.Model;
+using DialogGenerator.Model.Enum;
 using Microsoft.VisualBasic.FileIO;
 
 namespace DialogGenerator.DataAccess
@@ -81,17 +82,26 @@ namespace DialogGenerator.DataAccess
 
         public ObservableCollection<Character> GetAll()
         {
-            return Session.Get<ObservableCollection<Character>>(Core.Constants.CHARACTERS);
+            return Session.Get<ObservableCollection<Character>>(Constants.CHARACTERS);
         }
 
         public Character GetByInitials(string initials)
         {
-            Character character = Session.Get<ObservableCollection<Character>>(Core.Constants.CHARACTERS)
+            Character character = Session.Get<ObservableCollection<Character>>(Constants.CHARACTERS)
                 .Where(c => c.CharacterPrefix.Equals(initials))
                 .FirstOrDefault();
 
             return character;
         }
+        public List<Character> GetAllByState(CharacterState state)
+        {
+            var characters = Session.Get<ObservableCollection<Character>>(Constants.CHARACTERS)
+                .Where(c => c.State == state)
+                .ToList();
+
+            return characters;
+        }
+
 
         public Character GetByAssignedRadio(int _radioNum)
         {

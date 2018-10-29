@@ -75,7 +75,7 @@ namespace DialogGenerator
                 .Permit(Triggers.SetDefaultValues, States.DefaultValues);
 
             mWorkflow.Configure(States.DefaultValues)
-                .OnEntry(_setDefaultValues);
+                .OnEntry(_setInitialValues);
         }
 
 
@@ -139,15 +139,39 @@ namespace DialogGenerator
             mWorkflow.Fire(Triggers.SetDefaultValues);
         }
 
-        private void _setDefaultValues()
+        private void _setInitialValues()
         {
-            Session.Set(Constants.FORCED_CH_COUNT, 0);
+            var characters = mCharacterRepository.GetAll();
+            var _forcedCharacters = mCharacterRepository.GetAllByState(Model.Enum.CharacterState.On);
+
+            switch (_forcedCharacters.Count)
+            {
+                case 1:
+                    {
+                        Session.Set(Constants.FORCED_CH_1, characters.IndexOf(_forcedCharacters[0]));
+                        Session.Set(Constants.FORCED_CH_2, -1);
+                        break;
+                    }
+                case 2:
+                    {
+                        Session.Set(Constants.FORCED_CH_1, characters.IndexOf(_forcedCharacters[0]));
+                        Session.Set(Constants.FORCED_CH_2, characters.IndexOf(_forcedCharacters[1]));
+                        break;
+                    }
+                default:
+                    {
+                        Session.Set(Constants.FORCED_CH_1, -1);
+                        Session.Set(Constants.FORCED_CH_2, -1);
+                        break;
+                    }
+            }
+
+            Session.Set(Constants.FORCED_CH_COUNT, _forcedCharacters.Count);
             Session.Set(Constants.NEXT_CH_1, 1);
             Session.Set(Constants.NEXT_CH_2, 2);
-            Session.Set(Constants.FORCED_CH_1, -1);
-            Session.Set(Constants.FORCED_CH_2, -1);
             Session.Set(Constants.DIALOG_SPEED, 1000); // ms
             Session.Set(Constants.SELECTED_DLG_MODEL, -1);
+            Session.Set(Constants.COMPLETED_DLG_MODELS, 0);
 
             Completed(this,new EventArgs());
         }

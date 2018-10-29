@@ -292,7 +292,7 @@
                                 </Style>
                             </DataGrid.CellStyle>
                         </DataGrid>
-                        <Grid Width="200" Height="auto">
+                        <!--<Grid Width="200" Height="auto">
 
                             <Grid.RowDefinitions>
                                 <RowDefinition />
@@ -350,7 +350,7 @@
                                         <Run FontWeight="Bold" Foreground="Black" Text="{Binding RSSIstable}" />
                                 </TextBlock>
                             </Grid>
-                        </Grid>
+                        </Grid>-->
                     </StackPanel>
                 </Grid>
             </TabItem>

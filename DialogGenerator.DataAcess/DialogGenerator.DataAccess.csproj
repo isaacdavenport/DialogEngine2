@@ -91,6 +91,10 @@
       <Project>{8900af0a-e911-4e26-b60a-47453f1c1e36}</Project>
       <Name>DialogGenerator.Model</Name>
     </ProjectReference>
+    <ProjectReference Include="..\DialogGenerator.Utilities\DialogGenerator.Utilities.csproj">
+      <Project>{CA4D11CB-882D-44A3-AFF2-03083D106BCE}</Project>
+      <Name>DialogGenerator.Utilities</Name>
+    </ProjectReference>
   </ItemGroup>
   <ItemGroup>
     <None Include="packages.config" />

@@ -2,6 +2,8 @@
 using DialogGenerator.DialogEngine;
 using DialogGenerator.Events;
 using DialogGenerator.Events.EventArgs;
+using DialogGenerator.UI.Views.Dialogs;
+using DialogGenerator.Utilities;
 using Prism.Commands;
 using Prism.Events;
 using Prism.Mvvm;
@@ -21,6 +23,7 @@ namespace DialogGenerator.UI.ViewModels
 
         private ILogger mLogger;
         private IEventAggregator mEventAggregator;
+        private IMessageDialogService mMessageDialogService;
         private IDialogEngine mDialogEngine;
         private bool mIsDialogStarted;
         private bool mIsStopBtnEnabled;
@@ -30,10 +33,13 @@ namespace DialogGenerator.UI.ViewModels
 
         #region - constructor -
 
-        public DialogViewModel(ILogger logger,IEventAggregator _eventAggregator,IDialogEngine _dialogEngine)
+        public DialogViewModel(ILogger logger,IEventAggregator _eventAggregator
+            ,IDialogEngine _dialogEngine
+            ,IMessageDialogService _messageDialogService)
         {
             mLogger = logger;
             mEventAggregator = _eventAggregator;
+            mMessageDialogService = _messageDialogService;
             mDialogEngine = _dialogEngine;
 
             mEventAggregator.GetEvent<NewDialogLineEvent>().Subscribe(_onNewDialogLine);
@@ -91,8 +97,9 @@ namespace DialogGenerator.UI.ViewModels
             DialogLinesCollection.Clear();
         }
 
-        private void _configureDialogCommand_Execute()
+        private async void _configureDialogCommand_Execute()
         {
+            await mMessageDialogService.ShowDedicatedDialogAsync<int?>(new SettingsDialog());
         }
 
         private async void _startDialogCommand_Execute()
@@ -118,33 +125,22 @@ namespace DialogGenerator.UI.ViewModels
 
         private void _onNewDialogLine(NewDialogLineEventArgs obj)
         {
-            if (Application.Current.Dispatcher.CheckAccess())
-            {
-                if (DialogLinesCollection.Count > 150)
-                    DialogLinesCollection.RemoveAt(0);
-
-                DialogLinesCollection.Add(obj);
-            }
-            else
-            {
-                Application.Current.Dispatcher.BeginInvoke((Action) delegate
-                {
-                    if (DialogLinesCollection.Count > 150)
-                        DialogLinesCollection.RemoveAt(0);
-
-                    DialogLinesCollection.Add(obj);
-                });
-            }
+            _processDialogItem(obj);
         }
 
         private void _onNewActiveCharacters(string info)
+        {
+            _processDialogItem(info);
+        }
+
+        private void _processDialogItem(object item)
         {
             if (Application.Current.Dispatcher.CheckAccess())
             {
                 if (DialogLinesCollection.Count > 150)
                     DialogLinesCollection.RemoveAt(0);
 
-                DialogLinesCollection.Add(info);
+                DialogLinesCollection.Add(item);
             }
             else
             {
@@ -153,7 +149,7 @@ namespace DialogGenerator.UI.ViewModels
                     if (DialogLinesCollection.Count > 150)
                         DialogLinesCollection.RemoveAt(0);
 
-                    DialogLinesCollection.Add(info);
+                    DialogLinesCollection.Add(item);
                 });
             }
         }

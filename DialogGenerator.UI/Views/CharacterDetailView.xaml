@@ -208,15 +208,18 @@
                             Stretch="UniformToFill" 
                             Source="{Binding Character.CharacterImage, Converter={StaticResource ImageToFullPathValueConverter}}" />
                 </Border>
-                <TextBlock  HorizontalAlignment="Center" 
+                <StackPanel HorizontalAlignment="Center" Orientation="Horizontal">
+                    <TextBlock  HorizontalAlignment="Center" 
                             Margin="5"  
                             Foreground="{DynamicResource PrimaryHueMidBrush}" 
                             Text="Change image">
 
-                    <TextBlock.InputBindings>
-                        <MouseBinding Command="{Binding ChooseImageCommand}" MouseAction="LeftClick" />
-                    </TextBlock.InputBindings>
-                </TextBlock>
+                        <TextBlock.InputBindings>
+                            <MouseBinding Command="{Binding ChooseImageCommand}" MouseAction="LeftClick" />
+                        </TextBlock.InputBindings>
+                    </TextBlock>
+                    <TextBlock Foreground="{DynamicResource PrimaryHueMidBrush}" HorizontalAlignment="Center" Margin="5" Text="Reset" />
+                </StackPanel>
             </StackPanel>
 
             <StackPanel HorizontalAlignment="Center" Margin="0,40,0,0" Orientation="Horizontal" Grid.Row="6" Grid.ColumnSpan="2">

@@ -98,6 +98,7 @@ namespace DialogGenerator.DialogEngine
             mEventAggregator.GetEvent<StopPlayingCurrentDialogLineEvent>().Publish();
             mEventAggregator.GetEvent<SelectedCharactersPairChangedEvent>().Unsubscribe(_onSelectedCharactersPairChanged);
             mRandomSelectionDataCached = null;
+            Session.Set(Constants.COMPLETED_DLG_MODELS, 0);
             mStateMachineTaskTokenSource.Cancel();
         }
 
@@ -128,6 +129,7 @@ namespace DialogGenerator.DialogEngine
             mLogger.Debug("_onSelectedCharactersPairChanged");
 
             mRandomSelectionDataCached = obj;
+            Session.Set(Constants.COMPLETED_DLG_MODELS, 0);
 
             if (ApplicationData.Instance.UseSerialPort && mCurrentState != States.PreparingDialogParameters)
             {
@@ -230,7 +232,7 @@ namespace DialogGenerator.DialogEngine
             {
                 string _fileName = File.Exists(_pathAndFileName)
                     ? _pathAndFileName
-                    : DialogEngineConstants.SilenceFileName;
+                    : Path.Combine(ApplicationData.Instance.AudioDirectory,DialogEngineConstants.SilenceFileName);
 
                 var i = 0;
                 bool _isPlaying = false;
@@ -254,7 +256,7 @@ namespace DialogGenerator.DialogEngine
                 }
                 while (_isPlaying && i < 400);  // don't get stuck,, 40 seconds max phrase
 
-                Thread.Sleep(Session.Get<int>(Constants.DIALOG_SPEED)); // wait around a second after the audio is done for between phrase pause
+                Thread.Sleep((int)ApplicationData.Instance.DelayBetweenPhrases*1000); // wait around a second after the audio is done for between phrase pause
             }
             catch (Exception ex)
             {
@@ -753,6 +755,9 @@ namespace DialogGenerator.DialogEngine
                     mRecentDialogs.Dequeue(); //move to use HistoricalDialogs
                     mRecentDialogs.Enqueue(mIndexOfCurrentDialogModel);
                 }
+
+                int _completedDlgModels = Session.Get<int>(Constants.COMPLETED_DLG_MODELS);
+                Session.Set(Constants.COMPLETED_DLG_MODELS, ++_completedDlgModels);
             }
             catch (OperationCanceledException)
             {
@@ -813,7 +818,7 @@ namespace DialogGenerator.DialogEngine
                   ? mCharacterSelectionFactory.Create(SelectionMode.SerialSelectionMode)
                   : mCharacterSelectionFactory.Create(SelectionMode.RandomSelectionModel);
 
-            var _characterSelectionTask = mCharacterSelection.StartCharacterSelection();
+            Task _characterSelectionTask;
 
             mCancellationTokenSource = new CancellationTokenSource();
 
@@ -823,6 +828,8 @@ namespace DialogGenerator.DialogEngine
             await Task.Run(async() =>
             {
                 Thread.CurrentThread.Name = "DialogGeneratorThread";
+
+                _characterSelectionTask= mCharacterSelection.StartCharacterSelection();
 
                 do
                 {
@@ -883,6 +890,7 @@ namespace DialogGenerator.DialogEngine
             mStateMachineTaskTokenSource.Cancel();
             mCharacterSelection.StopCharacterSelection();
             mRandomSelectionDataCached = null;
+            Session.Set(Constants.COMPLETED_DLG_MODELS, 0);
 
             if (mCurrentState != States.DialogFinished)
                 mWorkflow.Fire(Triggers.FinishDialog);

@@ -81,7 +81,7 @@
                             </Grid>    
                             <Border Grid.Row="1" Margin="20" BorderBrush="LightGray"  BorderThickness="1" CornerRadius="5">
                                 <StackPanel Orientation="Horizontal"   HorizontalAlignment="Center">
-                                    <TextBlock Text="{Binding Value, Converter={StaticResource AssignedCharacter2NameValueConverter}}" MinWidth="100" 
+                                    <TextBlock Text="{Binding Value, Converter={StaticResource AssignedCharacter2NameValueConverter}}"  MinWidth="100" 
                                                HorizontalAlignment="Center"  Margin="7" VerticalAlignment="Center" x:Name="CharacterTb" />
                                     <Border BorderThickness="1,0,0,0" Background="WhiteSmoke" CornerRadius="0" BorderBrush="LightGray">
                                         <materialDesign:PopupBox Width="25"

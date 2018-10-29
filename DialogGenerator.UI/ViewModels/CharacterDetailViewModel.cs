@@ -34,7 +34,8 @@ namespace DialogGenerator.UI.ViewModels
 
         #region -constructor-
         public CharacterDetailViewModel(ILogger logger, IEventAggregator _eventAggregator
-            , ICharacterDataProvider _characterDataProvider, IMessageDialogService  _messageDialogService)
+            , ICharacterDataProvider _characterDataProvider
+            , IMessageDialogService  _messageDialogService)
         {
             mLogger = logger;
             mEventAggregator = _eventAggregator;

@@ -40,9 +40,12 @@ namespace DialogGenerator.UI.ViewModels
 
         #region - constructor -
 
-        public CharactersNavigationViewModel(ILogger logger,IEventAggregator _eventAggregator,IWizardDataProvider _wizardDataProvider,
-            IDialogModelDataProvider _dialogModelDataProvider,ICharacterDataProvider _characterDataProvider, 
-            IDialogDataRepository _dialogDataRepository,IMessageDialogService _messageDialogService)
+        public CharactersNavigationViewModel(ILogger logger,IEventAggregator _eventAggregator
+            ,IWizardDataProvider _wizardDataProvider
+            ,IDialogModelDataProvider _dialogModelDataProvider
+            ,ICharacterDataProvider _characterDataProvider
+            ,IDialogDataRepository _dialogDataRepository
+            ,IMessageDialogService _messageDialogService)
         {
             mEventAggregator = _eventAggregator;
             mLogger = logger;

@@ -22,5 +22,6 @@
         public const string FORCED_CH_2 = "SelectedIndex2";
         public const string DIALOG_SPEED = "DialogSpeed";
         public const string SELECTED_DLG_MODEL = "SelectedDialogModel";
+        public const string COMPLETED_DLG_MODELS = "CompletedDialogModels";
     }
 }

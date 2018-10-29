@@ -109,14 +109,13 @@ namespace DialogGenerator.CharacterSelection
 
                 // used for computers with no serial input radio for random, or forceCharacter mode
                 // TODO is this still true?  does not include final character the silent schoolhouse, not useful in noSerial mode 
-
-                DateTime _nextCharacterSwapTime = DateTime.Now;
+                bool _isSelectedCharactersSent = false;
 
                 while (!mCancellationTokenSource.Token.IsCancellationRequested)
                 {
-                    Thread.Sleep(1000);
-
-                    if (_nextCharacterSwapTime.CompareTo(DateTime.Now) < 0)
+                    if (!_isSelectedCharactersSent 
+                       || Session.Get<int>(Constants.COMPLETED_DLG_MODELS) >= ApplicationData.Instance.NumberOfDialogModelsCompleted
+                       || (Session.Get<int>(Constants.SELECTED_DLG_MODEL) != -1 && Session.Get<int>(Constants.COMPLETED_DLG_MODELS) >=1))
                     {
                         switch (Session.Get<int>(Constants.FORCED_CH_COUNT))
                         {
@@ -128,8 +127,6 @@ namespace DialogGenerator.CharacterSelection
                                     NextCharacter1 = _nextCharacter1Index >= 0 ? _nextCharacter1Index : NextCharacter1; //lower bound inclusive, upper exclusive
                                     NextCharacter2 = _nextCharacter2Index >= 0 ? _nextCharacter2Index : NextCharacter2; //lower bound inclusive, upper exclusive
 
-                                    _nextCharacterSwapTime = DateTime.Now.AddSeconds(4 + msRandom.Next(0, 2));
-
                                     break;
                                 }
                             case 1:
@@ -139,32 +136,30 @@ namespace DialogGenerator.CharacterSelection
 
                                     NextCharacter2 = _nextCharacter2Index >= 0 ? _nextCharacter2Index : NextCharacter2;
 
-                                    _nextCharacterSwapTime = DateTime.Now.AddSeconds(4 + msRandom.Next(0, 2));
-
                                     break;
                                 }
                             case 2:
                                 {
-                                    _nextCharacterSwapTime = DateTime.Now.AddSeconds(4 + msRandom.Next(0, 2));
                                     NextCharacter1 = Session.Get<int>(Constants.FORCED_CH_1);
                                     NextCharacter2 = Session.Get<int>(Constants.FORCED_CH_2);
                                     break;
                                 }
                         }
+
+                        Session.Set(Constants.NEXT_CH_1, NextCharacter1);
+                        Session.Set(Constants.NEXT_CH_2, NextCharacter2);
+
+                        mEventAggregator.GetEvent<SelectedCharactersPairChangedEvent>().
+                            Publish(new SelectedCharactersPairEventArgs
+                            {
+                                Character1Index = NextCharacter1,
+                                Character2Index = NextCharacter2
+                            });
+                        _isSelectedCharactersSent = true;
                     }
 
-                    Session.Set(Constants.NEXT_CH_1, NextCharacter1);
-                    Session.Set(Constants.NEXT_CH_2, NextCharacter2);
-
-                    mEventAggregator.GetEvent<SelectedCharactersPairChangedEvent>().
-                        Publish(new SelectedCharactersPairEventArgs
-                        {
-                            Character1Index = NextCharacter1,
-                            Character2Index = NextCharacter2
-                        });
-
+                    Thread.Sleep(1000);
                 }
-
             });
         }
 

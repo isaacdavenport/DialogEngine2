@@ -82,7 +82,14 @@ namespace DialogGenerator.UI.ViewModels
 
         private void _onReadTutorial_Execute()
         {
-            Process.Start(Path.Combine(ApplicationData.Instance.TutorialDirectory, ApplicationData.Instance.TutorialFileName));
+            try
+            {
+                Process.Start(Path.Combine(ApplicationData.Instance.TutorialDirectory, ApplicationData.Instance.TutorialFileName));
+            }
+            catch (System.Exception ex)
+            {
+                mLogger.Error(ex.Message);
+            }
         }
 
         #endregion

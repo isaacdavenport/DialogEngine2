@@ -11,6 +11,7 @@ using DialogGenerator.UI;
 using DialogGenerator.Utilities;
 using DialogGenerator.CharacterSelection;
 using Prism.Events;
+using Prism.Logging;
 
 namespace DialogGenerator
 {

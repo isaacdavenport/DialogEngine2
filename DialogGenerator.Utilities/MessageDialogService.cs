@@ -57,17 +57,15 @@ namespace DialogGenerator.Utilities
 
         public async Task ShowMessage(string tittle, string message,string _dialogHostName = "MainDialogHost")
         {
-            var dialog = new MessageDialog(tittle, message);
-
             if (Application.Current.Dispatcher.CheckAccess())
             {
-                await DialogHost.Show(dialog,_dialogHostName);
+                await DialogHost.Show(new MessageDialog(tittle, message), _dialogHostName);
             }
             else
             {
                 await Application.Current.Dispatcher.Invoke(async () =>
                 {
-                    await DialogHost.Show(dialog,_dialogHostName);
+                    await DialogHost.Show(new MessageDialog(tittle, message), _dialogHostName);
                 });
             }
         }

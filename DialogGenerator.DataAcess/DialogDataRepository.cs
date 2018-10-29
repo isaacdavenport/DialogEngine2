@@ -1,6 +1,7 @@
 ﻿using DialogGenerator.Core;
 using DialogGenerator.DataAccess.Helper;
 using DialogGenerator.Model;
+using DialogGenerator.Utilities;
 using System.IO;
 using System.Threading;
 using System.Threading.Tasks;
@@ -10,11 +11,13 @@ namespace DialogGenerator.DataAccess
     public class DialogDataRepository : IDialogDataRepository
     {
         private ILogger mLogger;
+        private IUserLogger mUserLogger;
         private JSONObjectsTypesList mJSONObjectsTypesList;
 
-        public DialogDataRepository(ILogger logger)
+        public DialogDataRepository(ILogger logger,IUserLogger _userLogger)
         {
             mLogger = logger;
+            mUserLogger = _userLogger;
         }
 
         public async Task<JSONObjectsTypesList> LoadAsync(string path)
@@ -30,7 +33,15 @@ namespace DialogGenerator.DataAccess
 
                 foreach (var _fileInfo in _filesInfo)
                 {
-                    _processJSONFile(_fileInfo);
+                    try
+                    {
+                        _processJSONFile(_fileInfo);
+                    }
+                    catch (System.Exception ex)
+                    {
+                        mUserLogger.Error("Error during reading file: " + _fileInfo.Name);
+                        mLogger.Error(ex.Message);
+                    }
                 }
             });
 

@@ -123,7 +123,7 @@ namespace DialogGenerator.Core
 
         [Description("Determine how long current dialog can play, if new characters selected. Value is in seconds.")]
         [DisplayName("Max time to play .mp3 file:")]
-        [RegularExpression(@"^\d+\.\d+$", ErrorMessage = @"Field requires decimal number.")]
+        [RegularExpression(@"^[0-9]([.,][0-9]{1,3})?$", ErrorMessage = @"Field requires decimal number.")]
         public double MaxTimeToPlayFile { get; set; } = 1.5;
 
         [Editable(true)]
@@ -131,6 +131,15 @@ namespace DialogGenerator.Core
         [DisplayName("Current parental rating:")]
         [RegularExpression(@"^(?:PG|G|PG13|R)$", ErrorMessage = @"Allowed values: PG,G,PG13,R.")]
         public string CurrentParentalRating { get; set; } = "PG";
+
+        [Description("Delay between 2 phrases in dialog.")]
+        [DisplayName("Delay between phrases:")]
+        [RegularExpression(@"^[0-9]([.,][0-9]{1,3})?$", ErrorMessage = @"Field requires decimal number.")]
+        public double DelayBetweenPhrases { get; set; } = 1.0;
+
+        [DisplayName("Number of dialog models:")]
+        [RegularExpression(@"^[1-9]+$", ErrorMessage = @"Field requires number.")]
+        public int NumberOfDialogModelsCompleted { get; set; } = 5;
 
         [XmlIgnore]
         public string RootDirectory

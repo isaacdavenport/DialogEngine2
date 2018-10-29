@@ -54,7 +54,6 @@ namespace DialogGenerator.UI.ViewModels
 
         #region - event handlers-
 
-
         private void _soundPlayer_PropertyChanged(object sender, PropertyChangedEventArgs e)
         {
             switch (e.PropertyName)
@@ -88,7 +87,6 @@ namespace DialogGenerator.UI.ViewModels
             PlayContentCommand = new DelegateCommand(_playContent_Execute);
         }
 
-
         private void _startOrStopRecording_Execute()
         {
             if (IsRecording)
@@ -112,12 +110,10 @@ namespace DialogGenerator.UI.ViewModels
 
         #region - public functions -
 
-
         public void ResetData()
         {
             IsLineRecorded = false;
         }
-
 
         public void PlayOrStop(string path)
         {

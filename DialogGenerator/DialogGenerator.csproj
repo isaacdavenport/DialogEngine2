@@ -194,6 +194,9 @@
       <EmbedInteropTypes>True</EmbedInteropTypes>
     </COMReference>
   </ItemGroup>
+  <ItemGroup>
+    <Content Include="Resources\Silence.mp3" />
+  </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <PropertyGroup>
     <PostBuildEvent>if not exist "$(OutputDir)Temp" mkdir "$(OutputDir)Temp"
@@ -205,6 +208,7 @@ if not exist "$(OutputDir)Tutorial" mkdir "$(OutputDir)Tutorial"
 
 if not exist "$(OutputDir)Images\avatar.png" copy "$(ProjectDir)Resources\avatar.png" "$(OutputDir)Images"
 if not exist "$(OutputDir)Images\doll.jpg" copy "$(ProjectDir)Resources\doll.jpg" "$(OutputDir)Images"
+if not exist "$(OutputDir)Audio\Silence.mp3" copy "$(ProjectDir)Resources\Silence.mp3" "$(OutputDir)Audio"
 
 powershell.exe -NoProfile -ExecutionPolicy RemoteSigned -file  $(SolutionDir)shortcut.ps1 -solutionDir  $(SolutionDir) -outDir  $(TargetDir)</PostBuildEvent>
   </PropertyGroup>

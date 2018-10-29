@@ -128,7 +128,7 @@
         <Border  Grid.Row="3"  Background="White" Height="60" BorderBrush="LightGray" BorderThickness="0,1,0,0">
             <Grid>
                 <StackPanel Orientation="Horizontal" HorizontalAlignment="Center" Margin="10">
-                    <Button>
+                    <Button Command="{Binding ConfigureDialogCommand}">
                         <Button.Content>
                             <StackPanel Orientation="Horizontal">
                                 <materialDesign:PackIcon Kind="Settings" VerticalAlignment="Center" />
