@@ -515,7 +515,7 @@ namespace DialogGenerator.UI.ViewModels
                         PhraseRating = CurrentTutorialStep.PhraseRating,
                         DialogStr = DialogStr,
                         PhraseWeights = CurrentTutorialStep.PhraseWeights,
-                        FileName = mFileNameArray[1]
+                        FileName = $"{mFileNameArray[1]}_{mFileNameArray[2]}"
                     };
 
                     mCharacter.Phrases.Add(entry);
