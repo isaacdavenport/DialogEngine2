@@ -355,13 +355,12 @@ namespace DialogGenerator.UI.ViewModels
             {
                 if (!string.IsNullOrEmpty(phrase.FileName))
                 {
-                    // file name is formed as BO_Greeting.mp3
+                    // file name is formed as BO_Greeting_xxxx(date).mp3
                     string _userRecordedFileName = phrase.FileName;
-                    // DPWizGiveCredit tag name is right side of 'Wiz'
-                    int _indexForSplitting = _tutorialStep.VideoFileName.IndexOf("Wiz");
-                    string _tagName = _tutorialStep.VideoFileName.Substring(_indexForSplitting + 3);
+                    string _userRecordedTagName = _userRecordedFileName.Split('_')[1];
+                    string _tagName = _tutorialStep.PhraseWeights.Keys.First();
 
-                    if (_userRecordedFileName.Equals(_tagName))
+                    if (_userRecordedTagName.Equals(_tagName))
                         return phrase;
                 }
             }
