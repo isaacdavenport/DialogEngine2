@@ -1,4 +1,5 @@
-﻿using Microsoft.Practices.Unity;
+﻿using DialogGenerator.DialogEngine.Model;
+using Microsoft.Practices.Unity;
 using Prism.Modularity;
 
 namespace DialogGenerator.DialogEngine
@@ -14,7 +15,10 @@ namespace DialogGenerator.DialogEngine
 
         public void Initialize()
         {
-            mContainer.RegisterType<IDialogEngine, DialogEngine>( new ContainerControlledLifetimeManager());
+            mContainer.RegisterType<DialogContext>(new ContainerControlledLifetimeManager()); // singleton
+            mContainer.RegisterType<DialogModelsManager>(new ContainerControlledLifetimeManager());
+            mContainer.RegisterType<CharactersManager>(new ContainerControlledLifetimeManager());
+            mContainer.RegisterType<IDialogEngine, DialogEngine>(new ContainerControlledLifetimeManager());
         }
     }
 }

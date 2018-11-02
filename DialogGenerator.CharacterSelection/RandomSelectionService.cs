@@ -21,10 +21,8 @@ namespace DialogGenerator.CharacterSelection
         private IMessageDialogService mMessageDialogService;
         private static Random msRandom = new Random();
         public static int NextCharacter1 = 1;
-        public bool mIsSelectedCharactersSent;
         public static int NextCharacter2 = 2;
         private CancellationTokenSource mCancellationTokenSource;
-
 
         public RandomSelectionService(ILogger logger,IEventAggregator _eventAggregator,
             ICharacterRepository _characterRepository,IMessageDialogService _messageDialogService)
@@ -33,15 +31,7 @@ namespace DialogGenerator.CharacterSelection
             mEventAggregator = _eventAggregator;
             mCharacterRepository = _characterRepository;
             mMessageDialogService = _messageDialogService;
-
-            mEventAggregator.GetEvent<ChangedCharacterStateEvent>().Subscribe(_onChangedCharacterState);
         }
-
-        private void _onChangedCharacterState()
-        {
-            mIsSelectedCharactersSent = false;
-        }
-
 
         /// <summary>
         /// Random selection of next available character
@@ -64,8 +54,6 @@ namespace DialogGenerator.CharacterSelection
                 case 0:  // no avaialbe characters
                     {
                         await mMessageDialogService.ShowMessage("Warning", "No available characters. Please change characters settings.");
-                        //TODO uncomment
-                        //MessageBox.Show("No available characters. Please change characters settings.");
                         break;
                     }
                 case 1: // 1 available character
@@ -117,57 +105,51 @@ namespace DialogGenerator.CharacterSelection
 
                 // used for computers with no serial input radio for random, or forceCharacter mode
                 // TODO is this still true?  does not include final character the silent schoolhouse, not useful in noSerial mode 
-                mIsSelectedCharactersSent= false;
 
                 while (!mCancellationTokenSource.Token.IsCancellationRequested)
                 {
-                    if (!mIsSelectedCharactersSent 
-                       || Session.Get<int>(Constants.COMPLETED_DLG_MODELS) >= ApplicationData.Instance.NumberOfDialogModelsCompleted
-                       || (Session.Get<int>(Constants.SELECTED_DLG_MODEL) != -1 && Session.Get<int>(Constants.COMPLETED_DLG_MODELS) >=1))
+
+                    switch (Session.Get<int>(Constants.FORCED_CH_COUNT))
                     {
-                        switch (Session.Get<int>(Constants.FORCED_CH_COUNT))
-                        {
-                            case 0:
-                                {
-                                    int _nextCharacter1Index = await GetNextCharacter();
-                                    int _nextCharacter2Index = await GetNextCharacter(_nextCharacter1Index >= 0 ? _nextCharacter1Index : NextCharacter1);
-
-                                    NextCharacter1 = _nextCharacter1Index >= 0 ? _nextCharacter1Index : NextCharacter1; //lower bound inclusive, upper exclusive
-                                    NextCharacter2 = _nextCharacter2Index >= 0 ? _nextCharacter2Index : NextCharacter2; //lower bound inclusive, upper exclusive
-
-                                    break;
-                                }
-                            case 1:
-                                {
-                                    NextCharacter1 = Session.Get<int>(Constants.FORCED_CH_1);
-                                    int _nextCharacter2Index = await GetNextCharacter(NextCharacter1);
-
-                                    NextCharacter2 = _nextCharacter2Index >= 0 ? _nextCharacter2Index : NextCharacter2;
-
-                                    break;
-                                }
-                            case 2:
-                                {
-                                    NextCharacter1 = Session.Get<int>(Constants.FORCED_CH_1);
-                                    NextCharacter2 = Session.Get<int>(Constants.FORCED_CH_2);
-                                    break;
-                                }
-                        }
-
-                        Session.Set(Constants.NEXT_CH_1, NextCharacter1);
-                        Session.Set(Constants.NEXT_CH_2, NextCharacter2);
-
-                        mEventAggregator.GetEvent<SelectedCharactersPairChangedEvent>().
-                            Publish(new SelectedCharactersPairEventArgs
+                        case 0:
                             {
-                                Character1Index = NextCharacter1,
-                                Character2Index = NextCharacter2
-                            });
-                        mIsSelectedCharactersSent = true;
+                                int _nextCharacter1Index = await GetNextCharacter();
+                                int _nextCharacter2Index = await GetNextCharacter(_nextCharacter1Index >= 0 ? _nextCharacter1Index : NextCharacter1);
+
+                                NextCharacter1 = _nextCharacter1Index >= 0 ? _nextCharacter1Index : NextCharacter1; //lower bound inclusive, upper exclusive
+                                NextCharacter2 = _nextCharacter2Index >= 0 ? _nextCharacter2Index : NextCharacter2; //lower bound inclusive, upper exclusive
+
+                                break;
+                            }
+                        case 1:
+                            {
+                                NextCharacter1 = Session.Get<int>(Constants.FORCED_CH_1);
+                                int _nextCharacter2Index = await GetNextCharacter(NextCharacter1);
+
+                                NextCharacter2 = _nextCharacter2Index >= 0 ? _nextCharacter2Index : NextCharacter2;
+
+                                break;
+                            }
+                        case 2:
+                            {
+                                NextCharacter1 = Session.Get<int>(Constants.FORCED_CH_1);
+                                NextCharacter2 = Session.Get<int>(Constants.FORCED_CH_2);
+                                break;
+                            }
                     }
 
-                    Thread.Sleep(1000);
+                    Session.Set(Constants.NEXT_CH_1, NextCharacter1);
+                    Session.Set(Constants.NEXT_CH_2, NextCharacter2);
+
+                    mEventAggregator.GetEvent<SelectedCharactersPairChangedEvent>().
+                        Publish(new SelectedCharactersPairEventArgs
+                        {
+                            Character1Index = NextCharacter1,
+                            Character2Index = NextCharacter2
+                        });
                 }
+
+                Thread.Sleep(1000);
             });
         }
 

@@ -122,10 +122,12 @@ namespace DialogGenerator.CharacterSelection
             if (_localAdapter.IsLowEnergySupported)
             {
                 mCurrentDataProvider = mBLEDataProviderFactory.Create(BLEDataProviderType.WinBLEWatcher);
+                Session.Set(Constants.BLE_DATA_PROVIDER, BLEDataProviderType.WinBLEWatcher);
             }
             else
             {
                 mCurrentDataProvider = mBLEDataProviderFactory.Create(BLEDataProviderType.Serial);
+                Session.Set(Constants.BLE_DATA_PROVIDER, BLEDataProviderType.Serial);
             }
 
             return Triggers.ProcessMessage;
@@ -362,6 +364,8 @@ namespace DialogGenerator.CharacterSelection
                         Publish(new SelectedCharactersPairEventArgs { Character1Index = CurrentCharacter1, Character2Index = CurrentCharacter2 });
 
                     mEventAggregator.GetEvent<StopPlayingCurrentDialogLineEvent>().Publish();
+
+                    mEventAggregator.GetEvent<HeatMapUpdateEvent>().Publish(HeatMap);
                 }
             }
             catch (Exception ex)

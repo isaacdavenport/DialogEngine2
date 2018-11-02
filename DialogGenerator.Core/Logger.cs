@@ -8,9 +8,10 @@ namespace DialogGenerator.Core
 {
     public class Logger : ILogger
     {
-        private readonly ILog mcDecimalSerialLog = LogManager.GetLogger(ApplicationData.Instance.DecimaSeriallLoggerKey);
+        private readonly ILog mcDecimalSerialLog = LogManager.GetLogger(ApplicationData.Instance.DecimaSerialLoggerKey);
         private readonly ILog mcLogDialog = LogManager.GetLogger(ApplicationData.Instance.DialogLoggerKey);
         private readonly ILog mcDefaultLog = LogManager.GetLogger(ApplicationData.Instance.DefaultLoggerKey);
+        private readonly ILog mcDecimalSerialLogDirectBLE = LogManager.GetLogger(ApplicationData.Instance.DecimalSerialDirectBLELoggerKey);
 
         public Logger()
         {
@@ -24,13 +25,17 @@ namespace DialogGenerator.Core
             {
                 return mcDefaultLog;
             }
-            else if (string.Equals(type, ApplicationData.Instance.DecimaSeriallLoggerKey, StringComparison.OrdinalIgnoreCase))
+            else if (string.Equals(type, ApplicationData.Instance.DecimaSerialLoggerKey, StringComparison.OrdinalIgnoreCase))
             {
                 return mcDecimalSerialLog;
             }
             else if (string.Equals(type, ApplicationData.Instance.DialogLoggerKey, StringComparison.OrdinalIgnoreCase))
             {
                 return mcLogDialog;
+            }
+            else if (string.Equals(type, ApplicationData.Instance.DecimalSerialDirectBLELoggerKey, StringComparison.OrdinalIgnoreCase))
+            {
+                return mcDecimalSerialLogDirectBLE;
             }
 
             return null;

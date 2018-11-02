@@ -70,6 +70,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="CharactersManager.cs" />
+    <Compile Include="Model\DialogContext.cs" />
     <Compile Include="DialogEngineConstants.cs" />
     <Compile Include="DialogEngine.cs" />
     <Compile Include="DialogEngineModule.cs" />

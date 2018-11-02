@@ -64,10 +64,6 @@
     <Compile Include="Enum\ModelDialogState.cs" />
     <Compile Include="Enum\SelectionMode.cs" />
     <Compile Include="JSONObjectsTypesList.cs" />
-    <Compile Include="Logger\ErrorMessage.cs" />
-    <Compile Include="Logger\InfoMessage.cs" />
-    <Compile Include="Logger\LogMessage.cs" />
-    <Compile Include="Logger\WarningMessage.cs" />
     <Compile Include="ModelDialog.cs" />
     <Compile Include="ModelDialogInfo.cs" />
     <Compile Include="ParentalRatings.cs" />

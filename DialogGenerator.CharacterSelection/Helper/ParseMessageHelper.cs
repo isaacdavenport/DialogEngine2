@@ -12,7 +12,8 @@ namespace DialogGenerator.CharacterSelection.Helper
     {
         #region - Fields -
 
-        public static List<ReceivedMessage> ReceivedMessages = new List<ReceivedMessage>();  
+        public static List<ReceivedMessage> ReceivedMessages = new List<ReceivedMessage>();
+        public static ILogger Logger;
 
         #endregion
 
@@ -50,8 +51,14 @@ namespace DialogGenerator.CharacterSelection.Helper
 
                 _debugString += ReceivedMessages[ReceivedMessages.Count - 1].SequenceNum.ToString("D3");
 
-                //TODO uncomment
-                //LoggerHelper.Info(ApplicationData.Instance.DecimaSeriallLoggerKey, _debugString);
+                if((BLEDataProviderType)Session.Get<int>(Constants.BLE_DATA_PROVIDER) == BLEDataProviderType.Serial)
+                {
+                    Logger.Info(ApplicationData.Instance.DecimaSerialLoggerKey, _debugString);
+                }
+                else
+                {
+                    Logger.Info(ApplicationData.Instance.DecimalSerialDirectBLELoggerKey, _debugString);
+                }
 
                 if (ReceivedMessages.Count > 30000)
                 {
@@ -109,9 +116,9 @@ namespace DialogGenerator.CharacterSelection.Helper
                 if (_message.IndexOf("a5",StringComparison.OrdinalIgnoreCase) < 0)
                     return _rowNumber;
 
-                if (_message.StartsWith(CharacterSelectionConstants.WIN_BLE))
+                if ((BLEDataProviderType)Session.Get<int>(Constants.BLE_DATA_PROVIDER) == BLEDataProviderType.WinBLEWatcher)
                 {
-                    string[] parts = _message.Split(':')[1].Split('-');
+                    string[] parts = _message.Split('-');
 
                     if (parts.Count() < ApplicationData.Instance.NumberOfRadios)
                         return _rowNumber;
@@ -141,9 +148,8 @@ namespace DialogGenerator.CharacterSelection.Helper
                     _rssiRow[ApplicationData.Instance.NumberOfRadios] = int.Parse(_message.Substring(ApplicationData.Instance.NumberOfRadios * 2 + 4, 2), System.Globalization.NumberStyles.HexNumber);
                 }
 
-                //TODO uncomment
-                //if (_rowNumber == -1 && ApplicationData.Instance.MonitorMessageParseFails)
-                //    mLogger.Error("Failed to parse message.");
+                if (_rowNumber == -1 && ApplicationData.Instance.MonitorMessageParseFails)
+                    Logger.Error("Failed to parse message.");
 
                 return _rowNumber;
             }

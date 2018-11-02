@@ -314,7 +314,7 @@ namespace DialogGenerator.UI.ViewModels
                                 }
                                 else
                                 {
-                                    mUserLogger.Error(path +" doesn't exist");
+                                    mUserLogger.Error(Path.GetFileName(path) +" doesn't exist");
                                     await Task.Delay(1000);
                                 }
                             }
@@ -369,25 +369,6 @@ namespace DialogGenerator.UI.ViewModels
             return null;
         }
 
-        private string _tutorialStepFilePath()
-        {
-            //int _indexForSplitting = CurrentTutorialStep.PhraseWeights.Keys[0];
-            //string _videoFileName = CurrentTutorialStep.VideoFileName.Substring(_indexForSplitting + 3);
-
-            //if (string.IsNullOrEmpty(_videoFileName))
-            //{
-            //    return "";
-            //}
-            //else
-            //{
-            //    string _mp3FilePath = $"{Character.CharacterPrefix}_{_videoFileName}";
-
-            //    return _mp3FilePath;
-            //}
-
-            throw new  NotImplementedException();
-        }
-
         private void _setDataForTutorialStep(int _currentStepIndex)
         {
             try
@@ -420,7 +401,6 @@ namespace DialogGenerator.UI.ViewModels
                     VoiceRecorderControlViewModel.ResetData();
                     DialogStr = "";
                 }
-
             }
             catch (Exception ex)
             {

@@ -93,7 +93,8 @@ namespace DialogGenerator.Core
         public string JSONEditorExeFileName { get; set; } = "JSONedit.exe"; 
         public string WebsiteUrl { get; set; } = "www.toys2life.net";
         public string TutorialFileName { get; set; } = "tutorial.pdf";
-        public string DecimaSeriallLoggerKey { get; set; } = "DecimalSerialLog";
+        public string DecimaSerialLoggerKey { get; set; } = "DecimalSerialLog";
+        public string DecimalSerialDirectBLELoggerKey { get; set; } = "DecimalSerialLogDirectBLE";
         public string DialogLoggerKey { get; set; } = "LogDialog";
         public string DefaultLoggerKey { get; set; } = "DefaultLog";
         public string DefaultImage { get; set; } = "avatar.png";

@@ -1,5 +1,7 @@
 ﻿using DialogGenerator.CharacterSelection.Data;
+using DialogGenerator.CharacterSelection.Helper;
 using DialogGenerator.CharacterSelection.Model;
+using DialogGenerator.Core;
 using DialogGenerator.Model.Enum;
 using Microsoft.Practices.Unity;
 using Prism.Modularity;
@@ -34,6 +36,8 @@ namespace DialogGenerator.CharacterSelection
 
             var _selectionFactoryInstance = new CharacterSelectionFactory(_selectionFactory);
             mContainer.RegisterInstance<ICharacterSelectionFactory>(_selectionFactoryInstance);
+
+            ParseMessageHelper.Logger = mContainer.Resolve<ILogger>();
         }
     }
 }

@@ -23,5 +23,6 @@
         public const string DIALOG_SPEED = "DialogSpeed";
         public const string SELECTED_DLG_MODEL = "SelectedDialogModel";
         public const string COMPLETED_DLG_MODELS = "CompletedDialogModels";
+        public const string BLE_DATA_PROVIDER = "BLEDataProvider";
     }
 }

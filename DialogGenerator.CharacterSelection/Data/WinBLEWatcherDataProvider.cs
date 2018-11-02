@@ -65,7 +65,7 @@ namespace DialogGenerator.CharacterSelection.Data
 
         public string GetMessage()
         {
-            return $"{CharacterSelectionConstants.WIN_BLE}:{mMessage}";
+            return mMessage;
         }
 
         public async Task StartReadingData()
