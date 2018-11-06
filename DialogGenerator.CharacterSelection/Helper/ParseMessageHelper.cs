@@ -23,7 +23,7 @@ namespace DialogGenerator.CharacterSelection.Helper
         {
             try
             {
-                if (_characterRowNum > Session.Get<ObservableCollection<Character>>(Constants.CHARACTERS).Count - 1)  //was omiting character 5 from log when it was Count - 2
+                if (_characterRowNum > Session.Get<ObservableCollection<Character>>(Constants.CHARACTERS).Count - 1)  
                 {
                     return;
                 }
@@ -76,7 +76,7 @@ namespace DialogGenerator.CharacterSelection.Helper
         #region - Public functions -
 
 
-        public static void ProcessMessage(int _rowNum, int[] _newRow)
+        public static void ProcessTheMessage(int _rowNum, int[] _newRow)
         {
             try
             {

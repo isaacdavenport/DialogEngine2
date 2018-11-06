@@ -162,7 +162,7 @@ namespace DialogGenerator.CharacterSelection
                 }
                 else
                 {
-                    ParseMessageHelper.ProcessMessage(mRowNum, mNewRow);
+                    ParseMessageHelper.ProcessTheMessage(mRowNum, mNewRow);
                     return Triggers.FindClosestPair;
                 }
             }

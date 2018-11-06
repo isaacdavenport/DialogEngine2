@@ -212,7 +212,7 @@ namespace DialogGenerator.UI.ViewModels
                             {
                                 try
                                 {
-                                    File.Delete(file.FullName);
+                                   File.Delete(file.FullName);
 
                                     _isDeleted = true;
                                 }
