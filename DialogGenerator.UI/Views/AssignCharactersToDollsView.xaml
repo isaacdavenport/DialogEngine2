@@ -116,26 +116,22 @@
                                                         <Grid.RowDefinitions>
                                                             <RowDefinition />
                                                             <RowDefinition />
-                                                            <RowDefinition />
                                                         </Grid.RowDefinitions>
                                                         <Grid.ColumnDefinitions>
                                                             <ColumnDefinition />
                                                             <ColumnDefinition Width="auto"/>
                                                         </Grid.ColumnDefinitions>
 
-                                                        <Label Content="Doll enabled:" HorizontalAlignment="Right" />
-                                                        <ToggleButton Grid.Column="1" Margin="10,0,0,0" HorizontalAlignment="Left" />
-
-                                                        <Label Content="Assign character:" HorizontalAlignment="Right" Grid.Row="1" />
+                                                        <Label Content="Assign character:" HorizontalAlignment="Right" Grid.Row="0" />
                                                         <ComboBox ItemsSource="{Binding DataContext.Characters,
                                                               RelativeSource={RelativeSource Mode=FindAncestor, AncestorType=view:AssignCharactersToDollsView}}"
                                                               MinWidth="100" SelectedValue="{Binding Path=Value, Mode=OneWay}" x:Name="CharactersCbx"
                                                               ItemTemplateSelector="{Binding Key,Converter={StaticResource CharacterDataTemplateSelectorValueConverter}}"
-                                                              Margin="10,0,0,0" HorizontalAlignment="Left" Grid.Row="1" Grid.Column="1" />
+                                                              Margin="10,0,0,0" HorizontalAlignment="Left" Grid.Row="0" Grid.Column="1" />
 
                                                         <Button Content="Save" Style="{DynamicResource MaterialDesignRaisedButton}"   
                                                             Grid.ColumnSpan="2"
-                                                            Grid.Row="2" Command="{Binding DataContext.SaveConfigurationCommand,
+                                                            Grid.Row="1" Command="{Binding DataContext.SaveConfigurationCommand,
                                                             RelativeSource={RelativeSource Mode=FindAncestor, AncestorType=view:AssignCharactersToDollsView}}" 
                                                             HorizontalAlignment="Center" VerticalAlignment="Center" Margin="0,20,0,0">
                                                             <Button.CommandParameter>

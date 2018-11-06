@@ -1,4 +1,5 @@
-﻿using Newtonsoft.Json;
+﻿using DialogGenerator.Core;
+using Newtonsoft.Json;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 
@@ -7,7 +8,7 @@ namespace DialogGenerator.Model
     public class JSONObjectsTypesList
     {
         [JsonProperty("Version")]
-        public string Version { get; set; }
+        public string Version { get; set; } = ApplicationData.Instance.JSONFilesVersion;
 
         [JsonProperty("Wizards")]
         public List<Wizard> Wizards { get; set; } = new List<Wizard>();

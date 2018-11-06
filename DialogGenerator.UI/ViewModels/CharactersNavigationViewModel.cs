@@ -4,6 +4,7 @@ using DialogGenerator.Events;
 using DialogGenerator.Model;
 using DialogGenerator.Model.Enum;
 using DialogGenerator.UI.Data;
+using DialogGenerator.UI.Helpers;
 using DialogGenerator.UI.Views.Dialogs;
 using DialogGenerator.Utilities;
 using MaterialDesignThemes.Wpf;
@@ -17,6 +18,7 @@ using System.IO.Compression;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
+using System.Windows;
 using System.Windows.Data;
 
 namespace DialogGenerator.UI.ViewModels
@@ -181,82 +183,92 @@ namespace DialogGenerator.UI.ViewModels
 
         private async void _importCharacterCommand_Execute()
         {
+            var dialog = new BusyDialog();
             try
             {
                 System.Windows.Forms.OpenFileDialog _openFileDialog = new System.Windows.Forms.OpenFileDialog();
-                _openFileDialog.Filter = "Zip file(*.zip)|*.zip";
+                _openFileDialog.Filter = "T2l file(*.t2l)|*.t2l";
 
                 if (_openFileDialog.ShowDialog() == System.Windows.Forms.DialogResult.OK)
                 {
-                    var dialog = new BusyDialog();
                     mMessageDialogService.ShowDedicatedDialogAsync<MessageDialogResult>(dialog);
 
-                    await Task.Run(() =>
+                    await Task.Run(async() =>
                     {
-                        Thread.CurrentThread.Name = "_importCharacterCommand_Execute";
+                        // clear temp directory if directory is not empty
+                        FileHelper.ClearDirectory(ApplicationData.Instance.TempDirectory);
+
                         ZipFile.ExtractToDirectory(_openFileDialog.FileName, ApplicationData.Instance.TempDirectory);
 
-                        _processExtractedFiles();
+                        var _JSONObjectsTypesList = await mDialogDataRepository.LoadAsync(ApplicationData.Instance.TempDirectory);
 
-                        GC.Collect();
-                        GC.WaitForPendingFinalizers();
-                        // clear data from Temp directory
-                        DirectoryInfo _directoryInfo = new DirectoryInfo(ApplicationData.Instance.TempDirectory);
-
-                        foreach (FileInfo file in _directoryInfo.GetFiles())
+                        if (_JSONObjectsTypesList.Characters == null || !_JSONObjectsTypesList.Characters.Any())
                         {
-                            bool _isDeleted = false;
-                            int counter = 0;
-
-                            do
+                            await Application.Current.Dispatcher.Invoke(async() =>
                             {
-                                try
-                                {
-                                    File.Delete(file.FullName);
-
-                                    _isDeleted = true;
-                                }
-                                catch (Exception)
-                                {
-                                    Thread.Sleep(500);
-                                    counter++;
-                                }
-                            }
-                            while (!_isDeleted && counter <= 16); // wait 8 seconds to delete file 
-
-                            if (!_isDeleted)
-                            {
-                                throw new Exception("Error during deleting file.");
-                            }
+                                DialogHost.CloseDialogCommand.Execute(null, dialog);
+                                await mMessageDialogService.ShowMessage("Warning", "An error occured during importing character.");
+                            });
                         }
-                    });
+                        else
+                        {
+                            var _importedCharacter = _JSONObjectsTypesList.Characters.First();
 
-                    DialogHost.CloseDialogCommand.Execute(null, dialog);
+                            if(mCharacterDataProvider.GetByInitials(_importedCharacter.CharacterPrefix) != null)
+                            {
+                                MessageDialogResult result = MessageDialogResult.Cancel;
+                                await Application.Current.Dispatcher.Invoke(async() =>
+                                {
+                                    DialogHost.CloseDialogCommand.Execute(null,dialog);
+                                    result = await mMessageDialogService
+                                        .ShowOKCancelDialogAsync($"Character '{_importedCharacter.CharacterName}' already exists. Do you want to overwrite this characters?", "Warning", "Yes", "No");
+                                    mMessageDialogService.ShowDedicatedDialogAsync<MessageDialogResult>(dialog);
+                                });
+
+                                if (result == MessageDialogResult.Cancel)
+                                {
+                                    FileHelper.ClearDirectory(ApplicationData.Instance.TempDirectory);
+                                    return;
+                                }
+
+                                var _oldCharacter = mCharacterDataProvider.GetByInitials(_importedCharacter.CharacterPrefix);
+                                string _imageFileName = _oldCharacter.CharacterImage;
+                                _oldCharacter.CharacterImage = ApplicationData.Instance.DefaultImage;
+                                await mCharacterDataProvider.Remove(_oldCharacter, _imageFileName);
+                            }
+
+                            _processExtractedFiles();
+
+                            Application.Current.Dispatcher.Invoke(() =>
+                            {
+                                mCharacterDataProvider.GetAll().Add(_importedCharacter);
+                            });
+                        }
+
+                        FileHelper.ClearDirectory(ApplicationData.Instance.TempDirectory);
+                    });
                 }
             }
             catch (Exception ex)
             {
                 mLogger.Error("_import_Click " + ex.Message);
+                DialogHost.CloseDialogCommand.Execute(null, dialog);
+                await mMessageDialogService.ShowMessage("Error","Error during importing character.");
             }
+
+            DialogHost.CloseDialogCommand.Execute(null, dialog);
         }
 
-        private async void _processExtractedFiles()
+        private  void _processExtractedFiles()
         {
             try
             {
                 var _directoryInfo = new DirectoryInfo(ApplicationData.Instance.TempDirectory);
-
-                // load data from .json files
-
-                FileInfo[] _jsonFiles = _directoryInfo.GetFiles("*.json");
-
-                var _JSONObjectsTypesList = await mDialogDataRepository.LoadAsync(ApplicationData.Instance.TempDirectory);
-
                 // copy .json file to Data directory
 
-                foreach (var _jsonFile in _jsonFiles)
+                foreach (var _jsonFile in _directoryInfo.GetFiles("*.json"))
                 {
-                    File.Copy(_jsonFile.FullName, ApplicationData.Instance.DataDirectory, true);
+                    File.Copy(_jsonFile.FullName,Path.Combine(ApplicationData.Instance.DataDirectory,_jsonFile.Name), true);
                 }
 
                 // copy .mp3 files to Audio directory
@@ -265,46 +277,23 @@ namespace DialogGenerator.UI.ViewModels
 
                 foreach (FileInfo _mp3File in _mp3Files)
                 {
-                    File.Copy(_mp3File.FullName, ApplicationData.Instance.AudioDirectory, true);
+                    File.Copy(_mp3File.FullName,Path.Combine(ApplicationData.Instance.AudioDirectory,_mp3File.Name), true);
                 }
 
                 // copy images to Image directory
-                var _supportedExtensions = new string[] { "*.jpg", "*.jpeg", "*.jpe", "*.jfif", "*.png" };
+                var _supportedExtensions = new string[] { ".jpg", ".jpeg", ".jpe", ".png" };
                 FileInfo[] _imageFiles = _directoryInfo.GetFiles()
                     .Where(f => _supportedExtensions.Contains(f.Extension.ToLower()))
                     .ToArray();
 
-                foreach(FileInfo _imageFile in _imageFiles)
+                foreach (FileInfo _imageFile in _imageFiles)
                 {
-                    File.Copy(_imageFile.FullName, ApplicationData.Instance.ImagesDirectory, true);
+                    File.Copy(_imageFile.FullName,Path.Combine(ApplicationData.Instance.ImagesDirectory,_imageFile.Name), true);
                 }
-
             }
             catch (Exception ex)
             {
                 mLogger.Error("_processExtractedFiles " + ex.Message);
-            }
-        }
-
-        private void _processLoadedData(JSONObjectsTypesList _JSONObjectsTypesList)
-        {
-            var characters = mCharacterDataProvider.GetAll();
-            var dialogModels = mDialogModelDataProvider.GetAll();
-            var wizards = mWizardDataProvider.GetAll();
-
-            foreach(var character in _JSONObjectsTypesList.Characters)
-            {
-                characters.Add(character);
-            }
-
-            foreach(var dialogModelInfo in _JSONObjectsTypesList.DialogModels)
-            {
-                dialogModels.Add(dialogModelInfo);
-            }
-
-            foreach(var wizard in _JSONObjectsTypesList.Wizards)
-            {
-                wizards.Add(wizard);
             }
         }
 

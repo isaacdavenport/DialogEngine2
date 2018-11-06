@@ -32,7 +32,6 @@ namespace DialogGenerator.UI.ViewModels
         //          [ "USR_CurrentLine", "WZ_BjornGreeting1" ]
         //       ]
         private const string mcCurrentLineName = "USR_CurrentLine"; 
-        private const string mcWordForSplitting = "Wiz"; // "VideoFileName" : "xxWizIntroduction" used to get step name(Introduction) from "VideoFileName" by splitting 
 
         #endregion
 

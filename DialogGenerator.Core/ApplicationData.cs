@@ -98,7 +98,7 @@ namespace DialogGenerator.Core
         public string DialogLoggerKey { get; set; } = "LogDialog";
         public string DefaultLoggerKey { get; set; } = "DefaultLog";
         public string DefaultImage { get; set; } = "avatar.png";
-
+        public string JSONFilesVersion { get; set; } = "1.1";
         public int NumberOfRadios { get; set; } = 6;
 
         [Editable(true)]

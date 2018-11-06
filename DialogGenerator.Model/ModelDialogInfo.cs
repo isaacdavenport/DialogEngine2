@@ -1,5 +1,6 @@
 ﻿using DialogGenerator.Model.Enum;
 using Newtonsoft.Json;
+using System;
 using System.Collections.Generic;
 using System.ComponentModel;
 
@@ -9,7 +10,7 @@ namespace DialogGenerator.Model
     /// This is subset of <see cref="ModelDialog" />
     /// It is used to store basic information about dialog models, which should be faster then parsing all json files 
     /// </summary>
-    public class ModelDialogInfo:INotifyPropertyChanged
+    public class ModelDialogInfo:INotifyPropertyChanged,IEquatable<ModelDialogInfo>
     {
         private ModelDialogState mState;
         private int mSelectedModelDialogIndex=-1;
@@ -59,6 +60,11 @@ namespace DialogGenerator.Model
         public int JsonArrayIndex { get; set; }
 
         public event PropertyChangedEventHandler PropertyChanged;
+
+        public bool Equals(ModelDialogInfo other)
+        {
+            return this.ModelsCollectionName.Equals(other.ModelsCollectionName);
+        }
 
         public virtual void OnPropertyChanged(string _propertyName)
         {

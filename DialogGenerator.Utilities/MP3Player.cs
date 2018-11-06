@@ -168,7 +168,6 @@ namespace DialogGenerator.Utilities
                     });
 
                     return _isPlaying;
-
                 }
                 else
                 {

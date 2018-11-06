@@ -7,15 +7,11 @@ namespace DialogGenerator.UI.Data
     public interface ICharacterDataProvider
     {
         ObservableCollection<Character> GetAll();
-
         Character GetByInitials(string initials);
-
         Character GetByAssignedRadio(int _radionNum);
-
         Task AddAsync(Character character);
-
         Task SaveAsync(Character character);
-
+        void Export(Character character);
         Task Remove(Character character,string _imageFileName);
     }
 }

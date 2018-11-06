@@ -152,6 +152,7 @@
     <Compile Include="Data\IDialogModelDataProvider.cs" />
     <Compile Include="Data\IWizardDataProvider.cs" />
     <Compile Include="Data\WizardDataProvider.cs" />
+    <Compile Include="Helpers\FileHelper.cs" />
     <Compile Include="UIModule.cs" />
     <Compile Include="ViewModels\AssignCharactersToDollsViewModel.cs" />
     <Compile Include="ViewModels\CharacterDetailViewModel.cs" />

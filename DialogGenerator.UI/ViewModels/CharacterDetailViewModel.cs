@@ -2,6 +2,7 @@
 using DialogGenerator.Events;
 using DialogGenerator.Model;
 using DialogGenerator.UI.Data;
+using DialogGenerator.UI.Helpers;
 using DialogGenerator.UI.Views.Dialogs;
 using DialogGenerator.UI.Wrapper;
 using DialogGenerator.Utilities;
@@ -120,10 +121,9 @@ namespace DialogGenerator.UI.ViewModels
             }
         }
 
-
         private bool _exportCharacterCommand_CanExecute()
         {
-            return mIsEditing;
+            return IsEditing;
         }
 
         private async void _exportCharacterCommand_Execute()
@@ -132,8 +132,8 @@ namespace DialogGenerator.UI.ViewModels
             {
                 System.Windows.Forms.SaveFileDialog _saveFileDialog = new System.Windows.Forms.SaveFileDialog
                 {
-                    Filter = "Zip file(*.zip)|*.zip",
-                    FileName = Path.GetFileNameWithoutExtension(Character.Model.FileName)
+                    Filter = "T2l file(*.t2l)|*.t2l",
+                    FileName = Character.Model.CharacterName.Replace(" ", string.Empty)
                 };
 
                 System.Windows.Forms.DialogResult result = System.Windows.Forms.DialogResult.Cancel;
@@ -157,16 +157,11 @@ namespace DialogGenerator.UI.ViewModels
 
                 await Task.Run(() =>
                 {
-                    Thread.CurrentThread.Name = "_exportCharacterCommand_Execute";
+                    FileHelper.ClearDirectory(ApplicationData.Instance.TempDirectory);
                     _generateZIPFile(Character.Model,_saveFileDialog.FileName);
 
                     // clear temp directory
-                    DirectoryInfo _directoryInfo = new DirectoryInfo(ApplicationData.Instance.TempDirectory);
-
-                    foreach (FileInfo file in _directoryInfo.GetFiles())
-                    {
-                        file.Delete();
-                    }
+                    FileHelper.ClearDirectory(ApplicationData.Instance.TempDirectory);
                 });
 
                 DialogHost.CloseDialogCommand.Execute(null, busyDialog);
@@ -179,7 +174,7 @@ namespace DialogGenerator.UI.ViewModels
 
         private bool _editWithJSONEditorCommand_CanExecute()
         {
-            return mIsEditing;
+            return IsEditing;
         }
 
         private void _editWithJSONEditorCommand_Execute()
@@ -190,7 +185,7 @@ namespace DialogGenerator.UI.ViewModels
 
         private bool _deleteCommand_CanExecute()
         {
-            return mIsEditing;
+            return IsEditing;
         }
 
         private async  void _deleteCommand_Execute()
@@ -233,7 +228,7 @@ namespace DialogGenerator.UI.ViewModels
         {
             try
             {
-                if (mIsEditing)
+                if (IsEditing)
                 {
                     await mCharacterDataProvider.SaveAsync(Character.Model);
                 }
@@ -256,14 +251,9 @@ namespace DialogGenerator.UI.ViewModels
             Load(_characterPrefix);
         }
 
-
         private void _generateZIPFile(Character _selectedCharacter,string path)
         {
-            string _fileName = _selectedCharacter.FileName;
-            string _fileAbsolutePath = Path.Combine(ApplicationData.Instance.DataDirectory, _fileName);
-
-            // copy file to Temp directory
-            File.Copy(_fileAbsolutePath, Path.Combine(ApplicationData.Instance.TempDirectory, _fileName), true);
+            mCharacterDataProvider.Export(_selectedCharacter);
 
             foreach (PhraseEntry phrase in _selectedCharacter.Phrases)
             {
@@ -276,6 +266,12 @@ namespace DialogGenerator.UI.ViewModels
                 }
             }
 
+            if (!_selectedCharacter.CharacterImage.Equals(ApplicationData.Instance.DefaultImage))
+            {
+                File.Copy(Path.Combine(ApplicationData.Instance.ImagesDirectory, _selectedCharacter.CharacterImage),
+                    Path.Combine(ApplicationData.Instance.TempDirectory, _selectedCharacter.CharacterImage));
+            }
+
             ZipFile.CreateFromDirectory(ApplicationData.Instance.TempDirectory, path);
         }
 
@@ -286,11 +282,11 @@ namespace DialogGenerator.UI.ViewModels
         {
             if (string.IsNullOrEmpty(_characterInitials))
             {
-                mIsEditing = false;
+                IsEditing = false;
             }
             else
             {
-                mIsEditing = true;
+                IsEditing = true;
             }
 
             var character = !string.IsNullOrEmpty(_characterInitials)
@@ -336,6 +332,16 @@ namespace DialogGenerator.UI.ViewModels
         public List<int> AgeValues { get; set; } = new List<int>(Enumerable.Range(2, 100));
 
         public List<string> GenderValues { get; set; } = new List<string>(new string[] { "Male", "Female" });
+
+        public bool IsEditing
+        {
+            get { return mIsEditing; }
+            set
+            {
+                mIsEditing = value;
+                RaisePropertyChanged();
+            }
+        }
         #endregion
     }
 }

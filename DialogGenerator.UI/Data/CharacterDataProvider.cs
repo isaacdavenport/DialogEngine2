@@ -22,6 +22,11 @@ namespace DialogGenerator.UI.Data
             return mCharacterRepository.AddAsync(character);
         }
 
+        public void Export(Character character)
+        {
+            mCharacterRepository.Export(character);
+        }
+
         public Task SaveAsync(Character character)
         {
             return mCharacterRepository.SaveAsync(character);

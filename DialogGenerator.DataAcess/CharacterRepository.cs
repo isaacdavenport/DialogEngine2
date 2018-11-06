@@ -69,6 +69,20 @@ namespace DialogGenerator.DataAccess
             });
         }
 
+        public void Export(Character character)
+        {
+            var _fileName = character.CharacterName.Replace(" ", string.Empty) + ".json";
+            var characters = new ObservableCollection<Character>();
+            characters.Add(character);
+
+            var _jsonObjectsTypesList = new JSONObjectsTypesList
+            {
+                Characters = characters
+            };
+
+            Serializer.Serialize(_jsonObjectsTypesList, Path.Combine(ApplicationData.Instance.TempDirectory, _fileName));
+        }
+
         public async Task AddAsync(Character character)
         {
             // add character to list of characters, so we can grab its data to serialize to file
