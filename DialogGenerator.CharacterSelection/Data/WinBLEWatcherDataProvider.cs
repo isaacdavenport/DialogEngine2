@@ -7,26 +7,27 @@ using Windows.Storage.Streams;
 
 namespace DialogGenerator.CharacterSelection.Data
 {
-    public class WinBLEWatcherDataProivder:IBLEDataProvider
+    public class WinBLEWatcherDataProvider:IBLEDataProvider
     {
         #region - fields -
         
         private ILogger mLogger;
         private BluetoothLEAdvertisementWatcher mWatcher;
         private string mMessage;
+        private bool mNewDataAvailable;
 
         #endregion
 
         #region - constructor -
 
-        public WinBLEWatcherDataProivder(ILogger logger)
+        public WinBLEWatcherDataProvider(ILogger logger)
         {
             mLogger = logger;
 
             mWatcher = new BluetoothLEAdvertisementWatcher();
 
             mWatcher.Received += _mWatcher_Received;
-            mWatcher.ScanningMode = BluetoothLEScanningMode.Active;
+            mWatcher.ScanningMode = BluetoothLEScanningMode.Passive;  // no need to send scan request packets, as our radios provide no scan response data
         }
 
         #endregion
@@ -53,6 +54,7 @@ namespace DialogGenerator.CharacterSelection.Data
                         return;
 
                     mMessage = message;
+                    mNewDataAvailable = true;
                 }
             }
             catch (Exception ex)
@@ -65,7 +67,12 @@ namespace DialogGenerator.CharacterSelection.Data
 
         public string GetMessage()
         {
-            return mMessage;
+            if (mNewDataAvailable)
+            {
+                mNewDataAvailable = false;
+                return mMessage;
+            }
+            return null;
         }
 
         public async Task StartReadingData()
