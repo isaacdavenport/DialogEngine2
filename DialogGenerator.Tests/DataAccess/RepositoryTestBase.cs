@@ -39,6 +39,8 @@ namespace DialogGenerator.Tests.DataAccess
 
             dialogModels.Add(dm1);
             dialogModels.Add(dm2);
+
+            Session.Set(Constants.DIALOG_MODELS, dialogModels);
         }
 
         private void _initializeCharacters()
@@ -61,15 +63,14 @@ namespace DialogGenerator.Tests.DataAccess
 
             characters.Add(character1);
             characters.Add(character2);
+
+            Session.Set(Constants.CHARACTERS, characters);
         }
 
         protected void testSetup()
         {
             _initializeCharacters();
-            Session.Set(Constants.CHARACTERS, characters);
-
             _initializeDialogModels();
-            Session.Set(Constants.DIALOG_MODELS, dialogModels);
         }
     }
 }

@@ -5,7 +5,7 @@ namespace DialogGenerator.CharacterSelection.Data
     public interface IBLEDataProvider
     {
         string GetMessage();
-        object StartReadingData();
+        Task StartReadingData();
         void StopReadingData();
     }
 }

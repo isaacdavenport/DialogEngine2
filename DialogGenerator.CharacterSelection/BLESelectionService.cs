@@ -398,7 +398,7 @@ namespace DialogGenerator.CharacterSelection
                 mWorkflow.Fire(Triggers.Initialize);
                 mcHeatMapUpdateTimer.Start();
                 Triggers next = await _initialize();
-                object _BLEDataReaderTask = mCurrentDataProvider.StartReadingData();
+                Task _BLEDataReaderTask = mCurrentDataProvider.StartReadingData();
 
                 do
                 {
@@ -430,8 +430,7 @@ namespace DialogGenerator.CharacterSelection
                 }
                 while (!mCancellationTokenSource.IsCancellationRequested);
 
-                if(_BLEDataReaderTask is Task)
-                    await (Task)_BLEDataReaderTask;
+                await _BLEDataReaderTask;
 
                 mWorkflow.Fire(Triggers.Finish);
             });          

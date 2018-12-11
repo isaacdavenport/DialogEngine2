@@ -191,7 +191,7 @@ namespace DialogGenerator.CharacterSelection.Data
             return mMessage;
         }
 
-        public  object StartReadingData()
+        public Task StartReadingData()
         {
             return Task.Run(async() =>
             {

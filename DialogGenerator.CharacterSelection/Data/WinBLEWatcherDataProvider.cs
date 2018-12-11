@@ -1,12 +1,11 @@
 ﻿using DialogGenerator.Core;
 using System;
 using System.Threading;
-using System.Threading.Tasks;
 using Windows.Devices.Bluetooth.Advertisement;
 using Windows.Storage.Streams;
 using System.Collections.Generic;
 using System.Runtime.InteropServices;
-
+using System.Threading.Tasks;
 
 namespace DialogGenerator.CharacterSelection.Data
 {
@@ -86,15 +85,12 @@ namespace DialogGenerator.CharacterSelection.Data
             return null;
         }
 
-        public async Task StartReadingData()
+        public Task StartReadingData()
         {
-            // fake task
-            await Task.Run(() =>
-            {
-                BetterScanner.StartScanner(0, 29, 29);
-                Thread.CurrentThread.Name = "BLEWatcherStartReadingData";
-                mWatcher.Start();
-            });
+            BetterScanner.StartScanner(0, 29, 29);
+            mWatcher.Start();
+
+            return Task.CompletedTask;
         }
 
         public void StopReadingData()
@@ -102,6 +98,7 @@ namespace DialogGenerator.CharacterSelection.Data
             mWatcher.Stop();
             // we should probably stop the BetterScanner here
         }
+
     }
 
 
