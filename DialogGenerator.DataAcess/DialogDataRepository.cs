@@ -2,6 +2,7 @@
 using DialogGenerator.DataAccess.Helper;
 using DialogGenerator.Model;
 using DialogGenerator.Utilities;
+using System;
 using System.IO;
 using System.Threading;
 using System.Threading.Tasks;
@@ -37,7 +38,7 @@ namespace DialogGenerator.DataAccess
                     {
                         _processJSONFile(_fileInfo);
                     }
-                    catch (System.Exception ex)
+                    catch (Exception ex)
                     {
                         mUserLogger.Error("Error during reading file: " + _fileInfo.Name);
                         mLogger.Error(ex.Message);

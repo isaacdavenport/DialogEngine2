@@ -1,0 +1,130 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Wix xmlns="http://schemas.microsoft.com/wix/2006/wi"
+     xmlns:util="http://schemas.microsoft.com/wix/UtilExtension">
+
+  <?define DialogGenerator_TargetDir=$(var.DialogGenerator.TargetDir)?>
+  <?define Manufacturer="Toys2Life"?>
+  <?define SkuName = "DialogGenerator"?>
+
+  <Fragment>
+    <ComponentGroup Id="ProductComponents" Directory="INSTALLFOLDER">
+      <Component Id="System.Runtime.WindowsRuntime.dll" Guid="6d90475b-1c6c-42d9-b4c9-faa8c9fa6997">
+        <File Id="System.Runtime.WindowsRuntime.dll" Name="System.Runtime.WindowsRuntime.dll" Source="$(var.DialogGenerator_TargetDir)System.Runtime.WindowsRuntime.dll" />
+      </Component>
+      <Component Id="NAudio.dll" Guid="65690e72-0d36-4d90-ac9e-e9595ca8541d">
+        <File Id="NAudio.dll" Name="NAudio.dll" Source="$(var.DialogGenerator_TargetDir)NAudio.dll" />
+      </Component>
+      <Component Id="Newtonsoft.Json.dll" Guid="2133648c-3e9d-44cf-ad63-9200f2b0edc0">
+        <File Id="Newtonsoft.Json.dll" Name="Newtonsoft.Json.dll" Source="$(var.DialogGenerator_TargetDir)Newtonsoft.Json.dll" />
+      </Component>
+      <Component Id="log4net.dll" Guid="0f54981e-e65e-403d-9ee9-6d3a22c395b1">
+        <File Id="log4net.dll" Name="log4net.dll" Source="$(var.DialogGenerator_TargetDir)log4net.dll" />
+      </Component>
+      <Component Id="MaterialDesignColors.dll" Guid="f4bdaa7f-d1e0-414f-bc43-705d03dcdea6">
+        <File Id="MaterialDesignColors.dll" Name="MaterialDesignColors.dll" Source="$(var.DialogGenerator_TargetDir)MaterialDesignColors.dll" />
+      </Component>
+      <Component Id="Microsoft.Practices.ServiceLocation.dll" Guid="06dfec1a-cbc3-434b-8401-edc1e341962f">
+        <File Id="Microsoft.Practices.ServiceLocation.dll" Name="Microsoft.Practices.ServiceLocation.dll" Source="$(var.DialogGenerator_TargetDir)Microsoft.Practices.ServiceLocation.dll" />
+      </Component>
+      <Component Id="AutoUpdater.NET.dll" Guid="fed440bc-5275-41ac-a23e-80595abecdac">
+        <File Id="AutoUpdater.NET.dll" Name="AutoUpdater.NET.dll" Source="$(var.DialogGenerator_TargetDir)AutoUpdater.NET.dll" />
+      </Component>
+      <Component Id="Microsoft.Practices.Unity.dll" Guid="e4aee88d-db00-447c-a281-ccc6f6c072f3">
+        <File Id="Microsoft.Practices.Unity.dll" Name="Microsoft.Practices.Unity.dll" Source="$(var.DialogGenerator_TargetDir)Microsoft.Practices.Unity.dll" />
+      </Component>
+      <Component Id="Stateless.dll" Guid="8626914e-513b-47b0-a326-718576673ee9">
+        <File Id="Stateless.dll" Name="Stateless.dll" Source="$(var.DialogGenerator_TargetDir)Stateless.dll" />
+      </Component>
+      <Component Id="Prism.dll" Guid="9c50804e-9737-4c62-ae9f-79e6bdca17ff">
+        <File Id="Prism.dll" Name="Prism.dll" Source="$(var.DialogGenerator_TargetDir)Prism.dll" />
+      </Component>
+      <Component Id="Prism.Unity.Wpf.dll" Guid="c89de4a4-b2c0-41d0-bb25-8cdf99d512b0">
+        <File Id="Prism.Unity.Wpf.dll" Name="Prism.Unity.Wpf.dll" Source="$(var.DialogGenerator_TargetDir)Prism.Unity.Wpf.dll" />
+      </Component>
+      <Component Id="MaterialDesignThemes.Wpf.dll" Guid="9d310972-5e31-48f2-82b1-613d693ba16b">
+        <File Id="MaterialDesignThemes.Wpf.dll" Name="MaterialDesignThemes.Wpf.dll" Source="$(var.DialogGenerator_TargetDir)MaterialDesignThemes.Wpf.dll" />
+      </Component>
+      <Component Id="System.Windows.Interactivity.dll" Guid="a6afa854-14fd-4d57-8802-cb6058e5f669">
+        <File Id="System.Windows.Interactivity.dll" Name="System.Windows.Interactivity.dll" Source="$(var.DialogGenerator_TargetDir)System.Windows.Interactivity.dll" />
+      </Component>
+      <Component Id="Prism.Wpf.dll" Guid="c91802e7-dd99-4054-988f-a962a842d3d1">
+        <File Id="Prism.Wpf.dll" Name="Prism.Wpf.dll" Source="$(var.DialogGenerator_TargetDir)Prism.Wpf.dll" />
+      </Component>
+      <Component Id="DialogGenerator.exe.config" Guid="f121ca55-33bc-46c5-b50d-293c72889b8d">
+        <File Id="DialogGenerator.exe.config" Name="DialogGenerator.exe.config" Source="$(var.DialogGenerator_TargetDir)DialogGenerator.exe.config" />
+      </Component>
+      <Component Id="DialogGenerator.exe" Guid="6912aa6b-d523-49ee-8fa9-9b54e40ae56b">
+        <File Id="DialogGenerator.exe" Name="DialogGenerator.exe" Source="$(var.DialogGenerator_TargetDir)DialogGenerator.exe" />
+      </Component>
+      <Component Id="DialogGenerator.Core.dll" Guid="9583853d-13e8-4aae-b649-a7d7dac190b9">
+        <File Id="DialogGenerator.Core.dll" Name="DialogGenerator.Core.dll" Source="$(var.DialogGenerator_TargetDir)DialogGenerator.Core.dll" />
+      </Component>
+      <Component Id="DialogGenerator.DataAcess.dll" Guid="b84e3f35-e1f3-464f-bb61-ae6c06cf7d5f">
+        <File Id="DialogGenerator.DataAcess.dll" Name="DialogGenerator.DataAcess.dll" Source="$(var.DialogGenerator_TargetDir)DialogGenerator.DataAcess.dll" />
+      </Component>
+      <Component Id="DialogGenerator.DialogEngine.dll" Guid="6e5e8b46-6783-47b7-ab86-e5fc9bee91b9">
+        <File Id="DialogGenerator.DialogEngine.dll" Name="DialogGenerator.DialogEngine.dll" Source="$(var.DialogGenerator_TargetDir)DialogGenerator.DialogEngine.dll" />
+      </Component>
+      <Component Id="DialogGenerator.Model.dll" Guid="92cf64aa-df1c-4046-974d-583b8403d475">
+        <File Id="DialogGenerator.Model.dll" Name="DialogGenerator.Model.dll" Source="$(var.DialogGenerator_TargetDir)DialogGenerator.Model.dll" />
+      </Component>
+      <Component Id="DialogGenerator.Utilities.dll" Guid="2022d188-1cb6-4bc3-b111-b6ef3af4cb98">
+        <File Id="DialogGenerator.Utilities.dll" Name="DialogGenerator.Utilities.dll" Source="$(var.DialogGenerator_TargetDir)DialogGenerator.Utilities.dll" />
+      </Component>
+      <Component Id="DialogGenerator.UI.dll" Guid="7416a31e-4283-4077-95ea-ebf36e863b5f">
+        <File Id="DialogGenerator.UI.dll" Name="DialogGenerator.UI.dll" Source="$(var.DialogGenerator_TargetDir)DialogGenerator.UI.dll" />
+      </Component>
+      <Component Id="DialogGenerator.CharacterSelection.dll" Guid="5f129f62-3b08-4076-9000-d8d3f9ef3720">
+        <File Id="DialogGenerator.CharacterSelection.dll" Name="DialogGenerator.CharacterSelection.dll" Source="$(var.DialogGenerator_TargetDir)DialogGenerator.CharacterSelection.dll" />
+      </Component>
+      <Component Id="DialogGenerator.Events.dll" Guid="79539ae1-d1a1-4490-a201-7acd5da6258d">
+        <File Id="DialogGenerator.Events.dll" Name="DialogGenerator.Events.dll" Source="$(var.DialogGenerator_TargetDir)DialogGenerator.Events.dll" />
+      </Component>
+      <Component Id="DialogGenerator.UI.Core.dll" Guid="82a1930c-cbab-4c7a-b508-50696bf1ce8d">
+        <File Id="DialogGenerator.UI.Core.dll" Name="DialogGenerator.UI.Core.dll" Source="$(var.DialogGenerator_TargetDir)DialogGenerator.UI.Core.dll" />
+      </Component>
+    </ComponentGroup>
+	</Fragment>
+
+  <Fragment>
+    <DirectoryRef Id="UserDocumentsFolder">      
+      <Component Id="Video" Guid="4aae8932-5230-44ba-846e-1eba7b1d719e" KeyPath="yes">
+        <CopyFile Id="VideoDir" SourceProperty="VIDEO_DIR" DestinationDirectory="Video" SourceName="*" />
+      </Component>
+      <Component Id="Application.xml" Guid="fc31ce71-a5e6-4635-805a-c77dc388bca9">
+        <File Id="Application.xml" Name="Application.xml" Source="$(var.DialogGenerator_TargetDir)Application.xml" />
+      </Component>
+    </DirectoryRef> 
+  </Fragment>
+
+  <Fragment>
+    <DirectoryRef Id="Temp">
+      <Component Id="Temp" Guid="7f567390-6d81-48ef-939e-7e6eddc0d6fb" KeyPath="yes">
+        <CreateFolder />
+      </Component>
+    </DirectoryRef>
+  </Fragment>
+
+  <Fragment>
+    <DirectoryRef Id="UserDocumentsFolder">
+      <Component Id="CleanupData" Guid="*">
+        <RegistryValue Root="HKLM" Key="SOFTWARE\$(var.Manufacturer)\$(var.SkuName)" Name="Path" Type="string" Value="[UserDocumentsFolder]" KeyPath="yes" />
+        <util:RemoveFolderEx On="uninstall" Property="USER_DOCUMENTS_FOLDER_PATH" />
+      </Component>
+    </DirectoryRef>
+  </Fragment>
+  
+  <Fragment>
+    <DirectoryRef Id="ApplicationProgramsFolder">
+      <Component Id="ApplicationShortcut" Guid="4b8cf9eb-43ae-43c6-b8e8-2fed92a1af46">
+        <Shortcut Id="ApplicationStartMenuShortcut" 
+                  Name="Dialog generator" 
+                  Target="[#DialogGenerator.exe]"
+                  WorkingDirectory="INSTALLFOLDER"/>
+        <RemoveFolder Id='ApplicationProgramsFolder' On='uninstall' />
+        <RegistryValue Root='HKCU' Key='Software\[Manufacturer]\[ProductName]' Type='string' Value='' KeyPath='yes' />
+      </Component>
+    </DirectoryRef>
+  </Fragment>
+  
+</Wix>

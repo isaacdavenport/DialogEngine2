@@ -28,7 +28,7 @@ namespace DialogGenerator.UI.Controls.VoiceRecorder
 
         // player's state
         private bool mIsPlaying;
-        private bool msIsRecording;
+        private bool mIsRecording;
 
         private bool mInChannelTimerUpdate;
         private double mChannelLength;
@@ -426,7 +426,7 @@ namespace DialogGenerator.UI.Controls.VoiceRecorder
                     ChannelLength = mInputStream.TotalTime.TotalSeconds;
                     CanPlay = true;
                 }
-                catch(Exception ex)
+                catch(Exception)
                 {
                     ActiveStream = null;
                     CanPlay = false;
@@ -518,10 +518,10 @@ namespace DialogGenerator.UI.Controls.VoiceRecorder
         /// </summary>
         public bool IsRecording
         {
-            get { return msIsRecording; }
+            get { return mIsRecording; }
             set
             {
-                msIsRecording = value;
+                mIsRecording = value;
                 NotifyPropertyChanged("IsRecording");
             }
         }

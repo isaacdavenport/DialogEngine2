@@ -6,6 +6,7 @@ using DialogGenerator.Core;
 using DialogGenerator.DataAccess;
 using DialogGenerator.Events;
 using DialogGenerator.Events.EventArgs;
+using DialogGenerator.Model;
 using Prism.Events;
 using System;
 using System.Linq;
@@ -20,13 +21,14 @@ namespace DialogGenerator.CharacterSelection
     {
         #region - fields -
 
+        public const int StrongRssiBufDepth = 12;
+
         private ILogger mLogger;
         private IEventAggregator mEventAggregator;
         private ICharacterRepository mCharacterRepository;
         private IBLEDataProviderFactory mBLEDataProviderFactory;
         private IBLEDataProvider mCurrentDataProvider;
         private States mCurrentState;
-        public const int StrongRssiBufDepth = 12;
         private int mTempCh1;
         private int mRowNum;
         private int mTempch2;
@@ -60,10 +62,10 @@ namespace DialogGenerator.CharacterSelection
 
             mWorkflow = new SerialSelectionWorkflow(() => { });
             mWorkflow.PropertyChanged += _mWorkflow_PropertyChanged;
-
-            _configureWorkflow();
             mcHeatMapUpdateTimer.Interval = TimeSpan.FromSeconds(3);
             mcHeatMapUpdateTimer.Tick += _heatMapUpdateTimer_Tick;
+
+            _configureWorkflow();
         }
 
         private void _mWorkflow_PropertyChanged(object sender, System.ComponentModel.PropertyChangedEventArgs e)
@@ -80,7 +82,13 @@ namespace DialogGenerator.CharacterSelection
 
         private void _heatMapUpdateTimer_Tick(object sender, EventArgs e)
         {
-            mEventAggregator.GetEvent<HeatMapUpdateEvent>().Publish(HeatMap);
+            mEventAggregator.GetEvent<HeatMapUpdateEvent>().Publish(new HeatMapData
+            {
+                HeatMap = HeatMap,
+                LastHeatMapUpdateTime = CharactersLastHeatMapUpdateTime,
+                Character1Index = NextCharacter1,
+                Character2Index = NextCharacter2
+            });
         }
 
         #endregion
@@ -94,22 +102,22 @@ namespace DialogGenerator.CharacterSelection
 
             mWorkflow.Configure(States.Init)
                 .Permit(Triggers.ProcessMessage, States.MessageProcessing)
-                .Permit(Triggers.Finish, States.Finish);
+                .Permit(Triggers.Finish, States.Finished);
 
             mWorkflow.Configure(States.MessageProcessing)
                 .PermitReentry(Triggers.ProcessMessage)
-                .Permit(Triggers.FindClosestPair, States.FindClosestPair);
+                .Permit(Triggers.CalculateClosestPair, States.CalculatingClosestPair);
 
-            mWorkflow.Configure(States.FindClosestPair)
+            mWorkflow.Configure(States.CalculatingClosestPair)
                 .Permit(Triggers.ProcessMessage, States.MessageProcessing)
                 .Permit(Triggers.SelectNextCharacters, States.SelectNextCharacters)
-                .Permit(Triggers.Finish, States.Finish);
+                .Permit(Triggers.Finish, States.Finished);
 
             mWorkflow.Configure(States.SelectNextCharacters)
                 .Permit(Triggers.ProcessMessage, States.MessageProcessing)
-                .Permit(Triggers.Finish, States.Finish);
+                .Permit(Triggers.Finish, States.Finished);
 
-            mWorkflow.Configure(States.Finish)
+            mWorkflow.Configure(States.Finished)
                 .OnEntry(t => _finishSelection())
                 .Permit(Triggers.Wait, States.Waiting);
         }
@@ -139,7 +147,6 @@ namespace DialogGenerator.CharacterSelection
             mWorkflow.Fire(Triggers.Wait);
         }
 
-
         private Triggers _processMessage()
         {
             try
@@ -163,7 +170,7 @@ namespace DialogGenerator.CharacterSelection
                 else
                 {
                     ParseMessageHelper.ProcessTheMessage(mRowNum, mNewRow);
-                    return Triggers.FindClosestPair;
+                    return Triggers.CalculateClosestPair;
                 }
             }
             catch (Exception ex)
@@ -173,13 +180,11 @@ namespace DialogGenerator.CharacterSelection
             }
         }
 
-
         private void _resetData()
         {
             mTempCh1 = 0;
             mTempch2 = 0;
         }
-
 
         private bool _calculateRssiStable(int _ch1, int _ch2)
         {
@@ -219,7 +224,6 @@ namespace DialogGenerator.CharacterSelection
             }
         }
 
-
         private int _getCharacterMappedIndex(int _radioNum)
         {
             try
@@ -235,13 +239,12 @@ namespace DialogGenerator.CharacterSelection
 
                 return index;
             }
-            catch (Exception ex)
+            catch (Exception)
             {
                 //MessageBox.Show("No character assigned to radio with number " + _radioNum + " .");
                 return -1;
             }
         }
-
 
         private bool _assignNextCharacters(int _tempCh1, int _tempCh2)
         {
@@ -280,7 +283,6 @@ namespace DialogGenerator.CharacterSelection
                 throw ex;
             }
         }
-
 
         private Triggers _findBiggestRssiPair()
         {
@@ -347,7 +349,6 @@ namespace DialogGenerator.CharacterSelection
             }
         }
 
-
         private Triggers _selectNextCharacters()
         {
             try
@@ -365,7 +366,13 @@ namespace DialogGenerator.CharacterSelection
 
                     mEventAggregator.GetEvent<StopPlayingCurrentDialogLineEvent>().Publish();
 
-                    mEventAggregator.GetEvent<HeatMapUpdateEvent>().Publish(HeatMap);
+                    mEventAggregator.GetEvent<HeatMapUpdateEvent>().Publish(new HeatMapData
+                    {
+                        HeatMap = HeatMap,
+                        LastHeatMapUpdateTime = CharactersLastHeatMapUpdateTime,
+                        Character1Index = NextCharacter1,
+                        Character2Index = NextCharacter2
+                    });
                 }
             }
             catch (Exception ex)
@@ -375,7 +382,6 @@ namespace DialogGenerator.CharacterSelection
 
             return Triggers.ProcessMessage;
         }
-
 
         #endregion
 
@@ -392,7 +398,7 @@ namespace DialogGenerator.CharacterSelection
                 mWorkflow.Fire(Triggers.Initialize);
                 mcHeatMapUpdateTimer.Start();
                 Triggers next = await _initialize();
-                Task _BLEDataReaderTask = mCurrentDataProvider.StartReadingData();
+                object _BLEDataReaderTask = mCurrentDataProvider.StartReadingData();
 
                 do
                 {
@@ -408,7 +414,7 @@ namespace DialogGenerator.CharacterSelection
                                 next = _processMessage();
                                 break;
                             }
-                        case Triggers.FindClosestPair:
+                        case Triggers.CalculateClosestPair:
                             {
                                 next = _findBiggestRssiPair();
                                 break;
@@ -424,7 +430,9 @@ namespace DialogGenerator.CharacterSelection
                 }
                 while (!mCancellationTokenSource.IsCancellationRequested);
 
-                await _BLEDataReaderTask;
+                if(_BLEDataReaderTask is Task)
+                    await (Task)_BLEDataReaderTask;
+
                 mWorkflow.Fire(Triggers.Finish);
             });          
         }

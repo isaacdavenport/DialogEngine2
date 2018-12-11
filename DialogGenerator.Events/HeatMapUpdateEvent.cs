@@ -1,8 +1,9 @@
-﻿using Prism.Events;
+﻿using DialogGenerator.Model;
+using Prism.Events;
 
 namespace DialogGenerator.Events
 {
-    public class HeatMapUpdateEvent:PubSubEvent<int[,]>
+    public class HeatMapUpdateEvent:PubSubEvent<HeatMapData>
     {
     }
 }

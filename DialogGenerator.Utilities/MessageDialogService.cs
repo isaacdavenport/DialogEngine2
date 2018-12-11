@@ -14,6 +14,8 @@ namespace DialogGenerator.Utilities
 
     public class MessageDialogService : IMessageDialogService
     {
+        private BusyDialog mBusyDialog = new BusyDialog("");
+
         public async Task<MessageDialogResult> ShowOKCancelDialogAsync(string message, string tittle,
             string _OKBtnContent = "OK", string _cancelBtnContent = "Cancel",string _dialogHostName = "MainDialogHost")
         {
@@ -55,7 +57,7 @@ namespace DialogGenerator.Utilities
             return result;
         }
 
-        public async Task ShowMessage(string tittle, string message,string _dialogHostName = "MainDialogHost")
+        public async Task<MessageDialogResult> ShowMessage(string tittle, string message,string _dialogHostName = "MainDialogHost")
         {
             if (Application.Current.Dispatcher.CheckAccess())
             {
@@ -66,6 +68,44 @@ namespace DialogGenerator.Utilities
                 await Application.Current.Dispatcher.Invoke(async () =>
                 {
                     await DialogHost.Show(new MessageDialog(tittle, message), _dialogHostName);
+                });
+            }
+
+            return MessageDialogResult.OK;
+        }
+
+        public async Task<MessageDialogResult> ShowBusyDialog(string message= "Working ...", string _dialogHostName = "MainDialogHost")
+        {
+
+            if (Application.Current.Dispatcher.CheckAccess())
+            {
+                mBusyDialog.Message = message;
+                await DialogHost.Show(mBusyDialog, _dialogHostName);
+            }
+            else
+            {
+                await Application.Current.Dispatcher.Invoke(async () =>
+                {
+                    mBusyDialog.Message = message;
+                    await DialogHost.Show(mBusyDialog, _dialogHostName);
+                });
+            }
+
+            return MessageDialogResult.OK;
+        }
+
+        public  void CloseBusyDialog()
+        {
+            if (Application.Current.Dispatcher.CheckAccess())
+            {
+                DialogHost.CloseDialogCommand.Execute(null, mBusyDialog);
+            }
+            else
+            {
+                Application.Current.Dispatcher.Invoke(() =>
+                {
+                    DialogHost.CloseDialogCommand.Execute(null, mBusyDialog);
+
                 });
             }
         }

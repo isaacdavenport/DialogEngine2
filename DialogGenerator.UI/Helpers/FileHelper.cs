@@ -1,5 +1,4 @@
-﻿using DialogGenerator.Core;
-using System;
+﻿using System;
 using System.IO;
 using System.Threading;
 
@@ -11,7 +10,6 @@ namespace DialogGenerator.UI.Helpers
         {
             GC.Collect();
             GC.WaitForPendingFinalizers();
-            // clear data from Temp directory
             DirectoryInfo _directoryInfo = new DirectoryInfo(path);
 
             foreach (FileInfo file in _directoryInfo.GetFiles())
@@ -24,7 +22,6 @@ namespace DialogGenerator.UI.Helpers
                     try
                     {
                         File.Delete(file.FullName);
-
                         _isDeleted = true;
                     }
                     catch (Exception)

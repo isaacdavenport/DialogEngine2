@@ -186,8 +186,7 @@ namespace DialogGenerator.Utilities
         public int Play(string path)
         {
             try
-            {
-                
+            {              
                 mIsPlayingStopped = false;
                 mIsLoaded = false;
                 mTimer.Change(Timeout.Infinite, Timeout.Infinite);
@@ -200,7 +199,6 @@ namespace DialogGenerator.Utilities
                     Player.Play();
                 });
 
-                mLogger.Debug(path);
                 mStartedTime = DateTime.Now.TimeOfDay;
                 return 0;  //TODO add error handling    
             }

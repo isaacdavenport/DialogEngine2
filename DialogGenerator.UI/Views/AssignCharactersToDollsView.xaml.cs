@@ -1,4 +1,5 @@
 ﻿using DialogGenerator.Model;
+using DialogGenerator.UI.Data;
 using DialogGenerator.UI.Helper;
 using MaterialDesignThemes.Wpf;
 using System.Collections.Generic;
@@ -12,15 +13,19 @@ namespace DialogGenerator.UI.Views
     /// </summary>
     public partial class AssignCharactersToDollsView : UserControl
     {
-        public AssignCharactersToDollsView()
+        private ICharacterDataProvider mCharacterDataProvider;
+
+        public AssignCharactersToDollsView(ICharacterDataProvider _characterDataProvider)
         {
+            mCharacterDataProvider = _characterDataProvider;
+
             InitializeComponent();
         }
 
         private void _popup_Opened(object sender, System.Windows.RoutedEventArgs e)
         {
           var _comboBox =  (((sender as PopupBox).PopupContent as GroupBox).Content as Grid).GetVisualChild<ComboBox>();
-            _comboBox.SelectedValue = ((KeyValuePair<int, Character>)_comboBox.DataContext).Value;
+            _comboBox.SelectedValue = mCharacterDataProvider.GetByAssignedRadio((int)_comboBox.DataContext);
         }
     }
 }

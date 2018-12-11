@@ -19,6 +19,7 @@
             <converters:CloneValuesConverter x:Key="CloneValuesConverter" />
             <converters:ImageToFullPathValueConverter x:Key="ImageToFullPathValueConverter" />
             <converters:InvertValueConverter x:Key="InvertValueConverter" />
+            <converters:IsRunOverWizardBtnEnabledValueConverter x:Key="IsRunOverWizardBtnEnabledValueConverter" />
 
             <Style TargetType="{x:Type Button}">
                 <Setter Property="Template">
@@ -94,8 +95,13 @@
                         BorderBrush="White"  
                         Height="40"
                         Command="NavigationCommands.GoToPage"
-                        IsEnabled="{Binding Path=IsEnabled,ElementName=DeleteBtn}"
                         Width="40">
+                        <Button.IsEnabled>
+                            <MultiBinding Converter="{StaticResource IsRunOverWizardBtnEnabledValueConverter}">
+                                <Binding Path="IsEnabled" ElementName="DeleteBtn" />
+                                <Binding Path="IsDialogStarted" />
+                            </MultiBinding>
+                        </Button.IsEnabled>
                         <Button.Content>
                             <materialDesign:PackIcon Kind="AccountEdit" Height="30" Width="30"/>
                         </Button.Content>

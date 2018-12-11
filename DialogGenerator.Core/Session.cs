@@ -12,7 +12,7 @@ namespace DialogGenerator.Core
 
         private static void _onSessionPropertyChagned(string _propertyName)
         {
-            SessionPropertyChanged(typeof(Session), new PropertyChangedEventArgs(_propertyName));
+            SessionPropertyChanged?.Invoke(typeof(Session), new PropertyChangedEventArgs(_propertyName));
         }
 
         /// <summary>
@@ -182,6 +182,4 @@ namespace DialogGenerator.Core
             get { return msIndexer ?? (msIndexer = new SessionKeysIndexer()); }
         }
     }
-
-
 }

@@ -4,41 +4,33 @@ using System.Windows.Input;
 
 namespace DialogGenerator.UI.Workflow.WizardWorkflow
 {
-    public enum States
+    public enum WizardStates
+    {
+        Started,
+        ChooseWizardDialogShown,
+        WaitingForUserAction,
+        UserActionStarted,
+        PlayingInContext,
+        SavingAndLoadingNextStep,
+        LoadingNextStep,
+        Finished,
+        LeavingWizard
+    }
+
+    public enum WizardTriggers
     {
         Start,
-        ShowFormDialog,
+        ShowChooseWizardDialog,
         ReadyForUserAction,
-        VoiceRecorderAction,
-        VoiceRecorderRecording,
-        VoiceRecorderPlaying,
-        VoiceRecorderPlayingInContext,
-        VideoPlayerAction,
-        VideoPlayerPlaying,
-        SaveAndNext,
-        SkipStep,
+        UserStartedAction,
+        PlayInContext,
+        SaveAndLoadNextStep,
+        LoadNextStep,
         Finish,
         LeaveWizard
     }
 
-    public enum Triggers
-    {
-        Start,
-        ShowFormDialog,
-        ReadyForUserAction,
-        VoiceRecorderAction,
-        VoiceRecorderRecording,
-        VoiceRecorderPlaying,
-        VoiceRecorderPlayingInContext,
-        VideoPlayerAction,
-        VideoPlayerPlaying,
-        SaveAndNext,
-        SkipStep,
-        Finish,
-        LeaveWizard
-    }
-
-    public class WizardWorkflow : Stateless.StateMachine<States, Triggers>, INotifyPropertyChanged
+    public class WizardWorkflow : Stateless.StateMachine<WizardStates, WizardTriggers>, INotifyPropertyChanged
     {
         #region - fields -
 
@@ -48,7 +40,7 @@ namespace DialogGenerator.UI.Workflow.WizardWorkflow
 
         #region - constructor -
 
-        public WizardWorkflow(Action action) : base(States.Start)
+        public WizardWorkflow(Action action) : base(WizardStates.Started)
         {
             OnTransitioned
             (

@@ -78,7 +78,9 @@
     <Compile Include="ICharacterRepository.cs" />
     <Compile Include="IDialogDataRepository.cs" />
     <Compile Include="IDialogModelRepository.cs" />
+    <Compile Include="IOnlineCharactersRepository.cs" />
     <Compile Include="IWizardRepository.cs" />
+    <Compile Include="OnlineCharactersRepository.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="WizardRepository.cs" />
   </ItemGroup>
@@ -95,8 +97,13 @@
       <Project>{CA4D11CB-882D-44A3-AFF2-03083D106BCE}</Project>
       <Name>DialogGenerator.Utilities</Name>
     </ProjectReference>
+    <ProjectReference Include="..\DialogGenerator.Web\DialogGenerator.Web.csproj">
+      <Project>{7b12550d-a62e-4d99-a694-379e480caec3}</Project>
+      <Name>DialogGenerator.Web</Name>
+    </ProjectReference>
   </ItemGroup>
   <ItemGroup>
+    <None Include="app.config" />
     <None Include="packages.config" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />

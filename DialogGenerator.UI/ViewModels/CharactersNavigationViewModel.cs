@@ -5,9 +5,7 @@ using DialogGenerator.Model;
 using DialogGenerator.Model.Enum;
 using DialogGenerator.UI.Data;
 using DialogGenerator.UI.Helpers;
-using DialogGenerator.UI.Views.Dialogs;
 using DialogGenerator.Utilities;
-using MaterialDesignThemes.Wpf;
 using Prism.Commands;
 using Prism.Events;
 using Prism.Mvvm;
@@ -16,7 +14,6 @@ using System.ComponentModel;
 using System.IO;
 using System.IO.Compression;
 using System.Linq;
-using System.Threading;
 using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Data;
@@ -35,7 +32,7 @@ namespace DialogGenerator.UI.ViewModels
         private IWizardDataProvider mWizardDataProvider;
         private IEventAggregator mEventAggregator;
         private Character mSelectedCharacter;
-        private CollectionViewSource mCharactersViewSource;
+        private CollectionViewSource mCharactersCollectionViewSource;
         private string mFilterText;
 
         #endregion
@@ -43,24 +40,24 @@ namespace DialogGenerator.UI.ViewModels
         #region - constructor -
 
         public CharactersNavigationViewModel(ILogger logger,IEventAggregator _eventAggregator
+            ,IDialogDataRepository _dialogDataRepository
             ,IWizardDataProvider _wizardDataProvider
             ,IDialogModelDataProvider _dialogModelDataProvider
             ,ICharacterDataProvider _characterDataProvider
-            ,IDialogDataRepository _dialogDataRepository
             ,IMessageDialogService _messageDialogService)
         {
             mEventAggregator = _eventAggregator;
             mLogger = logger;
-            mMessageDialogService = _messageDialogService;
             mDialogDataRepository = _dialogDataRepository;
+            mMessageDialogService = _messageDialogService;
             mCharacterDataProvider = _characterDataProvider;
             mDialogModelDataProvider = _dialogModelDataProvider;
             mWizardDataProvider = _wizardDataProvider;
 
-            mCharactersViewSource = new CollectionViewSource();
+            mCharactersCollectionViewSource = new CollectionViewSource();
             FilterText = "";
 
-            mCharactersViewSource.Filter += _mCharacterViewSource_Filter;
+            mCharactersCollectionViewSource.Filter += _mCharacterViewSource_Filter;
 
             _bindCommands();
         }
@@ -73,6 +70,7 @@ namespace DialogGenerator.UI.ViewModels
         public DelegateCommand CreateNewCharacterCommand { get; set; }
         public DelegateCommand ImportCharacterCommand { get; set; }
         public DelegateCommand<object> ChangeCharacterStatusCommand { get; set; }
+        public DelegateCommand OnlineCharactersCommand { get; set; }
 
         #endregion
 
@@ -107,6 +105,12 @@ namespace DialogGenerator.UI.ViewModels
             CreateNewCharacterCommand = new DelegateCommand(_createNewCharacterCommand_Execute);
             ImportCharacterCommand = new DelegateCommand(_importCharacterCommand_Execute);
             ChangeCharacterStatusCommand = new DelegateCommand<object>( (p) => _changeCharacterStatusCommand_Execute(p));
+            OnlineCharactersCommand = new DelegateCommand(_onOnlineCharacters_Execute);
+        }
+
+        private  void _onOnlineCharacters_Execute()
+        {
+            //await mMessageDialogService.ShowDedicatedDialogAsync<bool>(mOnlineCharactersDialog);
         }
 
         private async void _changeCharacterStatusCommand_Execute(object obj)
@@ -169,7 +173,6 @@ namespace DialogGenerator.UI.ViewModels
                 }
 
                 character.State = _newState;
-
                 await mCharacterDataProvider.SaveAsync(character);
 
                 mEventAggregator.GetEvent<ChangedCharacterStateEvent>().Publish();
@@ -183,92 +186,106 @@ namespace DialogGenerator.UI.ViewModels
 
         private async void _importCharacterCommand_Execute()
         {
-            var dialog = new BusyDialog();
             try
             {
                 System.Windows.Forms.OpenFileDialog _openFileDialog = new System.Windows.Forms.OpenFileDialog();
                 _openFileDialog.Filter = "T2l file(*.t2l)|*.t2l";
 
-                if (_openFileDialog.ShowDialog() == System.Windows.Forms.DialogResult.OK)
+                if (_openFileDialog.ShowDialog() != System.Windows.Forms.DialogResult.OK)
+                    return;
+
+                mMessageDialogService.ShowBusyDialog();
+
+                // extract data to temp directory and load 
+                var _JSONObjectsTypesList = await _extractAndLoadData(_openFileDialog.FileName);
+
+                // validate loaded data
+                if (_JSONObjectsTypesList.Characters == null || !_JSONObjectsTypesList.Characters.Any())
                 {
-                    mMessageDialogService.ShowDedicatedDialogAsync<MessageDialogResult>(dialog);
-
-                    await Task.Run(async() =>
-                    {
-                        // clear temp directory if directory is not empty
-                        FileHelper.ClearDirectory(ApplicationData.Instance.TempDirectory);
-
-                        ZipFile.ExtractToDirectory(_openFileDialog.FileName, ApplicationData.Instance.TempDirectory);
-
-                        var _JSONObjectsTypesList = await mDialogDataRepository.LoadAsync(ApplicationData.Instance.TempDirectory);
-
-                        if (_JSONObjectsTypesList.Characters == null || !_JSONObjectsTypesList.Characters.Any())
-                        {
-                            await Application.Current.Dispatcher.Invoke(async() =>
-                            {
-                                DialogHost.CloseDialogCommand.Execute(null, dialog);
-                                await mMessageDialogService.ShowMessage("Warning", "An error occured during importing character.");
-                            });
-                        }
-                        else
-                        {
-                            var _importedCharacter = _JSONObjectsTypesList.Characters.First();
-
-                            if(mCharacterDataProvider.GetByInitials(_importedCharacter.CharacterPrefix) != null)
-                            {
-                                MessageDialogResult result = MessageDialogResult.Cancel;
-                                await Application.Current.Dispatcher.Invoke(async() =>
-                                {
-                                    DialogHost.CloseDialogCommand.Execute(null,dialog);
-                                    result = await mMessageDialogService
-                                        .ShowOKCancelDialogAsync($"Character '{_importedCharacter.CharacterName}' already exists. Do you want to overwrite this characters?", "Warning", "Yes", "No");
-                                    mMessageDialogService.ShowDedicatedDialogAsync<MessageDialogResult>(dialog);
-                                });
-
-                                if (result == MessageDialogResult.Cancel)
-                                {
-                                    FileHelper.ClearDirectory(ApplicationData.Instance.TempDirectory);
-                                    return;
-                                }
-
-                                var _oldCharacter = mCharacterDataProvider.GetByInitials(_importedCharacter.CharacterPrefix);
-                                string _imageFileName = _oldCharacter.CharacterImage;
-                                _oldCharacter.CharacterImage = ApplicationData.Instance.DefaultImage;
-                                await mCharacterDataProvider.Remove(_oldCharacter, _imageFileName);
-                            }
-
-                            _processExtractedFiles();
-
-                            Application.Current.Dispatcher.Invoke(() =>
-                            {
-                                mCharacterDataProvider.GetAll().Add(_importedCharacter);
-                            });
-                        }
-
-                        FileHelper.ClearDirectory(ApplicationData.Instance.TempDirectory);
-                    });
+                    throw new Exception("Loaded data is not valid.");
                 }
+
+                // check if loaded character already exists
+                var _importedCharacter = _JSONObjectsTypesList.Characters.First();
+
+                if (mCharacterDataProvider.GetByInitials(_importedCharacter.CharacterPrefix) != null)
+                {
+                    MessageDialogResult result = MessageDialogResult.Cancel;
+                    await Application.Current.Dispatcher.Invoke(async () =>
+                    {
+                        mMessageDialogService.CloseBusyDialog();
+                        result = await mMessageDialogService
+                            .ShowOKCancelDialogAsync($"Character '{_importedCharacter.CharacterName}' already exists. Do you want to overwrite this characters?", "Warning", "Yes", "No");
+                    });
+
+                    if (result == MessageDialogResult.Cancel)
+                    {
+                        FileHelper.ClearDirectory(ApplicationData.Instance.TempDirectory);
+                        return;
+                    }
+
+                    mMessageDialogService.ShowBusyDialog();
+
+                    var _oldCharacter = mCharacterDataProvider.GetByInitials(_importedCharacter.CharacterPrefix);
+                    string _imageFileName = _oldCharacter.CharacterImage;
+                    _oldCharacter.CharacterImage = ApplicationData.Instance.DefaultImage;
+                    await mCharacterDataProvider.Remove(_oldCharacter, _imageFileName);
+                }
+
+                await _processImportedCharacter(_importedCharacter);
+
+                FileHelper.ClearDirectory(ApplicationData.Instance.TempDirectory);
             }
             catch (Exception ex)
             {
                 mLogger.Error("_import_Click " + ex.Message);
-                DialogHost.CloseDialogCommand.Execute(null, dialog);
-                await mMessageDialogService.ShowMessage("Error","Error during importing character.");
+                mMessageDialogService.CloseBusyDialog();
+                await mMessageDialogService.ShowMessage("Error", "Error during importing character.");
+                // add support for rollback files if exception occured
             }
 
-            DialogHost.CloseDialogCommand.Execute(null, dialog);
+            mMessageDialogService.CloseBusyDialog();
         }
 
-        private  void _processExtractedFiles()
+        private async Task _processImportedCharacter(Character _importedCharacter)
         {
-            try
+            // move character related files from temp to data related folders
+            await _processExtractedFiles();
+
+            _importedCharacter.RadioNum = -1; // unassign imported character to avoid duplicates
+            _importedCharacter.State = CharacterState.Available;
+            await mCharacterDataProvider.SaveAsync(_importedCharacter);
+
+            // add character to list of characters
+            Application.Current.Dispatcher.Invoke(() =>
+            {
+                mCharacterDataProvider.GetAll().Add(_importedCharacter);
+            });
+        }
+
+        private async Task<JSONObjectsTypesList> _extractAndLoadData(string path)
+        {
+            await Task.Run(() =>
+            {
+                FileHelper.ClearDirectory(ApplicationData.Instance.TempDirectory);
+                ZipFile.ExtractToDirectory(path, ApplicationData.Instance.TempDirectory);
+            });
+
+            var _jSONObjectsTypesList = await mDialogDataRepository.LoadAsync(ApplicationData.Instance.TempDirectory);
+
+            return _jSONObjectsTypesList;
+        }
+
+        private Task _processExtractedFiles()
+        {
+            return Task.Run(() =>
             {
                 var _directoryInfo = new DirectoryInfo(ApplicationData.Instance.TempDirectory);
                 // copy .json file to Data directory
 
                 foreach (var _jsonFile in _directoryInfo.GetFiles("*.json"))
                 {
-                    File.Copy(_jsonFile.FullName,Path.Combine(ApplicationData.Instance.DataDirectory,_jsonFile.Name), true);
+                    File.Copy(_jsonFile.FullName, Path.Combine(ApplicationData.Instance.DataDirectory, _jsonFile.Name), true);
                 }
 
                 // copy .mp3 files to Audio directory
@@ -277,7 +294,7 @@ namespace DialogGenerator.UI.ViewModels
 
                 foreach (FileInfo _mp3File in _mp3Files)
                 {
-                    File.Copy(_mp3File.FullName,Path.Combine(ApplicationData.Instance.AudioDirectory,_mp3File.Name), true);
+                    File.Copy(_mp3File.FullName, Path.Combine(ApplicationData.Instance.AudioDirectory, _mp3File.Name), true);
                 }
 
                 // copy images to Image directory
@@ -288,19 +305,14 @@ namespace DialogGenerator.UI.ViewModels
 
                 foreach (FileInfo _imageFile in _imageFiles)
                 {
-                    File.Copy(_imageFile.FullName,Path.Combine(ApplicationData.Instance.ImagesDirectory,_imageFile.Name), true);
+                    File.Copy(_imageFile.FullName, Path.Combine(ApplicationData.Instance.ImagesDirectory, _imageFile.Name), true);
                 }
-            }
-            catch (Exception ex)
-            {
-                mLogger.Error("_processExtractedFiles " + ex.Message);
-            }
+            });
         }
 
         private void _createNewCharacterCommand_Execute()
         {
-            mEventAggregator.GetEvent<OpenCharacterDetailViewEvent>()
-                .Publish(null);
+            mEventAggregator.GetEvent<OpenCharacterDetailViewEvent>().Publish(null);
         }
 
         #endregion
@@ -309,9 +321,9 @@ namespace DialogGenerator.UI.ViewModels
 
         public void Load()
         {
-            mCharactersViewSource.Source =  mCharacterDataProvider.GetAll();
+            mCharactersCollectionViewSource.Source =  mCharacterDataProvider.GetAll();
 
-            RaisePropertyChanged("CharactersViewSource");
+            RaisePropertyChanged(nameof(CharactersViewSource));
         }
 
         #endregion
@@ -320,8 +332,9 @@ namespace DialogGenerator.UI.ViewModels
 
         public ICollectionView CharactersViewSource
         {
-            get { return mCharactersViewSource.View; }
+            get { return mCharactersCollectionViewSource.View; }
         }
+
 
         public string FilterText
         {
@@ -329,7 +342,7 @@ namespace DialogGenerator.UI.ViewModels
             set
             {
                 mFilterText = value;
-                mCharactersViewSource.View?.Refresh();
+                mCharactersCollectionViewSource.View?.Refresh();
                 RaisePropertyChanged();
             }
         }
@@ -343,8 +356,7 @@ namespace DialogGenerator.UI.ViewModels
                 RaisePropertyChanged();
                 if(mSelectedCharacter != null)
                 {
-                    mEventAggregator.GetEvent<OpenCharacterDetailViewEvent>()
-                        .Publish(mSelectedCharacter.CharacterPrefix);
+                    mEventAggregator.GetEvent<OpenCharacterDetailViewEvent>().Publish(mSelectedCharacter.CharacterPrefix);
                 }
             }
         }

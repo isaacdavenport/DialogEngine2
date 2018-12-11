@@ -59,6 +59,7 @@ namespace DialogGenerator.Model
         }
 
         [StringLength(3,MinimumLength =2,ErrorMessage ="Field requires 3 characters")]
+        [RegularExpression("^[a-zA-Z0-9]+$",ErrorMessage ="Allowed only letters and numbers.")]
         [JsonProperty("CharacterPrefix")]
         public string CharacterPrefix { get; set; } = "";
 
@@ -85,6 +86,8 @@ namespace DialogGenerator.Model
             {
                 mRadioNum = value;
                 OnPropertyChanged("RadioNum");
+
+                
             }
         }
 

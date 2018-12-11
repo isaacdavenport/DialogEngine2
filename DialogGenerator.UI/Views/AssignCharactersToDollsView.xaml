@@ -19,6 +19,7 @@
             <converters:DollStatusColorValueConverter x:Key="DollStatusColorValueConverter" />
             <converters:DollStatusValueConverter x:Key="DollStatusValueConverter" />
             <converters:ImageToFullPathValueConverter x:Key="ImageToFullPathValueConverter" />
+            <converters:DollNumberToAssignedCharacterValueConverter x:Key="DollNumberToAssignedCharacterValueConverter" />
 
             <DataTemplate x:Key="AssignedCharacterTemplate">
                 <Grid>
@@ -46,9 +47,11 @@
                    HorizontalAlignment="Center" VerticalContentAlignment="Center"/>
         </Border>
 
-        <ScrollViewer Grid.Row="1"  ScrollViewer.VerticalScrollBarVisibility="Auto">
+        <ScrollViewer Grid.Row="1"  VerticalAlignment="Top" ScrollViewer.VerticalScrollBarVisibility="Auto">
             <Grid HorizontalAlignment="Stretch" Grid.Row="1"  Margin="10,0,10,0"  VerticalAlignment="Stretch" >
-                <ItemsControl HorizontalAlignment="Center" ScrollViewer.CanContentScroll="True" ScrollViewer.HorizontalScrollBarVisibility="Auto" ScrollViewer.VerticalScrollBarVisibility="Auto" x:Name="ItemsControl" VerticalAlignment="Center" ItemsSource="{Binding CharacterRadioRelationshipList}">
+                <ItemsControl HorizontalAlignment="Center" ScrollViewer.CanContentScroll="True" 
+                              ScrollViewer.HorizontalScrollBarVisibility="Auto" ScrollViewer.VerticalScrollBarVisibility="Auto" 
+                              x:Name="ItemsControl" VerticalAlignment="Center" ItemsSource="{Binding Dolls}">
                     <ItemsControl.ItemsPanel>
                         <ItemsPanelTemplate>
                             <WrapPanel />
@@ -63,39 +66,32 @@
                                 </Grid.RowDefinitions>
 
                                 <Grid>
-                                    <Image Stretch="Fill" Source="{Binding DataContext.DollFileName,RelativeSource={RelativeSource Mode=FindAncestor,AncestorType=view:AssignCharactersToDollsView}}" Height="150" Width="100" >
-                                        <!--<Image.Source>
-                                        <BitmapImage  UriSource="{Binding DollFileName}" />
-                                    </Image.Source>-->
+                                    <Image Stretch="Fill"  Height="150" Width="100" 
+                                           Source="{Binding DataContext.DollFileName,RelativeSource={RelativeSource Mode=FindAncestor,AncestorType=view:AssignCharactersToDollsView}}">
                                     </Image>
-                                    <TextBlock Text="{Binding Value, Converter={StaticResource DollStatusValueConverter}}" Foreground="{Binding Value, Converter={StaticResource DollStatusColorValueConverter}}" 
-                                           FontSize="16" Margin="0,50,0,0" FontWeight="SemiBold" HorizontalAlignment="Center" VerticalAlignment="Center">
+                                    <TextBlock Text="{Binding Converter={StaticResource DollStatusValueConverter}}" 
+                                               Foreground="{Binding  Converter={StaticResource DollStatusColorValueConverter}}" 
+                                               FontSize="16" Margin="0,50,0,0" FontWeight="SemiBold" HorizontalAlignment="Center" VerticalAlignment="Center">
                                         <TextBlock.Effect>
                                             <DropShadowEffect ShadowDepth="0" Color="LightGray" BlurRadius="10" />
                                         </TextBlock.Effect>
                                     </TextBlock>
                                     <StackPanel Orientation="Horizontal"  VerticalAlignment="Bottom" HorizontalAlignment="Center">
                                         <TextBlock Text="Doll" FontWeight="SemiBold" HorizontalAlignment="Center" VerticalAlignment="Bottom"/>
-                                        <TextBlock Text="{Binding Key}" FontWeight="SemiBold" Margin="5,0,0,0" />
+                                        <TextBlock Text="{Binding}" FontWeight="SemiBold" Margin="5,0,0,0" />
                                     </StackPanel>
                                 </Grid>
                                 <Border Grid.Row="1" Margin="20" BorderBrush="LightGray"  BorderThickness="1" CornerRadius="5">
                                     <StackPanel Orientation="Horizontal"   HorizontalAlignment="Center">
-                                        <TextBlock Text="{Binding Value, Converter={StaticResource AssignedCharacter2NameValueConverter}}"  MinWidth="100" 
+                                        <TextBlock Text="{Binding  Converter={StaticResource AssignedCharacter2NameValueConverter}}"  MinWidth="100" 
                                                HorizontalAlignment="Center"  Margin="7" VerticalAlignment="Center" x:Name="CharacterTb" />
                                         <Border BorderThickness="1,0,0,0" Background="WhiteSmoke" CornerRadius="0" BorderBrush="LightGray">
-                                            <materialDesign:PopupBox Width="25"
-                                                     Margin="0,0,0,0"
-                                                     Padding="0"
-                                                     x:Name="Popup"
-                                                     StaysOpen="True"
-                                                     Opened="_popup_Opened"
-                                                     PlacementMode="BottomAndAlignCentres"
-                                                     VerticalAlignment="Center"
-                                                     HorizontalAlignment="Center"
-                                                     Style="{DynamicResource MaterialDesignToolForegroundPopupBox}">
+                                            <materialDesign:PopupBox Width="25" Margin="0,0,0,0" Padding="0" x:Name="Popup" StaysOpen="True"
+                                                     Opened="_popup_Opened" PlacementMode="BottomAndAlignCentres" VerticalAlignment="Center"
+                                                     HorizontalAlignment="Center" Style="{DynamicResource MaterialDesignToolForegroundPopupBox}">
                                                 <materialDesign:PopupBox.ToggleContent>
-                                                    <materialDesign:PackIcon Kind="Pencil" ToolTip="Edit" Foreground="{DynamicResource PrimaryHueMidBrush}"  Height="20" Width="20"/>
+                                                    <materialDesign:PackIcon Kind="Pencil" ToolTip="Edit" Height="20" Width="20" 
+                                                                             Foreground="{DynamicResource PrimaryHueMidBrush}"  />
                                                 </materialDesign:PopupBox.ToggleContent>
 
                                                 <GroupBox x:Name="groupBox" 
@@ -125,8 +121,8 @@
                                                         <Label Content="Assign character:" HorizontalAlignment="Right" Grid.Row="0" />
                                                         <ComboBox ItemsSource="{Binding DataContext.Characters,
                                                               RelativeSource={RelativeSource Mode=FindAncestor, AncestorType=view:AssignCharactersToDollsView}}"
-                                                              MinWidth="100" SelectedValue="{Binding Path=Value, Mode=OneWay}" x:Name="CharactersCbx"
-                                                              ItemTemplateSelector="{Binding Key,Converter={StaticResource CharacterDataTemplateSelectorValueConverter}}"
+                                                              MinWidth="100" SelectedValue="{Binding Converter={StaticResource DollNumberToAssignedCharacterValueConverter}, Mode=OneWay}" 
+                                                              x:Name="CharactersCbx" ItemTemplateSelector="{Binding Converter={StaticResource CharacterDataTemplateSelectorValueConverter}}"
                                                               Margin="10,0,0,0" HorizontalAlignment="Left" Grid.Row="0" Grid.Column="1" />
 
                                                         <Button Content="Save" Style="{DynamicResource MaterialDesignRaisedButton}"   
@@ -136,7 +132,7 @@
                                                             HorizontalAlignment="Center" VerticalAlignment="Center" Margin="0,20,0,0">
                                                             <Button.CommandParameter>
                                                                 <MultiBinding Converter="{StaticResource CloneValuesConverter}">
-                                                                    <Binding Path="Key" />
+                                                                    <Binding />
                                                                     <Binding Path="SelectedIndex" ElementName="CharactersCbx" />
                                                                     <Binding Path="." ElementName="ItemsControl" />
                                                                     <Binding Path="." ElementName="Popup" />
@@ -150,10 +146,11 @@
                                         <Border Background="WhiteSmoke" CornerRadius="0,5,5,0" Width="25" BorderThickness="1,0,0,0" BorderBrush="LightGray" >
                                             <materialDesign:PackIcon Kind="CloseCircle" Foreground="Red" HorizontalAlignment="Center" Height="20" Width="20" VerticalAlignment="Center" />
                                             <Border.InputBindings>
-                                                <MouseBinding MouseAction="LeftClick" Command="{Binding DataContext.UnbindCharacterCommand, RelativeSource={RelativeSource Mode=FindAncestor, AncestorType=view:AssignCharactersToDollsView}}">
+                                                <MouseBinding MouseAction="LeftClick" 
+                                                              Command="{Binding DataContext.UnbindCharacterCommand, RelativeSource={RelativeSource Mode=FindAncestor, AncestorType=view:AssignCharactersToDollsView}}">
                                                     <MouseBinding.CommandParameter>
                                                         <MultiBinding Converter="{StaticResource CloneValuesConverter}">
-                                                            <Binding Path="Key" />
+                                                            <Binding />
                                                             <Binding Path="." ElementName="ItemsControl" />
                                                         </MultiBinding>
                                                     </MouseBinding.CommandParameter>

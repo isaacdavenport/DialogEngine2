@@ -1,7 +1,5 @@
 ﻿using DialogGenerator.Core;
 using System;
-using System.Threading;
-using System.Threading.Tasks;
 using Windows.Devices.Bluetooth.Advertisement;
 using Windows.Storage.Streams;
 
@@ -75,14 +73,11 @@ namespace DialogGenerator.CharacterSelection.Data
             return null;
         }
 
-        public async Task StartReadingData()
+        public object StartReadingData()
         {
-            // fake task
-            await Task.Run(() =>
-            {
-                Thread.CurrentThread.Name = "StartReadingData";
-                mWatcher.Start();
-            });
+            mWatcher.Start();
+
+            return null;
         }
 
         public void StopReadingData()

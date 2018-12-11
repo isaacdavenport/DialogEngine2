@@ -1,4 +1,5 @@
-﻿using System;
+﻿using DialogGenerator.Model;
+using System;
 using System.Data;
 using System.Globalization;
 using System.Windows.Data;
@@ -9,9 +10,11 @@ namespace DialogGenerator.UI.Converters
     {
         public object Convert(object value, Type targetType, object parameter, CultureInfo culture)
         {
-            var array = value as int[,];
-            if (array == null) return null;
+            var data = value as HeatMapData;
+            if (data == null)
+                return null; ;
 
+            var array = data.HeatMap;
             var rows = array.GetLength(0);
             if (rows == 0) return null;
 
@@ -40,8 +43,7 @@ namespace DialogGenerator.UI.Converters
                     newRow[c] = array[r, c - 1];
                 }
 
-                //TODO uncomment
-                //newRow[columns + 1] = SerialSelectionService.CharactersLastHeatMapUpdateTime[r].ToString("mm.ss.fff");
+                newRow[columns + 1] = data.LastHeatMapUpdateTime[r].ToString("mm.ss.fff");
                 t.Rows.Add(newRow);
             }
 

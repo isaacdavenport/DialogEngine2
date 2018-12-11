@@ -14,12 +14,14 @@ namespace DialogGenerator.Core
         private static XmlSerializer msSerializer;
 
         private string mRootDirectory;
+        private string mAppDataDirectory;
         private string mDataDirectory;
         private string mTempDirectory;
         private string mVideoDirectory;
         private string mTutorialDirectory;
         private string mAudioDirectory;
         private string mImagesDirectory;
+        private string mToolsDirectory;
 
         static ApplicationData()
         {
@@ -41,7 +43,7 @@ namespace DialogGenerator.Core
 
         public void Save()
         {
-            using (var _fileStream = new FileStream(Path.Combine(RootDirectory, msFileName), FileMode.Create))
+            using (var _fileStream = new FileStream(Path.Combine(AppDataDirectory, msFileName), FileMode.Create))
             {
                 msSerializer.Serialize(_fileStream, Instance);
             }
@@ -61,11 +63,13 @@ namespace DialogGenerator.Core
                 {
                     lock (msLocker)
                     {
-                        if (File.Exists(msFileName))
+                        string path = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.UserProfile),"Documents", "DialogGenerator", msFileName);
+
+                        if (File.Exists(path))
                         {
                             try
                             {
-                                msInstance = _deserialize(msFileName);
+                                msInstance = _deserialize(path);
                             }
                             catch (Exception)
                             {
@@ -100,6 +104,8 @@ namespace DialogGenerator.Core
         public string DefaultImage { get; set; } = "avatar.png";
         public string JSONFilesVersion { get; set; } = "1.1";
         public int NumberOfRadios { get; set; } = 6;
+        public string URLToUpdateFile { get; set; } = "http://drive.google.com/uc?export=download&id=1nkflu9P-y1gQMajnxv58BRU7TqrgBh9U";
+        public int CheckForUpdateInterval { get; set; } = 30; // minutes
 
         [Editable(true)]
         [Description("Check which tags will not be used in dialog.")]
@@ -157,13 +163,27 @@ namespace DialogGenerator.Core
         }
 
         [XmlIgnore]
+        public string AppDataDirectory
+        {
+            get
+            {
+                if (mAppDataDirectory == null)
+                {
+                    mAppDataDirectory = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.UserProfile),"Documents","DialogGenerator");
+                }
+
+                return mAppDataDirectory;
+            }
+        }
+
+        [XmlIgnore]
         public string DataDirectory
         {
             get
             {
                 if (string.IsNullOrEmpty(mDataDirectory))
                 {
-                    mDataDirectory = Path.Combine(Instance.RootDirectory, "Data");
+                    mDataDirectory = Path.Combine(Instance.AppDataDirectory, "Data");
                 }
 
                 return mDataDirectory;
@@ -177,7 +197,7 @@ namespace DialogGenerator.Core
             {
                 if (string.IsNullOrEmpty(mAudioDirectory))
                 {
-                    mAudioDirectory = Path.Combine(Instance.RootDirectory, "Audio");
+                    mAudioDirectory = Path.Combine(Instance.AppDataDirectory, "Audio");
                 }
 
                 return mAudioDirectory;
@@ -191,7 +211,7 @@ namespace DialogGenerator.Core
             {
                 if (string.IsNullOrEmpty(mVideoDirectory))
                 {
-                    mVideoDirectory = Path.Combine(Instance.RootDirectory, "Video");
+                    mVideoDirectory = Path.Combine(Instance.AppDataDirectory, "Video");
                 }
 
                 return mVideoDirectory;
@@ -219,7 +239,7 @@ namespace DialogGenerator.Core
             {
                 if (string.IsNullOrEmpty(mTempDirectory))
                 {
-                    mTempDirectory = Path.Combine(Instance.RootDirectory, "Temp");
+                    mTempDirectory = Path.Combine(Instance.AppDataDirectory, "Temp");
                 }
 
                 return mTempDirectory;
@@ -233,10 +253,24 @@ namespace DialogGenerator.Core
             {
                 if (string.IsNullOrEmpty(mImagesDirectory))
                 {
-                    mImagesDirectory = Path.Combine(Instance.RootDirectory, "Images");
+                    mImagesDirectory = Path.Combine(Instance.AppDataDirectory, "Images");
                 }
 
                 return mImagesDirectory;
+            }
+        }
+
+        [XmlIgnore]
+        public string ToolsDirectory
+        {
+            get
+            {
+                if (string.IsNullOrEmpty(mToolsDirectory))
+                {
+                    mToolsDirectory = Path.Combine(Instance.RootDirectory, "Tools");
+                }
+
+                return mToolsDirectory;
             }
         }
     }

@@ -1,0 +1,40 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Wix xmlns="http://schemas.microsoft.com/wix/2006/wi">
+  
+  <?define DialogGenerator_TargetDir=$(var.DialogGenerator.TargetDir)?>
+  <?define Manufacturer="Toys2Life"?>
+  <?define SkuName = "DialogGenerator"?>
+  
+	<Product Id="*" Name="$(var.SkuName)" Language="1033" Version="1.0.0.0" 
+   Manufacturer="$(var.Manufacturer)" UpgradeCode="880cbb5f-2d77-425a-8d96-a8000443c1f2">
+        
+		<Package InstallerVersion="200" Compressed="yes" InstallScope="perMachine" />
+
+		<MajorUpgrade DowngradeErrorMessage="A newer version of [ProductName] is already installed." AllowDowngrades="no" />
+		<MediaTemplate EmbedCab="yes" />
+
+    <Property Id="WIXUI_INSTALLDIR" Value="INSTALLDIR" />
+    <Property Id="DATA_DIR" Value="$(var.DialogGenerator_TargetDir)Data" />
+    <Property Id="VIDEO_DIR" Value="$(var.DialogGenerator_TargetDir)Video" />
+    <Property Id="USER_DOCUMENTS_FOLDER_PATH">
+      <RegistrySearch Key="SOFTWARE\$(var.Manufacturer)\$(var.SkuName)" Root="HKLM" Type="raw" Id="USER_DATA_FOLDER_REGSEARCH" Name="Path" />
+    </Property>
+    <SetDirectory Id='UserDocumentsFolder' Value='C:\Users\[LogonUser]\Documents' />
+    
+    <UIRef Id="WixUI_Minimal" />
+    
+		<Feature Id="DialogEngine" Title="DialogEngine" Level="1">
+			<ComponentGroupRef Id="ProductComponents" />
+      <ComponentRef Id="ApplicationShortcut" />
+		</Feature>
+
+    <Feature Id="Data" Title="Data" Level="1">
+      <ComponentRef Id="Temp"/>
+      <ComponentRef Id="Video"/>
+      <ComponentRef Id="CleanupData" />
+      <ComponentRef Id="Application.xml"/>
+      <Condition Level="1">NOT Installed</Condition>
+    </Feature>
+      
+	</Product>
+</Wix>

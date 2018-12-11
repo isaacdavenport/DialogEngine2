@@ -1,5 +1,6 @@
 ﻿using DialogGenerator.CharacterSelection.Model;
 using DialogGenerator.Core;
+using DialogGenerator.DataAccess;
 using DialogGenerator.Model;
 using System;
 using System.Collections.Generic;
@@ -14,6 +15,7 @@ namespace DialogGenerator.CharacterSelection.Helper
 
         public static List<ReceivedMessage> ReceivedMessages = new List<ReceivedMessage>();
         public static ILogger Logger;
+        public static ICharacterRepository CharacterRepository;
 
         #endregion
 
@@ -82,7 +84,7 @@ namespace DialogGenerator.CharacterSelection.Helper
             {
                 for (int _k = 0; _k < ApplicationData.Instance.NumberOfRadios; _k++)
                 {
-                    if (Session.Get<Dictionary<int,Character>>(Constants.CH_RADIO_RELATIONSHIP)[_rowNum]!= null)
+                    if (CharacterRepository.GetByAssignedRadio(_rowNum) != null)
                     {
                         BLESelectionService.HeatMap[_rowNum, _k] = _newRow[_k];
                     }

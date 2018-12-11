@@ -54,6 +54,11 @@
             </MenuItem>
 
             <MenuItem Header="_Tools" VerticalAlignment="Center">
+                <MenuItem Header="_Check for updates" Command="{Binding CheckForUpdatesCommand}">
+                    <MenuItem.Icon>
+                        <materialDesign:PackIcon Kind="Update" />
+                    </MenuItem.Icon>
+                </MenuItem>
                 <MenuItem Header="_Settings" Command="{Binding OpenSettingsDialogCommand}">
                     <MenuItem.Icon>
                         <materialDesign:PackIcon Kind="Settings" />

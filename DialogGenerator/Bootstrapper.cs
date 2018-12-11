@@ -11,7 +11,8 @@ using DialogGenerator.UI;
 using DialogGenerator.Utilities;
 using DialogGenerator.CharacterSelection;
 using Prism.Events;
-using Prism.Logging;
+using DialogGenerator.ViewModels;
+using DialogGenerator.Web;
 
 namespace DialogGenerator
 {
@@ -34,6 +35,7 @@ namespace DialogGenerator
             base.ConfigureContainer();
             Container.RegisterType<IEventAggregator, EventAggregator>(new ContainerControlledLifetimeManager());
             Container.RegisterType<AppInitializer>();
+            Container.RegisterType<ShellViewModel>(new ContainerControlledLifetimeManager());
             Container.RegisterType<Shell>();
         }
 
@@ -57,6 +59,14 @@ namespace DialogGenerator
                 InitializationMode = InitializationMode.WhenAvailable
             });
 
+            Type _webModuleType = typeof(WebModule);
+            ModuleCatalog.AddModule(new ModuleInfo()
+            {
+                ModuleName = _webModuleType.Name,
+                ModuleType = _webModuleType.AssemblyQualifiedName,
+                InitializationMode = InitializationMode.WhenAvailable
+            });
+
             Type _dialogEngineModuleType = typeof(DialogEngineModule);
             ModuleCatalog.AddModule(new ModuleInfo()
             {
@@ -65,19 +75,19 @@ namespace DialogGenerator
                 InitializationMode = InitializationMode.WhenAvailable
             });
 
-            Type _chSelectionModuleType = typeof(CharacterSelectionModule);
-            ModuleCatalog.AddModule(new ModuleInfo()
-            {
-                ModuleName = _chSelectionModuleType.Name,
-                ModuleType = _chSelectionModuleType.AssemblyQualifiedName,
-                InitializationMode = InitializationMode.WhenAvailable
-            });
-
             Type _dataAccessModuleType = typeof(DataAccessModule);
             ModuleCatalog.AddModule(new ModuleInfo()
             {
                 ModuleName = _dataAccessModuleType.Name,
                 ModuleType = _dataAccessModuleType.AssemblyQualifiedName,
+                InitializationMode = InitializationMode.WhenAvailable
+            });
+
+            Type _chSelectionModuleType = typeof(CharacterSelectionModule);
+            ModuleCatalog.AddModule(new ModuleInfo()
+            {
+                ModuleName = _chSelectionModuleType.Name,
+                ModuleType = _chSelectionModuleType.AssemblyQualifiedName,
                 InitializationMode = InitializationMode.WhenAvailable
             });
 

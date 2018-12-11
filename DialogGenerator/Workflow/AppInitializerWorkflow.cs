@@ -9,9 +9,8 @@ namespace DialogGenerator.Workflow
         Started,
         LoadingData,
         Error,
-        BindingCharacter2Radio,
-        DialogEngine,
-        DefaultValues
+        DialogEngineInitialization,
+        SettingDefaultValues
     }
 
     public enum Triggers
@@ -19,7 +18,6 @@ namespace DialogGenerator.Workflow
         Start,
         LoadData,
         ProcessError,
-        BindCharacter2Radio,
         InitializeDialogEngine,
         SetDefaultValues
     }

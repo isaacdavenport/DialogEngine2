@@ -9,12 +9,6 @@
              mc:Ignorable="d" 
              d:DesignHeight="450" d:DesignWidth="800">
 
-    <UserControl.Resources>
-        <ResourceDictionary>
-            <covnerters:IsMediaPlayerPlayBtnEnabledValueConverter x:Key="IsMediaPlayerPlayBtnEnabledValueConverter" />
-            <covnerters:IsMediaPlayerStopBtnEnabledValueConverter x:Key="IsMediaPlayerStopBtnEnabledValueConverter" />
-        </ResourceDictionary>
-    </UserControl.Resources>
     <Grid HorizontalAlignment="Stretch" VerticalAlignment="Stretch" Background="#FF595959">
         <Grid.RowDefinitions>
             <RowDefinition Height="*" />
@@ -23,61 +17,22 @@
 
         <Border Grid.Row="0" Background="#FF333333" CornerRadius="2,2,2,2" BorderThickness="0" Margin="2,2,2,2">
             <MediaElement   x:Name="VideoPlayer" Stretch="Fill" LoadedBehavior="Manual" ScrubbingEnabled="True"
-                            Source="{Binding Path=FilePath, RelativeSource={RelativeSource Mode=FindAncestor, AncestorType={x:Type UserControl}}}"
+                            Source="{Binding CurrentVideoFilePath}"
                             HorizontalAlignment="Stretch" VerticalAlignment="Stretch"  />
         </Border>
 
-        <Grid Grid.Row="1">
-            <Grid.ColumnDefinitions>
-                <ColumnDefinition Width="auto" />
-                <ColumnDefinition Width="*" />
-            </Grid.ColumnDefinitions>
-
-            <StackPanel x:Name="ToolbarSP"
-                    Grid.Row="1"
-                    Orientation="Horizontal"
-                    Visibility="Visible"
-                    Background="#FF595959"
-                    HorizontalAlignment="Stretch" 
-                    VerticalAlignment="Bottom">
-                <Button Width="25"
-                    x:Name="StartBtn"
-                    Height="25"
-                    Command="{Binding StartVideoCommand}"
-                    Margin="10,10,10,10">
-                    <Button.IsEnabled>
-                        <MultiBinding Converter="{StaticResource IsMediaPlayerPlayBtnEnabledValueConverter}" ConverterParameter="ReadyForUserAction">
-                            <Binding Path="State" RelativeSource="{RelativeSource Mode=FindAncestor, AncestorType=local:MediaPlayerControl}" />
-                            <Binding Path="FilePath" RelativeSource="{RelativeSource Mode=FindAncestor, AncestorType=local:MediaPlayerControl}" />
-                        </MultiBinding>
-                    </Button.IsEnabled>
-                    <Button.Content>
-                        <materialDesign:PackIcon Kind="Play" />
-                    </Button.Content>
-                </Button>
-                <Button Width="25" 
-                    Height="25"
-                    Command="{Binding PauseVideoCommand}"
-                    Margin="10,10,10,10">
-                    <Button.Content>
-                        <materialDesign:PackIcon Kind="Pause" />
-                    </Button.Content>
-                    <Button.IsEnabled>
-                        <MultiBinding Converter="{StaticResource IsMediaPlayerStopBtnEnabledValueConverter}" ConverterParameter="VideoPlayerPlaying">
-                            <Binding  Path="State" 
-                                      RelativeSource="{RelativeSource Mode=FindAncestor, AncestorType=local:MediaPlayerControl}" />
-                            <Binding Path="IsPlaying" />
-                        </MultiBinding>
-                    </Button.IsEnabled>
-                </Button>
-            </StackPanel>
-
-            <!--<Slider VerticalAlignment="Center"
-                x:Name="VideoPlayerSlider"
-                Grid.Column="1"
-                HorizontalAlignment="Stretch"
-                Margin="10,0,10,0"
-                IsMoveToPointEnabled="False" />-->
-        </Grid>
+        <StackPanel x:Name="ToolbarSP" Grid.Row="1" Orientation="Horizontal"
+            Background="#FF595959" HorizontalAlignment="Stretch" VerticalAlignment="Bottom">
+            <Button Width="25" x:Name="StartBtn" Height="25" Command="{Binding StartVideoCommand}" Margin="10,10,10,10">
+                <Button.Content>
+                    <materialDesign:PackIcon Kind="Play" />
+                </Button.Content>
+            </Button>
+            <Button Width="25" Height="25" Command="{Binding PauseVideoCommand}" Margin="10,10,10,10">
+                <Button.Content>
+                    <materialDesign:PackIcon Kind="Pause" />
+                </Button.Content>
+            </Button>
+        </StackPanel>
     </Grid>
 </UserControl>

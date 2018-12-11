@@ -1,10 +1,8 @@
 ﻿using DialogGenerator.Core;
 using DialogGenerator.DataAccess;
 using DialogGenerator.DialogEngine;
-using DialogGenerator.Model;
 using DialogGenerator.Workflow;
 using System;
-using System.Collections.Generic;
 using System.IO;
 
 namespace DialogGenerator
@@ -60,21 +58,17 @@ namespace DialogGenerator
 
             mWorkflow.Configure(States.LoadingData)
                 .OnEntry(_loadData)
-                .Permit(Triggers.BindCharacter2Radio, States.BindingCharacter2Radio)
+                .Permit(Triggers.InitializeDialogEngine, States.DialogEngineInitialization)
                 .Permit(Triggers.ProcessError, States.Error);
 
             mWorkflow.Configure(States.Error)
                 .OnEntry(_processError);
 
-            mWorkflow.Configure(States.BindingCharacter2Radio)
-                .OnEntry(_bindCharacter2Radio)
-                .Permit(Triggers.InitializeDialogEngine, States.DialogEngine);
-
-            mWorkflow.Configure(States.DialogEngine)
+            mWorkflow.Configure(States.DialogEngineInitialization)
                 .OnEntry(_initializeDialogEngine)
-                .Permit(Triggers.SetDefaultValues, States.DefaultValues);
+                .Permit(Triggers.SetDefaultValues, States.SettingDefaultValues);
 
-            mWorkflow.Configure(States.DefaultValues)
+            mWorkflow.Configure(States.SettingDefaultValues)
                 .OnEntry(_setInitialValues);
         }
 
@@ -110,33 +104,6 @@ namespace DialogGenerator
             Session.Set(Constants.CHARACTERS, _loadedData.Characters);
             Session.Set(Constants.DIALOG_MODELS, _loadedData.DialogModels);
             Session.Set(Constants.WIZARDS, _loadedData.Wizards);
-
-            mWorkflow.Fire(Triggers.BindCharacter2Radio);
-        }
-
-
-        private async void _bindCharacter2Radio()
-        {
-            var _character2RadioBindingDict = new Dictionary<int, Character>();
-
-            for (int i = 0; i < ApplicationData.Instance.NumberOfRadios; i++)
-            {
-                var character = mCharacterRepository.GetByAssignedRadio(i);
-
-                _character2RadioBindingDict.Add(i, character);
-            }
-
-            //var characters = mCharacterRepository.GetAll();
-
-            //for (int i = 0; i < ApplicationData.Instance.NumberOfRadios; i++)
-            //{
-            //    characters[i].RadioNum = i;
-            //}
-
-            //foreach (var character in characters)
-            //    await mCharacterRepository.SaveAsync(character);
-
-            Session.Set(Constants.CH_RADIO_RELATIONSHIP, _character2RadioBindingDict);
 
             mWorkflow.Fire(Triggers.InitializeDialogEngine);
         }

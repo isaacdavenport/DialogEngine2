@@ -1,10 +1,12 @@
-﻿using DialogGenerator.Core;
+﻿using AutoUpdaterDotNET;
+using DialogGenerator.Core;
 using DialogGenerator.Events;
 using DialogGenerator.UI.Views.Dialogs;
 using DialogGenerator.Utilities;
 using Prism.Commands;
 using Prism.Events;
 using Prism.Mvvm;
+using System;
 using System.Diagnostics;
 using System.IO;
 using System.Reflection;
@@ -43,6 +45,7 @@ namespace DialogGenerator.UI.ViewModels
         public ICommand ReadTutorialCommand { get; set; }
         public ICommand AboutToys2LifeCommand { get; set; }
         public ICommand OpenSettingsDialogCommand { get; set; }
+        public ICommand CheckForUpdatesCommand { get; set; }
 
         #endregion
 
@@ -53,6 +56,12 @@ namespace DialogGenerator.UI.ViewModels
             ReadTutorialCommand = new DelegateCommand(_onReadTutorial_Execute);
             AboutToys2LifeCommand = new DelegateCommand(_onAboutToys2Life_Execute);
             OpenSettingsDialogCommand = new DelegateCommand(_onOpenSettingsDialog_Execute);
+            CheckForUpdatesCommand = new DelegateCommand(_onCheckForUpdates_Execute);
+        }
+
+        private void _onCheckForUpdates_Execute()
+        {
+            AutoUpdater.Start(ApplicationData.Instance.URLToUpdateFile);
         }
 
         private void _onCharacterSelectionActionChanged(bool _isStarted)
@@ -77,7 +86,14 @@ namespace DialogGenerator.UI.ViewModels
 
         private void _onAboutToys2Life_Execute()
         {
-            Process.Start(ApplicationData.Instance.WebsiteUrl);
+            try
+            {
+                Process.Start(ApplicationData.Instance.WebsiteUrl);
+            }
+            catch (Exception ex)
+            {
+                mLogger.Error("_onAboutToys2Life_Execute " + ex.Message);
+            }
         }
 
         private void _onReadTutorial_Execute()

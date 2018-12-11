@@ -20,10 +20,8 @@ namespace DialogGenerator.UI.Converters
 
                 return ((ModelDialog)_activeDialogModel).Name.Equals(_currentDialogModel.Name) ? Visibility.Hidden : Visibility.Visible;
             }
-            catch (Exception)
-            {
-                return Visibility.Visible;
-            }
+            catch (Exception){}
+            return Visibility.Visible;
         }
 
         public object[] ConvertBack(object value, Type[] targetTypes, object parameter, CultureInfo culture)

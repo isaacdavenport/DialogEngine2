@@ -9,9 +9,9 @@ namespace DialogGenerator.CharacterSelection.Workflow
         Waiting,
         Init,
         MessageProcessing,
-        FindClosestPair,
+        CalculatingClosestPair,
         SelectNextCharacters,
-        Finish
+        Finished
     }
 
     public enum Triggers
@@ -19,7 +19,7 @@ namespace DialogGenerator.CharacterSelection.Workflow
         Wait,
         Initialize,
         ProcessMessage,
-        FindClosestPair,
+        CalculateClosestPair,
         SelectNextCharacters,
         Finish
     }

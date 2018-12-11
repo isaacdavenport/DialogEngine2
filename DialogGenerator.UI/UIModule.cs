@@ -2,6 +2,7 @@
 using DialogGenerator.UI.Data;
 using DialogGenerator.UI.ViewModels;
 using DialogGenerator.UI.Views;
+using DialogGenerator.UI.Views.Dialogs;
 using Microsoft.Practices.Unity;
 using Prism.Modularity;
 using Prism.Regions;
@@ -29,13 +30,15 @@ namespace DialogGenerator.UI
             mContainer.RegisterType<object, DialogModelDetailView>(typeof(DialogModelDetailView).FullName);
             mContainer.RegisterType<object, DialogModelsNavigationView>(typeof(DialogModelsNavigationView).FullName);
             mContainer.RegisterType<object, DialogView>(typeof(DialogView).FullName);
-            mContainer.RegisterType<object, AssignCharactersToDollsView>(typeof(AssignCharactersToDollsView).FullName);
+            mContainer.RegisterType<object, AssignCharactersToDollsView>(typeof(AssignCharactersToDollsView).FullName,new TransientLifetimeManager());
             mContainer.RegisterType<object, WizardView>(typeof(WizardView).FullName,new ContainerControlledLifetimeManager());
 
             mContainer.RegisterType<WizardViewModel>(new ContainerControlledLifetimeManager());
             mContainer.RegisterType<CharacterDetailViewModel>(new ContainerControlledLifetimeManager());
             mContainer.RegisterType<DialogModelDetailViewModel>(new ContainerControlledLifetimeManager());
             mContainer.RegisterType<DialogModelsNavigationViewModel>(new ContainerControlledLifetimeManager()).Resolve(typeof(DialogModelsNavigationViewModel));
+            mContainer.RegisterType<OnlineCharactersDialog>();
+            mContainer.RegisterType<OnlineCharactersDialogViewModel>();
 
             mRegionManager.RegisterViewWithRegion(Constants.MenuRegion, typeof(MenuView));
             mRegionManager.RegisterViewWithRegion(Constants.ContentRegion, typeof(DialogView));

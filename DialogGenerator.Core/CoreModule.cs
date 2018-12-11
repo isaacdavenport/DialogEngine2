@@ -1,5 +1,4 @@
 ﻿using Microsoft.Practices.Unity;
-using Prism.Events;
 using Prism.Modularity;
 
 namespace DialogGenerator.Core
@@ -16,7 +15,6 @@ namespace DialogGenerator.Core
         public void Initialize()
         {
             mContainer.RegisterType<ILogger,Logger>(new ContainerControlledLifetimeManager());
-            //mContainer.RegisterType<IEventAggregator, EventAggregator>(new ContainerControlledLifetimeManager());
         }
     }
 }

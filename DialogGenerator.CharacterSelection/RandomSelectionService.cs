@@ -24,8 +24,9 @@ namespace DialogGenerator.CharacterSelection
         public static int NextCharacter2 = 2;
         private CancellationTokenSource mCancellationTokenSource;
 
-        public RandomSelectionService(ILogger logger,IEventAggregator _eventAggregator,
-            ICharacterRepository _characterRepository,IMessageDialogService _messageDialogService)
+        public RandomSelectionService(ILogger logger,IEventAggregator _eventAggregator
+            ,ICharacterRepository _characterRepository
+            ,IMessageDialogService _messageDialogService)
         {
             mLogger = logger;
             mEventAggregator = _eventAggregator;
@@ -53,7 +54,7 @@ namespace DialogGenerator.CharacterSelection
             {
                 case 0:  // no avaialbe characters
                     {
-                        await mMessageDialogService.ShowMessage("Warning", "No available characters. Please change characters settings.");
+                        await mMessageDialogService.ShowMessage("Warning", "No available characters. Please change characters settings.","ContentDialogHost");
                         break;
                     }
                 case 1: // 1 available character

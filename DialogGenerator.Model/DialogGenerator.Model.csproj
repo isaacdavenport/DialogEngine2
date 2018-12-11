@@ -63,6 +63,8 @@
     <Compile Include="Enum\CharacterState.cs" />
     <Compile Include="Enum\ModelDialogState.cs" />
     <Compile Include="Enum\SelectionMode.cs" />
+    <Compile Include="FileItem.cs" />
+    <Compile Include="HeatMapData.cs" />
     <Compile Include="JSONObjectsTypesList.cs" />
     <Compile Include="ModelDialog.cs" />
     <Compile Include="ModelDialogInfo.cs" />

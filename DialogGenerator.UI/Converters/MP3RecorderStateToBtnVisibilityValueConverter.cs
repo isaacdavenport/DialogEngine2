@@ -1,22 +1,19 @@
-﻿using DialogGenerator.UI.Workflow.WizardWorkflow;
+﻿using DialogGenerator.UI.Workflow.MP3RecorderStateMachine;
 using System;
 using System.Globalization;
+using System.Windows;
 using System.Windows.Data;
 
 namespace DialogGenerator.UI.Converters
 {
-    public class IsEnabledCancelBtnConverter : IValueConverter
+    public class MP3RecorderStateToBtnVisibilityValueConverter : IValueConverter
     {
         public object Convert(object value, Type targetType, object parameter, CultureInfo culture)
         {
-            try
-            {
-                States state = (States)value;
-                return state == States.ReadyForUserAction;
-            }
-            catch (Exception) { }
+            States _currentState = (States)value;
+            States _expectedState = (States)parameter;
 
-            return false;
+            return _currentState == _expectedState ? Visibility.Visible : Visibility.Collapsed;
         }
 
         public object ConvertBack(object value, Type targetType, object parameter, CultureInfo culture)

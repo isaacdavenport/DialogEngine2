@@ -66,6 +66,8 @@
     <Reference Include="PresentationFramework" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="DispatcherWrapper.cs" />
+    <Compile Include="IDispatcher.cs" />
     <Compile Include="ModelWrapper.cs" />
     <Compile Include="NotifyDataErrorInfoBase.cs" />
     <Compile Include="Properties\AssemblyInfo.cs">

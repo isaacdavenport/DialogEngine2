@@ -17,10 +17,12 @@ namespace DialogGenerator.UI.ViewModels
     {
         #region - fields -
 
+        private const string mDollFileName = "doll.jpg";
+
         private ILogger mLogger;
         private IEventAggregator mEventAggregator;
         private ICharacterDataProvider mCharacterDataProvider;
-        private const string mDollFileName = "doll.jpg";
+        private List<int> mDolls;
 
         #endregion
 
@@ -31,6 +33,8 @@ namespace DialogGenerator.UI.ViewModels
             mLogger = _logger;
             mEventAggregator = _eventAggregator;
             mCharacterDataProvider = _characterDataProvider;
+
+            Dolls = Enumerable.Range(0, ApplicationData.Instance.NumberOfRadios).ToList();
 
             _bindCommands();
         }
@@ -65,16 +69,9 @@ namespace DialogGenerator.UI.ViewModels
             }
 
             int _currentDoll = int.Parse(parametes[0].ToString());
-            var _itemsControl = parametes[2] as ItemsControl;
-
             var _selectedCharacter = mCharacterDataProvider.GetAll()[_indexOfSelectedCharacter];
 
-            if(_selectedCharacter.RadioNum >= 0)
-            {
-                CharacterRadioRelationshipList[_selectedCharacter.RadioNum] = null;
-            }
-
-            if(CharacterRadioRelationshipList[_currentDoll] != null)
+            if(mCharacterDataProvider.GetByAssignedRadio(_currentDoll) != null)
             {
                 var _oldCharacter = mCharacterDataProvider.GetByAssignedRadio(_currentDoll);
                 _oldCharacter.RadioNum = -1;
@@ -83,11 +80,11 @@ namespace DialogGenerator.UI.ViewModels
             }
 
             _selectedCharacter.RadioNum = _currentDoll;
-            CharacterRadioRelationshipList[_currentDoll] = _selectedCharacter;
 
             await mCharacterDataProvider.SaveAsync(_selectedCharacter);
 
             popup.IsPopupOpen = false;
+            var _itemsControl = parametes[2] as ItemsControl;
             _itemsControl.Items.Refresh();
         }
 
@@ -95,17 +92,16 @@ namespace DialogGenerator.UI.ViewModels
         {
             var args = (object[])parameters;
             int _dollNumber = int.Parse(args[0].ToString());
-            var _itemsControl = args[1] as ItemsControl;
+            var _assignedCharacter = mCharacterDataProvider.GetByAssignedRadio(_dollNumber);
 
-            if (CharacterRadioRelationshipList[_dollNumber] == null)
+            if (_assignedCharacter == null)
                 return;
 
-            CharacterRadioRelationshipList[_dollNumber].RadioNum = -1;
+            _assignedCharacter.RadioNum = -1;
 
-            await mCharacterDataProvider.SaveAsync(CharacterRadioRelationshipList[_dollNumber]);
+            await mCharacterDataProvider.SaveAsync(_assignedCharacter);
 
-            CharacterRadioRelationshipList[_dollNumber] = null;
-
+            var _itemsControl = args[1] as ItemsControl;
             _itemsControl.Items.Refresh();
         }
 
@@ -118,9 +114,14 @@ namespace DialogGenerator.UI.ViewModels
             get { return mCharacterDataProvider.GetAll(); }
         }
 
-        public Dictionary<int,Character> CharacterRadioRelationshipList
+        public List<int> Dolls
         {
-            get { return Session.Get<Dictionary<int, Character>>(Constants.CH_RADIO_RELATIONSHIP); }
+            get { return mDolls; }
+            set
+            {
+                mDolls = value;
+                RaisePropertyChanged();
+            }
         }
 
         public string DollFileName

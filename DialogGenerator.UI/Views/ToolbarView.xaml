@@ -24,7 +24,8 @@
                         <ControlTemplate  TargetType="{x:Type Button}">
                             <Grid HorizontalAlignment="Stretch"  VerticalAlignment="Stretch">
                                 <Border BorderThickness="1"  x:Name="btnBorder"  >
-                                    <ContentPresenter HorizontalAlignment="Center" Content="{TemplateBinding Content}" VerticalAlignment="Center" />
+                                    <ContentPresenter HorizontalAlignment="Center" Content="{TemplateBinding Content}" 
+                                                      VerticalAlignment="Center" />
                                 </Border>
                             </Grid>
                             <ControlTemplate.Triggers>
@@ -41,38 +42,39 @@
     </UserControl.Resources>
     <Grid>
         <Border BorderThickness="0,0,0,1" BorderBrush="LightGray">
-                    <UniformGrid Height="60" Columns="3" Rows="1" HorizontalAlignment="Stretch" VerticalAlignment="Stretch" >
-                        <Button Command="NavigationCommands.GoToPage" 
-                                Background="White"  Margin="0"  HorizontalContentAlignment="Center" 
-                                VerticalContentAlignment="Center"  ToolTip="Dialog view" BorderBrush="White" BorderThickness="0" >
-                            <Button.Content>
-                                <materialDesign:PackIcon Kind="CommentMultipleOutline" Width="30" Height="30" HorizontalContentAlignment="Stretch" VerticalContentAlignment="Center" />
-                            </Button.Content>
-                            <Button.CommandParameter>
-                                <MultiBinding Converter="{StaticResource CloneValuesConverter}">
-                                    <Binding Source="{x:Static inf:Constants.ContentRegion}" />
-                                    <Binding Source="{x:Type view:DialogView}" />
-                                </MultiBinding>
-                            </Button.CommandParameter>
-                        </Button>
-                        <Button  Command="NavigationCommands.GoToPage" Background="White"  BorderBrush="White" 
-                                 ToolTip="Dolls configuration" BorderThickness="0" >
-                            <Button.Content>
-                                <materialDesign:PackIcon Kind="RadioTower" Width="30" Height="30" />
-                            </Button.Content>
-                            <Button.CommandParameter>
-                                <MultiBinding Converter="{StaticResource CloneValuesConverter}">
-                                    <Binding Source="{x:Static inf:Constants.ContentRegion}" />
-                                    <Binding Source="{x:Type view:AssignCharactersToDollsView}" />
-                                </MultiBinding>
-                            </Button.CommandParameter>
-                        </Button>
-                        <Button  Background="White" ToolTip="More..." BorderBrush="White" BorderThickness="0" >
-                            <Button.Content>
-                                <materialDesign:PackIcon Kind="DotsHorizontal" Width="30" Height="30" />
-                            </Button.Content>
-                        </Button>
-                    </UniformGrid>
+        <UniformGrid Height="60" Columns="3" Rows="1" HorizontalAlignment="Stretch" VerticalAlignment="Stretch" >
+            <Button Command="NavigationCommands.GoToPage" 
+                    Background="White"  Margin="0"  HorizontalContentAlignment="Center" 
+                    VerticalContentAlignment="Center"  ToolTip="Dialog view" BorderBrush="White" BorderThickness="0" >
+                <Button.Content>
+                    <materialDesign:PackIcon Kind="CommentMultipleOutline" Width="30" Height="30" 
+                                             HorizontalContentAlignment="Stretch" VerticalContentAlignment="Center" />
+                </Button.Content>
+                <Button.CommandParameter>
+                    <MultiBinding Converter="{StaticResource CloneValuesConverter}">
+                        <Binding Source="{x:Static inf:Constants.ContentRegion}" />
+                        <Binding Source="{x:Type view:DialogView}" />
+                    </MultiBinding>
+                </Button.CommandParameter>
+            </Button>
+            <Button  Command="NavigationCommands.GoToPage" Background="White"  BorderBrush="White" 
+                        ToolTip="Dolls configuration" BorderThickness="0" >
+                <Button.Content>
+                    <materialDesign:PackIcon Kind="RadioTower" Width="30" Height="30" />
+                </Button.Content>
+                <Button.CommandParameter>
+                    <MultiBinding Converter="{StaticResource CloneValuesConverter}">
+                        <Binding Source="{x:Static inf:Constants.ContentRegion}" />
+                        <Binding Source="{x:Type view:AssignCharactersToDollsView}" />
+                    </MultiBinding>
+                </Button.CommandParameter>
+            </Button>
+            <Button  Background="White" ToolTip="More..." BorderBrush="White" BorderThickness="0" >
+                <Button.Content>
+                    <materialDesign:PackIcon Kind="DotsHorizontal" Width="30" Height="30" />
+                </Button.Content>
+            </Button>
+        </UniformGrid>
         </Border>
     </Grid>
 </UserControl>

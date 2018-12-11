@@ -18,9 +18,6 @@
                 <ResourceDictionary>
                     <converters:IncrementValueConverter x:Key="IncrementValueConverter" />
                     <converters:ListBoxItemTextAndIndexValueConverter x:Key="ListBoxItemTextAndIndexValueConverter" />
-                    <converters:IsEnabledCancelBtnConverter x:Key="IsEnabledCancelBtnConverter" />
-                    <converters:IsSkipStepBtnEnabledConverter x:Key="IsSkipStepBtnEnabledConverter" />
-                    <converters:IsEnabledSaveAndNextBtnConverter x:Key="IsEnabledSaveAndNextBtnConverter" />
                     <converters:SaveAndNextBtnContentConverter x:Key="SaveAndNextBtnContentConverter" />
                 </ResourceDictionary>
                 <ResourceDictionary Source="pack://application:,,,/DialogGenerator.UI;component/Themes/VoiceRecorderStyle.xaml" />
@@ -151,15 +148,7 @@
                             <!-- Video player-->
                             <Border x:Name="VideoBrd" Margin="0,0,0,40" BorderBrush="#FF595959" 
                                     Grid.Row="0" BorderThickness="1" CornerRadius="2,2,2,2">
-
-                                <controls:MediaPlayerControl  x:Name="mediaPlayer"
-                                    DataContext="{Binding MediaPlayerControlViewModel}"
-                                    State="{Binding DataContext.CurrentState, 
-                                                    RelativeSource={RelativeSource 
-                                                    Mode=FindAncestor, AncestorType=local:WizardView}}"                                                              
-                                    FilePath="{Binding DataContext.CurrentVideoFilePath ,
-                                                       RelativeSource={RelativeSource 
-                                                       Mode=FindAncestor, AncestorType=local:WizardView}}" />
+                                <controls:MediaPlayerControl  x:Name="mediaPlayer" DataContext="{Binding MediaPlayerControlViewModel}"/>
                             </Border>
 
                             <!-- Recorder -->
@@ -167,20 +156,9 @@
                                     HorizontalAlignment="Stretch" VerticalAlignment="Stretch"
                                     CornerRadius="2,2,2,2" BorderBrush="#FF595959">
 
-                                <controls:VoiceRecorderControl x:Name="voiceRecorder"
-                                    DataContext="{Binding DataContext.VoiceRecorderControlViewModel, 
-                                                          RelativeSource={RelativeSource 
-                                                          Mode=FindAncestor, AncestorType=local:WizardView}}"
-                                    State="{Binding DataContext.CurrentState,
-                                                    RelativeSource={RelativeSource 
-                                                    Mode=FindAncestor, AncestorType=local:WizardView}}"
-                                    RecordingAllowed="{Binding DataContext.CurrentTutorialStep.CollectUserInput, 
-                                                               RelativeSource={RelativeSource 
-                                                               Mode=FindAncestor, AncestorType=local:WizardView}}"
-                                    IsPlayingLineInContext="{Binding DataContext.IsPlayingLineInContext, 
-                                                                     RelativeSource={RelativeSource 
-                                                                     Mode=FindAncestor, AncestorType=local:WizardView}}"
-                                    HorizontalAlignment="Stretch" VerticalAlignment="Stretch"/>
+                                <controls:VoiceRecorderControl x:Name="voiceRecorder" HorizontalAlignment="Stretch" VerticalAlignment="Stretch"
+                                        DataContext="{Binding DataContext.VoiceRecorderControlViewModel, RelativeSource={RelativeSource 
+                                                              Mode=FindAncestor, AncestorType=local:WizardView}}" />
                             </Border>
 
                         </Grid>
@@ -200,28 +178,12 @@
                         <StackPanel Orientation="Horizontal" Grid.Row="2" Grid.Column="2" 
                                     Margin="0,40,0,0" VerticalAlignment="Center" HorizontalAlignment="Center">
 
-                            <Button Content="Cancel" Command="{Binding Cancel}" Style="{DynamicResource MaterialDesignRaisedButton}"
-                                    IsEnabled="{Binding CurrentState, Converter={StaticResource IsEnabledCancelBtnConverter}}" Margin="20,0,0,0" />
+                            <Button Content="Cancel" Command="{Binding Cancel}" Style="{DynamicResource MaterialDesignRaisedButton}" Margin="20,0,0,0" />
 
-                            <Button Content="Skip" Command="{Binding SkipStep}" Style="{DynamicResource MaterialDesignRaisedButton}" Margin="20,0,0,0">
-                                <Button.IsEnabled>
-                                    <MultiBinding Converter="{StaticResource IsSkipStepBtnEnabledConverter}">
-                                        <Binding Path="CurrentStepIndex" />
-                                        <Binding Path="CurrentWizard.TutorialSteps.Count" />
-                                        <Binding Path="CurrentState" />
-                                    </MultiBinding>
-                                </Button.IsEnabled>
-                            </Button>
+                            <Button Content="Skip" Command="{Binding SkipStep}" 
+                                    Style="{DynamicResource MaterialDesignRaisedButton}" Margin="20,0,0,0"/>
 
                             <Button Command="{Binding SaveAndNext}" Style="{DynamicResource MaterialDesignRaisedButton}" Margin="20,0,0,0">
-                                <Button.IsEnabled>
-                                    <MultiBinding Converter="{StaticResource IsEnabledSaveAndNextBtnConverter}" >
-                                        <Binding Path="VoiceRecorderControlViewModel.IsLineRecorded" />
-                                        <Binding Path="CurrentStepIndex" />
-                                        <Binding Path="CurrentWizard.TutorialSteps.Count" />
-                                        <Binding Path="CurrentState" />
-                                    </MultiBinding>
-                                </Button.IsEnabled>
                                 <Button.Content>
                                     <MultiBinding Converter="{StaticResource SaveAndNextBtnContentConverter}">
                                         <Binding Path="CurrentStepIndex" />

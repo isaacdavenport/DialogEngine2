@@ -3,6 +3,8 @@ using System.Windows.Controls;
 using System.Windows.Data;
 using DialogGenerator.Core;
 using DialogGenerator.Events;
+using DialogGenerator.Model;
+using DialogGenerator.UI.Data;
 using DialogGenerator.Utilities;
 using Prism.Commands;
 using Prism.Events;
@@ -16,20 +18,28 @@ namespace DialogGenerator.UI.ViewModels
 
         private ILogger mLogger;
         private IEventAggregator mEventAggregator;
-        private int[,] mHeatMap;
+        private ICharacterDataProvider mCharacterDataProvider;
+        private string mCharacter1Prefix;
+        private string mCharacter2Prefix;
+        private HeatMapData mHeatMap;
 
         #endregion
 
         #region - constructor -
 
-        public DebugViewModel(ILogger logger,IUserLogger _userLogger,IEventAggregator _eventAggregator)
+        public DebugViewModel(ILogger logger,IUserLogger _userLogger
+            ,IEventAggregator _eventAggregator
+            ,ICharacterDataProvider _characterDataProvider)
         {
             mLogger = logger;
             UserLogger = _userLogger;
             mEventAggregator = _eventAggregator;
-            mHeatMap = new int[ApplicationData.Instance.NumberOfRadios, ApplicationData.Instance.NumberOfRadios];
+            mCharacterDataProvider = _characterDataProvider;
 
             mEventAggregator.GetEvent<HeatMapUpdateEvent>().Subscribe(_onHeatMapUpdate);
+            mHeatMap = new HeatMapData();
+            HeatMap.HeatMap = new int[ApplicationData.Instance.NumberOfRadios, ApplicationData.Instance.NumberOfRadios];
+            HeatMap.LastHeatMapUpdateTime = new DateTime[ApplicationData.Instance.NumberOfRadios];
 
             _bindCommands();
         }
@@ -67,21 +77,45 @@ namespace DialogGenerator.UI.ViewModels
             }
         }
 
-        private void _onHeatMapUpdate(int[,] _heatMapUpdate)
+        private void _onHeatMapUpdate(HeatMapData data)
         {
-            HeatMap = _heatMapUpdate;
+            var characters = mCharacterDataProvider.GetAll();
+
+            HeatMap = data;
+            Character1Prefix = characters[data.Character1Index].CharacterPrefix;
+            Character2Prefix = characters[data.Character2Index].CharacterPrefix;
         }
 
         #endregion
 
         #region - properties -
 
-        public int[,] HeatMap
+        public HeatMapData HeatMap
         {
             get { return mHeatMap; }
             set
             {
                 mHeatMap = value;
+                RaisePropertyChanged();
+            }
+        }
+        
+        public string Character1Prefix
+        {
+            get { return mCharacter1Prefix; }
+            set
+            {
+                mCharacter1Prefix = value;
+                RaisePropertyChanged();
+            }
+        }
+
+        public string Character2Prefix
+        {
+            get { return mCharacter2Prefix; }
+            set
+            {
+                mCharacter2Prefix = value;
                 RaisePropertyChanged();
             }
         }

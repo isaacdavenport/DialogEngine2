@@ -1,0 +1,96 @@
+﻿// test file version 1.1
+
+{
+  "Wizards": [
+    {
+      "WizardName": "BasicWizard",
+      "Commands": "This string would normally be blank, but in future use we may want to pass commands like, -start a new file- or have the GUI do other executable type items  on starting a wizard or on a certain wizard step.",
+      "TutorialSteps": [
+        {
+          "VideoFileName": "DPWizIntroduction",
+          "InstructionalText": "Welcome to Toys2Life! \r\n\r\nThis wizard will help you bring your toy to life as a talking character. Then, your toy and any other Toys2Life character will be able to talk with each other! \r\n\r\nFirst, take a moment to think about who your character is, and how they talk. Ask yourself: How does my character spend their time? What makes them happy, and what makes them sad? Is there anything unusual about them that you might not expect based on how they look? How do they talk? Do they like to use lots of fancy words, or do they keep it simple? \r\n\r\nOnce you have an idea about who your character is, you're ready to move on! Click the \"next\" button.",
+          "CollectUserInput": false,
+          "Commands": "This string would normally be blank, but in future use we may want to pass commands like, -start a new file- or have the GUI do other executable type items  on starting a wizard or on a certain wizard step.",
+          "PhraseWeights": {},
+          "PhraseRating": "PG",
+          "Popularity": 3.0,
+          "PlayUserRecordedAudioInContext": [
+            [ "NoUserDataCollectedHere, this array element should not exist if we don't want to use this feature, although the CollectUserInput flag should cause it to be ignored anyway." ]
+          ]
+        }
+      ]
+    }
+  ],
+  "DialogModels": [
+    {
+      "ModelsCollectionName": "BasicDialogModels",
+      "ArrayOfDialogModels": [
+        {
+          "DialogName": "Greeting, Greeting",
+          "AddedOnDateTime": "2016-05-18T00:00:00",
+          "Popularity": 12.0,
+          "Adventure": "",
+          "Requires": [],
+          "Provides": [],
+          "PhraseTypeSequence": [ "Greeting", "Greeting" ]
+        }
+      ]
+    }
+  ],
+  "Characters": [
+    {
+      "CharacterAge": 10,
+      "CharacterGender": "M",
+      "CharacterName": "Cowboy Bill",
+      "CharacterPrefix": "CB",
+      "CharacterImage": "CB_bahamas.jpg",
+      "RadioNum": 2,
+      "State": 2,
+      "Phrases": [
+        {
+          "FileName": "TheCowboyHasNot",
+          "PhraseRating": "G",
+          "PhraseWeights": {
+            "Exclamation": 0.01
+          },
+          "DialogStr": "The Cowboy has not been initialized."
+        },
+        {
+          "FileName": "Howdy",
+          "PhraseRating": "G",
+          "PhraseWeights": {
+            "Greeting": 0.6
+          },
+          "DialogStr": "Howdy"
+        }
+      ]
+    },
+    {
+      "CharacterAge": 27,
+      "CharacterGender": "F",
+      "CharacterName": "Rarity",
+      "CharacterPrefix": "RY",
+      "CharacterImage": "avatar.png",
+      "RadioNum": 3,
+      "State": 1,
+      "Phrases": [
+        {
+          "FileName": "RarityHasNotBeen",
+          "PhraseRating": "PG",
+          "PhraseWeights": {
+            "Exclamation": 0.01
+          },
+          "DialogStr": "Rarity has not been initialized."
+        },
+        {
+          "FileName": "HiImRarity",
+          "PhraseRating": "PG",
+          "PhraseWeights": {
+            "Greeting": 9.0
+          },
+          "DialogStr": "Hi, I'm Rarity"
+        }
+      ]
+    }
+    ]
+}

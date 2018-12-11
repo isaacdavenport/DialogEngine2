@@ -153,11 +153,13 @@ namespace DialogGenerator.CharacterSelection.Data
         {
             try
             {
-                mSerialPort = new SerialPort();
-                mSerialPort.PortName = ApplicationData.Instance.ComPortName;
-                mSerialPort.BaudRate = 460800;
-                mSerialPort.Handshake = Handshake.None;
-                mSerialPort.ReadTimeout = 500;
+                mSerialPort = new SerialPort
+                {
+                    PortName = ApplicationData.Instance.ComPortName,
+                    BaudRate = 460800,
+                    Handshake = Handshake.None,
+                    ReadTimeout = 500
+                };
                 mSerialPort.Open();
                 mSerialPort.DiscardInBuffer();
 
@@ -189,7 +191,7 @@ namespace DialogGenerator.CharacterSelection.Data
             return mMessage;
         }
 
-        public  Task StartReadingData()
+        public  object StartReadingData()
         {
             return Task.Run(async() =>
             {

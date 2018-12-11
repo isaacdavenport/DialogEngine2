@@ -1,14 +1,28 @@
-﻿using System;
+﻿using DialogGenerator.Core;
+using DialogGenerator.Model;
+using System;
+using System.Collections.ObjectModel;
 using System.Globalization;
+using System.Linq;
 using System.Windows.Data;
 
 namespace DialogGenerator.UI.Converters
 {
     public class DollStatusValueConverter : IValueConverter
     {
+        private ObservableCollection<Character> mCharacters;
+
+        public DollStatusValueConverter()
+        {
+            mCharacters = Session.Get<ObservableCollection<Character>>(Constants.CHARACTERS);
+        }
+
         public object Convert(object value, Type targetType, object parameter, CultureInfo culture)
         {
-            return value != null ? "Enabled" : "Disabled";
+            int _dollNumber = int.Parse(value.ToString());
+            var _assignedCharacter = mCharacters.Where(ch => ch.RadioNum == _dollNumber).FirstOrDefault();
+
+            return _assignedCharacter != null ? "Enabled" : "Disabled";
         }
 
         public object ConvertBack(object value, Type targetType, object parameter, CultureInfo culture)

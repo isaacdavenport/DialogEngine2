@@ -25,8 +25,10 @@ namespace DialogGenerator
                     ev.Set();
 
                     Dispatcher.CurrentDispatcher.BeginInvoke((Action)delegate () {
-                        SplashScreenView _splashScreenWindow = new SplashScreenView();
-                        _splashScreenWindow.DataContext = msVieModel;
+                        SplashScreenView _splashScreenWindow = new SplashScreenView
+                        {
+                            DataContext = msVieModel
+                        };
                         _splashScreenWindow.Show();
                     });
 

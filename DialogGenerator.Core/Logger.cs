@@ -44,25 +44,25 @@ namespace DialogGenerator.Core
         public void Error(string _loggerType = null, string _message = null, 
             [CallerFilePath] string _file = "", [CallerLineNumber] int _line = 0)
         {
-            _getLogger(_loggerType)?.Error(_file + " " + _line + " Message : " + _message);
+            _getLogger(_loggerType)?.Error(_message);
         }
 
         public void Info(string _loggerType = null, string _message = null, 
             [CallerFilePath] string _file = "", [CallerLineNumber] int _line = 0)
         {
-            _getLogger(_loggerType)?.Error(_file + " " + _line + " Message : " + _message);
+            _getLogger(_loggerType)?.Info(_message);
         }
 
         public void Warning(string _loggerType = null, string _message = null, 
             [CallerFilePath] string _file = "", [CallerLineNumber] int _line = 0)
         {
-            _getLogger(_loggerType)?.Error(_file + " " + _line + " Message : " + _message);
+            _getLogger(_loggerType)?.Warn(_message);
         }
 
         public void Debug(string _loggerType = null, string _message = null, 
             [CallerFilePath] string _file = "", [CallerLineNumber] int _line = 0)
         {
-            _getLogger(_loggerType)?.Debug(_file + " " + _line + " Message : " + _message);
+            _getLogger(_loggerType)?.Debug(_message);
         }
     }
 }

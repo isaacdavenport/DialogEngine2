@@ -140,14 +140,6 @@ namespace DialogGenerator.DataAccess
                 {
                     //remove character from list of characters
                     GetAll().Remove(character);
-                    // clear radio bindings for this character 
-
-                    var bindings = Session.Get <Dictionary<int, Character>>(Core.Constants.CH_RADIO_RELATIONSHIP);
-
-                    if (bindings.ContainsKey(character.RadioNum))
-                    {
-                        bindings[character.RadioNum] = null;
-                    }
                 });
 
                 var _jsonObjectsTypesList = _findDataForFile(_fileName);

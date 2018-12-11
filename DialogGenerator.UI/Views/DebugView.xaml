@@ -264,7 +264,7 @@
                     </Grid.RowDefinitions>
 
                     <StackPanel Orientation="Horizontal" Grid.Row="0">
-                        <DataGrid   Margin="5,5,5,0" x:Name="DebugGrid" Width="auto" GridLinesVisibility="All"
+                        <DataGrid   Margin="5,5,5,0" x:Name="DebugGrid" MinWidth="150" Width="auto" GridLinesVisibility="All"
                                     Height="auto" Background="White" VerticalGridLinesBrush="LightGray" HorizontalGridLinesBrush="LightGray" 
                                     BorderBrush="LightGray" BorderThickness="1,1,0,0" HeadersVisibility="Column" CanUserAddRows="False"
                                     IsReadOnly="True" IsHitTestVisible="False" ItemsSource="{Binding HeatMap, Converter={StaticResource MatrixToDataViewConverter}}">
@@ -283,7 +283,7 @@
                                         <Setter.Value>
                                             <MultiBinding Converter="{StaticResource MatrixCellValueToBackgroundColorConverter}">
                                                 <Binding RelativeSource="{RelativeSource Self}" />
-                                                <Binding Path="DataContext.HeatMap" RelativeSource="{RelativeSource Mode=FindAncestor, AncestorType=views:DebugView}" />
+                                                <Binding Path="DataContext.HeatMap.HeatMap" RelativeSource="{RelativeSource Mode=FindAncestor, AncestorType=views:DebugView}" />
                                             </MultiBinding>
                                         </Setter.Value>
                                     </Setter>
@@ -292,13 +292,11 @@
                                 </Style>
                             </DataGrid.CellStyle>
                         </DataGrid>
-                        <!--<Grid Width="200" Height="auto">
+                        <Grid Width="200"  Height="auto">
 
                             <Grid.RowDefinitions>
-                                <RowDefinition />
-                                <RowDefinition />
-                                <RowDefinition />
-                                <RowDefinition />
+                                <RowDefinition Height="auto"/>
+                                <RowDefinition Height="auto"/>
                             </Grid.RowDefinitions>
 
                             <Grid Grid.Row="0">
@@ -324,33 +322,7 @@
                                         <Run FontWeight="Bold" Foreground="Black" Text="{Binding Character2Prefix}" />
                                 </TextBlock>
                             </Grid>
-
-                            <Grid Grid.Row="2">
-                                <Grid.ColumnDefinitions>
-                                    <ColumnDefinition Width="*" />
-                                    <ColumnDefinition Width="*" />
-                                </Grid.ColumnDefinitions>
-
-                                <Label HorizontalAlignment="Right" Grid.Column="0" VerticalAlignment="Center" 
-                                       HorizontalContentAlignment="Right" VerticalContentAlignment="Center" Content="RSSIsum:" />
-                                <TextBlock Grid.Column="1" TextAlignment="Left" VerticalAlignment="Center" HorizontalAlignment="Left" IsEnabled="False" >                                   
-                                        <Run FontWeight="Bold" Foreground="Black" Text="{Binding RSSIsum}" />
-                                </TextBlock>
-                            </Grid>
-
-                            <Grid Grid.Row="3">
-                                <Grid.ColumnDefinitions>
-                                    <ColumnDefinition Width="*" />
-                                    <ColumnDefinition Width="*"/>
-                                </Grid.ColumnDefinitions>
-
-                                <Label HorizontalAlignment="Right" VerticalAlignment="Center" VerticalContentAlignment="Center"  
-                                       HorizontalContentAlignment="Right" Grid.Column="0" Content="RSSIstable:" />
-                                <TextBlock Grid.Column="1" VerticalAlignment="Center" HorizontalAlignment="Left" Grid.Row="0" IsEnabled="False" >                                  
-                                        <Run FontWeight="Bold" Foreground="Black" Text="{Binding RSSIstable}" />
-                                </TextBlock>
-                            </Grid>
-                        </Grid>-->
+                        </Grid>
                     </StackPanel>
                 </Grid>
             </TabItem>

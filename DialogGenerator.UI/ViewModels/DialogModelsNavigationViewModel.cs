@@ -6,7 +6,6 @@ using DialogGenerator.UI.Data;
 using Prism.Commands;
 using Prism.Events;
 using Prism.Mvvm;
-using System;
 using System.ComponentModel;
 using System.Windows.Data;
 
@@ -38,8 +37,7 @@ namespace DialogGenerator.UI.ViewModels
             mDialogModelsInfoCollection = new CollectionViewSource();
             FilterText = "";
 
-            mEventAggregator.GetEvent<CharacterSelectionActionChangedEvent>()
-                .Subscribe(_onCharacterSelectionActionChanged);
+            mEventAggregator.GetEvent<CharacterSelectionActionChangedEvent>().Subscribe(_onCharacterSelectionActionChanged);
             mDialogModelsInfoCollection.Filter += _mDialogModelsInfoCollection_Filter;
 
             _bindCommands();

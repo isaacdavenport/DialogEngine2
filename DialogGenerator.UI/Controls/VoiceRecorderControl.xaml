@@ -5,6 +5,8 @@
              xmlns:materialDesign="http://materialdesigninxaml.net/winfx/xaml/themes"
              xmlns:view="clr-namespace:DialogGenerator.UI.Views"
              xmlns:converters="clr-namespace:DialogGenerator.UI.Converters"
+             xmlns:state="clr-namespace:DialogGenerator.UI.Workflow.MP3RecorderStateMachine"
+             xmlns:wizardState="clr-namespace:DialogGenerator.UI.Workflow.WizardWorkflow"
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
              xmlns:local="clr-namespace:DialogGenerator.UI.Controls"
              mc:Ignorable="d" 
@@ -14,16 +16,10 @@
         <ResourceDictionary>
             <ResourceDictionary.MergedDictionaries>
                 <ResourceDictionary>
-                    <materialDesign:PackIcon x:Key="Microphone" Kind="Microphone" />
-                    <materialDesign:PackIcon x:Key="StopBtn" Kind="Stop" />
-                    <materialDesign:PackIcon x:Key="PauseBtn" Kind="Pause" />
-                    <materialDesign:PackIcon x:Key="PlayBtn" Kind="Play" />
-
-                    <converters:IsRecordingEnabledValueConverter x:Key="IsRecordingEnabledValueConverter" />
-                    <converters:IsVoiceRecorderPlayingEnabledValueConverter x:Key="IsVoiceRecorderPlayingEnabledValueConverter" />
-                    <converters:PlayStopChangeIconValueConverter x:Key="PlayStopChangeIconValueConverter" />
-                    <converters:IsPlayInContextEnabledValueConverter x:Key="IsPlayInContextEnabledValueConverter" />
-                    <converters:PlayInContextBtnContentValueConverter x:Key="PlayInContextBtnContentValueConverter" />
+                    <converters:MP3RecorderStateToBtnVisibilityValueConverter x:Key="MP3RecorderStateToBtnVisibilityValueConverter" />
+                    <converters:WizardStateToBtnVisibilityValueConverter x:Key="WizardStateToBtnVisibilityValueConverter" />
+                    <converters:WizardAndMP3PlayerStatesToBtnVisibilityConverter x:Key="WizardAndMP3PlayerStatesToBtnVisibilityConverter" />
+                    <converters:InvertVisibilityValueConverter x:Key="InvertVisibilityValueConverter" />
                 </ResourceDictionary>
             </ResourceDictionary.MergedDictionaries>
         </ResourceDictionary>
@@ -35,96 +31,42 @@
             <RowDefinition Height="auto" />
         </Grid.RowDefinitions>
 
-        <Border x:Name="VoiceRcrdBorder"
-            BorderThickness="2"                
-            Grid.Row="0" 
-            HorizontalAlignment="Stretch" 
-            VerticalAlignment="Stretch" 
-            Background="#FF333333" 
-            CornerRadius="3,3,3,3">
-
+        <Border x:Name="VoiceRcrdBorder" BorderThickness="2" Grid.Row="0" HorizontalAlignment="Stretch" 
+                VerticalAlignment="Stretch" Background="#FF333333" CornerRadius="3,3,3,3">
             <local:SpectrumAnalyzer SoundPlayer="{Binding SoundPlayer}" x:Name="spectrumAnalyzer"
                 HorizontalAlignment="Stretch" VerticalAlignment="Stretch" BarCount="64" />
         </Border>
 
-        <Grid Grid.Row="1">
-            <Grid.ColumnDefinitions>
-                <ColumnDefinition Width="auto" />
-                <ColumnDefinition Width="*" />
-            </Grid.ColumnDefinitions>
-
-            <StackPanel Grid.Column="0" HorizontalAlignment="Stretch" VerticalAlignment="Center"  Orientation="Horizontal">
-                <Button x:Name="RecordingBtn"
-                    Margin="10,10,10,10"  
-                    Command="{Binding StartRecordingCommand}"
-                    Width="25"
-                    Height="25">
-                    <Button.IsEnabled>
-                        <MultiBinding Converter="{StaticResource IsRecordingEnabledValueConverter}" ConverterParameter="ReadyForUserAction|VoiceRecorderRecording">
-                            <Binding  Path="State" 
-                                      RelativeSource="{RelativeSource Mode=FindAncestor, AncestorType=local:VoiceRecorderControl}" />
-                            <Binding  Path="RecordingAllowed" 
-                                      RelativeSource="{RelativeSource Mode=FindAncestor, AncestorType=local:VoiceRecorderControl}" />
-                        </MultiBinding>
-                    </Button.IsEnabled>
-                    <Button.Content>
-                        <MultiBinding Converter="{StaticResource PlayStopChangeIconValueConverter}" ConverterParameter="Microphone|StopBtn">
-                            <Binding Path="IsRecording" />
-                            <Binding RelativeSource="{RelativeSource Self}" />
-                        </MultiBinding>
-                    </Button.Content>
-                    <Button.Resources>
-                        <materialDesign:PackIcon x:Key="Microphone" Kind="Microphone" />
-                        <materialDesign:PackIcon x:Key="StopBtn" Kind="Stop" />
-                    </Button.Resources>
-                </Button>
-                <Button x:Name="PlayingBtn"
-                    Margin="10,10,10,10"  
-                    Command="{Binding PlayContentCommand}" 
-                    Width="25"
-                    Height="25" >
-                    <Button.IsEnabled >
-                        <MultiBinding Converter="{StaticResource IsVoiceRecorderPlayingEnabledValueConverter}" ConverterParameter="ReadyForUserAction|VoiceRecorderPlaying">
-                            <Binding  Path="State" 
-                                      RelativeSource="{RelativeSource Mode=FindAncestor, AncestorType=local:VoiceRecorderControl}" />
-                            <Binding Path="IsLineRecorded" />
-                        </MultiBinding>
-                    </Button.IsEnabled>
-                    <Button.Content>
-                        <MultiBinding Converter="{StaticResource PlayStopChangeIconValueConverter}" ConverterParameter="PlayBtn|StopBtn">
-                            <Binding Path="IsPlaying" />
-                            <Binding RelativeSource="{RelativeSource Self}" />
-                        </MultiBinding>
-                    </Button.Content>
-                    <Button.Resources>
-                        <materialDesign:PackIcon x:Key="PlayBtn" Kind="Play" />
-                        <materialDesign:PackIcon x:Key="StopBtn" Kind="Stop" />
-                    </Button.Resources>
-                </Button>
-
-                <Button x:Name="PlayInContextBtn"
-                    Margin="10,10,10,10"  
-                    Command="{Binding DataContext.PlayInContext, RelativeSource={RelativeSource 
-                                      Mode=FindAncestor, AncestorType=view:WizardView}}" 
-                    Width="auto"
-                    Padding="4,0,4,0"
-                    Content="{Binding IsPlayingLineInContext, RelativeSource={RelativeSource 
-                                      Mode=FindAncestor, AncestorType=local:VoiceRecorderControl}, 
-                                      Converter={StaticResource PlayInContextBtnContentValueConverter}}"
-                    Height="25" >
-                    <Button.IsEnabled >
-                        <MultiBinding Converter="{StaticResource IsPlayInContextEnabledValueConverter}" ConverterParameter="ReadyForUserAction|VoiceRecorderPlayingInContext">
-                            <Binding  Path="State" 
-                                      RelativeSource="{RelativeSource Mode=FindAncestor, AncestorType=local:VoiceRecorderControl}" />
-                            <Binding Path="IsLineRecorded" />
-                        </MultiBinding>
-                    </Button.IsEnabled>
-                </Button>
-
-            </StackPanel>
-
-            <!--<Slider x:Name="ProgressSlider" VerticalAlignment="Center" Grid.Column="1"  HorizontalAlignment="Stretch"
-                Margin="10,0,10,0" Maximum="100" Value="{Binding ChannelPosition}" IsMoveToPointEnabled="True" />-->
-        </Grid>
+        <StackPanel Grid.Row="1" HorizontalAlignment="Stretch" VerticalAlignment="Center"  Orientation="Horizontal">
+            <Button x:Name="RecordBtn" Margin="10,10,10,10" Command="{Binding StartRecordingCommand}" Width="25" Height="25"
+                Visibility="{Binding Path=Visibility, ElementName=StopRecordingBtn,Converter={StaticResource InvertVisibilityValueConverter}}">    
+                <materialDesign:PackIcon  Kind="Microphone" />
+            </Button>
+            <Button x:Name="StopRecordingBtn" Margin="10,10,10,10" Command="{Binding StopRecorderCommand}" Width="25" Height="25"
+                Visibility="{Binding StateMachine.State,Converter={StaticResource MP3RecorderStateToBtnVisibilityValueConverter}
+                ,ConverterParameter={x:Static state:States.Recording}}" >
+                <materialDesign:PackIcon Kind="Stop" />
+            </Button>
+            <Button x:Name="PlayBtn" Margin="10,10,10,10" Command="{Binding StartPlayingCommand}" Width="25" Height="25"  
+                Visibility="{Binding Path=Visibility, ElementName=StopPlayingBtn,Converter={StaticResource InvertVisibilityValueConverter}}">
+                <materialDesign:PackIcon  Kind="Play" />
+            </Button>
+            <Button x:Name="StopPlayingBtn" Margin="10,10,10,10" Command="{Binding StopRecorderCommand}" Width="25" Height="25">
+                <Button.Visibility>
+                    <MultiBinding Converter="{StaticResource WizardAndMP3PlayerStatesToBtnVisibilityConverter}" ConverterParameter="{x:Static state:States.Playing}">
+                        <Binding Path="StateMachine.State" />
+                        <Binding Path="WizardWorkflow.State" />
+                    </MultiBinding>
+                </Button.Visibility>
+                <materialDesign:PackIcon Kind="Stop" />
+            </Button>
+            <Button x:Name="PlayInContextBtn" Content="Play in context" Height="25" Margin="10,10,10,10"  Padding="4,0,4,0" Width="auto"
+                Visibility="{Binding Path=Visibility, ElementName=StopPlayingInContextBtn,Converter={StaticResource InvertVisibilityValueConverter}}"    
+                Command="{Binding DataContext.PlayInContext, RelativeSource={RelativeSource Mode=FindAncestor, AncestorType=view:WizardView}}"/>
+            <Button x:Name="StopPlayingInContextBtn" Content="Stop" Height="25" Margin="10,10,10,10" Padding="4,0,4,0" Width="auto"
+                Visibility="{Binding WizardWorkflow.State,Converter={StaticResource WizardStateToBtnVisibilityValueConverter}
+                ,ConverterParameter={x:Static wizardState:WizardStates.PlayingInContext}}"
+                Command="{Binding DataContext.StopPlayingInContext, RelativeSource={RelativeSource Mode=FindAncestor, AncestorType=view:WizardView}}"/>
+        </StackPanel>
     </Grid>
 </UserControl>

@@ -136,9 +136,8 @@ namespace DialogGenerator.DialogEngine
         {
             mLogger.Debug("_onSelectedCharactersPairChanged");
 
-            if (!ApplicationData.Instance.UseSerialPort
-               && Session.Get<int>(Constants.COMPLETED_DLG_MODELS) < ApplicationData.Instance.NumberOfDialogModelsCompleted
-               && mRandomSelectionDataCached != null)
+            if (!ApplicationData.Instance.UseSerialPort && mRandomSelectionDataCached != null
+               && Session.Get<int>(Constants.COMPLETED_DLG_MODELS) < ApplicationData.Instance.NumberOfDialogModelsCompleted)
             {
                 return;
             }
@@ -247,7 +246,7 @@ namespace DialogGenerator.DialogEngine
                 return false;
 
             mContext.SameCharactersAsLast = (_tempChar1 == mPriorCharacter1Num || _tempChar1 == mPriorCharacter2Num)
-                                  && (_tempChar2 == mPriorCharacter1Num || _tempChar2 == mPriorCharacter2Num);
+                                            && (_tempChar2 == mPriorCharacter1Num || _tempChar2 == mPriorCharacter2Num);
 
             mContext.Character1Num = _tempChar1;
             mContext.Character2Num = _tempChar2;
@@ -316,11 +315,11 @@ namespace DialogGenerator.DialogEngine
                 var _speakingCharacter = mContext.Character1Num;
                 var _selectedPhrase = mContext.CharactersList[_speakingCharacter].Phrases[0]; //initialize to unused placeholder phrase
 
-                mLogger.Debug("_startDialog " + mContext.CharactersList[mContext.Character1Num].CharacterPrefix + " and " +
-                    mContext.CharactersList[mContext.Character2Num].CharacterPrefix + " " + mContext.DialogModelsList[mIndexOfCurrentDialogModel].Name);
+                string _debugMessage = "_startDialog " + mContext.CharactersList[mContext.Character1Num].CharacterPrefix + " and " +
+                    mContext.CharactersList[mContext.Character2Num].CharacterPrefix + " " + mContext.DialogModelsList[mIndexOfCurrentDialogModel].Name;
 
-                mUserLogger.Info("_startDialog " + mContext.CharactersList[mContext.Character1Num].CharacterPrefix + " and " +
-                    mContext.CharactersList[mContext.Character2Num].CharacterPrefix + " " + mContext.DialogModelsList[mIndexOfCurrentDialogModel].Name);
+                mLogger.Debug(_debugMessage);
+                mUserLogger.Info(_debugMessage);
 
                 if (!mContext.SameCharactersAsLast)
                 {

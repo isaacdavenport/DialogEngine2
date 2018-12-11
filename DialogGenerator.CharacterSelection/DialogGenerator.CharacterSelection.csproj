@@ -88,7 +88,6 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="BLEDataProviderFactory.cs" />
-    <Compile Include="CharacterSelectionConstants.cs" />
     <Compile Include="CharacterSelectionFactory.cs" />
     <Compile Include="CharacterSelectionModule.cs" />
     <Compile Include="Data\IBLEDataProvider.cs" />

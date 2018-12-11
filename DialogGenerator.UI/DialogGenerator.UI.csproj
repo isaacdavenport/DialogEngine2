@@ -41,6 +41,9 @@
     <StartupObject />
   </PropertyGroup>
   <ItemGroup>
+    <Reference Include="AutoUpdater.NET, Version=1.4.11.0, Culture=neutral, PublicKeyToken=501435c91b35f4bc, processorArchitecture=MSIL">
+      <HintPath>..\packages\Autoupdater.NET.Official.1.4.11\lib\net40\AutoUpdater.NET.dll</HintPath>
+    </Reference>
     <Reference Include="MaterialDesignColors, Version=1.1.3.0, Culture=neutral, processorArchitecture=MSIL">
       <HintPath>..\packages\MaterialDesignColors.1.1.3\lib\net45\MaterialDesignColors.dll</HintPath>
     </Reference>
@@ -120,6 +123,7 @@
     <Compile Include="Converters\CharacterStateToColorValueConverter.cs" />
     <Compile Include="Converters\CloneValuesConverter.cs" />
     <Compile Include="Converters\DivideBy2ValueConverter.cs" />
+    <Compile Include="Converters\DollNumberToAssignedCharacterValueConverter.cs" />
     <Compile Include="Converters\DollStatusColorValueConverter.cs" />
     <Compile Include="Converters\DollStatusValueConverter.cs" />
     <Compile Include="Converters\ImageToFullPathValueConverter.cs" />
@@ -127,25 +131,20 @@
     <Compile Include="Converters\InvertValueConverter.cs" />
     <Compile Include="Converters\InvertVisibilityValueConverter.cs" />
     <Compile Include="Converters\IsActiveModelDialogValueConverter.cs" />
-    <Compile Include="Converters\IsEnabledCancelBtnConverter.cs" />
-    <Compile Include="Converters\IsEnabledSaveAndNextBtnConverter.cs" />
-    <Compile Include="Converters\IsMediaPlayerPlayBtnEnabledValueConverter.cs" />
-    <Compile Include="Converters\IsMediaPlayerStopBtnEnabledValueConverter.cs" />
-    <Compile Include="Converters\IsRecordingEnabledValueConverter.cs" />
-    <Compile Include="Converters\IsSkipStepBtnEnabledConverter.cs" />
     <Compile Include="Converters\IsDialogBtnVisibleValueConverter.cs" />
+    <Compile Include="Converters\IsRunOverWizardBtnEnabledValueConverter.cs" />
     <Compile Include="Converters\IsStatesEqualValueConverter.cs" />
-    <Compile Include="Converters\IsVoiceRecorderPlayingEnabledValueConverter.cs" />
     <Compile Include="Converters\ListBoxItemTextAndIndexValueConverter.cs" />
     <Compile Include="Converters\MatrixCellValueToBackgroundColorConverter.cs" />
     <Compile Include="Converters\MatrixToDataViewConverter.cs" />
     <Compile Include="Converters\ModelDialogStateToColorValueConverter.cs" />
-    <Compile Include="Converters\IsPlayInContextEnabledValueConverter.cs" />
+    <Compile Include="Converters\MP3RecorderStateToBtnVisibilityValueConverter.cs" />
     <Compile Include="Converters\PlayInContextBtnContentValueConverter.cs" />
-    <Compile Include="Converters\PlayStopChangeIconValueConverter.cs" />
     <Compile Include="Converters\RadioNumberToDisplayNameValueConverter.cs" />
     <Compile Include="Converters\SaveAndNextBtnContentConverter.cs" />
     <Compile Include="Converters\StarWidthConverter.cs" />
+    <Compile Include="Converters\WizardAndMP3PlayerStatesToBtnVisibilityConverter.cs" />
+    <Compile Include="Converters\WizardStateToBtnVisibilityValueConverter.cs" />
     <Compile Include="Data\CharacterDataProvider.cs" />
     <Compile Include="Data\DialogModelDataProvider.cs" />
     <Compile Include="Data\ICharacterDataProvider.cs" />
@@ -165,6 +164,7 @@
     <Compile Include="ViewModels\INavigationViewModel.cs" />
     <Compile Include="ViewModels\MediaPlayerControlViewModel.cs" />
     <Compile Include="ViewModels\MenuViewModel.cs" />
+    <Compile Include="ViewModels\OnlineCharactersDialogViewModel.cs" />
     <Compile Include="ViewModels\VoiceRecorderControlViewModel.cs" />
     <Compile Include="ViewModels\WizardViewModel.cs" />
     <Compile Include="Views\AssignCharactersToDollsView.xaml.cs">
@@ -186,8 +186,8 @@
     <Compile Include="Views\DialogModelsNavigationView.xaml.cs">
       <DependentUpon>DialogModelsNavigationView.xaml</DependentUpon>
     </Compile>
-    <Compile Include="Views\Dialogs\BusyDialog.xaml.cs">
-      <DependentUpon>BusyDialog.xaml</DependentUpon>
+    <Compile Include="Views\Dialogs\OnlineCharactersDialog.xaml.cs">
+      <DependentUpon>OnlineCharactersDialog.xaml</DependentUpon>
     </Compile>
     <Compile Include="Views\Dialogs\SettingsDialog.xaml.cs">
       <DependentUpon>SettingsDialog.xaml</DependentUpon>
@@ -207,9 +207,11 @@
     <Compile Include="Views\WizardView.xaml.cs">
       <DependentUpon>WizardView.xaml</DependentUpon>
     </Compile>
+    <Compile Include="Workflow\MP3RecorderStateMachine.cs" />
+    <Compile Include="Workflow\VideoPlayerStateMachine.cs" />
     <Compile Include="Workflow\WizardWorkflow.cs" />
-    <Compile Include="Wrapper\ApplicationDataWrapper.cs" />
-    <Compile Include="Wrapper\CharacterWrapper.cs" />
+    <Compile Include="ModelWrapper\ApplicationDataWrapper.cs" />
+    <Compile Include="ModelWrapper\CharacterWrapper.cs" />
     <Page Include="Controls\MediaPlayerControl.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
@@ -258,7 +260,7 @@
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
-    <Page Include="Views\Dialogs\BusyDialog.xaml">
+    <Page Include="Views\Dialogs\OnlineCharactersDialog.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
