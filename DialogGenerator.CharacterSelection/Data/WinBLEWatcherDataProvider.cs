@@ -19,7 +19,6 @@ namespace DialogGenerator.CharacterSelection.Data
         private string mMessage;
         private bool mNewDataAvailable;
         private static List<string> receivedBLE = new List<string>();
-        private Task mActiveTask = null;
         
         #endregion
 
@@ -86,11 +85,10 @@ namespace DialogGenerator.CharacterSelection.Data
             return null;
         }
 
-        public Task StartReadingData()
+        public async Task StartReadingData()
         {
             mWatcher.Start();
-            mActiveTask = BetterScanner.StartScanner(0, 29, 29);
-            return mActiveTask;
+            await BetterScanner.StartScanner(0, 29, 29);
         }
 
         public void StopReadingData()
