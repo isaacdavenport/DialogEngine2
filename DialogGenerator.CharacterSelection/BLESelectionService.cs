@@ -439,6 +439,7 @@ namespace DialogGenerator.CharacterSelection
         public void StopCharacterSelection()
         {
             mcHeatMapUpdateTimer.Stop();
+            mCurrentDataProvider.StopReadingData();
             mCancellationTokenSource.Cancel();
         }
 

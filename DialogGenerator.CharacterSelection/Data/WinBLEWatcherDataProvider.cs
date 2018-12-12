@@ -19,6 +19,7 @@ namespace DialogGenerator.CharacterSelection.Data
         private string mMessage;
         private bool mNewDataAvailable;
         private static List<string> receivedBLE = new List<string>();
+        private Task mActiveTask = null;
         
         #endregion
 
@@ -87,16 +88,15 @@ namespace DialogGenerator.CharacterSelection.Data
 
         public Task StartReadingData()
         {
-            BetterScanner.StartScanner(0, 29, 29);
             mWatcher.Start();
-
-            return Task.CompletedTask;
+            mActiveTask = BetterScanner.StartScanner(0, 29, 29);
+            return mActiveTask;
         }
 
         public void StopReadingData()
         {
             mWatcher.Stop();
-            // we should probably stop the BetterScanner here
+            BetterScanner.Cancel();
         }
 
     }
@@ -105,6 +105,8 @@ namespace DialogGenerator.CharacterSelection.Data
 
 class BetterScanner
     {
+        private static IntPtr handle;
+
         /// <summary>
         /// The BLUETOOTH_FIND_RADIO_PARAMS structure facilitates enumerating installed Bluetooth radios.
         ///   This is used in parallel with the WinBLEWatcherDataProvider to force the scan parameters to more 
@@ -155,6 +157,9 @@ class BetterScanner
         IntPtr lpOutBuffer, uint nOutBufferSize,
         out uint lpBytesReturned, IntPtr lpOverlapped);
 
+        [DllImport("kernel32.dll", SetLastError = true)]
+        static extern bool CancelIoEx(IntPtr handle, IntPtr lpOverlapped);
+
         /// <summary>
         /// Starts scanning for LE devices.
         /// Example: BetterScanner.StartScanner(0, 29, 29)
@@ -162,19 +167,22 @@ class BetterScanner
         /// <param name="scanType">0 = Passive, 1 = Active</param>
         /// <param name="scanInterval">Interval in 0.625 ms units</param>
         /// <param name="scanWindow">Window in 0.625 ms units</param>
-        public static void StartScanner(int scanType, ushort scanInterval, ushort scanWindow)
+        public static Task StartScanner(int scanType, ushort scanInterval, ushort scanWindow)
         {
-            var thread = new Thread(() =>
+            return Task.Run(() =>
             {
                 BLUETOOTH_FIND_RADIO_PARAM param = new BLUETOOTH_FIND_RADIO_PARAM();
                 param.Initialize();
-                IntPtr handle;
                 BluetoothFindFirstRadio(ref param, out handle);
                 uint outsize;
                 LE_SCAN_REQUEST req = new LE_SCAN_REQUEST { scanType = scanType, scanInterval = scanInterval, scanWindow = scanWindow };
-                DeviceIoControl(handle, 0x41118c, ref req, 8, IntPtr.Zero, 0, out outsize, IntPtr.Zero);
+                bool value = DeviceIoControl(handle, 0x41118c, ref req, 8, IntPtr.Zero, 0, out outsize, IntPtr.Zero);
             });
-            thread.Start();
+        }
+
+        public static void Cancel()
+        {
+            CancelIoEx(handle, IntPtr.Zero);
         }
     }
 

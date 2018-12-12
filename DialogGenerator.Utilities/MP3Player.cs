@@ -157,7 +157,6 @@ namespace DialogGenerator.Utilities
         {
             try
             {
-                //Debug.WriteLine(Player.Position.TotalSeconds);
                 if (mIsLoaded)
                 {
                     bool _isPlaying = false;
@@ -191,9 +190,14 @@ namespace DialogGenerator.Utilities
                 mIsLoaded = false;
                 mTimer.Change(Timeout.Infinite, Timeout.Infinite);
                 mVolumeTimer.Change(Timeout.Infinite, Timeout.Infinite);
-
+                
                 Player.Dispatcher.Invoke(() =>
                 {
+                    if(Player.Source != null)
+                    {
+                        if (Player.Source.OriginalString.Equals(path))
+                            mIsLoaded = true;
+                    }
                     Player.Volume = 0.8;
                     Player.Open(new Uri(path));
                     Player.Play();

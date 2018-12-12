@@ -1,5 +1,4 @@
 ﻿using DialogGenerator.CharacterSelection.Dialogs;
-using DialogGenerator.CharacterSelection.Model.Exceptions;
 using DialogGenerator.CharacterSelection.SerialPortDataProviderWorkflow;
 using DialogGenerator.Core;
 using DialogGenerator.Utilities;

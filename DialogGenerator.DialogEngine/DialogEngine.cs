@@ -424,11 +424,11 @@ namespace DialogGenerator.DialogEngine
 
         public async Task StartDialogEngine()
         {
+            mIsDialogCancelled = false;
+            Task _characterSelectionTask;
             mCharacterSelection = ApplicationData.Instance.UseSerialPort
                   ? mCharacterSelectionFactory.Create(SelectionMode.SerialSelectionMode)
                   : mCharacterSelectionFactory.Create(SelectionMode.RandomSelectionModel);
-
-            Task _characterSelectionTask;
             mCancellationTokenSource = new CancellationTokenSource();
 
             if (mCurrentState != States.PreparingDialogParameters)
@@ -470,6 +470,7 @@ namespace DialogGenerator.DialogEngine
                             }
                         case States.DialogFinished:
                             {
+                                // we need to track is "Stop dialog" btn pressed, because we can arrive in this state if event with new characters fire
                                 if (mIsDialogCancelled)
                                 {
                                     mCancellationTokenSource.Cancel();
@@ -477,6 +478,7 @@ namespace DialogGenerator.DialogEngine
                                 }
                                 else
                                 {
+                                    // if task is cancelled but we didn't stop dialog in case event with new characters occured
                                     if (mWorkflow.CanFire(Triggers.PrepareDialogParameters))
                                         mWorkflow.Fire(Triggers.PrepareDialogParameters);
                                 }
