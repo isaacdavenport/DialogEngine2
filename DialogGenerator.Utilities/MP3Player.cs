@@ -3,6 +3,7 @@ using DialogGenerator.Events;
 using Prism.Events;
 using System;
 using System.Diagnostics;
+using System.IO;
 using System.Threading;
 using System.Windows;
 using System.Windows.Media;
@@ -181,11 +182,18 @@ namespace DialogGenerator.Utilities
             }
         }
 
-
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="path">Path</param>
+        /// <returns>0 for success or 0 in case of error</returns>
         public int Play(string path)
         {
             try
-            {              
+            {
+                if (!File.Exists(path))
+                    return 1;
+
                 mIsPlayingStopped = false;
                 mIsLoaded = false;
                 mTimer.Change(Timeout.Infinite, Timeout.Infinite);

@@ -34,7 +34,7 @@ namespace DialogGenerator.CharacterSelection.Helper
                 {
                     ReceivedTime = _timeStamp,
                     SequenceNum = _rw[ApplicationData.Instance.NumberOfRadios],
-                    CharacterPrefix = Session.Get<ObservableCollection<Character>>(Constants.CHARACTERS)[_characterRowNum].CharacterPrefix
+                    CharacterPrefix = CharacterRepository.GetByAssignedRadio(_characterRowNum).CharacterPrefix
                 });
 
                 //TODO add a lock around this

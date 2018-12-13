@@ -142,8 +142,7 @@ namespace DialogGenerator.UI.ViewModels
                     FileName = Character.Model.CharacterName.Replace(" ", string.Empty)
                 };
 
-                System.Windows.Forms.DialogResult result = System.Windows.Forms.DialogResult.Cancel;
-                result = _saveFileDialog.ShowDialog();
+                System.Windows.Forms.DialogResult result = _saveFileDialog.ShowDialog();
 
                 if (result != System.Windows.Forms.DialogResult.OK)
                     return;

@@ -233,14 +233,13 @@ namespace DialogGenerator.UI.ViewModels
                 }
 
                 await _processImportedCharacter(_importedCharacter);
-
-                FileHelper.ClearDirectory(ApplicationData.Instance.TempDirectory);
             }
             catch (Exception ex)
             {
                 mLogger.Error("_import_Click " + ex.Message);
                 mMessageDialogService.CloseBusyDialog();
                 await mMessageDialogService.ShowMessage("Error", "Error during importing character.");
+                FileHelper.ClearDirectory(ApplicationData.Instance.TempDirectory);
                 // add support for rollback files if exception occured
             }
 
@@ -257,10 +256,7 @@ namespace DialogGenerator.UI.ViewModels
             await mCharacterDataProvider.SaveAsync(_importedCharacter);
 
             // add character to list of characters
-            Application.Current.Dispatcher.Invoke(() =>
-            {
-                mCharacterDataProvider.GetAll().Add(_importedCharacter);
-            });
+            mCharacterDataProvider.GetAll().Add(_importedCharacter);
         }
 
         private async Task<JSONObjectsTypesList> _extractAndLoadData(string path)
@@ -307,6 +303,8 @@ namespace DialogGenerator.UI.ViewModels
                 {
                     File.Copy(_imageFile.FullName, Path.Combine(ApplicationData.Instance.ImagesDirectory, _imageFile.Name), true);
                 }
+
+                FileHelper.ClearDirectory(ApplicationData.Instance.TempDirectory);
             });
         }
 
