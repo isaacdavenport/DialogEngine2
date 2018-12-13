@@ -35,6 +35,8 @@ Project("{930C7802-8A8C-48F9-8165-68863BCCD9DD}") = "DialogGenerator.Setup", "Di
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DialogGenerator.Web", "DialogGenerator.Web\DialogGenerator.Web.csproj", "{7B12550D-A62E-4D99-A694-379E480CAEC3}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DialogGenerator.Tests.UI", "DialogGenerator.Tests.UI\DialogGenerator.Tests.UI.csproj", "{6818CF8A-3A5A-4821-8C58-2BE51E0B0A96}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -145,6 +147,14 @@ Global
 		{7B12550D-A62E-4D99-A694-379E480CAEC3}.Release|Any CPU.Build.0 = Release|Any CPU
 		{7B12550D-A62E-4D99-A694-379E480CAEC3}.Release|x86.ActiveCfg = Release|Any CPU
 		{7B12550D-A62E-4D99-A694-379E480CAEC3}.Release|x86.Build.0 = Release|Any CPU
+		{6818CF8A-3A5A-4821-8C58-2BE51E0B0A96}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{6818CF8A-3A5A-4821-8C58-2BE51E0B0A96}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{6818CF8A-3A5A-4821-8C58-2BE51E0B0A96}.Debug|x86.ActiveCfg = Debug|Any CPU
+		{6818CF8A-3A5A-4821-8C58-2BE51E0B0A96}.Debug|x86.Build.0 = Debug|Any CPU
+		{6818CF8A-3A5A-4821-8C58-2BE51E0B0A96}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{6818CF8A-3A5A-4821-8C58-2BE51E0B0A96}.Release|Any CPU.Build.0 = Release|Any CPU
+		{6818CF8A-3A5A-4821-8C58-2BE51E0B0A96}.Release|x86.ActiveCfg = Release|Any CPU
+		{6818CF8A-3A5A-4821-8C58-2BE51E0B0A96}.Release|x86.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

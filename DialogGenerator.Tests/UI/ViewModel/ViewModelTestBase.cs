@@ -7,6 +7,8 @@ using DialogGenerator.Utilities;
 using Moq;
 using Prism.Events;
 using System.Collections.ObjectModel;
+using System.Linq;
+using System.Threading.Tasks;
 
 namespace DialogGenerator.Tests.UI.ViewModel
 {
@@ -26,12 +28,9 @@ namespace DialogGenerator.Tests.UI.ViewModel
 
         public ViewModelTestBase()
         {
-            characters = new ObservableCollection<Character>
-            {
-                new Character(),
-                new Character(),
-                new Character()
-            };
+            characters = new ObservableCollection<Character>();
+
+            _initializeCharacters();
         }
 
         private void _eventAggregatorSetup()
@@ -43,6 +42,25 @@ namespace DialogGenerator.Tests.UI.ViewModel
         private void _characterDataProviderSetup()
         {
             characterDataProviderMock.Setup(x => x.GetAll()).Returns(() => characters);
+            characterDataProviderMock.Setup(x => x.GetByAssignedRadio(1)).Returns(characters.First());
+            characterDataProviderMock.Setup(x => x.GetByAssignedRadio(-1)).Returns((Character)null);
+            characterDataProviderMock.Setup(x => x.SaveAsync(It.IsAny<Character>())).Returns(Task.CompletedTask);
+        }
+
+        private void _initializeCharacters()
+        {
+            var character1 = new Character
+            {
+                RadioNum = 1
+            };
+
+            var character2 = new Character
+            {
+                RadioNum = 2
+            };
+
+            characters.Add(character1);
+            characters.Add(character2);
         }
 
         protected void testSetup()
@@ -50,5 +68,7 @@ namespace DialogGenerator.Tests.UI.ViewModel
             _eventAggregatorSetup();
             _characterDataProviderSetup();
         }
+
+
     }
 }

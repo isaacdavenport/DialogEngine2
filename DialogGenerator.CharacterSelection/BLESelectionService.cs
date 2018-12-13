@@ -241,7 +241,6 @@ namespace DialogGenerator.CharacterSelection
             }
             catch (Exception)
             {
-                //MessageBox.Show("No character assigned to radio with number " + _radioNum + " .");
                 return -1;
             }
         }
@@ -450,7 +449,7 @@ namespace DialogGenerator.CharacterSelection
         public States CurrentState
         {
             get { return mCurrentState; }
-            set { mCurrentState = value; }
+            private set { mCurrentState = value; }
         }
 
         #endregion
