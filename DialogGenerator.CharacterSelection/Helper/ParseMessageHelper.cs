@@ -108,7 +108,7 @@ namespace DialogGenerator.CharacterSelection.Helper
         }
 
 
-        public static int Parse(string _message, ref int[] _rssiRow)
+        public static int ParseBle(string _message, ref int[] _rssiRow)
         {
             try
             {
@@ -135,7 +135,7 @@ namespace DialogGenerator.CharacterSelection.Helper
                     _rssiRow[ApplicationData.Instance.NumberOfRadios] = int.Parse(parts.Last(), System.Globalization.NumberStyles.HexNumber);
                 }
                 else
-                {
+                {    // we should not be in here anymore unless we have gone back to the USB-Serial CSR dongle because internal BLE laptop HW didn't work
                     if (_message.Length != 19 || !_message.StartsWith("ff"))
                         return _rowNumber;
 

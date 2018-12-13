@@ -45,7 +45,7 @@ namespace DialogGenerator.ViewModels
 
         private void _mcTimer_Tick(object sender, EventArgs e)
         {
-            AutoUpdater.Start(ApplicationData.Instance.URLToUpdateFile);
+           // TODO Isaac, reinstate when setup/working, manual only till then AutoUpdater.Start(ApplicationData.Instance.URLToUpdateFile);
         }
 
         private async void _autoUpdater_CheckForUpdateEvent(UpdateInfoEventArgs args)
