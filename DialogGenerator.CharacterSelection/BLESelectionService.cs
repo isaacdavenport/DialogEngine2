@@ -21,7 +21,7 @@ namespace DialogGenerator.CharacterSelection
     {
         #region - fields -
 
-        public const int StrongRssiBufDepth = 12;
+        public const int StrongRssiBufDepth = 16;  // TODO we should use a timer as well as relying on a number of incoming packets to switch characters
 
         private ILogger mLogger;
         private IEventAggregator mEventAggregator;
@@ -161,7 +161,7 @@ namespace DialogGenerator.CharacterSelection
                     return Triggers.ProcessMessage;
                 }
 
-                mRowNum = ParseMessageHelper.Parse(message, ref mNewRow);
+                mRowNum = ParseMessageHelper.ParseBle(message, ref mNewRow);
 
                 if (mRowNum < 0 || mRowNum >= ApplicationData.Instance.NumberOfRadios)
                 {

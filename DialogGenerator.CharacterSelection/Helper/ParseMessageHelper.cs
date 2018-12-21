@@ -53,7 +53,14 @@ namespace DialogGenerator.CharacterSelection.Helper
 
                 _debugString += ReceivedMessages[ReceivedMessages.Count - 1].SequenceNum.ToString("D3");
 
-                Logger.Info(_debugString,ApplicationData.Instance.DecimalSerialDirectBLELoggerKey);
+                if((BLEDataProviderType)Session.Get<int>(Constants.BLE_DATA_PROVIDER) == BLEDataProviderType.Serial)
+                {
+                    Logger.Info(ApplicationData.Instance.DecimaSerialLoggerKey, _debugString);
+                }
+                else
+                {
+                    Logger.Info(ApplicationData.Instance.DecimalSerialDirectBLELoggerKey, _debugString);
+                }
 
                 if (ReceivedMessages.Count > 30000)
                 {
@@ -69,6 +76,7 @@ namespace DialogGenerator.CharacterSelection.Helper
         #endregion
 
         #region - Public functions -
+
 
         public static void ProcessTheMessage(int _rowNum, int[] _newRow)
         {
@@ -99,7 +107,8 @@ namespace DialogGenerator.CharacterSelection.Helper
 
         }
 
-        public static int Parse(string _message, ref int[] _rssiRow)
+
+        public static int ParseBle(string _message, ref int[] _rssiRow)
         {
             try
             {
@@ -126,7 +135,7 @@ namespace DialogGenerator.CharacterSelection.Helper
                     _rssiRow[ApplicationData.Instance.NumberOfRadios] = int.Parse(parts.Last(), System.Globalization.NumberStyles.HexNumber);
                 }
                 else
-                {
+                {    // we should not be in here anymore unless we have gone back to the USB-Serial CSR dongle because internal BLE laptop HW didn't work
                     if (_message.Length != 19 || !_message.StartsWith("ff"))
                         return _rowNumber;
 
