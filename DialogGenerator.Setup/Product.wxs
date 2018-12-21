@@ -39,6 +39,10 @@
       <ComponentRef Id="Data" />
       <ComponentRef Id="Audio" />
       <ComponentRef Id="Images" />
+      <ComponentRef Id="VideoFiles" />
+      <ComponentRef Id="DataFiles" />
+      <ComponentRef Id="AudioFiles" />
+      <ComponentRef Id="ImagesFiles" />
       <ComponentRef Id="CleanupData" />
       <ComponentRef Id="Application.xml" />
       <Condition Level="1">NOT Installed</Condition>
