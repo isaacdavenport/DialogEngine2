@@ -124,8 +124,8 @@
                                                             AncestorType=ListView}, 
                                                             Converter={StaticResource StarWidthConverter}}"                                               
                                             DisplayMemberBinding="{Binding Message}" />
-                            <GridViewColumn Header="File" Width="200"  DisplayMemberBinding="{Binding FileName}" />
-                            <GridViewColumn Header="Line" Width="100" DisplayMemberBinding="{Binding Line}" />
+                            <!--<GridViewColumn Header="File" Width="200"  DisplayMemberBinding="{Binding FileName}" />
+                            <GridViewColumn Header="Line" Width="100" DisplayMemberBinding="{Binding Line}" />-->
                         </GridView>
                     </ListView.View>
                 </ListView>
@@ -181,8 +181,8 @@
                                                                 Converter={StaticResource StarWidthConverter}}" 
                                                 DisplayMemberBinding="{Binding Message}" />
 
-                            <GridViewColumn Header="File" Width="200" DisplayMemberBinding="{Binding FileName}" />
-                            <GridViewColumn Header="Line" Width="100" DisplayMemberBinding="{Binding Line}" />
+                            <!--<GridViewColumn Header="File" Width="200" DisplayMemberBinding="{Binding FileName}" />
+                            <GridViewColumn Header="Line" Width="100" DisplayMemberBinding="{Binding Line}" />-->
                         </GridView>
                     </ListView.View>
                 </ListView>
@@ -242,8 +242,8 @@
                                     </DataTemplate>
                                 </GridViewColumn.CellTemplate>
                             </GridViewColumn>
-                            <GridViewColumn Header="File" Width="200"  DisplayMemberBinding="{Binding FileName}" />
-                            <GridViewColumn Header="Line" Width="100" DisplayMemberBinding="{Binding Line}" />
+                            <!--<GridViewColumn Header="File" Width="200"  DisplayMemberBinding="{Binding FileName}" />
+                            <GridViewColumn Header="Line" Width="100" DisplayMemberBinding="{Binding Line}" />-->
                         </GridView>
                     </ListView.View>
                 </ListView>

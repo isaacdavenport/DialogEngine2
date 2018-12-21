@@ -109,12 +109,6 @@
     <Compile Include="Controls\VoiceRecorderControl.xaml.cs">
       <DependentUpon>VoiceRecorderControl.xaml</DependentUpon>
     </Compile>
-    <Compile Include="Controls\VoiceRecorder\BarHeightScalingStyles.cs" />
-    <Compile Include="Controls\VoiceRecorder\FFTDataSize.cs" />
-    <Compile Include="Controls\VoiceRecorder\ISoundPlayer.cs" />
-    <Compile Include="Controls\VoiceRecorder\ISpectrumPlayer.cs" />
-    <Compile Include="Controls\VoiceRecorder\NAudioEngine.cs" />
-    <Compile Include="Controls\VoiceRecorder\SampleAggregator.cs" />
     <Compile Include="Converters\ActiveDialogModelBtnVisibilityValueConverter.cs" />
     <Compile Include="Converters\AssignedCharacter2NameValueConverter.cs" />
     <Compile Include="Converters\CharacterDataTemplateSelectorValueConverter.cs" />
@@ -164,7 +158,6 @@
     <Compile Include="ViewModels\INavigationViewModel.cs" />
     <Compile Include="ViewModels\MediaPlayerControlViewModel.cs" />
     <Compile Include="ViewModels\MenuViewModel.cs" />
-    <Compile Include="ViewModels\OnlineCharactersDialogViewModel.cs" />
     <Compile Include="ViewModels\VoiceRecorderControlViewModel.cs" />
     <Compile Include="ViewModels\WizardViewModel.cs" />
     <Compile Include="Views\AssignCharactersToDollsView.xaml.cs">
@@ -185,9 +178,6 @@
     </Compile>
     <Compile Include="Views\DialogModelsNavigationView.xaml.cs">
       <DependentUpon>DialogModelsNavigationView.xaml</DependentUpon>
-    </Compile>
-    <Compile Include="Views\Dialogs\OnlineCharactersDialog.xaml.cs">
-      <DependentUpon>OnlineCharactersDialog.xaml</DependentUpon>
     </Compile>
     <Compile Include="Views\Dialogs\SettingsDialog.xaml.cs">
       <DependentUpon>SettingsDialog.xaml</DependentUpon>
@@ -257,10 +247,6 @@
       <Generator>MSBuild:Compile</Generator>
     </Page>
     <Page Include="Views\DialogModelsNavigationView.xaml">
-      <SubType>Designer</SubType>
-      <Generator>MSBuild:Compile</Generator>
-    </Page>
-    <Page Include="Views\Dialogs\OnlineCharactersDialog.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>

@@ -36,9 +36,8 @@ namespace DialogGenerator.UI
             mContainer.RegisterType<WizardViewModel>(new ContainerControlledLifetimeManager());
             mContainer.RegisterType<CharacterDetailViewModel>(new ContainerControlledLifetimeManager());
             mContainer.RegisterType<DialogModelDetailViewModel>(new ContainerControlledLifetimeManager());
-            mContainer.RegisterType<DialogModelsNavigationViewModel>(new ContainerControlledLifetimeManager()).Resolve(typeof(DialogModelsNavigationViewModel));
-            mContainer.RegisterType<OnlineCharactersDialog>();
-            mContainer.RegisterType<OnlineCharactersDialogViewModel>();
+            mContainer.RegisterType<DialogModelsNavigationViewModel>(new ContainerControlledLifetimeManager())
+                .Resolve(typeof(DialogModelsNavigationViewModel));
 
             mRegionManager.RegisterViewWithRegion(Constants.MenuRegion, typeof(MenuView));
             mRegionManager.RegisterViewWithRegion(Constants.ContentRegion, typeof(DialogView));

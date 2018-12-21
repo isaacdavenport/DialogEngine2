@@ -8,7 +8,6 @@ namespace DialogGenerator.Core
 {
     public class Logger : ILogger
     {
-        private readonly ILog mcDecimalSerialLog = LogManager.GetLogger(ApplicationData.Instance.DecimaSerialLoggerKey);
         private readonly ILog mcLogDialog = LogManager.GetLogger(ApplicationData.Instance.DialogLoggerKey);
         private readonly ILog mcDefaultLog = LogManager.GetLogger(ApplicationData.Instance.DefaultLoggerKey);
         private readonly ILog mcDecimalSerialLogDirectBLE = LogManager.GetLogger(ApplicationData.Instance.DecimalSerialDirectBLELoggerKey);
@@ -25,10 +24,6 @@ namespace DialogGenerator.Core
             {
                 return mcDefaultLog;
             }
-            else if (string.Equals(type, ApplicationData.Instance.DecimaSerialLoggerKey, StringComparison.OrdinalIgnoreCase))
-            {
-                return mcDecimalSerialLog;
-            }
             else if (string.Equals(type, ApplicationData.Instance.DialogLoggerKey, StringComparison.OrdinalIgnoreCase))
             {
                 return mcLogDialog;
@@ -41,28 +36,28 @@ namespace DialogGenerator.Core
             return null;
         }
 
-        public void Error(string _loggerType = null, string _message = null, 
+        public void Error(string message, string _loggerType = null, 
             [CallerFilePath] string _file = "", [CallerLineNumber] int _line = 0)
         {
-            _getLogger(_loggerType)?.Error(_message);
+            _getLogger(_loggerType)?.Error(message);
         }
 
-        public void Info(string _loggerType = null, string _message = null, 
+        public void Info(string message, string _loggerType = null, 
             [CallerFilePath] string _file = "", [CallerLineNumber] int _line = 0)
         {
-            _getLogger(_loggerType)?.Info(_message);
+            _getLogger(_loggerType)?.Info(message);
         }
 
-        public void Warning(string _loggerType = null, string _message = null, 
+        public void Warning(string message, string _loggerType = null, 
             [CallerFilePath] string _file = "", [CallerLineNumber] int _line = 0)
         {
-            _getLogger(_loggerType)?.Warn(_message);
+            _getLogger(_loggerType)?.Warn(message);
         }
 
-        public void Debug(string _loggerType = null, string _message = null, 
+        public void Debug(string message, string _loggerType = null, 
             [CallerFilePath] string _file = "", [CallerLineNumber] int _line = 0)
         {
-            _getLogger(_loggerType)?.Debug(_message);
+            _getLogger(_loggerType)?.Debug(message);
         }
     }
 }

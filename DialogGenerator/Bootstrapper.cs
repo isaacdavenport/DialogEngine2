@@ -12,7 +12,7 @@ using DialogGenerator.Utilities;
 using DialogGenerator.CharacterSelection;
 using Prism.Events;
 using DialogGenerator.ViewModels;
-using DialogGenerator.Web;
+using DialogGenerator.Handlers;
 
 namespace DialogGenerator
 {
@@ -34,9 +34,11 @@ namespace DialogGenerator
         {
             base.ConfigureContainer();
             Container.RegisterType<IEventAggregator, EventAggregator>(new ContainerControlledLifetimeManager());
-            Container.RegisterType<AppInitializer>();
+            Container.RegisterType<AppInitializer>(new ContainerControlledLifetimeManager());
             Container.RegisterType<ShellViewModel>(new ContainerControlledLifetimeManager());
-            Container.RegisterType<Shell>();
+            Container.RegisterType<Shell>(new ContainerControlledLifetimeManager());
+            Container.RegisterType<FileChangesHandler>(new ContainerControlledLifetimeManager());
+            Container.RegisterType<UpdatesHandler>(new ContainerControlledLifetimeManager());
         }
 
         protected override void ConfigureModuleCatalog()
@@ -56,14 +58,6 @@ namespace DialogGenerator
             {
                 ModuleName = _utilitiesModuleType.Name,
                 ModuleType = _utilitiesModuleType.AssemblyQualifiedName,
-                InitializationMode = InitializationMode.WhenAvailable
-            });
-
-            Type _webModuleType = typeof(WebModule);
-            ModuleCatalog.AddModule(new ModuleInfo()
-            {
-                ModuleName = _webModuleType.Name,
-                ModuleType = _webModuleType.AssemblyQualifiedName,
                 InitializationMode = InitializationMode.WhenAvailable
             });
 

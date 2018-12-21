@@ -17,14 +17,14 @@ namespace DialogGenerator.Tests.Utilities
             mPlayer = new MP3Player(mEventAggregatorMock.Object, mLoggerMock.Object);
         }
 
-        //[Theory]
-        //[InlineData("")]
-        //[InlineData("invalid")]
-        //public void Play_ShouldReturn1_WhenInvalidPathProvided(string path)
-        //{
-        //    int result = mPlayer.Play(path);
+        [Theory]
+        [InlineData("")]
+        [InlineData("invalid")]
+        public void Play_ShouldReturn1_WhenInvalidPathProvided(string path)
+        {
+            int result = mPlayer.Play(path);
 
-        //    Assert.Equal(1, result);
-        //}
+            Assert.Equal(1, result);
+        }
     }
 }

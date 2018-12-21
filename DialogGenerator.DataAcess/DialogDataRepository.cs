@@ -3,9 +3,9 @@ using DialogGenerator.DataAccess.Helper;
 using DialogGenerator.Model;
 using DialogGenerator.Utilities;
 using System;
+using System.Collections.Generic;
+using System.ComponentModel.DataAnnotations;
 using System.IO;
-using System.Threading;
-using System.Threading.Tasks;
 
 namespace DialogGenerator.DataAccess
 {
@@ -13,7 +13,6 @@ namespace DialogGenerator.DataAccess
     {
         private ILogger mLogger;
         private IUserLogger mUserLogger;
-        private JSONObjectsTypesList mJSONObjectsTypesList;
 
         public DialogDataRepository(ILogger logger,IUserLogger _userLogger)
         {
@@ -21,87 +20,133 @@ namespace DialogGenerator.DataAccess
             mUserLogger = _userLogger;
         }
 
-        public async Task<JSONObjectsTypesList> LoadAsync(string path)
+        private void _processLoadedData(JSONObjectsTypesList _jsonObjectsTypesList, string _fileName)
         {
-            await Task.Run(() =>
+            var characters = _jsonObjectsTypesList.Characters;
+            if (characters != null)
             {
-                Thread.CurrentThread.Name = "LoadDialogDataAsync";
-
-                mJSONObjectsTypesList = new JSONObjectsTypesList();
-
-                var _directoryInfo = new DirectoryInfo(path);
-                FileInfo[] _filesInfo = _directoryInfo.GetFiles("*.json");
-
-                foreach (var _fileInfo in _filesInfo)
+                for (int i = 0; i < characters.Count; i++)
                 {
-                    try
-                    {
-                        _processJSONFile(_fileInfo);
-                    }
-                    catch (Exception ex)
-                    {
-                        mUserLogger.Error("Error during reading file: " + _fileInfo.Name);
-                        mLogger.Error(ex.Message);
-                    }
+                    characters[i].FileName = _fileName;
+                    characters[i].JsonArrayIndex = i;
                 }
-            });
+            }
 
-            return mJSONObjectsTypesList;
+            var wizards = _jsonObjectsTypesList.Wizards;
+            if (wizards != null)
+            {
+                for (int i = 0; i < wizards.Count; i++)
+                {
+                    wizards[i].FileName = _fileName;
+                    wizards[i].JsonArrayIndex = i;
+                }
+            }
+
+            var _dialogModels = _jsonObjectsTypesList.DialogModels;
+            if (_dialogModels != null)
+            {
+                for (int i = 0; i < _dialogModels.Count; i++)
+                {
+                    _dialogModels[i].FileName = _fileName;
+                    _dialogModels[i].JsonArrayIndex = i;
+                }
+            }
         }
 
-        public  void _processJSONFile(FileInfo _fileInfo)
+        public JSONObjectsTypesList LoadFromFile(string _filePath,out IList<string> errors)
         {
-            var _fileSteam = _fileInfo.OpenRead(); //open a read-only FileStream
-            using (var reader = new StreamReader(_fileSteam)) //creates new streamerader for fs stream. Could also construct with filename...
+            var _jsonObjectsTypesList = new JSONObjectsTypesList();
+            using (var reader = new StreamReader(_filePath)) //creates new streamerader for fs stream. Could also construct with filename...
             {
                 string _jsonString = reader.ReadToEnd();
-                //json string to Object.
-                var _jsonObjectsTypesList = Serializer.Deserialize<JSONObjectsTypesList>(_jsonString);
+                // validate according json schema
+                if (!ValidationHelper.Validate(_jsonString, out errors))
+                    return null;
 
+                //json string to Object.
+                _jsonObjectsTypesList = Serializer.Deserialize<JSONObjectsTypesList>(_jsonString);
                 if (_jsonObjectsTypesList != null)
                 {
-                    //This assumes all characters/wizards in array read and are formatted correctly or the entire json read fails
-                    // otherwise array member numbers will be off by one if we decide not to read one due to a parse error
-                    //Application.Current.Dispatcher.Invoke(() =>
-                    //{
-                    _processJSONData(_jsonObjectsTypesList, _fileInfo.Name);
-                    //});
+                    _validateLoadedData(_jsonObjectsTypesList,out errors);
+                    if (errors.Count > 0)
+                        return null;
+
+                    _processLoadedData(_jsonObjectsTypesList, Path.GetFileName(_filePath));
+                }
+            }
+
+            return _jsonObjectsTypesList;
+        }
+
+        private void _validateLoadedData(JSONObjectsTypesList _jsonObjectsTypesList,out IList<string> errors)
+        {
+            errors = new List<string>();
+            if(_jsonObjectsTypesList.Characters != null)
+            {
+                foreach(var character in _jsonObjectsTypesList.Characters)
+                {
+                    var context = new ValidationContext(character);
+                    var results = new List<ValidationResult>();
+
+                    Validator.TryValidateObject(character, context, results, true);
+
+                    foreach (var _validationResult in results)
+                    {
+                        errors.Add(_validationResult.ErrorMessage);
+                    }
                 }
             }
         }
 
-        private void _processJSONData(JSONObjectsTypesList _jsonObjectsTypesList, string _fileName)
+        public JSONObjectsTypesList LoadFromDirectory(string _directoryPath, out IList<string> _errorsList)
         {
-            if (_jsonObjectsTypesList.Characters != null)
+            var _JSONObjectTypesList = new JSONObjectsTypesList();
+            _errorsList = new List<string>();
+            var _dataDir = new DirectoryInfo(_directoryPath);
+
+            foreach (var _fileInfo in _dataDir.GetFiles("*.json"))
             {
-                foreach (var _character in _jsonObjectsTypesList.Characters)
+                IList<string> errors;
+                var data = LoadFromFile(_fileInfo.FullName, out errors);
+
+                if (errors.Count > 0)
                 {
-                    _character.FileName = _fileName;
-                    _character.JsonArrayIndex = mJSONObjectsTypesList.Characters.Count;
-                    mJSONObjectsTypesList.Characters.Add(_character);
+                    foreach (var error in errors)
+                    {
+                        _errorsList.Add($"{_fileInfo} - {error}");
+                    }
+                    continue;
+                }
+
+                if (data == null)
+                    continue;
+
+                if (data.Characters != null)
+                {
+                    foreach (var character in data.Characters)
+                    {
+                        _JSONObjectTypesList.Characters.Add(character);
+                    }
+                }
+
+                if (data.DialogModels != null)
+                {
+                    foreach (var _dialogModel in data.DialogModels)
+                    {
+                        _JSONObjectTypesList.DialogModels.Add(_dialogModel);
+                    }
+                }
+
+                if (data.Wizards != null)
+                {
+                    foreach (var wizard in data.Wizards)
+                    {
+                        _JSONObjectTypesList.Wizards.Add(wizard);
+                    }
                 }
             }
 
-            if (_jsonObjectsTypesList.Wizards != null)
-            {
-                foreach (var _wizard in _jsonObjectsTypesList.Wizards)
-                {
-
-                    _wizard.FileName = _fileName;
-                    _wizard.JsonArrayIndex = mJSONObjectsTypesList.Wizards.Count;
-                    mJSONObjectsTypesList.Wizards.Add(_wizard);
-                }
-            }
-
-            if (_jsonObjectsTypesList.DialogModels != null)
-            {
-                foreach (var _dialogModel in _jsonObjectsTypesList.DialogModels)
-                {
-                    _dialogModel.FileName = _fileName;
-                    _dialogModel.JsonArrayIndex = mJSONObjectsTypesList.DialogModels.Count;
-                    mJSONObjectsTypesList.DialogModels.Add(_dialogModel);
-                }
-            }
+            return _JSONObjectTypesList;
         }
     }
 }

@@ -1,12 +1,12 @@
 ﻿using System;
-using System.Diagnostics;
 using System.Reflection;
 using System.Threading;
 using System.Windows;
-using System.Windows.Automation;
+using DialogGenerator.Core;
+using DialogGenerator.Handlers;
 using DialogGenerator.UI.ViewModels;
 using DialogGenerator.Utilities;
-using DialogGenerator.ViewModels;
+using DialogGenerator.Views;
 using Microsoft.Practices.Unity;
 
 
@@ -18,6 +18,8 @@ namespace DialogGenerator
     public partial class App : Application
     {
         private static Mutex msMutex = null;
+        private FileChangesHandler mFileChangesHandler;
+        private UpdatesHandler mUpdatesHandler;
 
         protected override void OnStartup(StartupEventArgs e)
         {
@@ -37,32 +39,26 @@ namespace DialogGenerator
             var bootstrapper = new Bootstrapper();
             bootstrapper.Run();
 
-            bootstrapper.Container.Resolve<ShellViewModel>()
-                .MessageDialogService = bootstrapper.Container.Resolve<IMessageDialogService>();
             bootstrapper.Container.Resolve<CharacterDetailViewModel>();
             bootstrapper.Container.Resolve<DialogModelDetailViewModel>();
+            mFileChangesHandler = bootstrapper.Container.Resolve<FileChangesHandler>();
+            mUpdatesHandler = bootstrapper.Container.Resolve<UpdatesHandler>();
+            bootstrapper.Container.Resolve<Shell>().MessageDialogService = bootstrapper.Container.Resolve<IMessageDialogService>();
 
             var _appInit = bootstrapper.Container.Resolve<AppInitializer>();
-            _appInit.Error += _appInit_Error;
             _appInit.Completed += _appInit_Completed;
             _appInit.Initialize();
         }
 
         private void _appInit_Completed(object sender, EventArgs e)
         {
-            
+
             SplashScreenManager.Close();
             Current.MainWindow.Show();
+            FocusHelper.RequestFocus();
 
-            AutomationElement element = AutomationElement.FromHandle(Process.GetCurrentProcess().MainWindowHandle);
-            if (element != null)
-            {
-                element.SetFocus();
-            }
-        }
-
-        private void _appInit_Error(object sender, string e)
-        {
+            mFileChangesHandler.StartWatching(ApplicationData.Instance.EditorTempDirectory,"*.json");
+            mUpdatesHandler.CheckForUpdates();
         }
     }
 }

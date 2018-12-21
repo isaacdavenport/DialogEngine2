@@ -10,6 +10,7 @@
         mc:Ignorable="d"
         xmlns:i="clr-namespace:System.Windows.Interactivity;assembly=System.Windows.Interactivity"
         xmlns:prism="http://prismlibrary.com/"
+        Closing="_window_Closing"
         prism:ViewModelLocator.AutoWireViewModel="True"
         xmlns:materialDesign="http://materialdesigninxaml.net/winfx/xaml/themes"
         xmlns:inf="clr-namespace:DialogGenerator.Core;assembly=DialogGenerator.Core"

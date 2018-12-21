@@ -62,7 +62,7 @@ namespace DialogGenerator.CharacterSelection
 
             mWorkflow = new SerialSelectionWorkflow(() => { });
             mWorkflow.PropertyChanged += _mWorkflow_PropertyChanged;
-            mcHeatMapUpdateTimer.Interval = TimeSpan.FromSeconds(3);
+            mcHeatMapUpdateTimer.Interval = TimeSpan.FromMilliseconds(300);
             mcHeatMapUpdateTimer.Tick += _heatMapUpdateTimer_Tick;
 
             _configureWorkflow();

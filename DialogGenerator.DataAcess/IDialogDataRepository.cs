@@ -1,10 +1,11 @@
 ﻿using DialogGenerator.Model;
-using System.Threading.Tasks;
+using System.Collections.Generic;
 
 namespace DialogGenerator.DataAccess
 {
     public interface IDialogDataRepository
     {
-        Task<JSONObjectsTypesList> LoadAsync(string path); 
+        JSONObjectsTypesList LoadFromFile(string _filePath,out IList<string> errors);
+        JSONObjectsTypesList LoadFromDirectory(string _directoryPath, out IList<string> _errorsList);
     }
 }

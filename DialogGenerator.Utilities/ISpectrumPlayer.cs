@@ -1,7 +1,7 @@
 ﻿//  Confidential Source Code Property Toys2Life LLC Colorado 2017
 //  www.toys2life.org
 
-namespace DialogGenerator.UI.Controls.VoiceRecorder
+namespace DialogGenerator.Utilities
 {
     /// <summary>
     /// Provides access to sound player functionality needed to

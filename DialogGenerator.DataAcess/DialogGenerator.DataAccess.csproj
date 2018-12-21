@@ -46,6 +46,9 @@
     <Reference Include="Newtonsoft.Json, Version=11.0.0.0, Culture=neutral, PublicKeyToken=30ad4fe6b2a6aeed, processorArchitecture=MSIL">
       <HintPath>..\packages\Newtonsoft.Json.11.0.2\lib\net45\Newtonsoft.Json.dll</HintPath>
     </Reference>
+    <Reference Include="Newtonsoft.Json.Schema, Version=3.0.0.0, Culture=neutral, PublicKeyToken=30ad4fe6b2a6aeed, processorArchitecture=MSIL">
+      <HintPath>..\packages\Newtonsoft.Json.Schema.3.0.10\lib\net45\Newtonsoft.Json.Schema.dll</HintPath>
+    </Reference>
     <Reference Include="PresentationFramework" />
     <Reference Include="Prism, Version=6.3.0.0, Culture=neutral, PublicKeyToken=40ee6c3a2184dc59, processorArchitecture=MSIL">
       <HintPath>..\packages\Prism.Core.6.3.0\lib\net45\Prism.dll</HintPath>
@@ -57,6 +60,7 @@
       <HintPath>..\packages\Prism.Wpf.6.3.0\lib\net45\Prism.Wpf.dll</HintPath>
     </Reference>
     <Reference Include="System" />
+    <Reference Include="System.ComponentModel.DataAnnotations" />
     <Reference Include="System.Core" />
     <Reference Include="System.Windows.Interactivity, Version=4.5.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
       <HintPath>..\packages\Prism.Wpf.6.3.0\lib\net45\System.Windows.Interactivity.dll</HintPath>
@@ -75,12 +79,11 @@
     <Compile Include="DialogDataRepository.cs" />
     <Compile Include="DialogModelRepository.cs" />
     <Compile Include="Helper\Serializer.cs" />
+    <Compile Include="Helper\ValidationHelper.cs" />
     <Compile Include="ICharacterRepository.cs" />
     <Compile Include="IDialogDataRepository.cs" />
     <Compile Include="IDialogModelRepository.cs" />
-    <Compile Include="IOnlineCharactersRepository.cs" />
     <Compile Include="IWizardRepository.cs" />
-    <Compile Include="OnlineCharactersRepository.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="WizardRepository.cs" />
   </ItemGroup>
@@ -96,10 +99,6 @@
     <ProjectReference Include="..\DialogGenerator.Utilities\DialogGenerator.Utilities.csproj">
       <Project>{CA4D11CB-882D-44A3-AFF2-03083D106BCE}</Project>
       <Name>DialogGenerator.Utilities</Name>
-    </ProjectReference>
-    <ProjectReference Include="..\DialogGenerator.Web\DialogGenerator.Web.csproj">
-      <Project>{7b12550d-a62e-4d99-a694-379e480caec3}</Project>
-      <Name>DialogGenerator.Web</Name>
     </ProjectReference>
   </ItemGroup>
   <ItemGroup>

@@ -1,10 +1,9 @@
 ﻿using DialogGenerator.Core;
-using DialogGenerator.UI.Controls.VoiceRecorder;
 using DialogGenerator.UI.Workflow.MP3RecorderStateMachine;
 using DialogGenerator.UI.Workflow.WizardWorkflow;
+using DialogGenerator.Utilities;
 using Prism.Commands;
 using Prism.Mvvm;
-using System;
 using System.ComponentModel;
 using System.IO;
 using System.Windows.Input;

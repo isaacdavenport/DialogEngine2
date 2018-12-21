@@ -1,6 +1,7 @@
 ﻿using DialogGenerator.Utilities.Dialogs;
 using MaterialDesignThemes.Wpf;
 using System;
+using System.Collections.Generic;
 using System.Threading.Tasks;
 using System.Windows;
 
@@ -16,8 +17,10 @@ namespace DialogGenerator.Utilities
     {
         private BusyDialog mBusyDialog = new BusyDialog("");
 
-        public async Task<MessageDialogResult> ShowOKCancelDialogAsync(string message, string tittle,
-            string _OKBtnContent = "OK", string _cancelBtnContent = "Cancel",string _dialogHostName = "MainDialogHost")
+        public async Task<MessageDialogResult> ShowOKCancelDialogAsync(string message, string tittle
+            , string _OKBtnContent = "OK"
+            , string _cancelBtnContent = "Cancel"
+            ,string _dialogHostName = "MainDialogHost")
         {
             MessageDialogResult result = MessageDialogResult.Cancel;
 
@@ -108,6 +111,32 @@ namespace DialogGenerator.Utilities
 
                 });
             }
+        }
+
+        public async Task<MessageDialogResult> ShowMessagesDialogAsync(string tittle, string message
+            , IList<string> messages
+            , string _OkBtnContent = "OK"
+            , bool _isOKCancel = true
+            , string _cancelBtnContent = "Cancel"
+            , string _dialogHostName = "MainDialogHost")
+        {
+            MessageDialogResult result = MessageDialogResult.Cancel;
+
+            if (Application.Current.Dispatcher.CheckAccess())
+            {
+                result = (MessageDialogResult)await DialogHost
+                    .Show(new MessagesDialog(tittle,message,messages,_OkBtnContent,_isOKCancel,_cancelBtnContent),_dialogHostName);
+            }
+            else
+            {
+                await Application.Current.Dispatcher.Invoke(async() =>
+                {
+                   result = (MessageDialogResult)await DialogHost
+                    .Show(new MessagesDialog(tittle, message, messages, _OkBtnContent,_isOKCancel, _cancelBtnContent), _dialogHostName);
+                });
+            }
+
+            return result;
         }
     }
 }

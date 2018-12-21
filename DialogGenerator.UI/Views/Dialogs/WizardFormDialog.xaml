@@ -4,6 +4,7 @@
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
              xmlns:materialDesign="http://materialdesigninxaml.net/winfx/xaml/themes"
+             xmlns:dialogResult="clr-namespace:DialogGenerator.Utilities"
              xmlns:local="clr-namespace:DialogGenerator.UI.Views.Dialogs"
              mc:Ignorable="d" 
              d:DesignHeight="450" d:DesignWidth="800">
@@ -51,8 +52,7 @@
 
             <Button Content="Close"
                     Grid.Row="1"
-                    Click="_close_Click"
-                    x:Name="CloseBtn"
+                    Command="{x:Static materialDesign:DialogHost.CloseDialogCommand}"
                     Grid.Column="0"
                     HorizontalAlignment="Right"
                     Style="{DynamicResource MaterialDesignRaisedButton}"
@@ -62,7 +62,7 @@
                      x:Name="StartBtn"
                      Grid.Row="1"
                      Grid.Column="1"
-                     Click="_start_Click"
+                     Command="{Binding StartWizardCommand}"
                      HorizontalAlignment="Left"
                      Style="{DynamicResource MaterialDesignRaisedButton}"
                      Margin="20,20,0,0">

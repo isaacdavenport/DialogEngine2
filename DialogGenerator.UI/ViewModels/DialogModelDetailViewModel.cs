@@ -146,7 +146,7 @@ namespace DialogGenerator.UI.ViewModels
                 : null;
             SelectedDialogModelIndex = DialogModel.SelectedModelDialogIndex;
 
-            RaisePropertyChanged("DialogModelCollection");
+            RaisePropertyChanged(nameof(DialogModelCollection));
         }
 
         #endregion

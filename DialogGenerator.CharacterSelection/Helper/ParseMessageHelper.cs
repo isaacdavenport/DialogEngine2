@@ -53,14 +53,7 @@ namespace DialogGenerator.CharacterSelection.Helper
 
                 _debugString += ReceivedMessages[ReceivedMessages.Count - 1].SequenceNum.ToString("D3");
 
-                if((BLEDataProviderType)Session.Get<int>(Constants.BLE_DATA_PROVIDER) == BLEDataProviderType.Serial)
-                {
-                    Logger.Info(ApplicationData.Instance.DecimaSerialLoggerKey, _debugString);
-                }
-                else
-                {
-                    Logger.Info(ApplicationData.Instance.DecimalSerialDirectBLELoggerKey, _debugString);
-                }
+                Logger.Info(_debugString,ApplicationData.Instance.DecimalSerialDirectBLELoggerKey);
 
                 if (ReceivedMessages.Count > 30000)
                 {
@@ -76,7 +69,6 @@ namespace DialogGenerator.CharacterSelection.Helper
         #endregion
 
         #region - Public functions -
-
 
         public static void ProcessTheMessage(int _rowNum, int[] _newRow)
         {
@@ -106,7 +98,6 @@ namespace DialogGenerator.CharacterSelection.Helper
             }
 
         }
-
 
         public static int Parse(string _message, ref int[] _rssiRow)
         {

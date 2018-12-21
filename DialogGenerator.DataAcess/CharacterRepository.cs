@@ -61,6 +61,81 @@ namespace DialogGenerator.DataAccess
             return _jsonObjectsTypesList;
         }
 
+        private void _removeFile(string _fileName)
+        {
+            var _jsonObjectsTypesList = _findDataForFile(_fileName);
+
+            if (!_isListNullOrEmpty(_jsonObjectsTypesList.Characters)
+                || !_isListNullOrEmpty(_jsonObjectsTypesList.Wizards)
+                || !_isListNullOrEmpty(_jsonObjectsTypesList.DialogModels))
+            {
+                Serializer.Serialize(_jsonObjectsTypesList, Path.Combine(ApplicationData.Instance.DataDirectory, _fileName));
+            }
+            else
+            {
+                FileSystem.DeleteFile(Path.Combine(ApplicationData.Instance.DataDirectory, _fileName),
+                    UIOption.OnlyErrorDialogs,
+                    RecycleOption.SendToRecycleBin);
+            }
+        }
+
+        private void _removeImage(string _imageFileName)
+        {
+            //remove character's image if image is not default
+
+            if (!string.IsNullOrEmpty(_imageFileName)
+               && !_imageFileName.Equals(ApplicationData.Instance.DefaultImage)
+               && File.Exists(Path.Combine(ApplicationData.Instance.ImagesDirectory, _imageFileName)))
+            {
+                // used to be sure that image is not used by application anymore so we can delete it
+                GC.Collect();
+                GC.WaitForPendingFinalizers();
+                bool _isDeleted = false;
+                int counter = 0;
+
+                // used because it can happen that image is not released by application instantly
+                do
+                {
+                    try
+                    {
+                        FileSystem.DeleteFile(Path.Combine(ApplicationData.Instance.ImagesDirectory, _imageFileName)
+                            , UIOption.OnlyErrorDialogs
+                            , RecycleOption.SendToRecycleBin);
+
+                        _isDeleted = true;
+                    }
+                    catch (Exception)
+                    {
+                        Thread.Sleep(500);
+                        counter++;
+                    }
+                }
+                while (!_isDeleted && counter <= 16); // wait 8 seconds to delete file 
+
+                if (!_isDeleted)
+                {
+                    throw new Exception("Error during deleting image file.");
+                }
+            }
+        }
+
+        private bool _isListNullOrEmpty(IEnumerable<object> list)
+        {
+            return list == null || !list.Any();
+        }
+
+        private void _removeMP3Files(Character character)
+        {
+            var _audioDir = new DirectoryInfo(ApplicationData.Instance.AudioDirectory);
+            FileInfo[] _mp3Files = _audioDir.GetFiles($"{character.CharacterPrefix}*.mp3");
+
+            foreach (var _fileInfo in _mp3Files)
+            {
+                FileSystem.DeleteFile(_fileInfo.FullName, UIOption.OnlyErrorDialogs
+                    , RecycleOption.SendToRecycleBin);
+            }
+        }
+
         public async Task SaveAsync(Character character)
         {
             await Task.Run(() =>
@@ -69,7 +144,7 @@ namespace DialogGenerator.DataAccess
             });
         }
 
-        public void Export(Character character)
+        public void Export(Character character,string _directoryPath)
         {
             var _fileName = character.CharacterName.Replace(" ", string.Empty) + ".json";
             var characters = new ObservableCollection<Character>();
@@ -79,8 +154,29 @@ namespace DialogGenerator.DataAccess
             {
                 Characters = characters
             };
+            Serializer.Serialize(_jsonObjectsTypesList, Path.Combine(_directoryPath, _fileName));
 
-            Serializer.Serialize(_jsonObjectsTypesList, Path.Combine(ApplicationData.Instance.TempDirectory, _fileName));
+            // export mp3 files
+            foreach (PhraseEntry phrase in character.Phrases)
+            {
+                string _phraseFileName = $"{character.CharacterPrefix}_{phrase.FileName}.mp3";
+                string _phraseFileAbsolutePath = Path.Combine(ApplicationData.Instance.AudioDirectory, _phraseFileName);
+
+                if (File.Exists(_phraseFileAbsolutePath))
+                {
+                    File.Copy(_phraseFileAbsolutePath, Path.Combine(ApplicationData.Instance.TempDirectory, _phraseFileName), true);
+                }
+            }
+
+            // move character's image file to Temp dir if image is not default
+            if (!character.CharacterImage.Equals(ApplicationData.Instance.DefaultImage))
+            {
+                string _imageFilePath = Path.Combine(ApplicationData.Instance.ImagesDirectory, character.CharacterImage);
+                if (File.Exists(_imageFilePath))
+                {
+                    File.Copy(_imageFilePath,Path.Combine(ApplicationData.Instance.TempDirectory, character.CharacterImage));
+                }
+            }
         }
 
         public async Task AddAsync(Character character)
@@ -142,72 +238,14 @@ namespace DialogGenerator.DataAccess
                     GetAll().Remove(character);
                 });
 
-                var _jsonObjectsTypesList = _findDataForFile(_fileName);
+                // remove or update json file
+                _removeFile(_fileName);
 
                 //serialize data without character or delete json file if character is in own file
-                if((_jsonObjectsTypesList.Characters != null && _jsonObjectsTypesList.Characters.Any()) 
-                   || ( _jsonObjectsTypesList.Wizards !=null && _jsonObjectsTypesList.Wizards.Any())
-                   || (_jsonObjectsTypesList.DialogModels != null && _jsonObjectsTypesList.DialogModels.Any()))
-                {
-                    Serializer.Serialize(_jsonObjectsTypesList,Path.Combine(ApplicationData.Instance.DataDirectory,_fileName));
-                }
-                else
-                {
-                    FileSystem.DeleteFile(Path.Combine(ApplicationData.Instance.DataDirectory, _fileName),
-                        UIOption.OnlyErrorDialogs,
-                        RecycleOption.SendToRecycleBin);
-                    //File.Delete(Path.Combine(ApplicationData.Instance.DataDirectory, _fileName));
-                }
-
-                //remove character's image if image is not default
-
-                if(!string.IsNullOrEmpty(_imageFileName) 
-                   && !_imageFileName.Equals(ApplicationData.Instance.DefaultImage) 
-                   && File.Exists(Path.Combine(ApplicationData.Instance.ImagesDirectory, _imageFileName)))
-                {
-                    // used to be sure that image is not used by application anymore so we can delete it
-                    GC.Collect();
-                    GC.WaitForPendingFinalizers();
-                    bool _isDeleted = false;
-                    int counter = 0;
-
-                    // used because it can happen that image is not released by application instantly
-                    do
-                    {
-                        try
-                        {
-                            FileSystem.DeleteFile(Path.Combine(ApplicationData.Instance.ImagesDirectory, _imageFileName)
-                                , UIOption.OnlyErrorDialogs
-                                , RecycleOption.SendToRecycleBin);
-                            //File.Delete(Path.Combine(ApplicationData.Instance.ImagesDirectory, _imageFileName));
-
-                            _isDeleted = true;
-                        }
-                        catch (Exception)
-                        {
-                            Thread.Sleep(500);
-                            counter++;
-                        }
-                    }
-                    while (!_isDeleted && counter <= 16); // wait 8 seconds to delete file 
-
-                    if (!_isDeleted)
-                    {
-                        throw new Exception("Error during deleting image file.");
-                    }
-                }
+                _removeImage(_imageFileName);
 
                 // remove all character related .mp3 files
-                var _audioDir = new DirectoryInfo(ApplicationData.Instance.AudioDirectory);
-                FileInfo[] _mp3Files = _audioDir.GetFiles($"{character.CharacterPrefix}*.mp3");
-
-                foreach(var _fileInfo in _mp3Files)
-                {
-                    FileSystem.DeleteFile(_fileInfo.FullName, UIOption.OnlyErrorDialogs
-                        , RecycleOption.SendToRecycleBin);
-
-                    //_fileInfo.Delete();
-                }
+                _removeMP3Files(character);
             });
         }
     }

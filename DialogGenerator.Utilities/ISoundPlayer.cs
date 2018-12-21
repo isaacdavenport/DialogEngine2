@@ -3,7 +3,7 @@
 
 using System.ComponentModel;
 
-namespace DialogGenerator.UI.Controls.VoiceRecorder
+namespace DialogGenerator.Utilities
 {
     /// <summary>
     /// Provides access to functionality that is common

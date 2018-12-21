@@ -10,12 +10,13 @@ using Prism.Commands;
 using Prism.Events;
 using Prism.Mvvm;
 using System;
+using System.Collections.Generic;
 using System.ComponentModel;
+using System.ComponentModel.DataAnnotations;
 using System.IO;
 using System.IO.Compression;
 using System.Linq;
 using System.Threading.Tasks;
-using System.Windows;
 using System.Windows.Data;
 
 namespace DialogGenerator.UI.ViewModels
@@ -196,31 +197,40 @@ namespace DialogGenerator.UI.ViewModels
 
                 mMessageDialogService.ShowBusyDialog();
 
-                // extract data to temp directory and load 
-                var _JSONObjectsTypesList = await _extractAndLoadData(_openFileDialog.FileName);
-
-                // validate loaded data
-                if (_JSONObjectsTypesList.Characters == null || !_JSONObjectsTypesList.Characters.Any())
+                // extract data to temp directory
+                await Task.Run(() =>
                 {
-                    throw new Exception("Loaded data is not valid.");
+                    FileHelper.ClearDirectory(ApplicationData.Instance.TempDirectory);
+                    ZipFile.ExtractToDirectory(_openFileDialog.FileName, ApplicationData.Instance.TempDirectory);
+                });
+
+                IList<string> errors;
+                var _JSONObjectsTypesList = mDialogDataRepository.LoadFromDirectory(ApplicationData.Instance.TempDirectory,out errors);
+                // validate against json schema
+                if(errors.Count > 0)
+                {
+                    mMessageDialogService.CloseBusyDialog();
+                    await mMessageDialogService.ShowMessagesDialogAsync("Error", "Imported file has errors: ",errors, "Close", false);
+                    return;
+                }
+                // validate is character found
+                if(_JSONObjectsTypesList.Characters.Count == 0)
+                {
+                    mMessageDialogService.CloseBusyDialog();
+                    await mMessageDialogService.ShowMessage("Error", "Couldn't find character inside loaded file.");
+                    return;
                 }
 
-                // check if loaded character already exists
                 var _importedCharacter = _JSONObjectsTypesList.Characters.First();
-
                 if (mCharacterDataProvider.GetByInitials(_importedCharacter.CharacterPrefix) != null)
                 {
                     MessageDialogResult result = MessageDialogResult.Cancel;
-                    await Application.Current.Dispatcher.Invoke(async () =>
-                    {
-                        mMessageDialogService.CloseBusyDialog();
-                        result = await mMessageDialogService
-                            .ShowOKCancelDialogAsync($"Character '{_importedCharacter.CharacterName}' already exists. Do you want to overwrite this characters?", "Warning", "Yes", "No");
-                    });
+                    mMessageDialogService.CloseBusyDialog();
+                    result = await mMessageDialogService.ShowOKCancelDialogAsync($"Character '{_importedCharacter.CharacterName}' already exists." +
+                            $" Do you want to overwrite this characters?", "Warning", "Yes", "No");
 
                     if (result == MessageDialogResult.Cancel)
                     {
-                        FileHelper.ClearDirectory(ApplicationData.Instance.TempDirectory);
                         return;
                     }
 
@@ -229,6 +239,7 @@ namespace DialogGenerator.UI.ViewModels
                     var _oldCharacter = mCharacterDataProvider.GetByInitials(_importedCharacter.CharacterPrefix);
                     string _imageFileName = _oldCharacter.CharacterImage;
                     _oldCharacter.CharacterImage = ApplicationData.Instance.DefaultImage;
+
                     await mCharacterDataProvider.Remove(_oldCharacter, _imageFileName);
                 }
 
@@ -239,11 +250,13 @@ namespace DialogGenerator.UI.ViewModels
                 mLogger.Error("_import_Click " + ex.Message);
                 mMessageDialogService.CloseBusyDialog();
                 await mMessageDialogService.ShowMessage("Error", "Error during importing character.");
-                FileHelper.ClearDirectory(ApplicationData.Instance.TempDirectory);
-                // add support for rollback files if exception occured
+                //TODO add support for rollback files if exception occured
             }
-
-            mMessageDialogService.CloseBusyDialog();
+            finally
+            {
+                FileHelper.ClearDirectory(ApplicationData.Instance.TempDirectory);
+                mMessageDialogService.CloseBusyDialog();
+            }
         }
 
         private async Task _processImportedCharacter(Character _importedCharacter)
@@ -257,19 +270,6 @@ namespace DialogGenerator.UI.ViewModels
 
             // add character to list of characters
             mCharacterDataProvider.GetAll().Add(_importedCharacter);
-        }
-
-        private async Task<JSONObjectsTypesList> _extractAndLoadData(string path)
-        {
-            await Task.Run(() =>
-            {
-                FileHelper.ClearDirectory(ApplicationData.Instance.TempDirectory);
-                ZipFile.ExtractToDirectory(path, ApplicationData.Instance.TempDirectory);
-            });
-
-            var _jSONObjectsTypesList = await mDialogDataRepository.LoadAsync(ApplicationData.Instance.TempDirectory);
-
-            return _jSONObjectsTypesList;
         }
 
         private Task _processExtractedFiles()
@@ -320,7 +320,6 @@ namespace DialogGenerator.UI.ViewModels
         public void Load()
         {
             mCharactersCollectionViewSource.Source =  mCharacterDataProvider.GetAll();
-
             RaisePropertyChanged(nameof(CharactersViewSource));
         }
 

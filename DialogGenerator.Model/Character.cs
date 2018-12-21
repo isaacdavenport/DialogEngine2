@@ -1,4 +1,5 @@
 ﻿using DialogGenerator.Core;
+using DialogGenerator.Model.Attributes;
 using DialogGenerator.Model.Enum;
 using Newtonsoft.Json;
 using System;
@@ -40,13 +41,16 @@ namespace DialogGenerator.Model
             }
         }
 
+        [Range(1,100)]
         [JsonProperty("CharacterAge"),Required]
         public int CharacterAge { get; set; } = 10;
 
+        [RegularExpression(@"^(?:M|F)$",ErrorMessage = "Alloed letters: 'M' (Male) and 'F' (Female).")]
         [JsonProperty("CharacterGender")]
         public string CharacterGender { get; set; } = "M";
 
 
+        [StringLength(30,MinimumLength =3)]
         [JsonProperty("CharacterName"),Required]
         public string CharacterName
         {
@@ -58,11 +62,12 @@ namespace DialogGenerator.Model
             }
         }
 
-        [StringLength(3,MinimumLength =2,ErrorMessage ="Field requires 3 characters")]
+        [StringLength(3,MinimumLength =2,ErrorMessage ="Field requires 3 characters.")]
         [RegularExpression("^[a-zA-Z0-9]+$",ErrorMessage ="Allowed only letters and numbers.")]
         [JsonProperty("CharacterPrefix")]
         public string CharacterPrefix { get; set; } = "";
 
+        [FileExtensions(Extensions ="jpg,jpe,jpeg,png",ErrorMessage ="Allowed extensions: jpg,jpe,jpeg,png.")]
         [JsonProperty("CharacterImage")]
         public string CharacterImage
         {
@@ -78,6 +83,7 @@ namespace DialogGenerator.Model
         /// Radio number assigned to character
         /// Default value is unassigned ( -1 )
         /// </summary>
+        [RadioNumRange]
         [JsonProperty("RadioNum")]
         public int RadioNum
         {
@@ -85,9 +91,7 @@ namespace DialogGenerator.Model
             set
             {
                 mRadioNum = value;
-                OnPropertyChanged("RadioNum");
-
-                
+                OnPropertyChanged("RadioNum");                
             }
         }
 

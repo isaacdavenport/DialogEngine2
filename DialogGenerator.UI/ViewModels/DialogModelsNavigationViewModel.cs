@@ -123,7 +123,7 @@ namespace DialogGenerator.UI.ViewModels
         public void Load()
         {
             mDialogModelsInfoCollection.Source = mDialogModelDataProvider.GetAll();
-            RaisePropertyChanged("ModelsDialogInfoCollection");
+            RaisePropertyChanged(nameof(ModelsDialogInfoCollection));
         }
 
         #endregion

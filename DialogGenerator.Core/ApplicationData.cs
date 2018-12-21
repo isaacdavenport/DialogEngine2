@@ -22,6 +22,7 @@ namespace DialogGenerator.Core
         private string mAudioDirectory;
         private string mImagesDirectory;
         private string mToolsDirectory;
+        private string mEditorTempDirectory;
 
         static ApplicationData()
         {
@@ -97,7 +98,6 @@ namespace DialogGenerator.Core
         public string JSONEditorExeFileName { get; set; } = "JSONedit.exe"; 
         public string WebsiteUrl { get; set; } = "www.toys2life.net";
         public string TutorialFileName { get; set; } = "tutorial.pdf";
-        public string DecimaSerialLoggerKey { get; set; } = "DecimalSerialLog";
         public string DecimalSerialDirectBLELoggerKey { get; set; } = "DecimalSerialLogDirectBLE";
         public string DialogLoggerKey { get; set; } = "LogDialog";
         public string DefaultLoggerKey { get; set; } = "DefaultLog";
@@ -271,6 +271,20 @@ namespace DialogGenerator.Core
                 }
 
                 return mToolsDirectory;
+            }
+        }
+
+        [XmlIgnore]
+        public string EditorTempDirectory
+        {
+            get
+            {
+                if (string.IsNullOrEmpty(mEditorTempDirectory))
+                {
+                    mEditorTempDirectory = Path.Combine(Instance.AppDataDirectory, "EditorTemp");
+                }
+
+                return mEditorTempDirectory;
             }
         }
     }

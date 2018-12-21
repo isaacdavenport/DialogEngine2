@@ -70,6 +70,12 @@
     <Reference Include="Microsoft.Practices.Unity.RegistrationByConvention, Version=4.0.0.0, Culture=neutral, PublicKeyToken=6d32ff45e0ccc69f, processorArchitecture=MSIL">
       <HintPath>..\packages\Unity.4.0.1\lib\net45\Microsoft.Practices.Unity.RegistrationByConvention.dll</HintPath>
     </Reference>
+    <Reference Include="Newtonsoft.Json, Version=12.0.0.0, Culture=neutral, PublicKeyToken=30ad4fe6b2a6aeed, processorArchitecture=MSIL">
+      <HintPath>..\packages\Newtonsoft.Json.12.0.1\lib\net45\Newtonsoft.Json.dll</HintPath>
+    </Reference>
+    <Reference Include="Newtonsoft.Json.Schema, Version=3.0.0.0, Culture=neutral, PublicKeyToken=30ad4fe6b2a6aeed, processorArchitecture=MSIL">
+      <HintPath>..\packages\Newtonsoft.Json.Schema.3.0.10\lib\net45\Newtonsoft.Json.Schema.dll</HintPath>
+    </Reference>
     <Reference Include="Prism, Version=6.3.0.0, Culture=neutral, PublicKeyToken=40ee6c3a2184dc59, processorArchitecture=MSIL">
       <HintPath>..\packages\Prism.Core.6.3.0\lib\net45\Prism.dll</HintPath>
     </Reference>
@@ -83,6 +89,7 @@
       <HintPath>..\packages\Stateless.4.2.1\lib\net45\Stateless.dll</HintPath>
     </Reference>
     <Reference Include="System" />
+    <Reference Include="System.ComponentModel.DataAnnotations" />
     <Reference Include="System.Data" />
     <Reference Include="System.Windows.Interactivity, Version=4.5.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
       <HintPath>..\packages\Prism.Wpf.6.3.0\lib\net45\System.Windows.Interactivity.dll</HintPath>
@@ -112,6 +119,9 @@
     </Compile>
     <Compile Include="AppInitializer.cs" />
     <Compile Include="Bootstrapper.cs" />
+    <Compile Include="FocusHelper.cs" />
+    <Compile Include="Handlers\FileChangesHandler.cs" />
+    <Compile Include="Handlers\UpdatesHandler.cs" />
     <Compile Include="ViewModels\SplashScreenViewModel.cs" />
     <Compile Include="Views\Shell.xaml.cs">
       <DependentUpon>Shell.xaml</DependentUpon>
@@ -195,10 +205,6 @@
       <Project>{CA4D11CB-882D-44A3-AFF2-03083D106BCE}</Project>
       <Name>DialogGenerator.Utilities</Name>
     </ProjectReference>
-    <ProjectReference Include="..\DialogGenerator.Web\DialogGenerator.Web.csproj">
-      <Project>{7b12550d-a62e-4d99-a694-379e480caec3}</Project>
-      <Name>DialogGenerator.Web</Name>
-    </ProjectReference>
   </ItemGroup>
   <ItemGroup>
     <Resource Include="Resources\doll.jpg" />
@@ -234,6 +240,7 @@
       <Install>false</Install>
     </BootstrapperPackage>
   </ItemGroup>
+  <ItemGroup />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <PropertyGroup>
     <PostBuildEvent>:: copy tutorial data to output folder
@@ -250,6 +257,7 @@ IF NOT EXIST  "%25RELEASEPATH%25\Data" MKDIR "%25RELEASEPATH%25\Data"
 IF NOT EXIST  "%25RELEASEPATH%25\Audio" MKDIR "%25RELEASEPATH%25\Audio"
 IF NOT EXIST  "%25RELEASEPATH%25\Video" MKDIR "%25RELEASEPATH%25\Video"
 IF NOT EXIST  "%25RELEASEPATH%25\Temp" MKDIR "%25RELEASEPATH%25\Temp"
+IF NOT EXIST  "%25RELEASEPATH%25\Temp" MKDIR "%25RELEASEPATH%25\EditorTemp"
 
 </PostBuildEvent>
   </PropertyGroup>

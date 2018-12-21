@@ -5,7 +5,10 @@
       
       <!-- application -->
       <Directory Id="ProgramFilesFolder">
-        <Directory Id="INSTALLFOLDER" Name="DialogGenerator" />
+        <Directory Id="INSTALLFOLDER" Name="DialogGenerator">
+          <Directory Id="Tools" Name="Tools" />
+          <Directory Id="Tutorial" Name="Tutorial" />
+        </Directory>
       </Directory>
 
       <!--  data  -->
@@ -15,6 +18,8 @@
           <Directory Id="Audio" Name="Audio" />
           <Directory Id="Temp" Name="Temp" />
           <Directory Id="Video" Name="Video" />
+          <Directory Id="Images" Name="Images" />
+          <Directory Id="EditorTemp" Name="EditorTemp" />
         </Directory>
       </Directory>
       

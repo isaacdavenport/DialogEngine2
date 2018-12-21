@@ -3,15 +3,16 @@
 
 using System;
 using System.ComponentModel;
+using System.Diagnostics;
+using System.IO;
 using System.Windows.Threading;
+using DialogGenerator.Core;
+using DialogGenerator.Utilities.Model;
 using NAudio.Wave;
+using NAudio.Wave.SampleProviders;
 
-
-namespace DialogGenerator.UI.Controls.VoiceRecorder
+namespace DialogGenerator.Utilities
 {
-    /// <summary>
-    /// 
-    /// </summary>
     public class NAudioEngine : INotifyPropertyChanged, ISpectrumPlayer, IDisposable
     {
         #region - Fields -
@@ -19,6 +20,7 @@ namespace DialogGenerator.UI.Controls.VoiceRecorder
         private readonly DispatcherTimer mcPositionTimer = new DispatcherTimer(DispatcherPriority.ApplicationIdle);
         private readonly int mcfftDataSize = (int)FFTDataSize.FFT2048;
         // singleton instance
+        private string mCurrentFilePath;
         private static NAudioEngine msInstance;
         private bool mDisposed;
         // player's conditions
@@ -251,6 +253,45 @@ namespace DialogGenerator.UI.Controls.VoiceRecorder
             }
         }
 
+        private  void _trimWavFile(WaveFileReader reader, WaveFileWriter writer, int _startPos, int _endPos)
+        {
+            reader.Position = _startPos;
+            byte[] buffer = new byte[1024];
+            while (reader.Position < _endPos)
+            {
+                int _bytesRequired = (int)(_endPos - reader.Position);
+                if (_bytesRequired > 0)
+                {
+                    int _bytesToRead = Math.Min(_bytesRequired, buffer.Length);
+                    int _bytesRead = reader.Read(buffer, 0, _bytesToRead);
+                    if (_bytesRead > 0)
+                    {
+                        writer.Write(buffer, 0, _bytesRead);
+                    }
+                }
+            }
+        }
+
+        private void _trimWavFile(string _inPath, string _outPath, TimeSpan _cutFromStart, TimeSpan _cutFromEnd)
+        {
+            using (WaveFileReader reader = new WaveFileReader(_inPath))
+            {
+                using (WaveFileWriter writer = new WaveFileWriter(_outPath, reader.WaveFormat))
+                {
+                    int _bytesPerMillisecond = reader.WaveFormat.AverageBytesPerSecond / 1000;
+
+                    int _startPos = (int)_cutFromStart.TotalMilliseconds * _bytesPerMillisecond;
+                    _startPos = _startPos - _startPos % reader.WaveFormat.BlockAlign;
+
+                    int _endBytes = (int)_cutFromEnd.TotalMilliseconds * _bytesPerMillisecond;
+                    _endBytes = _endBytes - _endBytes % reader.WaveFormat.BlockAlign;
+                    int _endPos = (int)reader.Length - _endBytes;
+
+                    _trimWavFile(reader, writer, _startPos, _endPos);
+                }
+            }
+        }
+
         private void _waveIn_DataAvailable(object sender, WaveInEventArgs e)
         {
             mWaveFileWriter.Write(e.Buffer, 0, e.BytesRecorded);
@@ -268,15 +309,39 @@ namespace DialogGenerator.UI.Controls.VoiceRecorder
             mWaveFileWriter.Flush();
         }
 
+
+        private void _normalizeMP3File()
+        {
+            ProcessStartInfo _processStartInfo = new ProcessStartInfo();
+            _processStartInfo.FileName = Path.Combine(ApplicationData.Instance.ToolsDirectory, "mp3gain.exe");
+            Process _mp3GainProcess = Process.Start(_processStartInfo);
+            _mp3GainProcess.WaitForExit(5000);
+
+        }
+
         private void _waveIn_RecordingStopped(object sender, EventArgs e)
         {
-            //throw new NotImplementedException();
+            string _outputPath = Path.Combine(ApplicationData.Instance.TempDirectory, Path.GetFileName(mCurrentFilePath));
+            try
+            {
+                _trimWavFile(mCurrentFilePath,_outputPath, TimeSpan.Zero, TimeSpan.FromMilliseconds(100));
+                File.Copy(_outputPath, mCurrentFilePath,true);
+            }
+            catch { }
+            finally
+            {
+                if (File.Exists(_outputPath))
+                {
+                    File.Delete(_outputPath);
+                }
+                IsRecording = false;
+            }
         }
 
         #endregion
 
         #region - private functions -
-
+        
         private void _stopAndCloseStream()
         {
             if (mWaveOutDevice != null)
@@ -310,10 +375,12 @@ namespace DialogGenerator.UI.Controls.VoiceRecorder
             mWaveInDevice = new WaveIn();
             mWaveInDevice.WaveFormat = WaveFormat.CreateIeeeFloatWaveFormat(44100,2);
             mWaveInDevice.DataAvailable += _waveIn_DataAvailable;
+            mWaveInDevice.RecordingStopped += _waveIn_RecordingStopped;
 
             mSampleAggregator = new SampleAggregator(mcfftDataSize);
             mWaveFileWriter = new WaveFileWriter(path, mWaveInDevice.WaveFormat);
 
+            mCurrentFilePath = path;
             mWaveInDevice.StartRecording();
             IsRecording = true;    
         }
@@ -329,7 +396,6 @@ namespace DialogGenerator.UI.Controls.VoiceRecorder
             mWaveFileWriter.Close();
             mWaveFileWriter.Dispose();
             mWaveFileWriter = null;
-            IsRecording = false;
         }
 
         /// <summary>

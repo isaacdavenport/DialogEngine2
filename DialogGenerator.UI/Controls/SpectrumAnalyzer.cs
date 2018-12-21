@@ -1,7 +1,8 @@
 ﻿//  Confidential Source Code Property Toys2Life LLC Colorado 2017
 //  www.toys2life.org
 
-using DialogGenerator.UI.Controls.VoiceRecorder;
+using DialogGenerator.Utilities;
+using DialogGenerator.Utilities.Model;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;

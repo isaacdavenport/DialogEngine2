@@ -21,7 +21,10 @@ namespace DialogGenerator.UI.Helpers
                 {
                     try
                     {
-                        File.Delete(file.FullName);
+                        if (File.Exists(file.FullName))
+                        {
+                            File.Delete(file.FullName);
+                        }
                         _isDeleted = true;
                     }
                     catch (Exception)
@@ -42,7 +45,12 @@ namespace DialogGenerator.UI.Helpers
                 {
                     try
                     {
-                        dir.Delete(true);
+                        if (Directory.Exists(dir.FullName))
+                        {
+                            dir.Delete(true);
+                        }
+
+                        _isDeleted = true;
                     }
                     catch (Exception)
                     {

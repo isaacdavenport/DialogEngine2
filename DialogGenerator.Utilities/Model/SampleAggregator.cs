@@ -4,7 +4,7 @@
 using System;
 using NAudio.Dsp;
 
-namespace DialogGenerator.UI.Controls.VoiceRecorder
+namespace DialogGenerator.Utilities.Model
 {
     /// <summary>
     /// Collects data from <see cref="ISoundPlayer"/> and calculates FFT of data

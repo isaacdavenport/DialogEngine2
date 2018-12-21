@@ -16,6 +16,10 @@
     <Property Id="WIXUI_INSTALLDIR" Value="INSTALLDIR" />
     <Property Id="DATA_DIR" Value="$(var.DialogGenerator_TargetDir)Data" />
     <Property Id="VIDEO_DIR" Value="$(var.DialogGenerator_TargetDir)Video" />
+    <Property Id="AUDIO_DIR" Value="$(var.DialogGenerator_TargetDir)Audio" />
+    <Property Id="IMAGES_DIR" Value="$(var.DialogGenerator_TargetDir)Images" />
+    <Property Id="TOOLS_DIR" Value="$(var.DialogGenerator_TargetDir)Tools" />
+    <Property Id="TUTORIAL_DIR" Value="$(var.DialogGenerator_TargetDir)Tutorial" />
     <Property Id="USER_DOCUMENTS_FOLDER_PATH">
       <RegistrySearch Key="SOFTWARE\$(var.Manufacturer)\$(var.SkuName)" Root="HKLM" Type="raw" Id="USER_DATA_FOLDER_REGSEARCH" Name="Path" />
     </Property>
@@ -29,10 +33,14 @@
 		</Feature>
 
     <Feature Id="Data" Title="Data" Level="1">
-      <ComponentRef Id="Temp"/>
-      <ComponentRef Id="Video"/>
+      <ComponentRef Id="Temp" />
+      <ComponentRef Id="EditorTemp" />
+      <ComponentRef Id="Video" />
+      <ComponentRef Id="Data" />
+      <ComponentRef Id="Audio" />
+      <ComponentRef Id="Images" />
       <ComponentRef Id="CleanupData" />
-      <ComponentRef Id="Application.xml"/>
+      <ComponentRef Id="Application.xml" />
       <Condition Level="1">NOT Installed</Condition>
     </Feature>
       

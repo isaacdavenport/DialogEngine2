@@ -13,7 +13,7 @@ namespace DialogGenerator.DataAccess
         List<Character> GetAllByState(CharacterState state);
         Character GetByAssignedRadio(int _radioNum);
         Task AddAsync(Character character);
-        void Export(Character character);
+        void Export(Character character,string _directoryPath);
         Task SaveAsync(Character character);
         Task Remove(Character character,string _imageFileName);
     }

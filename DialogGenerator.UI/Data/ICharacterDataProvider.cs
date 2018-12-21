@@ -11,7 +11,7 @@ namespace DialogGenerator.UI.Data
         Character GetByAssignedRadio(int _radionNum);
         Task AddAsync(Character character);
         Task SaveAsync(Character character);
-        void Export(Character character);
+        void Export(Character character,string _directoryPath);
         Task Remove(Character character,string _imageFileName);
     }
 }

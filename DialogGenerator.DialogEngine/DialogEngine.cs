@@ -134,7 +134,7 @@ namespace DialogGenerator.DialogEngine
 
         private void _onSelectedCharactersPairChanged(SelectedCharactersPairEventArgs obj)
         {
-            mLogger.Debug("_onSelectedCharactersPairChanged");
+            mLogger.Debug($"_onSelectedCharactersPairChanged - character1:{obj.Character1Index} Character2: {obj.Character2Index} ",ApplicationData.Instance.DialogLoggerKey);
 
             if (!ApplicationData.Instance.UseSerialPort && mRandomSelectionDataCached != null
                && Session.Get<int>(Constants.COMPLETED_DLG_MODELS) < ApplicationData.Instance.NumberOfDialogModelsCompleted)
@@ -168,6 +168,7 @@ namespace DialogGenerator.DialogEngine
                 {
                     _fileName = Path.Combine(ApplicationData.Instance.AudioDirectory, DialogEngineConstants.SilenceFileName);
                     mUserLogger.Warning("File: " + Path.GetFileName(_pathAndFileName) + " doesn't exist.");
+                    mLogger.Info("File: " + Path.GetFileName(_pathAndFileName) + " doesn't exist.", ApplicationData.Instance.DialogLoggerKey);
                 }
 
                 Thread.Sleep(300);
@@ -177,6 +178,7 @@ namespace DialogGenerator.DialogEngine
                 if (_playSuccess != 0)
                 {
                     mUserLogger.Error("MP3 Play Error  ---  " + _playSuccess);
+                    mLogger.Info("MP3 Play Error  ---  " + _playSuccess);
                 }
 
                 do
@@ -209,8 +211,8 @@ namespace DialogGenerator.DialogEngine
                 StartedTime = DateTime.Now
             });
 
-            mLogger.Info(ApplicationData.Instance.DialogLoggerKey, 
-                mContext.CharactersList[_speakingCharacter].CharacterName + ": " + _selectedPhrase.DialogStr);
+            mLogger.Info(mContext.CharactersList[_speakingCharacter].CharacterName + ": " + _selectedPhrase.DialogStr
+                ,ApplicationData.Instance.DialogLoggerKey);
         }
 
         private void _addDialogModelToHistory(int _dialogModelIndex, int _ch1, int _ch2)
@@ -318,7 +320,7 @@ namespace DialogGenerator.DialogEngine
                 string _debugMessage = "_startDialog " + mContext.CharactersList[mContext.Character1Num].CharacterPrefix + " and " +
                     mContext.CharactersList[mContext.Character2Num].CharacterPrefix + " " + mContext.DialogModelsList[mIndexOfCurrentDialogModel].Name;
 
-                mLogger.Debug(_debugMessage);
+                mLogger.Debug(_debugMessage,ApplicationData.Instance.DialogLoggerKey);
                 mUserLogger.Info(_debugMessage);
 
                 if (!mContext.SameCharactersAsLast)
@@ -333,11 +335,12 @@ namespace DialogGenerator.DialogEngine
 
                     if (mContext.CharactersList[_speakingCharacter].PhraseTotals.PhraseWeights.ContainsKey(_currentPhraseType))
                     {
-                        mLogger.Info(mContext.CharactersList[_speakingCharacter].CharacterName + ": ");
+                        mLogger.Info(mContext.CharactersList[_speakingCharacter].CharacterName + ": ",ApplicationData.Instance.DialogLoggerKey);
 
                         if (mContext.CharactersList[_speakingCharacter].PhraseTotals.PhraseWeights[_currentPhraseType] < 0.01f)
                         {
                             mUserLogger.Warning("Missing PhraseType: " + _currentPhraseType);
+                            mLogger.Info("Missing PhraseType: " + _currentPhraseType);
                         }
 
                         token.ThrowIfCancellationRequested();
@@ -347,6 +350,7 @@ namespace DialogGenerator.DialogEngine
                         if (_selectedPhrase == null)
                         {
                             mUserLogger.Warning("Phrase type " + _currentPhraseType + " was not found.");
+                            mLogger.Info("Phrase type " + _currentPhraseType + " was not found.");
                             continue;
                         }
 

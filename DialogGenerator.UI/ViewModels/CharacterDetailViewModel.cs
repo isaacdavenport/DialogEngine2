@@ -157,17 +157,23 @@ namespace DialogGenerator.UI.ViewModels
                 await Task.Run(() =>
                 {
                     FileHelper.ClearDirectory(ApplicationData.Instance.TempDirectory);
-                    _generateZIPFile(Character.Model, _saveFileDialog.FileName);
+                    mCharacterDataProvider.Export(Character.Model, ApplicationData.Instance.TempDirectory);
 
-                    // clear temp directory
-                    FileHelper.ClearDirectory(ApplicationData.Instance.TempDirectory);
+                    // zip content from temp directory
+                    ZipFile.CreateFromDirectory(ApplicationData.Instance.TempDirectory, _saveFileDialog.FileName);
                 });
 
-                mMessageDialogService.CloseBusyDialog();
             }
             catch (Exception ex)
             {
                 mLogger.Error("_exportCharacterCommand_Execute " + ex.Message);
+                mMessageDialogService.CloseBusyDialog();
+                await mMessageDialogService.ShowMessage("Error","An error occured during exporting character. Please try again.");                
+            }
+            finally
+            {
+                FileHelper.ClearDirectory(ApplicationData.Instance.TempDirectory);
+                mMessageDialogService.CloseBusyDialog();
             }
         }
 
@@ -176,12 +182,27 @@ namespace DialogGenerator.UI.ViewModels
             return IsEditing;
         }
 
-        private void _editWithJSONEditorCommand_Execute()
+        private async void _editWithJSONEditorCommand_Execute()
         {
             try
             {
-                Process.Start(Path.Combine(ApplicationData.Instance.ToolsDirectory, ApplicationData.Instance.JSONEditorExeFileName),
-                    Path.Combine(ApplicationData.Instance.DataDirectory, Character.Model.FileName));
+                if (ProcessHandler.Contains(Character.Model.FileName))
+                {
+                    await mMessageDialogService.ShowMessage("Info","Character already opened with JSON editor.");
+                    return;
+                }
+
+                File.Copy(Path.Combine(ApplicationData.Instance.DataDirectory, Character.Model.FileName),
+                    Path.Combine(ApplicationData.Instance.EditorTempDirectory, Character.Model.FileName));
+
+                ProcessStartInfo _startInfo = new ProcessStartInfo();
+                _startInfo.FileName = Path.Combine(ApplicationData.Instance.ToolsDirectory, ApplicationData.Instance.JSONEditorExeFileName);
+                _startInfo.Arguments = Path.Combine(ApplicationData.Instance.EditorTempDirectory, Character.Model.FileName);
+
+                var process = Process.Start(_startInfo);
+                process.EnableRaisingEvents = true;
+
+                ProcessHandler.Set(Character.Model.FileName, process);             
             }
             catch (Exception ex)
             {
@@ -212,8 +233,6 @@ namespace DialogGenerator.UI.ViewModels
                 await mCharacterDataProvider.Remove(Character.Model, _imageFileName);
 
                 Load("");
-
-                mMessageDialogService.CloseBusyDialog();
             }
             catch (Exception ex)
             {
@@ -221,6 +240,10 @@ namespace DialogGenerator.UI.ViewModels
                 mMessageDialogService.CloseBusyDialog();
                 await mMessageDialogService.ShowMessage("Error", "Error occured during deleting character.");
                 Load(Character.CharacterPrefix);
+            }
+            finally
+            {
+                mMessageDialogService.CloseBusyDialog();
             }
         }
 
@@ -256,62 +279,34 @@ namespace DialogGenerator.UI.ViewModels
             Load(_characterPrefix);
         }
 
-        private void _generateZIPFile(Character _selectedCharacter,string path)
-        {
-            // create .json file with character's content and place to Temp dir
-            mCharacterDataProvider.Export(_selectedCharacter);
-
-            // move character related .mp3 files to Temp dir
-            foreach (PhraseEntry phrase in _selectedCharacter.Phrases)
-            {
-                string _phraseFileName = $"{_selectedCharacter.CharacterPrefix}_{phrase.FileName}.mp3";
-                string _phraseFileAbsolutePath = Path.Combine(ApplicationData.Instance.AudioDirectory, _phraseFileName);
-
-                if (File.Exists(_phraseFileAbsolutePath))
-                {
-                    File.Copy(_phraseFileAbsolutePath, Path.Combine(ApplicationData.Instance.TempDirectory, _phraseFileName), true);
-                }
-            }
-
-            // move character's image file to Temp dir if image is not default
-            if (!_selectedCharacter.CharacterImage.Equals(ApplicationData.Instance.DefaultImage))
-            {
-                File.Copy(Path.Combine(ApplicationData.Instance.ImagesDirectory, _selectedCharacter.CharacterImage),
-                    Path.Combine(ApplicationData.Instance.TempDirectory, _selectedCharacter.CharacterImage));
-            }
-
-            // zip content from temp directory
-            ZipFile.CreateFromDirectory(ApplicationData.Instance.TempDirectory, path);
-        }
-
         #endregion
 
         #region - public functions -
 
         public void Load(string _characterInitials)
         {
-            if (string.IsNullOrEmpty(_characterInitials))
-            {
-                IsEditing = false;
-            }
-            else
-            {
-                IsEditing = true;
-            }
+            IsEditing = !string.IsNullOrEmpty(_characterInitials);
 
             var character = !string.IsNullOrEmpty(_characterInitials)
                 ? mCharacterDataProvider.GetByInitials(_characterInitials)
                 : new Character();
 
             if (character == null)
+            {
                 character = new Character();
+                IsEditing = false;
+            }
 
             Character = new CharacterWrapper(character,mCharacterDataProvider);
             Character.PropertyChanged += (s, e) =>
             {
-                if(e.PropertyName == nameof(Character.HasErrors))
+                switch (e.PropertyName)
                 {
-                    ((DelegateCommand)SaveCommand).RaiseCanExecuteChanged();
+                    case nameof(Character.HasErrors):
+                        {
+                            ((DelegateCommand)SaveCommand).RaiseCanExecuteChanged();
+                            break;
+                        }
                 }
             };
 

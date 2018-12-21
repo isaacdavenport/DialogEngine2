@@ -4,10 +4,10 @@ namespace DialogGenerator.Core
 {
     public interface ILogger
     {
-        void Error(string _loggerType = null, string _message = null, [CallerFilePath] string _file = "", [CallerLineNumber] int _line = 0);
-        void Info(string _loggerType = null, string _message = null, [CallerFilePath] string _file = "", [CallerLineNumber] int _line = 0);
-        void Warning(string _loggerType = null, string _message = null, [CallerFilePath] string _file = "", [CallerLineNumber] int _line = 0);
-        void Debug(string _loggerType = null, string _message = null, [CallerFilePath] string _file = "", [CallerLineNumber] int _line = 0);
+        void Error(string message, string _loggerType = null, [CallerFilePath] string _file = "", [CallerLineNumber] int _line = 0);
+        void Info(string message, string _loggerType = null, [CallerFilePath] string _file = "", [CallerLineNumber] int _line = 0);
+        void Warning(string message, string _loggerType = null, [CallerFilePath] string _file = "", [CallerLineNumber] int _line = 0);
+        void Debug(string message, string _loggerType = null, [CallerFilePath] string _file = "", [CallerLineNumber] int _line = 0);
 
     }
 }

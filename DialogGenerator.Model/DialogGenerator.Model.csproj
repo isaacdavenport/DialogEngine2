@@ -59,6 +59,7 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Attributes\RadioNumRangeAttribute.cs" />
     <Compile Include="Character.cs" />
     <Compile Include="Enum\CharacterState.cs" />
     <Compile Include="Enum\ModelDialogState.cs" />

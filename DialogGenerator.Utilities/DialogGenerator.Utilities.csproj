@@ -48,6 +48,9 @@
     <Reference Include="Microsoft.Practices.Unity.RegistrationByConvention, Version=4.0.0.0, Culture=neutral, PublicKeyToken=6d32ff45e0ccc69f, processorArchitecture=MSIL">
       <HintPath>..\packages\Unity.4.0.1\lib\net45\Microsoft.Practices.Unity.RegistrationByConvention.dll</HintPath>
     </Reference>
+    <Reference Include="NAudio, Version=1.8.5.0, Culture=neutral, processorArchitecture=MSIL">
+      <HintPath>..\packages\NAudio.1.8.5\lib\net35\NAudio.dll</HintPath>
+    </Reference>
     <Reference Include="PresentationCore" />
     <Reference Include="PresentationFramework" />
     <Reference Include="Prism, Version=6.3.0.0, Culture=neutral, PublicKeyToken=40ee6c3a2184dc59, processorArchitecture=MSIL">
@@ -61,6 +64,8 @@
     </Reference>
     <Reference Include="System" />
     <Reference Include="System.Core" />
+    <Reference Include="System.Drawing" />
+    <Reference Include="System.Windows.Forms" />
     <Reference Include="System.Windows.Interactivity, Version=4.5.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
       <HintPath>..\packages\Prism.Wpf.6.3.0\lib\net45\System.Windows.Interactivity.dll</HintPath>
     </Reference>
@@ -80,6 +85,9 @@
     <Compile Include="Dialogs\MessageDialog.xaml.cs">
       <DependentUpon>MessageDialog.xaml</DependentUpon>
     </Compile>
+    <Compile Include="Dialogs\MessagesDialog.xaml.cs">
+      <DependentUpon>MessagesDialog.xaml</DependentUpon>
+    </Compile>
     <Compile Include="Dialogs\OKCancelDialog.xaml.cs">
       <DependentUpon>OKCancelDialog.xaml</DependentUpon>
     </Compile>
@@ -87,8 +95,15 @@
     <Compile Include="IMP3Player.cs" />
     <Compile Include="IUserLogger.cs" />
     <Compile Include="MessageDialogService.cs" />
+    <Compile Include="Model\BarHeightScalingStyles.cs" />
+    <Compile Include="Model\FFTDataSize.cs" />
+    <Compile Include="ISoundPlayer.cs" />
+    <Compile Include="ISpectrumPlayer.cs" />
+    <Compile Include="NAudioEngine.cs" />
+    <Compile Include="Model\SampleAggregator.cs" />
     <Compile Include="Model\UserLoggerModel.cs" />
     <Compile Include="MP3Player.cs" />
+    <Compile Include="ProcessHandler.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="UserLogger.cs" />
     <Compile Include="UtilitiesModule.cs" />
@@ -114,6 +129,10 @@
     <Page Include="Dialogs\MessageDialog.xaml">
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
+    </Page>
+    <Page Include="Dialogs\MessagesDialog.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
     </Page>
     <Page Include="Dialogs\OKCancelDialog.xaml">
       <Generator>MSBuild:Compile</Generator>

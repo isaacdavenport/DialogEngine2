@@ -20,6 +20,13 @@ namespace DialogGenerator.UI.Views
             mCharacterDataProvider = _characterDataProvider;
 
             InitializeComponent();
+
+            Loaded += _assignCharactersToDollsView_Loaded;
+        }
+
+        private void _assignCharactersToDollsView_Loaded(object sender, RoutedEventArgs e)
+        {
+            this.ItemsControl.Items.Refresh();
         }
 
         private void _popup_Opened(object sender, System.Windows.RoutedEventArgs e)

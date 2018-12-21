@@ -16,7 +16,6 @@ namespace DialogGenerator.DataAccess
             mContainer.RegisterType<ICharacterRepository,CharacterRepository>();
             mContainer.RegisterType<IDialogModelRepository,DialogModelRepository>();
             mContainer.RegisterType<IWizardRepository,WizardRepository>();
-            mContainer.RegisterType<IOnlineCharactersRepository, OnlineCharactersRepository>();
         }
     }
 }

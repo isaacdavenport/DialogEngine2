@@ -4,6 +4,8 @@ using DialogGenerator.DialogEngine;
 using DialogGenerator.Workflow;
 using System;
 using System.IO;
+using System.Collections.Generic;
+using DialogGenerator.Utilities;
 
 namespace DialogGenerator
 {
@@ -12,22 +14,23 @@ namespace DialogGenerator
         #region - fields -
 
         private ILogger mLogger;
+        private IUserLogger mUserLogger;
         private IDialogDataRepository mDialogDataRepository;
         private ICharacterRepository mCharacterRepository;
         private IDialogEngine mDialogEngine;
         private AppInitializerWorkflow mWorkflow;
         private States mCurrentState;
-        public event EventHandler<string> Error;
         public event EventHandler Completed;
 
         #endregion
 
         #region - constructor -
 
-        public AppInitializer(ILogger logger, IDialogDataRepository _dialogRepository,
+        public AppInitializer(ILogger logger,IUserLogger _userLogger, IDialogDataRepository _dialogRepository,
             IDialogEngine _dialogEngine,ICharacterRepository _characterRepository)
         {
             mLogger = logger;
+            mUserLogger = _userLogger;
             mDialogDataRepository = _dialogRepository;
             mCharacterRepository = _characterRepository;
             mDialogEngine = _dialogEngine;
@@ -58,11 +61,7 @@ namespace DialogGenerator
 
             mWorkflow.Configure(States.LoadingData)
                 .OnEntry(_loadData)
-                .Permit(Triggers.InitializeDialogEngine, States.DialogEngineInitialization)
-                .Permit(Triggers.ProcessError, States.Error);
-
-            mWorkflow.Configure(States.Error)
-                .OnEntry(_processError);
+                .Permit(Triggers.InitializeDialogEngine, States.DialogEngineInitialization);
 
             mWorkflow.Configure(States.DialogEngineInitialization)
                 .OnEntry(_initializeDialogEngine)
@@ -73,9 +72,29 @@ namespace DialogGenerator
         }
 
 
-        private async void _loadData()
+        private  void _loadData()
         {
-            if (File.Exists(ApplicationData.Instance.TempDirectory))
+            _checkDirectories();
+
+            IList<string> errors;
+            var _JSONObjectTypesList = mDialogDataRepository.LoadFromDirectory(ApplicationData.Instance.DataDirectory,out errors);
+
+            foreach(var error in errors)
+            {
+                mUserLogger.Error(error);
+                mLogger.Error(error);
+            }
+            
+            Session.Set(Constants.CHARACTERS, _JSONObjectTypesList.Characters);
+            Session.Set(Constants.DIALOG_MODELS, _JSONObjectTypesList.DialogModels);
+            Session.Set(Constants.WIZARDS, _JSONObjectTypesList.Wizards);
+
+            mWorkflow.Fire(Triggers.InitializeDialogEngine);
+        }
+
+        private  void _checkDirectories()
+        {
+            if (Directory.Exists(ApplicationData.Instance.TempDirectory))
             {
                 var _dirInfo = new DirectoryInfo(ApplicationData.Instance.TempDirectory);
 
@@ -93,21 +112,24 @@ namespace DialogGenerator
                 Directory.CreateDirectory(ApplicationData.Instance.TempDirectory);
             }
 
-            var _loadedData = await mDialogDataRepository.LoadAsync(ApplicationData.Instance.DataDirectory);
-
-            if (_loadedData.DialogModels.Count == 0)
+            if (Directory.Exists(ApplicationData.Instance.EditorTempDirectory))
             {
-                // TODO process error
-                //mWorkflow.Fire(Triggers.ProcessError);
+                var _dirInfo = new DirectoryInfo(ApplicationData.Instance.EditorTempDirectory);
+
+                foreach (FileInfo file in _dirInfo.EnumerateFiles())
+                {
+                    file.Delete();
+                }
+                foreach (DirectoryInfo dir in _dirInfo.EnumerateDirectories())
+                {
+                    dir.Delete(true);
+                }
             }
-
-            Session.Set(Constants.CHARACTERS, _loadedData.Characters);
-            Session.Set(Constants.DIALOG_MODELS, _loadedData.DialogModels);
-            Session.Set(Constants.WIZARDS, _loadedData.Wizards);
-
-            mWorkflow.Fire(Triggers.InitializeDialogEngine);
+            else
+            {
+                Directory.CreateDirectory(ApplicationData.Instance.EditorTempDirectory);
+            }
         }
-
 
         private void _initializeDialogEngine()
         {
@@ -150,13 +172,7 @@ namespace DialogGenerator
             Session.Set(Constants.SELECTED_DLG_MODEL, -1);
             Session.Set(Constants.COMPLETED_DLG_MODELS, 0);
 
-            Completed(this,new EventArgs());
-        }
-
-
-        private void _processError()
-        {
-                     
+            Completed?.Invoke(this, new EventArgs());
         }
 
         #endregion

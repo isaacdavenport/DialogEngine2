@@ -52,8 +52,8 @@ namespace DialogGenerator.Utilities
             mTimer = new Timer(_timerElapsed, null, Timeout.Infinite, Timeout.Infinite);
 
             Player.MediaOpened += _player_MediaOpened;
+            Player.MediaFailed += _player_MediaFailed;
         }
-
 
         #endregion
 
@@ -99,6 +99,10 @@ namespace DialogGenerator.Utilities
             };
         }
 
+        private void _player_MediaFailed(object sender, ExceptionEventArgs e)
+        {
+            mLogger.Error(e.ErrorException.StackTrace);
+        }
 
         private void _player_MediaOpened(object sender, EventArgs e)
         {
@@ -107,7 +111,6 @@ namespace DialogGenerator.Utilities
                 mDuration = Player.NaturalDuration.TimeSpan.TotalSeconds;
             }
 
-            Debug.WriteLine("loaded + " + mDuration);
             mIsLoaded = true;
         }
 
@@ -117,6 +120,7 @@ namespace DialogGenerator.Utilities
 
         private void _stopPlayingCurrentDialogLine()
         {
+            mLogger.Info("_stopPlayingCurrentDialogLine");
             mTimer.Change(Timeout.Infinite, Timeout.Infinite);
             mVolumeTimer.Change(Timeout.Infinite, Timeout.Infinite);
 
@@ -132,6 +136,8 @@ namespace DialogGenerator.Utilities
         // when this function is inveoked, we stops player without any condition
         private void _stopImmediatelyPlayingCurrentDialogLine()
         {
+            mLogger.Info("_stopImmediatelyPlayingCurrentDialogLine");
+
             if (IsPlaying())
             {
                 try
@@ -141,7 +147,7 @@ namespace DialogGenerator.Utilities
                 }
                 catch (Exception ex)
                 {
-                    mLogger.Error("StopImmediatelyPlayingCurrentDialogLine error. Message: " + ex.Message);
+                    mLogger.Error("StopImmediatelyPlayingCurrentDialogLine " + ex.Message);
                 }
             }
         }
@@ -182,11 +188,6 @@ namespace DialogGenerator.Utilities
             }
         }
 
-        /// <summary>
-        /// 
-        /// </summary>
-        /// <param name="path">Path</param>
-        /// <returns>0 for success or 0 in case of error</returns>
         public int Play(string path)
         {
             try

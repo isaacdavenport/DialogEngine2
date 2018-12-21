@@ -1,0 +1,64 @@
+﻿<UserControl x:Class="DialogGenerator.Utilities.Dialogs.MessagesDialog"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             xmlns:materialDesign="http://materialdesigninxaml.net/winfx/xaml/themes"
+             xmlns:dialogResult="clr-namespace:DialogGenerator.Utilities"
+             xmlns:local="clr-namespace:DialogGenerator.Utilities.Dialogs"
+             mc:Ignorable="d"
+             MaxWidth="800"
+             MinWidth="600"
+             MaxHeight="800"
+             d:DesignHeight="450" d:DesignWidth="800">
+    
+    <GroupBox x:Name="groupBox" 
+              Header="{Binding Tittle}"  
+              BorderThickness="0" 
+              Style="{DynamicResource MaterialDesignGroupBox}"  
+              UseLayoutRounding="True" 
+              SnapsToDevicePixels="True">
+        <GroupBox.HeaderTemplate>
+            <DataTemplate>
+                <TextBlock Text="{Binding}" HorizontalAlignment="Center" VerticalAlignment="Center" />
+            </DataTemplate>
+        </GroupBox.HeaderTemplate>
+
+        <Grid HorizontalAlignment="Stretch" Margin="20,20,20,20" VerticalAlignment="Stretch">
+
+            <Grid.RowDefinitions>
+                <RowDefinition Height="auto"/>
+                <RowDefinition />
+                <RowDefinition Height="auto" />
+            </Grid.RowDefinitions>
+
+            <TextBlock Text="{Binding Message}" 
+                       Grid.Row="0"
+                       MaxWidth="300"
+                       Margin="0,0,0,10"
+                       TextWrapping="Wrap"
+                       HorizontalAlignment="Left" 
+                       VerticalAlignment="Center" />
+
+            <ScrollViewer VerticalScrollBarVisibility="Auto" Grid.Row="1" HorizontalScrollBarVisibility="Auto">
+                <ItemsControl ItemsSource="{Binding Messages}"  
+                          ScrollViewer.HorizontalScrollBarVisibility="Auto" ScrollViewer.VerticalScrollBarVisibility="Auto" />
+            </ScrollViewer>
+
+
+            <StackPanel Orientation="Horizontal" VerticalAlignment="Center" Grid.Row="2" Margin="0,20,0,0" HorizontalAlignment="Center">
+                <Button Content="{Binding CancelBtnContent}"
+                        Visibility="{Binding IsCancelBtnVisible}"
+                        Command="{x:Static materialDesign:DialogHost.CloseDialogCommand}"
+                        CommandParameter="{x:Static dialogResult:MessageDialogResult.Cancel}"
+                        Margin="0,0,10,0" />
+
+                <Button Grid.Row="1"
+                        Content="{Binding OkBtnContent}"
+                        Margin="10,0,0,0"
+                        Command="{x:Static materialDesign:DialogHost.CloseDialogCommand}"
+                        CommandParameter="{x:Static dialogResult:MessageDialogResult.OK}" />
+            </StackPanel>
+        </Grid>
+    </GroupBox>
+</UserControl>

@@ -1,6 +1,7 @@
 ﻿using DialogGenerator.Core;
 using DialogGenerator.Model;
 using DialogGenerator.UI.Views;
+using DialogGenerator.Utilities;
 using Prism.Regions;
 using System.Linq;
 using System.Windows;
@@ -34,6 +35,29 @@ namespace DialogGenerator.Views
 
         #region - event handlers -
 
+        private async void _window_Closing(object sender, System.ComponentModel.CancelEventArgs e)
+        {
+            e.Cancel = true;
+            if (ProcessHandler.HasActiveProcess)
+            {
+                MessageDialogResult result = await MessageDialogService
+                    .ShowOKCancelDialogAsync("JSON editor didn't closed. If you made changes, please save and close editor.","Warning","Close message","Close editor");
+
+                if(result == MessageDialogResult.Cancel)
+                {
+                    ProcessHandler.ClearAll();
+                    e.Cancel = false;
+                    Application.Current.Shutdown();
+                }
+            }
+            else
+            {
+                e.Cancel = false;
+                Application.Current.Shutdown();
+            }
+            
+        }
+
         private void _onGoToPage(object sender, ExecutedRoutedEventArgs e)
         {
             var parameters = (object[])e.Parameter;
@@ -58,5 +82,7 @@ namespace DialogGenerator.Views
         }
 
         #endregion
+
+        public IMessageDialogService MessageDialogService { get; set; }
     }
 }

@@ -1,9 +1,12 @@
 ﻿using DialogGenerator.Model;
 using DialogGenerator.UI.Data;
 using MaterialDesignThemes.Wpf;
+using Prism.Commands;
+using System;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Windows.Controls;
+using System.Windows.Input;
 
 namespace DialogGenerator.UI.Views.Dialogs
 {
@@ -17,29 +20,37 @@ namespace DialogGenerator.UI.Views.Dialogs
 
         public WizardFormDialog(IWizardDataProvider _wizardDataProvider)
         {
-            mWizardDataProvider = _wizardDataProvider;
-            DataContext = this;
             InitializeComponent();
+            DataContext = this;
+            Loaded += _wizardFormDialog_Loaded;
 
-            SelectedWizardIndex = 0;
+            mWizardDataProvider = _wizardDataProvider;
+            StartWizardCommand = new DelegateCommand(_startWizard_Execute, _startWizard_CanExecute);
         }
 
-
-        private void _start_Click(object sender, System.Windows.RoutedEventArgs e)
+        private void _wizardFormDialog_Loaded(object sender, System.Windows.RoutedEventArgs e)
         {
-            DialogHost.CloseDialogCommand.Execute(SelectedWizardIndex, sender as Button);
+            SelectedWizardIndex = Wizards.Count > 0 ? 0 : -1;
+            ((DelegateCommand)StartWizardCommand).RaiseCanExecuteChanged();
         }
 
-        private void _close_Click(object sender, System.Windows.RoutedEventArgs e)
+        private bool _startWizard_CanExecute()
         {
-            DialogHost.CloseDialogCommand.Execute(null, sender as Button);
+            return SelectedWizardIndex >= 0;
         }
+
+        private void _startWizard_Execute()
+        {
+            if(StartWizardCommand.CanExecute(null))
+                DialogHost.CloseDialogCommand.Execute(SelectedWizardIndex, this.StartBtn);
+        }
+
+        public ICommand StartWizardCommand { get; set; }
 
         public virtual void OnPropertyChanged(string _propertyName)
         {
             PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(_propertyName));
         }
-
 
         public event PropertyChangedEventHandler PropertyChanged;
 
@@ -55,6 +66,7 @@ namespace DialogGenerator.UI.Views.Dialogs
             {
                 mSelectedWizardIndex = value;
                 OnPropertyChanged("SelectedWizardIndex");
+                ((DelegateCommand)StartWizardCommand).RaiseCanExecuteChanged();
             }
         }
     }

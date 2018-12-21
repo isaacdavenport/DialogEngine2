@@ -37,6 +37,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DialogGenerator.Web", "Dial
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DialogGenerator.Tests.UI", "DialogGenerator.Tests.UI\DialogGenerator.Tests.UI.csproj", "{6818CF8A-3A5A-4821-8C58-2BE51E0B0A96}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DialogGenerator.Tests.Integration", "DialogGenerator.Tests.Integration\DialogGenerator.Tests.Integration.csproj", "{895AC7E0-AD54-4881-8742-BCD903F2D61D}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -155,6 +157,14 @@ Global
 		{6818CF8A-3A5A-4821-8C58-2BE51E0B0A96}.Release|Any CPU.Build.0 = Release|Any CPU
 		{6818CF8A-3A5A-4821-8C58-2BE51E0B0A96}.Release|x86.ActiveCfg = Release|Any CPU
 		{6818CF8A-3A5A-4821-8C58-2BE51E0B0A96}.Release|x86.Build.0 = Release|Any CPU
+		{895AC7E0-AD54-4881-8742-BCD903F2D61D}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{895AC7E0-AD54-4881-8742-BCD903F2D61D}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{895AC7E0-AD54-4881-8742-BCD903F2D61D}.Debug|x86.ActiveCfg = Debug|Any CPU
+		{895AC7E0-AD54-4881-8742-BCD903F2D61D}.Debug|x86.Build.0 = Debug|Any CPU
+		{895AC7E0-AD54-4881-8742-BCD903F2D61D}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{895AC7E0-AD54-4881-8742-BCD903F2D61D}.Release|Any CPU.Build.0 = Release|Any CPU
+		{895AC7E0-AD54-4881-8742-BCD903F2D61D}.Release|x86.ActiveCfg = Release|Any CPU
+		{895AC7E0-AD54-4881-8742-BCD903F2D61D}.Release|x86.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

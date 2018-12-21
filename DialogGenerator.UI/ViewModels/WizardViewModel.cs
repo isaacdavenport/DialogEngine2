@@ -1,6 +1,5 @@
 ﻿using DialogGenerator.Core;
 using DialogGenerator.Model;
-using DialogGenerator.UI.Controls.VoiceRecorder;
 using DialogGenerator.UI.Data;
 using DialogGenerator.UI.Views;
 using DialogGenerator.UI.Views.Dialogs;
