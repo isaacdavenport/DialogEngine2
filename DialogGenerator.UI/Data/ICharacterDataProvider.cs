@@ -13,5 +13,6 @@ namespace DialogGenerator.UI.Data
         Task SaveAsync(Character character);
         void Export(Character character,string _directoryPath);
         Task Remove(Character character,string _imageFileName);
+        void RemovePhrase(Character character, PhraseEntry phrase);
     }
 }

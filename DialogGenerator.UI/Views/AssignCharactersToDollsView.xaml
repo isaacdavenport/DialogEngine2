@@ -48,7 +48,7 @@
         </Border>
 
         <ScrollViewer Grid.Row="1"  VerticalAlignment="Top" ScrollViewer.VerticalScrollBarVisibility="Auto">
-            <Grid HorizontalAlignment="Stretch" Grid.Row="1"  Margin="10,0,10,0"  VerticalAlignment="Stretch" >
+            <Grid HorizontalAlignment="Stretch" Grid.Row="1"  Margin="10,10,10,10"  VerticalAlignment="Stretch" >
                 <ItemsControl HorizontalAlignment="Center" ScrollViewer.CanContentScroll="True" 
                               ScrollViewer.HorizontalScrollBarVisibility="Auto" ScrollViewer.VerticalScrollBarVisibility="Auto" 
                               x:Name="ItemsControl" VerticalAlignment="Center" ItemsSource="{Binding Dolls}">
@@ -65,7 +65,7 @@
                                     <RowDefinition Height="auto" />
                                 </Grid.RowDefinitions>
 
-                                <Grid>
+                                <Grid Background="Transparent">
                                     <Image Stretch="Fill"  Height="150" Width="100" 
                                            Source="{Binding DataContext.DollFileName,RelativeSource={RelativeSource Mode=FindAncestor,AncestorType=view:AssignCharactersToDollsView}}">
                                     </Image>

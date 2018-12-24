@@ -1,4 +1,6 @@
 ﻿using DialogGenerator.UI.ViewModels;
+using DialogGenerator.Utilities;
+using Moq;
 using Xunit;
 
 namespace DialogGenerator.Tests.UI.ViewModel
@@ -6,12 +8,14 @@ namespace DialogGenerator.Tests.UI.ViewModel
     public class CharacterDetailViewModelTests:ViewModelTestBase
     {
         private CharacterDetailViewModel mViewModel;
+        private Mock<IMP3Player> mMP3PlayerMock = new Mock<IMP3Player>();
 
         public CharacterDetailViewModelTests()
         {
             mViewModel = new CharacterDetailViewModel(loggerMock.Object, eventAggregatorMock.Object
                 , characterDataProviderMock.Object
-                , messageDialogServiceMock.Object);
+                , messageDialogServiceMock.Object
+                , mMP3PlayerMock.Object);
 
             testSetup();
         }

@@ -248,5 +248,16 @@ namespace DialogGenerator.DataAccess
                 _removeMP3Files(character);
             });
         }
+
+        public void RemovePhrase(Character character, PhraseEntry phrase)
+        {
+            string _fileName = $"{character.CharacterPrefix}_{phrase.FileName}.mp3";
+            if (File.Exists(_fileName))
+            {
+                File.Delete(_fileName);
+            }
+
+            character.Phrases.Remove(phrase);
+        }
     }
 }

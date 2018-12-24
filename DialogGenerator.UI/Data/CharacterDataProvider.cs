@@ -51,5 +51,10 @@ namespace DialogGenerator.UI.Data
         {
             return mCharacterRepository.Remove(character,_imageFileName);
         }
+
+        public void RemovePhrase(Character character, PhraseEntry phrase)
+        {
+            mCharacterRepository.RemovePhrase(character, phrase);
+        }
     }
 }

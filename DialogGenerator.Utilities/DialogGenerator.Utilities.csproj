@@ -82,6 +82,9 @@
     <Compile Include="Dialogs\BusyDialog.xaml.cs">
       <DependentUpon>BusyDialog.xaml</DependentUpon>
     </Compile>
+    <Compile Include="Dialogs\ExpirationDialog.xaml.cs">
+      <DependentUpon>ExpirationDialog.xaml</DependentUpon>
+    </Compile>
     <Compile Include="Dialogs\MessageDialog.xaml.cs">
       <DependentUpon>MessageDialog.xaml</DependentUpon>
     </Compile>
@@ -125,6 +128,10 @@
     <Page Include="Dialogs\BusyDialog.xaml">
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
+    </Page>
+    <Page Include="Dialogs\ExpirationDialog.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
     </Page>
     <Page Include="Dialogs\MessageDialog.xaml">
       <Generator>MSBuild:Compile</Generator>

@@ -138,5 +138,30 @@ namespace DialogGenerator.Utilities
 
             return result;
         }
+
+        public async Task<MessageDialogResult> ShowExpirationDialogAsync(TimeSpan _exprationTime, string message
+            , string tittle
+            , string _okBtnContent = "Continue"
+            , string _cancelBtnContent = "Cancel"
+            , string _dialogHostName = "MainDialogHost")
+        {
+            MessageDialogResult result = MessageDialogResult.Cancel;
+
+            if (Application.Current.Dispatcher.CheckAccess())
+            {
+                result = (MessageDialogResult)await DialogHost
+                    .Show(new ExpirationDialog(_exprationTime, message, tittle,_okBtnContent, _cancelBtnContent), _dialogHostName);
+            }
+            else
+            {
+                await Application.Current.Dispatcher.Invoke(async () =>
+                {
+                    result = (MessageDialogResult)await DialogHost
+                     .Show(new ExpirationDialog(_exprationTime, message, tittle, _okBtnContent, _cancelBtnContent), _dialogHostName);
+                });
+            }
+
+            return result;
+        }
     }
 }
