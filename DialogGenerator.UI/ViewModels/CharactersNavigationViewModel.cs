@@ -248,7 +248,7 @@ namespace DialogGenerator.UI.ViewModels
             }
             finally
             {
-                FileHelper.ClearDirectory(ApplicationData.Instance.TempDirectory);
+               // FileHelper.ClearDirectory(ApplicationData.Instance.TempDirectory);
                 mMessageDialogService.CloseBusyDialog();
             }
         }
@@ -260,10 +260,11 @@ namespace DialogGenerator.UI.ViewModels
 
             _importedCharacter.RadioNum = -1; // unassign imported character to avoid duplicates
             _importedCharacter.State = CharacterState.Available;
+            mCharacterDataProvider.GetAll().Add(_importedCharacter);
+
             await mCharacterDataProvider.SaveAsync(_importedCharacter);
 
             // add character to list of characters
-            mCharacterDataProvider.GetAll().Add(_importedCharacter);
         }
 
         private Task _processExtractedFiles()

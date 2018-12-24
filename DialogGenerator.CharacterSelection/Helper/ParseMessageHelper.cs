@@ -55,7 +55,7 @@ namespace DialogGenerator.CharacterSelection.Helper
 
                 if((BLEDataProviderType)Session.Get<int>(Constants.BLE_DATA_PROVIDER) == BLEDataProviderType.Serial)
                 {
-                    Logger.Info(_debugString, ApplicationData.Instance.DecimalSerialDirectBLELoggerKey);
+                    Logger.Info(_debugString,ApplicationData.Instance.DecimalSerialDirectBLELoggerKey);
                 }
                 else
                 {
