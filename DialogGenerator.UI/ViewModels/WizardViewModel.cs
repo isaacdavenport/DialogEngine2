@@ -390,32 +390,31 @@ namespace DialogGenerator.UI.ViewModels
         {
             CurrentTutorialStep = CurrentWizard.TutorialSteps[_currentStepIndex];
             MediaPlayerControlViewModel.CurrentVideoFilePath = Path.Combine(ApplicationData.Instance.VideoDirectory, CurrentTutorialStep.VideoFileName + ".avi");
+            DialogStr = "";
 
             if (!CurrentTutorialStep.CollectUserInput)
             {
                 VoiceRecorderControlViewModel.CurrentFilePath = "";
-                DialogStr = "";
-
                 return;
             }
 
             VoiceRecorderControlViewModel.
                 CurrentFilePath = $"{Character.CharacterPrefix}_{CurrentTutorialStep.PhraseWeights.Keys.First()}_{DateTime.Now.ToString("yyyy-dd-MM-HH-mm-ss")}";
-            var _currentPhrase = _findPhraseInCharacterForTutorialStep(CurrentTutorialStep);
+            //var _currentPhrase = _findPhraseInCharacterForTutorialStep(CurrentTutorialStep);
 
-            if (_currentPhrase == null)
-            {
-                mIsPhraseEditable = false;
-                DialogStr = "";
-                VoiceRecorderControlViewModel.CurrentFilePath = "";
+            //if (_currentPhrase == null)
+            //{
+            //    mIsPhraseEditable = false;
+            //    DialogStr = "";
+            //    //VoiceRecorderControlViewModel.CurrentFilePath = "";
 
-                return;
-            }
-
-            DialogStr = _currentPhrase.DialogStr;
-            VoiceRecorderControlViewModel.CurrentFilePath = $"{Character.CharacterPrefix}_{_currentPhrase.FileName}";
-            mCurrentPhrase = _currentPhrase;
-            mIsPhraseEditable = true;
+            //    return;
+            //}
+            //mIsPhraseEditable = false;  //TODO make 
+            //DialogStr = _currentPhrase.DialogStr;
+            //VoiceRecorderControlViewModel.CurrentFilePath = $"{Character.CharacterPrefix}_{_currentPhrase.FileName}";
+            //mCurrentPhrase = _currentPhrase;
+            //mIsPhraseEditable = true;
         }
 
         #endregion
@@ -501,24 +500,24 @@ namespace DialogGenerator.UI.ViewModels
                 }
             }
 
-            if (mIsPhraseEditable)
-            {
-                mCurrentPhrase.DialogStr = DialogStr;
-            }
-            else
-            {
-                string[] _fileNameParts = VoiceRecorderControlViewModel.CurrentFilePath.Split('_');
+            //if (mIsPhraseEditable)
+            //{
+            //    mCurrentPhrase.DialogStr = DialogStr;
+            //}
+            //else
+            //{
+            string[] _fileNameParts = VoiceRecorderControlViewModel.CurrentFilePath.Split('_');
 
-                var _phraseEntry = new PhraseEntry
-                {
-                    PhraseRating = CurrentTutorialStep.PhraseRating,
-                    DialogStr = DialogStr,
-                    PhraseWeights = CurrentTutorialStep.PhraseWeights,
-                    FileName = $"{_fileNameParts[1]}_{_fileNameParts[2]}"
-                };
+            var _phraseEntry = new PhraseEntry
+            {
+                PhraseRating = CurrentTutorialStep.PhraseRating,
+                DialogStr = DialogStr,
+                PhraseWeights = CurrentTutorialStep.PhraseWeights,
+                FileName = $"{_fileNameParts[1]}_{_fileNameParts[2]}"
+            };
 
-                mCharacter.Phrases.Add(_phraseEntry);
-            }
+            mCharacter.Phrases.Add(_phraseEntry);
+            //}
 
             await mCharacterDataProvider.SaveAsync(Character);
 

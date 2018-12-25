@@ -21,7 +21,7 @@ namespace DialogGenerator.CharacterSelection
     {
         #region - fields -
 
-        public const int StrongRssiBufDepth = 16;  // TODO we should use a timer as well as relying on a number of incoming packets to switch characters
+        public const int StrongRssiBufDepth = 26;  // TODO we should use a timer as well as relying on a number of incoming packets to switch characters
 
         private ILogger mLogger;
         private IEventAggregator mEventAggregator;
