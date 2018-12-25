@@ -409,10 +409,16 @@ namespace DialogGenerator.Utilities
                 mWaveOutDevice.Stop();
                 mWaveOutDevice.Dispose();
                 mWaveOutDevice = null;
-                ActiveStream.Dispose();
-                ActiveStream = null;
-                mInputStream.Dispose();
-                mInputStream = null;
+                if (ActiveStream != null)
+                {
+                    ActiveStream.Dispose();
+                    ActiveStream = null;
+                }
+                if (mInputStream != null)
+                {
+                    mInputStream.Dispose();
+                    mInputStream = null;
+                }
             }
             IsPlaying = false;
             CanStop = false;
