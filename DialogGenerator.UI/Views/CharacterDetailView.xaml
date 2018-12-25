@@ -81,7 +81,7 @@
                             Command="{Binding ExportCharacterCommand}" 
                             Foreground="{DynamicResource PrimaryHueMidBrush}" 
                             BorderThickness="0"
-                            ToolTip="Export character to .zip file"
+                            ToolTip="Export character to file"
                             Background="White" 
                             BorderBrush="White"  
                             Height="40" 

@@ -42,8 +42,8 @@ namespace DialogGenerator.UI.ViewModels
         private IRegionManager mRegionManager;
         private int mCurrentStepIndex;
         private string mDialogStr;
-        //private bool mIsPhraseEditable;
-        //private PhraseEntry mCurrentPhrase;
+        private bool mIsPhraseEditable;
+        private PhraseEntry mCurrentPhrase;
         private WizardFormDialog mWizardFormDialog;
         private MediaPlayerControlViewModel mMediaPlayerControlViewModel;
         private VoiceRecorderControlViewModel mVoiceRecorderControlViewModel;
@@ -406,11 +406,11 @@ namespace DialogGenerator.UI.ViewModels
             //{
             //    mIsPhraseEditable = false;
             //    DialogStr = "";
-            //    VoiceRecorderControlViewModel.CurrentFilePath = "";
+            //    //VoiceRecorderControlViewModel.CurrentFilePath = "";
 
             //    return;
             //}
-
+            //mIsPhraseEditable = false;  //TODO make 
             //DialogStr = _currentPhrase.DialogStr;
             //VoiceRecorderControlViewModel.CurrentFilePath = $"{Character.CharacterPrefix}_{_currentPhrase.FileName}";
             //mCurrentPhrase = _currentPhrase;
@@ -506,17 +506,17 @@ namespace DialogGenerator.UI.ViewModels
             //}
             //else
             //{
-                string[] _fileNameParts = VoiceRecorderControlViewModel.CurrentFilePath.Split('_');
+            string[] _fileNameParts = VoiceRecorderControlViewModel.CurrentFilePath.Split('_');
 
-                var _phraseEntry = new PhraseEntry
-                {
-                    PhraseRating = CurrentTutorialStep.PhraseRating,
-                    DialogStr = DialogStr,
-                    PhraseWeights = CurrentTutorialStep.PhraseWeights,
-                    FileName = $"{_fileNameParts[_fileNameParts.Length-2]}_{_fileNameParts.Last()}"
-                };
+            var _phraseEntry = new PhraseEntry
+            {
+                PhraseRating = CurrentTutorialStep.PhraseRating,
+                DialogStr = DialogStr,
+                PhraseWeights = CurrentTutorialStep.PhraseWeights,
+                FileName = $"{_fileNameParts[1]}_{_fileNameParts[2]}"
+            };
 
-                mCharacter.Phrases.Add(_phraseEntry);
+            mCharacter.Phrases.Add(_phraseEntry);
             //}
 
             await mCharacterDataProvider.SaveAsync(Character);
