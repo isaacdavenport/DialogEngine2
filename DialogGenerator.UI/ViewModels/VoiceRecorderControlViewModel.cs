@@ -4,8 +4,11 @@ using DialogGenerator.UI.Workflow.WizardWorkflow;
 using DialogGenerator.Utilities;
 using Prism.Commands;
 using Prism.Mvvm;
+using System;
 using System.ComponentModel;
 using System.IO;
+using System.Threading;
+using System.Windows;
 using System.Windows.Input;
 
 namespace DialogGenerator.UI.ViewModels
@@ -14,9 +17,13 @@ namespace DialogGenerator.UI.ViewModels
     {
         #region - fields -
 
+        private IMessageDialogService mMessageDialogService;
+        private TimeSpan mMaxTimeForRecording = TimeSpan.FromMinutes(5);
+        private DateTime mRecordingStartedTime;
         private string mCurrentFilePath;
         private NAudioEngine mSoundPlayer;
         private WizardWorkflow mWizardWorkflow;
+        private readonly Timer mTimer;
 
         #endregion
 
@@ -26,11 +33,13 @@ namespace DialogGenerator.UI.ViewModels
         /// Constructor
         /// </summary>
         /// <param name="player">Instance of <see cref="ISoundPlayer"/></param>
-        public VoiceRecorderControlViewModel(NAudioEngine player, WizardWorkflow _wizardWorkflow)
+        public VoiceRecorderControlViewModel(NAudioEngine player, WizardWorkflow _wizardWorkflow,IMessageDialogService _messageDialogService)
         {
             SoundPlayer = player;
             StateMachine = new MP3RecorderStateMachine(() => { });
             WizardWorkflow = _wizardWorkflow;
+            mMessageDialogService = _messageDialogService;
+            mTimer = new Timer(_timer_Elapsed, null, Timeout.Infinite, Timeout.Infinite);
 
             StateMachine.PropertyChanged += _stateMachine_PropertyChanged;
             mWizardWorkflow.PropertyChanged += _mWizardWorkflow_PropertyChanged;
@@ -124,6 +133,30 @@ namespace DialogGenerator.UI.ViewModels
             }
         }
 
+        private async void _timer_Elapsed(object state)
+        {
+            if((DateTime.Now - mRecordingStartedTime)> mMaxTimeForRecording)
+            {
+                mTimer.Change(Timeout.Infinite, Timeout.Infinite);
+
+                MessageDialogResult result = await mMessageDialogService
+                    .ShowExpirationDialogAsync(TimeSpan.FromSeconds(10),"Recording will be stopped in ","Warning","Continue recording");
+
+                if(result == MessageDialogResult.Cancel)
+                {
+                    await Application.Current.Dispatcher.BeginInvoke((Action)(() =>
+                    {
+                        _stopRecorder_Execute();
+                    }));
+                }
+                else
+                {
+                    mTimer.Change(0, 1000);
+                    mRecordingStartedTime = DateTime.Now;
+                }
+            }
+        }
+        
         #endregion
 
         #region - private functions -
@@ -137,6 +170,7 @@ namespace DialogGenerator.UI.ViewModels
                 .Permit(Triggers.Off, States.Idle)
                 .Permit(Triggers.Record, States.Recording)
                 .Permit(Triggers.Play, States.Playing);
+
             StateMachine.Configure(States.Stopped)
                 .Permit(Triggers.On, States.Ready);
 
@@ -192,6 +226,8 @@ namespace DialogGenerator.UI.ViewModels
         private void _startRecording()
         {
             mSoundPlayer.StartRecording(Path.Combine(ApplicationData.Instance.AudioDirectory, CurrentFilePath + ".mp3"));
+            mRecordingStartedTime = DateTime.Now;
+            mTimer.Change(0, 1000);
         }
 
         private void _startPlaying_Execute()
@@ -225,6 +261,7 @@ namespace DialogGenerator.UI.ViewModels
             {
                 case States.Recording:
                     {
+                        mTimer.Change(Timeout.Infinite, Timeout.Infinite);
                         mSoundPlayer.StopRecording();
                         StateMachine.Fire(Triggers.On);
                         break;

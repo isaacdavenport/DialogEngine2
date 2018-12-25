@@ -53,7 +53,7 @@
 
                         <Border Grid.Column="2" IsEnabled="{Binding DataContext.DialogModel.State, RelativeSource={RelativeSource Mode=FindAncestor, AncestorType=view:DialogModelDetailView},
                             Converter={StaticResource IsStatesEqualValueConverter}, ConverterParameter={x:Static enums:ModelDialogState.Available}}" 
-                            BorderBrush="LightGray" Width="40" ToolTip="Select dialog model" Background="WhiteSmoke" CornerRadius="3" BorderThickness="1" Margin="10,10,16,10">
+                            BorderBrush="LightGray" Width="40" ToolTip="Select dialog model" CornerRadius="3" BorderThickness="1" Margin="10,10,16,10">
                             <Border.Visibility>
                                 <MultiBinding Converter="{StaticResource ActiveDialogModelBtnVisibilityValueConverter}">
                                     <Binding />
@@ -66,6 +66,16 @@
                                               Command="{Binding DataContext.SetActiveDialogModel,RelativeSource={RelativeSource Mode=FindAncestor,AncestorType=view:DialogModelDetailView}}"/>
                             </Border.InputBindings>
                             <materialDesign:PackIcon HorizontalAlignment="Center"  VerticalAlignment="Center" Foreground="{DynamicResource PrimaryHueMidBrush}" Kind="Check"/>
+                            <Border.Style>
+                                <Style TargetType="Border">
+                                    <Setter Property="Border.Background" Value="WhiteSmoke" />
+                                    <Style.Triggers>
+                                        <Trigger Property="Border.IsMouseOver" Value="true">
+                                            <Setter Property="Border.Background" Value="LightGray" />
+                                        </Trigger>
+                                    </Style.Triggers>
+                                </Style>
+                            </Border.Style>
                         </Border>
                     </Grid>
                 </DataTemplate>

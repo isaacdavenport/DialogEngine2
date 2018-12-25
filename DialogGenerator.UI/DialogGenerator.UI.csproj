@@ -137,6 +137,8 @@
     <Compile Include="Converters\RadioNumberToDisplayNameValueConverter.cs" />
     <Compile Include="Converters\SaveAndNextBtnContentConverter.cs" />
     <Compile Include="Converters\StarWidthConverter.cs" />
+    <Compile Include="Converters\UniqueCharacterIdentifierToPrefixValueConverter.cs" />
+    <Compile Include="Converters\UniqueIdentifierTbVisibilityValueConverter.cs" />
     <Compile Include="Converters\WizardAndMP3PlayerStatesToBtnVisibilityConverter.cs" />
     <Compile Include="Converters\WizardStateToBtnVisibilityValueConverter.cs" />
     <Compile Include="Data\CharacterDataProvider.cs" />
@@ -178,6 +180,9 @@
     </Compile>
     <Compile Include="Views\DialogModelsNavigationView.xaml.cs">
       <DependentUpon>DialogModelsNavigationView.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="Views\Dialogs\MP3PlayerDialog.xaml.cs">
+      <DependentUpon>MP3PlayerDialog.xaml</DependentUpon>
     </Compile>
     <Compile Include="Views\Dialogs\SettingsDialog.xaml.cs">
       <DependentUpon>SettingsDialog.xaml</DependentUpon>
@@ -247,6 +252,10 @@
       <Generator>MSBuild:Compile</Generator>
     </Page>
     <Page Include="Views\DialogModelsNavigationView.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="Views\Dialogs\MP3PlayerDialog.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>

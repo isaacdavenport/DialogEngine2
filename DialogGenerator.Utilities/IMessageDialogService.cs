@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Threading.Tasks;
 
 namespace DialogGenerator.Utilities
@@ -18,5 +19,10 @@ namespace DialogGenerator.Utilities
             , string _dialogHostName = "MainDialogHost");
         Task<MessageDialogResult> ShowBusyDialog(string message = "Working ...", string _dialogHostName = "MainDialogHost");
         void CloseBusyDialog();
+        Task<MessageDialogResult> ShowExpirationDialogAsync(TimeSpan _exprationTime, string message
+            , string tittle 
+            , string _okBtnContent = "Continue"
+            , string _cancelBtnContent = "Cancel"
+            , string _dialogHostName = "MainDialogHost");
     }
 }

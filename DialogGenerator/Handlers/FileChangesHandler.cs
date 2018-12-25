@@ -81,7 +81,7 @@ namespace DialogGenerator.Handlers
             if (errors.Count > 0)
             {
                 MessageDialogResult _dialogResult = await mMessageDialogService
-                    .ShowMessagesDialogAsync("Error", $"Changes you made in '{e.Name}' has errors:", errors, "Close", true, "Undo changes");
+                    .ShowMessagesDialogAsync("Error", $"Changes you made in '{e.Name}' has errors:", errors, "Close message", true, "Undo changes");
 
                 if (_dialogResult == MessageDialogResult.Cancel)
                 {

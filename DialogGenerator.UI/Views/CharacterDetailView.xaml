@@ -20,6 +20,8 @@
             <converters:ImageToFullPathValueConverter x:Key="ImageToFullPathValueConverter" />
             <converters:InvertValueConverter x:Key="InvertValueConverter" />
             <converters:IsRunOverWizardBtnEnabledValueConverter x:Key="IsRunOverWizardBtnEnabledValueConverter" />
+            <converters:UniqueIdentifierTbVisibilityValueConverter x:Key="UniqueIdentifierTbVisibilityValueConverter" />
+            <converters:UniqueCharacterIdentifierToPrefixValueConverter x:Key="UniqueCharacterIdentifierToPrefixValueConverter" />
 
             <Style TargetType="{x:Type Button}">
                 <Setter Property="Template">
@@ -129,112 +131,348 @@
             </StackPanel>
         </DockPanel>
         </Border>
-        <Grid Grid.Row="1" Margin="50" HorizontalAlignment="Center">
-           <Grid.RowDefinitions>
-                <RowDefinition Height="auto"/>
-                <RowDefinition Height="auto"/>
-                <RowDefinition Height="auto"/>
-                <RowDefinition Height="auto"/>
-                <RowDefinition Height="auto" />
-                <RowDefinition Height="auto" />
-                <RowDefinition Height="auto" />
-            </Grid.RowDefinitions>
-           <Grid.ColumnDefinitions>
-                <ColumnDefinition Width="auto"/>
-                <ColumnDefinition Width="*"/>
-           </Grid.ColumnDefinitions>
+        <TabControl Grid.Row="1" Background="Transparent" x:Name="TabControl" BorderThickness="0">
+            <TabControl.Resources>
+                <Style TargetType="TabItem">
+                    <Setter Property="Template">
+                        <Setter.Value>
+                            <ControlTemplate TargetType="TabItem">
+                                <Grid Name="Panel">
+                                    <Grid.RowDefinitions>
+                                        <RowDefinition />
+                                    </Grid.RowDefinitions>
+                                    <ContentPresenter   Grid.Row="0" x:Name="ContentSite" VerticalAlignment="Center"
+                                                        HorizontalAlignment="Center" ContentSource="Header" Height="auto" Margin="10,3,10,3"/>
+                                </Grid>
+                                <ControlTemplate.Triggers>
+                                    <Trigger Property="IsSelected" Value="False">
+                                        <Setter TargetName="ContentSite" Property="TextElement.Foreground" Value="{DynamicResource MaterialDesignBody}" />
+                                    </Trigger>
+                                    <Trigger Property="IsSelected" Value="True">
+                                        <Setter TargetName="Panel" Property="Background" Value="{DynamicResource PrimaryHueMidBrush}" />
+                                        <Setter Property="TextElement.Foreground" TargetName="ContentSite" Value="White" />
+                                    </Trigger>
+                                    <Trigger Property="IsMouseOver" Value="True">
+                                        <Setter TargetName="Panel" Property="Background" Value="{DynamicResource SecondaryAccentBrush}" />
+                                        <Setter Property="TextElement.Foreground" TargetName="ContentSite" Value="White" />
+                                    </Trigger>
+                                </ControlTemplate.Triggers>
+                            </ControlTemplate>
+                        </Setter.Value>
+                    </Setter>
+                </Style>
+            </TabControl.Resources>
+            <TabItem Header="Details" Background="Red">
+                <Grid Grid.Row="1" Margin="20"  HorizontalAlignment="Center">
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="auto"/>
+                        <RowDefinition Height="auto"/>
+                        <RowDefinition Height="auto"/>
+                        <RowDefinition Height="auto"/>
+                        <RowDefinition Height="auto" />
+                        <RowDefinition Height="auto" />
+                        <RowDefinition Height="auto" />
+                    </Grid.RowDefinitions>
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="auto"/>
+                        <ColumnDefinition Width="*"/>
+                    </Grid.ColumnDefinitions>
 
-                <Label Content="Character name:" HorizontalAlignment="Right" Margin="0,0,10,10" Grid.Row="0" Grid.Column="0" />
-                <TextBox Grid.Row="0" 
-                         Grid.Column="1"
-                         MinWidth="300"
-                         Margin="10,0,0,10"
-                         Style="{StaticResource MaterialDesignTextBox}"
-                         materialDesign:HintAssist.Hint="Enter name..."
-                         materialDesign:ValidationAssist.UsePopup="True"
-                         Text="{Binding Character.CharacterName,Mode=TwoWay,UpdateSourceTrigger=PropertyChanged}"/>
+                    <StackPanel Grid.Row="0" Grid.Column="1">
+                        <Label Content="Character name:" HorizontalAlignment="Left" Margin="-5,0,0,0"/>
+                        <TextBox MinWidth="300"
+                             Margin="0"
+                             HorizontalAlignment="Left"
+                             Style="{StaticResource MaterialDesignTextBox}"
+                             materialDesign:HintAssist.Hint="Enter name..."
+                             materialDesign:ValidationAssist.UsePopup="True"
+                             Text="{Binding Character.CharacterName,Mode=TwoWay,UpdateSourceTrigger=PropertyChanged}"/>
+                    </StackPanel>
+                    
+                    <StackPanel Grid.Row="1" Grid.Column="1">
+                        <Label Content="Character initials:" HorizontalAlignment="Left" Margin="-5,15,0,0"/>
+                        <StackPanel Orientation="Horizontal" HorizontalAlignment="Left" Margin="0">
+                            <TextBox HorizontalAlignment="Left"
+                                Width="100"
+                                x:Name="initialsTb"
+                                Margin="0,0,5,0"
+                                IsEnabled="{Binding IsEditing,Converter={StaticResource InvertValueConverter}}"
+                                Style="{StaticResource MaterialDesignTextBox}"
+                                materialDesign:ValidationAssist.UsePopup="True"
+                                materialDesign:HintAssist.Hint="Enter initials..."
+                                Text="{Binding Character.CharacterPrefix,Mode=TwoWay,UpdateSourceTrigger=PropertyChanged,
+                                Converter={StaticResource UniqueCharacterIdentifierToPrefixValueConverter}}"/>
+                            <TextBlock Text="_" VerticalAlignment="Bottom" Visibility="{Binding Path=Visibility, ElementName=identifierTb}" />
+                            <TextBox Margin="5,0,0,0" x:Name="identifierTb" IsEnabled="False" Text="{Binding UniqueIdentifier}"
+                                Visibility="{Binding UniqueIdentifier, Converter={StaticResource UniqueIdentifierTbVisibilityValueConverter}}" />
+                            <Label ToolTip="Copy to clipboard" IsEnabled="{Binding ElementName=initialsTb,Path=Text.Length,Mode=OneWay}" Visibility="{Binding Path=Visibility, ElementName=identifierTb}">
+                                <Label.Content>
+                                    <materialDesign:PackIcon Kind="ContentCopy" />
+                                </Label.Content>
+                                <Label.InputBindings>
+                                    <MouseBinding Command="{Binding CopyToClipboardCommand}" MouseAction="LeftClick" />
+                                </Label.InputBindings>
+                                <Label.Style>
+                                    <Style TargetType="Label">
+                                        <Setter Property="Foreground" Value="{DynamicResource PrimaryHueMidBrush}" />
+                                        <Style.Triggers>
+                                            <Trigger Property="IsMouseOver" Value="true">
+                                                <Setter Property="Foreground" Value="Black" />
+                                            </Trigger>
+                                        </Style.Triggers>
+                                    </Style>
+                                </Label.Style>
+                            </Label>
+                        </StackPanel>
+                    </StackPanel>
 
-                <Label Content="Character initials:" HorizontalAlignment="Right" Margin="0,10,10,10" Grid.Row="1" Grid.Column="0" />
-                <TextBox Grid.Row="1" 
-                         Grid.Column="1"
-                         HorizontalAlignment="Left"
-                         Width="100"
-                         Margin="10,10,0,10"
-                         IsEnabled="{Binding IsEditing,Converter={StaticResource InvertValueConverter}}"
-                         Style="{StaticResource MaterialDesignTextBox}"
-                         materialDesign:ValidationAssist.UsePopup="True"
-                         materialDesign:HintAssist.Hint="Enter initials..."
-                         Text="{Binding Character.CharacterPrefix,Mode=TwoWay,UpdateSourceTrigger=PropertyChanged}">
 
-            </TextBox>
-
-                <Label Content="Character age:" HorizontalAlignment="Right" Margin="0,10,10,10" Grid.Row="2" Grid.Column="0"/>
-                <ComboBox ItemsSource="{Binding AgeValues}"
-                          Grid.Row="2"
-                          Margin="10,10,0,10"
+                    <StackPanel Grid.Row="2" Grid.Column="1">
+                        <Label Content="Character age:" HorizontalAlignment="Left" Margin="-5,15,0,0" />
+                        <ComboBox ItemsSource="{Binding AgeValues}"
+                          Margin="0"
                           HorizontalAlignment="Left"
-                          Grid.Column="1"
                           Width="100"
                           Style="{StaticResource MaterialDesignComboBox}"
                           SelectedValue="{Binding Character.CharacterAge,Mode=TwoWay}"
                           IsEditable="False">
-                    <ComboBox.ItemsPanel>
-                        <ItemsPanelTemplate>
-                            <VirtualizingStackPanel/>
-                        </ItemsPanelTemplate>
-                    </ComboBox.ItemsPanel>
-                </ComboBox>
+                            <ComboBox.ItemsPanel>
+                                <ItemsPanelTemplate>
+                                    <VirtualizingStackPanel/>
+                                </ItemsPanelTemplate>
+                            </ComboBox.ItemsPanel>
+                        </ComboBox>
+                    </StackPanel>
 
-                <Label Content="Character gender:" HorizontalAlignment="Right" Margin="0,10,10,10" Grid.Row="3" Grid.Column="0" />
-                <ComboBox ItemsSource="{Binding GenderValues}"
+                    <StackPanel Grid.Row="3" Grid.Column="1">
+                        <Label Content="Character gender:" HorizontalAlignment="Left" Margin="-5,15,0,0" />
+                        <ComboBox ItemsSource="{Binding GenderValues}"
                           Style="{StaticResource MaterialDesignComboBox}"
                           IsEditable="False"
-                          Margin="10,10,0,10"
-                          Grid.Row="3"
+                          Margin="0"
                           Width="100"
                           HorizontalAlignment="Left"
-                          Grid.Column="1"
                           SelectedValue="{Binding Character.CharacterGender,Converter={StaticResource CharacterGenderValueConverter}}"/>
+                    </StackPanel>
 
-            <Label Content="Assigned doll:" 
-                   Grid.Row="4" 
-                   Grid.Column="0" 
-                   HorizontalAlignment="Right" 
-                   Margin="0,10,10,10" />
-            
-            <TextBlock Text="{Binding Character.RadioNum, Converter={StaticResource CharacterRadioNumberToTextValueConverter}}" 
-                       Grid.Column="1" 
-                       Grid.Row="4" 
-                       HorizontalAlignment="Left" 
-                       Margin="10,15,0,10" />
+                    <StackPanel Grid.Row="4" Grid.Column="1">
+                        <Label Content="Assigned doll:" HorizontalAlignment="Left" Margin="-5,15,0,0" />
+                        <TextBlock Text="{Binding Character.RadioNum, Converter={StaticResource CharacterRadioNumberToTextValueConverter}}" 
+                           HorizontalAlignment="Left" Margin="0" />
+                    </StackPanel>
 
-            <StackPanel Grid.Row="5" Grid.ColumnSpan="2" HorizontalAlignment="Center">
 
-                <Border Grid.Column="1" Margin="10,10,0,0" BorderThickness="1" BorderBrush="LightGray" CornerRadius="3">
-                    <Image  Width="200" 
-                            Height="200" 
-                            Stretch="UniformToFill" 
-                            Source="{Binding Character.CharacterImage, Converter={StaticResource ImageToFullPathValueConverter}}" />
-                </Border>
-                <StackPanel HorizontalAlignment="Center" Orientation="Horizontal">
-                    <TextBlock  HorizontalAlignment="Center" 
-                            Margin="5"  
-                            Foreground="{DynamicResource PrimaryHueMidBrush}" 
-                            Text="Change image">
+                    <StackPanel  Grid.Column="0" Grid.RowSpan="6"  HorizontalAlignment="Left" Margin="0,0,30,0">
+                        <Border Grid.Column="1" Margin="10,10,0,0" BorderThickness="1" BorderBrush="LightGray" CornerRadius="3">
+                            <Image  Width="200" Height="200" Stretch="UniformToFill" 
+                                Source="{Binding Character.CharacterImage, Converter={StaticResource ImageToFullPathValueConverter}}" />
+                        </Border>
+                        <StackPanel HorizontalAlignment="Center" Orientation="Horizontal">
+                            <TextBlock  HorizontalAlignment="Center" Margin="5" Text="Change image">
+                                <TextBlock.InputBindings>
+                                    <MouseBinding Command="{Binding ChooseImageCommand}" MouseAction="LeftClick" />
+                                </TextBlock.InputBindings>
+                                <TextBlock.Style>
+                                    <Style TargetType="TextBlock">
+                                        <Setter Property="Foreground" Value="{DynamicResource PrimaryHueMidBrush}" />
+                                        <Style.Triggers>
+                                            <Trigger Property="IsMouseOver" Value="true">
+                                                <Setter Property="Foreground" Value="LightGray" />
+                                            </Trigger>
+                                        </Style.Triggers>
+                                    </Style>
+                                </TextBlock.Style>
+                            </TextBlock>
+                            <TextBlock Foreground="{DynamicResource PrimaryHueMidBrush}" HorizontalAlignment="Center" Margin="5" Text="Reset" />
+                        </StackPanel>
+                    </StackPanel>
 
-                        <TextBlock.InputBindings>
-                            <MouseBinding Command="{Binding ChooseImageCommand}" MouseAction="LeftClick" />
-                        </TextBlock.InputBindings>
-                    </TextBlock>
-                    <TextBlock Foreground="{DynamicResource PrimaryHueMidBrush}" HorizontalAlignment="Center" Margin="5" Text="Reset" />
-                </StackPanel>
-            </StackPanel>
+                    <StackPanel HorizontalAlignment="Center" Margin="0,20,0,0" Orientation="Horizontal" Grid.Row="6" Grid.ColumnSpan="2">
+                        <Button x:Name="DeleteBtn" Content="Delete" Style="{DynamicResource MaterialDesignRaisedButton}" Command="{Binding DeleteCommand}" Margin="0,0,10,0" />
+                        <Button Content="Save" Command="{Binding SaveCommand}" Style="{DynamicResource MaterialDesignRaisedButton}"  Margin="10,0,0,0" />
+                    </StackPanel>
+                </Grid>
+            </TabItem>
 
-            <StackPanel HorizontalAlignment="Center" Margin="0,40,0,0" Orientation="Horizontal" Grid.Row="6" Grid.ColumnSpan="2">
-                <Button x:Name="DeleteBtn" Content="Delete" Style="{DynamicResource MaterialDesignRaisedButton}" Command="{Binding DeleteCommand}" Margin="0,0,10,0" />
-                <Button Content="Save" Command="{Binding SaveCommand}" Style="{DynamicResource MaterialDesignRaisedButton}"  Margin="10,0,0,0" />
-            </StackPanel>
-        </Grid>
+            <TabItem Header="Phrases">
 
-    </Grid>
+                <Grid>
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="auto" />
+                        <RowDefinition Height="*" />
+                    </Grid.RowDefinitions>
+
+                    <Border Grid.Row="0" BorderThickness="0,1,0,1" BorderBrush="LightGray">
+                        <Grid>
+                            <TextBox Margin="15,10,15,10" VerticalContentAlignment="Center" >
+                                <TextBox.Template>
+                                    <ControlTemplate TargetType="{x:Type TextBox}">
+                                        <Border BorderThickness="1" x:Name="tbBorder" MinHeight="30" Background="WhiteSmoke" BorderBrush="LightGray" CornerRadius="5" >
+                                            <Grid>
+                                                <Grid.ColumnDefinitions>
+                                                    <ColumnDefinition Width="auto" />
+                                                    <ColumnDefinition Width="*" />
+                                                </Grid.ColumnDefinitions>
+
+                                                <materialDesign:PackIcon Kind="Magnify" Foreground="DarkGray"  HorizontalAlignment="Left" 
+                                                             VerticalAlignment="Center" Padding="0" Width="15" Height="15" Margin="10,0,10,0" Grid.Column="0" />
+                                                <TextBox Style="{x:Null}" VerticalAlignment="Center" Text="{Binding FilterText, UpdateSourceTrigger=PropertyChanged}"
+                                             Background="{TemplateBinding Background}" BorderThickness="0" Grid.Column="1" />
+                                            </Grid>
+                                        </Border>
+                                        <ControlTemplate.Triggers>
+                                            <Trigger Property="IsMouseOver" Value="true">
+                                                <Setter TargetName="tbBorder" Property="BorderBrush" Value="{DynamicResource PrimaryHueMidBrush}" />
+                                            </Trigger>
+                                        </ControlTemplate.Triggers>
+                                    </ControlTemplate>
+                                </TextBox.Template>
+                            </TextBox>
+                            <TextBlock IsHitTestVisible="False" Text="Search dialog lines..." VerticalAlignment="Center" 
+                                       HorizontalAlignment="Left" Margin="53,0,0,0" Foreground="DarkGray">
+                                <TextBlock.Style>
+                                    <Style TargetType="{x:Type TextBlock}">
+                                        <Setter Property="Visibility" Value="Collapsed"/>
+                                        <Style.Triggers>
+                                            <DataTrigger Binding="{Binding FilterText}" Value="">
+                                                <Setter Property="Visibility" Value="Visible"/>
+                                            </DataTrigger>
+                                        </Style.Triggers>
+                                    </Style>
+                                </TextBlock.Style>
+                            </TextBlock>
+                        </Grid>
+                    </Border>
+
+                    <ItemsControl ItemsSource="{Binding PhrasesViewSource}"
+                              Grid.Row="1"
+                              x:Name="PhrasesItemsControl"
+                              ScrollViewer.IsDeferredScrollingEnabled="True"
+                              ScrollViewer.CanContentScroll="True"
+                              ScrollViewer.HorizontalScrollBarVisibility="Disabled"
+                              ScrollViewer.VerticalScrollBarVisibility="Auto">
+                        <ItemsControl.ItemTemplate>
+                            <DataTemplate>
+                                <Grid>
+                                    <Grid.RowDefinitions>
+                                        <RowDefinition Height="auto" />
+                                        <RowDefinition Height="auto" />
+                                    </Grid.RowDefinitions>
+                                    <Expander HorizontalAlignment="Stretch" TextBlock.FontSize="13" TextElement.FontSize="13" TextElement.FontWeight="Regular">
+                                        <Expander.Header>
+                                            <Grid>
+                                                <Grid.ColumnDefinitions>
+                                                    <ColumnDefinition Width="*" />
+                                                    <ColumnDefinition Width="Auto" />
+                                                </Grid.ColumnDefinitions>
+                                                
+                                                <TextBlock Text="{Binding DialogStr}" Grid.Column="0" SnapsToDevicePixels="True" HorizontalAlignment="Left" />
+                                                <StackPanel x:Name="toolsSP" Orientation="Horizontal" Margin="10,0,0,0" Grid.Column="1" HorizontalAlignment="Right">
+                                                    <Border BorderBrush="LightGray" ToolTip="Play" Width="40" Height="25" CornerRadius="3" BorderThickness="1">
+                                                        <Border.InputBindings>
+                                                            <MouseBinding MouseAction="LeftClick" CommandParameter="{Binding FileName}"
+                                                            Command="{Binding DataContext.PlayDialogLineCommand, 
+                                                            RelativeSource={RelativeSource Mode=FindAncestor,AncestorType=view:CharacterDetailView}}" />
+                                                        </Border.InputBindings>
+                                                        <materialDesign:PackIcon HorizontalAlignment="Center"  VerticalAlignment="Center" 
+                                                            Foreground="{DynamicResource PrimaryHueMidBrush}" Kind="Play" />
+                                                        <Border.Style>
+                                                            <Style TargetType="Border">
+                                                                <Setter Property="Border.Background" Value="WhiteSmoke" />
+                                                                <Style.Triggers>
+                                                                    <Trigger Property="Border.IsMouseOver" Value="true">
+                                                                        <Setter Property="Border.Background" Value="LightGray" />
+                                                                    </Trigger>
+                                                                </Style.Triggers>
+                                                            </Style>
+                                                        </Border.Style>
+                                                    </Border>
+                                                    <Border BorderBrush="LightGray" Width="40" ToolTip="Delete dialog line" Height="25" Margin="10,0,0,0" CornerRadius="3" BorderThickness="1">
+                                                        <Border.InputBindings>
+                                                            <MouseBinding MouseAction="LeftClick" CommandParameter="{Binding}"
+                                                            Command="{Binding DataContext.DeletePhraseCommand,
+                                                            RelativeSource={RelativeSource Mode=FindAncestor,AncestorType=view:CharacterDetailView} }" />
+                                                        </Border.InputBindings>
+                                                        <materialDesign:PackIcon Kind="Delete" HorizontalAlignment="Center"  
+                                                            VerticalAlignment="Center" Foreground="Red" />
+                                                        <Border.Style>
+                                                            <Style TargetType="Border">
+                                                                <Setter Property="Border.Background" Value="WhiteSmoke" />
+                                                                <Style.Triggers>
+                                                                    <Trigger Property="Border.IsMouseOver" Value="true">
+                                                                        <Setter Property="Border.Background" Value="LightGray" />
+                                                                    </Trigger>
+                                                                </Style.Triggers>
+                                                            </Style>
+                                                        </Border.Style>
+                                                    </Border>
+                                                </StackPanel>
+                                            </Grid>
+                                        </Expander.Header>
+                                        <Grid Margin="10">
+                                            <Grid.ColumnDefinitions>
+                                                <ColumnDefinition Width="2*" />
+                                                <ColumnDefinition Width="*" />
+                                                <ColumnDefinition Width="*" />
+                                            </Grid.ColumnDefinitions>
+                                            <Grid.RowDefinitions>
+                                                <RowDefinition Height="auto" />
+                                                <RowDefinition />
+                                            </Grid.RowDefinitions>
+
+                                            <TextBlock Text="Dialog line:" FontWeight="SemiBold" Margin="0,5,0,5" Grid.Row="0" Grid.Column="0" />
+                                            <TextBox Style="{StaticResource MaterialDesignTextAreaTextBox}" Grid.Row="1" 
+                                             TextWrapping="Wrap" IsEnabled="False" Text="{Binding DialogStr}" Grid.Column="0" />
+
+                                            <TextBlock Text="Phrase weights:" FontWeight="SemiBold" Grid.Row="0" Margin="10,5,0,5" Grid.Column="1" />
+                                            <ItemsControl ItemsSource="{Binding PhraseWeights}" Grid.Row="1" Grid.Column="1" Margin="10,0,0,0">
+                                                <ItemsControl.ItemTemplate>
+                                                    <DataTemplate>
+                                                        <StackPanel Orientation="Horizontal">
+                                                            <TextBlock Text="{Binding Path=Key,Mode=OneWay}"  />
+                                                            <TextBlock Text=" " />
+                                                            <TextBlock Text="{Binding Path=Value, Mode=OneWay}" />
+                                                        </StackPanel>
+                                                    </DataTemplate>
+                                                </ItemsControl.ItemTemplate>
+                                            </ItemsControl>
+
+                                            <TextBlock Text="File name:" FontWeight="SemiBold" Grid.Row="0" Margin="0,5,0,5" Grid.Column="2" />
+                                            <StackPanel Orientation="Horizontal"  Grid.Row="1" Grid.Column="3" >
+                                                <TextBlock Text="{Binding FileName}" TextWrapping="Wrap"/>
+                                            </StackPanel>
+                                        </Grid>
+                                    </Expander>
+                                    <Border Grid.Row="1"
+                                Background="{DynamicResource MaterialDesignDivider}"
+                              Height="1"
+                              HorizontalAlignment="Stretch"
+                              SnapsToDevicePixels="True" />
+                                </Grid>
+                            </DataTemplate>
+                        </ItemsControl.ItemTemplate>
+                        <ItemsControl.ItemsPanel>
+                            <ItemsPanelTemplate>
+                                <VirtualizingStackPanel />
+                            </ItemsPanelTemplate>
+                        </ItemsControl.ItemsPanel>
+                        <ItemsControl.Template>
+                            <ControlTemplate>
+                                <Border
+                                    BorderThickness="{TemplateBinding Border.BorderThickness}"
+                                    Padding="{TemplateBinding Control.Padding}"
+                                    BorderBrush="{TemplateBinding Border.BorderBrush}"
+                                    Background="{TemplateBinding Panel.Background}"
+                                    SnapsToDevicePixels="True">
+                                    <ScrollViewer Padding="{TemplateBinding Control.Padding}" Focusable="False">
+                                        <ItemsPresenter SnapsToDevicePixels="{TemplateBinding UIElement.SnapsToDevicePixels}" />
+                                    </ScrollViewer>
+                                </Border>
+                            </ControlTemplate>
+                        </ItemsControl.Template>
+                    </ItemsControl>
+                </Grid>
+            </TabItem>
+   </TabControl>
+</Grid>
 </UserControl>

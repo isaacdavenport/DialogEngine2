@@ -12,7 +12,6 @@ using Prism.Mvvm;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
-using System.ComponentModel.DataAnnotations;
 using System.IO;
 using System.IO.Compression;
 using System.Linq;
@@ -128,25 +127,20 @@ namespace DialogGenerator.UI.ViewModels
                     return;
 
                 if (_newState == CharacterState.On)
-                {
-                    switch (_forcedCharactersCount)
+                {                    
+                    if(_forcedCharactersCount == 0)
                     {
-                        case 0:
-                            {
-                                Session.Set(Constants.FORCED_CH_1, index);
-                                Session.Set(Constants.FORCED_CH_COUNT, 1);
-                                break;
-                            }
-                        case 1:
-                            {
-                                Session.Set(Constants.FORCED_CH_2, index);
-                                Session.Set(Constants.FORCED_CH_COUNT, 2);
-                                break;
-                            }
-                        default:
-                            {
-                                return;
-                            }
+                        Session.Set(Constants.FORCED_CH_1, index);
+                        Session.Set(Constants.FORCED_CH_COUNT, 1);
+                    }
+                    else if(_forcedCharactersCount == 1)
+                    {
+                        Session.Set(Constants.FORCED_CH_2, index);
+                        Session.Set(Constants.FORCED_CH_COUNT, 2);
+                    }
+                    else
+                    {
+                        return;
                     }
                 }
                 else
@@ -210,7 +204,7 @@ namespace DialogGenerator.UI.ViewModels
                 if(errors.Count > 0)
                 {
                     mMessageDialogService.CloseBusyDialog();
-                    await mMessageDialogService.ShowMessagesDialogAsync("Error", "Imported file has errors: ",errors, "Close", false);
+                    await mMessageDialogService.ShowMessagesDialogAsync("Error", "Imported file has errors: ",errors, "Close message", false);
                     return;
                 }
                 // validate is character found

@@ -74,7 +74,7 @@ namespace DialogGenerator.UI.ViewModels
 
             Workflow = new WizardWorkflow(action: () => { });
             MediaPlayerControlViewModel = new MediaPlayerControlViewModel(Workflow);
-            VoiceRecorderControlViewModel = new VoiceRecorderControlViewModel(NAudioEngine.Instance,Workflow);
+            VoiceRecorderControlViewModel = new VoiceRecorderControlViewModel(NAudioEngine.Instance,Workflow,mMessageDialogService);
 
             Workflow.PropertyChanged += _workflow_PropertyChanged;
             this.PropertyChanged += _wizardViewModel_PropertyChanged;

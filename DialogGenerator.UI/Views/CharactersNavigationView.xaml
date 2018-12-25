@@ -118,7 +118,9 @@
                   ScrollViewer.VerticalScrollBarVisibility="Auto"
                   BorderBrush="WhiteSmoke"
                   x:Name="CharactersListView"
+                  SelectionChanged="_listView_SelectionChanged"
                   SelectedValue="{Binding SelectedCharacter,Mode=TwoWay,UpdateSourceTrigger=PropertyChanged}">
+                        
             <ListView.ItemTemplate>
                 <DataTemplate>
                     <Grid HorizontalAlignment="Stretch"  Height="50">

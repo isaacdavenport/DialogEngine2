@@ -3,6 +3,7 @@ using DialogGenerator.Events;
 using DialogGenerator.Model;
 using DialogGenerator.UI.Data;
 using DialogGenerator.UI.Helpers;
+using DialogGenerator.UI.Views.Dialogs;
 using DialogGenerator.UI.Wrapper;
 using DialogGenerator.Utilities;
 using Prism.Commands;
@@ -10,12 +11,16 @@ using Prism.Events;
 using Prism.Mvvm;
 using System;
 using System.Collections.Generic;
+using System.ComponentModel;
 using System.Diagnostics;
 using System.IO;
 using System.IO.Compression;
 using System.Linq;
+using System.Text.RegularExpressions;
 using System.Threading;
 using System.Threading.Tasks;
+using System.Windows;
+using System.Windows.Data;
 using System.Windows.Input;
 
 namespace DialogGenerator.UI.ViewModels
@@ -27,20 +32,29 @@ namespace DialogGenerator.UI.ViewModels
         private IEventAggregator mEventAggregator;
         private ICharacterDataProvider mCharacterDataProvider;
         private IMessageDialogService mMessageDialogService;
+        private IMP3Player mMP3Player;
         private CharacterWrapper mCharacter;
+        private CollectionViewSource mPhrasesCollectionViewSource;
+        private string mFilterText;
         private bool mIsDialogStarted;
         private bool mIsEditing;
+        private string mUniqueIdentifier;
         #endregion
 
         #region -constructor-
         public CharacterDetailViewModel(ILogger logger, IEventAggregator _eventAggregator
             , ICharacterDataProvider _characterDataProvider
-            , IMessageDialogService  _messageDialogService)
+            , IMessageDialogService  _messageDialogService
+            , IMP3Player _mp3Player)
         {
             mLogger = logger;
             mEventAggregator = _eventAggregator;
             mCharacterDataProvider = _characterDataProvider;
             mMessageDialogService = _messageDialogService;
+            mMP3Player = _mp3Player;
+            mPhrasesCollectionViewSource = new CollectionViewSource();
+            FilterText = "";
+            mPhrasesCollectionViewSource.Filter += _phrases_Filter;
 
             mEventAggregator.GetEvent<OpenCharacterDetailViewEvent>().Subscribe(_onOpenCharacterDetailView);
             mEventAggregator.GetEvent<CharacterSelectionActionChangedEvent>().Subscribe(_onCharacterSelectionActionChanged);
@@ -57,6 +71,32 @@ namespace DialogGenerator.UI.ViewModels
         public ICommand EditWithJSONEditorCommand { get; set; }
         public ICommand ExportCharacterCommand { get; set; }
         public ICommand ChooseImageCommand { get; set; }
+        public ICommand CopyToClipboardCommand { get; set; }
+        public DelegateCommand<PhraseEntry> DeletePhraseCommand { get; set; }
+        public DelegateCommand<string> PlayDialogLineCommand { get; set; }
+
+        #endregion
+
+        #region - event handlers -
+
+        private void _phrases_Filter(object sender, FilterEventArgs e)
+        {
+            if (string.IsNullOrEmpty(FilterText))
+            {
+                e.Accepted = true;
+                return;
+            }
+
+            var phrase = e.Item as PhraseEntry;
+            if (phrase.DialogStr.ToUpper().Contains(FilterText.ToUpper()))
+            {
+                e.Accepted = true;
+            }
+            else
+            {
+                e.Accepted = false;
+            }
+        }
 
         #endregion
 
@@ -68,6 +108,52 @@ namespace DialogGenerator.UI.ViewModels
             EditWithJSONEditorCommand = new DelegateCommand(_editWithJSONEditorCommand_Execute, _editWithJSONEditorCommand_CanExecute);
             ExportCharacterCommand = new DelegateCommand(_exportCharacterCommand_Execute, _exportCharacterCommand_CanExecute);
             ChooseImageCommand = new DelegateCommand(_chooseImage_Execute,_chooseImage_CanExecute);
+            CopyToClipboardCommand = new DelegateCommand(_copyToClipboard_Execute);
+            DeletePhraseCommand = new DelegateCommand<PhraseEntry>(_deletePhrase_Execute,_deletePrhase_CanExecute);
+            PlayDialogLineCommand = new DelegateCommand<string>(_playDialogLine_Execute,_playDialogLine_CanExecute);
+        }
+
+        private bool _deletePrhase_CanExecute(PhraseEntry arg)
+        {
+            return !IsDialogStarted;
+        }
+
+        private bool _playDialogLine_CanExecute(string arg)
+        {
+            return !IsDialogStarted;
+        }
+
+        private async void _playDialogLine_Execute(string _fileName)
+        {
+            string _fullFileName = $"{Character.CharacterPrefix}_{_fileName}.mp3";
+            string _fullPath = Path.Combine(ApplicationData.Instance.AudioDirectory, _fullFileName);
+            MP3PlayerDialog dialog = new MP3PlayerDialog(_fullPath);
+
+            await mMessageDialogService.ShowDedicatedDialogAsync<int?>(dialog);            
+        }
+
+        private async void _deletePhrase_Execute(PhraseEntry phrase)
+        {
+            try
+            {
+                MessageDialogResult result = await mMessageDialogService.ShowOKCancelDialogAsync("Are you sure about deleting this line?", "Warning");
+
+                if (result == MessageDialogResult.Cancel)
+                    return;
+
+                mCharacterDataProvider.RemovePhrase(Character.CharacterModel, phrase);
+                await mCharacterDataProvider.SaveAsync(Character.CharacterModel);
+                FilterText = "";
+            }
+            catch (Exception ex)
+            {
+                mLogger.Error($"_deletePhrase_Execute {ex.Message}");
+            }
+        }
+
+        private void _copyToClipboard_Execute()
+        {
+            Clipboard.SetText($"{Character.Model.CharacterPrefix}_{UniqueIdentifier}");
         }
 
         private void _onCharacterSelectionActionChanged(bool _isDialogStarted)
@@ -141,9 +227,7 @@ namespace DialogGenerator.UI.ViewModels
                     Filter = "T2l file(*.t2l)|*.t2l",
                     FileName = Character.Model.CharacterName.Replace(" ", string.Empty)
                 };
-
                 System.Windows.Forms.DialogResult result = _saveFileDialog.ShowDialog();
-
                 if (result != System.Windows.Forms.DialogResult.OK)
                     return;
 
@@ -221,7 +305,6 @@ namespace DialogGenerator.UI.ViewModels
             {
                 var result = await mMessageDialogService
                     .ShowOKCancelDialogAsync("Are you sure about deleting this character?", "Delete character");
-
                 if (result == MessageDialogResult.Cancel)
                     return;
 
@@ -256,12 +339,14 @@ namespace DialogGenerator.UI.ViewModels
         {
             try
             {
+                Character.CharacterName = Character.CharacterName.Trim();
                 if (IsEditing)
                 {
                     await mCharacterDataProvider.SaveAsync(Character.Model);
                 }
                 else
-                {
+                {                    
+                    Character.CharacterPrefix = $"{Character.CharacterPrefix}_{UniqueIdentifier}".Trim();
                     await mCharacterDataProvider.AddAsync(Character.Model);
                 }
 
@@ -277,6 +362,44 @@ namespace DialogGenerator.UI.ViewModels
         private void _onOpenCharacterDetailView(string _characterPrefix)
         {
             Load(_characterPrefix);
+        }
+
+        // Mason Zhwiti                -> MZ
+        // mason lowercase zhwiti      -> MZ
+        // Mason G Zhwiti              -> MZ
+        // Mason G. Zhwiti             -> MZ
+        // John Queue Public           -> JP
+        // John Q. Public, Jr.         -> JP
+        // John Q Public Jr.           -> JP
+        // Thurston Howell III         -> TH
+        // Thurston Howell, III        -> TH
+        // Malcolm X                   -> MX
+        // A Ron                       -> AR
+        // A A Ron                     -> AR
+        // Madonna                     -> M
+        // Chris O'Donnell             -> CO
+        // Malcolm McDowell            -> MM
+        // Robert "Rocky" Balboa, Sr.  -> RB
+        private string _extractInitialsFromName(string name)
+        {
+            // first remove all: punctuation, separator chars, control chars, and numbers (unicode style regexes)
+            string initials = Regex.Replace(name, @"[\p{P}\p{S}\p{C}\p{N}]+", "");
+
+            // Replacing all possible whitespace/separator characters (unicode style), with a single, regular ascii space.
+            initials = Regex.Replace(initials, @"\p{Z}+", " ");
+
+            // Remove all Sr, Jr, I, II, III, IV, V, VI, VII, VIII, IX at the end of names
+            initials = Regex.Replace(initials.Trim(), @"\s+(?:[JS]R|I{1,3}|I[VX]|VI{0,3})$", "", RegexOptions.IgnoreCase);
+
+            // Extract up to 2 initials from the remaining cleaned name.
+            initials = Regex.Replace(initials, @"^(\p{L})[^\s]*(?:\s+(?:\p{L}+\s+(?=\p{L}))?(?:(\p{L})\p{L}*)?)?$", "$1$2").Trim();
+            if (initials.Length > 2)
+            {
+                // Worst case scenario, everything failed, just grab the first two letters of what we have left.
+                initials = initials.Substring(0, 2);
+            }
+
+            return initials.ToUpperInvariant();
         }
 
         #endregion
@@ -307,9 +430,18 @@ namespace DialogGenerator.UI.ViewModels
                             ((DelegateCommand)SaveCommand).RaiseCanExecuteChanged();
                             break;
                         }
+                    case nameof(Character.CharacterName):
+                        {
+                            if (!IsEditing)
+                            {
+                                Character.CharacterPrefix = _extractInitialsFromName(Character.CharacterName);
+                            }
+                            break;
+                        }
                 }
             };
 
+            mPhrasesCollectionViewSource.Source = Character.CharacterModel.Phrases;
             ((DelegateCommand)DeleteCommand).RaiseCanExecuteChanged();
             ((DelegateCommand)SaveCommand).RaiseCanExecuteChanged();
             ((DelegateCommand)EditWithJSONEditorCommand).RaiseCanExecuteChanged();
@@ -320,8 +452,17 @@ namespace DialogGenerator.UI.ViewModels
             {
                 Character.CharacterName = "";
                 Character.CharacterPrefix = "";
+                UniqueIdentifier = Guid.NewGuid().ToString();
             }
+            else
+            {
+                string[] _characterPrefixParts = Character.Model.CharacterPrefix.Split('_');
+                UniqueIdentifier = _characterPrefixParts.Length > 1 ? _characterPrefixParts[1] : "";
+            }
+
+            RaisePropertyChanged(nameof(PhrasesViewSource));
         }
+
 
         #endregion
 
@@ -356,6 +497,32 @@ namespace DialogGenerator.UI.ViewModels
             set
             {
                 mIsDialogStarted = value;
+                RaisePropertyChanged();
+            }
+        }
+
+        public string UniqueIdentifier
+        {
+            get { return mUniqueIdentifier; }
+            set
+            {
+                mUniqueIdentifier = value;
+                RaisePropertyChanged();
+            }
+        }
+
+        public ICollectionView PhrasesViewSource
+        {
+            get { return mPhrasesCollectionViewSource.View; }
+        }
+
+        public string FilterText
+        {
+            get { return mFilterText; }
+            set
+            {
+                mFilterText = value;
+                mPhrasesCollectionViewSource.View?.Refresh();
                 RaisePropertyChanged();
             }
         }

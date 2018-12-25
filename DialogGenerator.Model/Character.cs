@@ -41,7 +41,6 @@ namespace DialogGenerator.Model
             }
         }
 
-        [Range(1,100)]
         [JsonProperty("CharacterAge"),Required]
         public int CharacterAge { get; set; } = 10;
 
@@ -49,9 +48,9 @@ namespace DialogGenerator.Model
         [JsonProperty("CharacterGender")]
         public string CharacterGender { get; set; } = "M";
 
-
+        [RegularExpression("^[a-zA-Z' ]+$")]
         [StringLength(30,MinimumLength =3)]
-        [JsonProperty("CharacterName"),Required]
+        [JsonProperty("CharacterName"),Required(ErrorMessage ="Character name is required.")]
         public string CharacterName
         {
             get { return mCharacterName; }
@@ -62,12 +61,11 @@ namespace DialogGenerator.Model
             }
         }
 
-        [StringLength(3,MinimumLength =2,ErrorMessage ="Field requires 3 characters.")]
-        [RegularExpression("^[a-zA-Z0-9]+$",ErrorMessage ="Allowed only letters and numbers.")]
-        [JsonProperty("CharacterPrefix")]
+        [ValidCharacterPrefix]
+        [JsonProperty("CharacterPrefix"),Required(ErrorMessage ="Character initials is required.")]
         public string CharacterPrefix { get; set; } = "";
 
-        [FileExtensions(Extensions ="jpg,jpe,jpeg,png",ErrorMessage ="Allowed extensions: jpg,jpe,jpeg,png.")]
+        [FileExtensions(Extensions ="jpg,jpe,jpeg,png",ErrorMessage ="Allowed image file extensions: jpg,jpe,jpeg,png.")]
         [JsonProperty("CharacterImage")]
         public string CharacterImage
         {
@@ -137,15 +135,12 @@ namespace DialogGenerator.Model
         public Queue<PhraseEntry> RecentPhrases = new Queue<PhraseEntry>();
         [JsonIgnore]
         public const int RecentPhrasesQueueSize = 8;
-
-        public event PropertyChangedEventHandler PropertyChanged;
-
         [JsonIgnore]
         public string FileName { get; set; }
-
         [JsonIgnore]
         public int JsonArrayIndex { get; set; }
 
+        public event PropertyChangedEventHandler PropertyChanged;
         #endregion
 
         public override string ToString()

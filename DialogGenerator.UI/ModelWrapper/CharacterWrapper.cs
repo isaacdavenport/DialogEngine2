@@ -32,7 +32,7 @@ namespace DialogGenerator.UI.Wrapper
                         var character = mCharacterDataProvider.GetByInitials(CharacterPrefix);
 
                         if (character != null)
-                            errors.Add("Character initials must be unique");
+                            errors.Add("Character initials must be unique.");
                         break;
                     }                    
             }

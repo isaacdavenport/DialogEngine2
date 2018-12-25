@@ -125,7 +125,7 @@
             <views:DebugView HorizontalAlignment="Stretch" VerticalAlignment="Stretch" />
         </Border>
 
-        <Border  Grid.Row="3"  Background="White" Height="60" BorderBrush="LightGray" BorderThickness="0,1,0,0">
+        <Border  Grid.Row="3"  Height="60" BorderBrush="LightGray" BorderThickness="0,1,0,0">
             <Grid>
                 <StackPanel Orientation="Horizontal" HorizontalAlignment="Center" Margin="10">
                     <Button Command="{Binding ConfigureDialogCommand}">

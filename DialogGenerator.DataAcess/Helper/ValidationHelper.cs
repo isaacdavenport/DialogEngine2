@@ -3,6 +3,7 @@ using DialogGenerator.Model;
 using Newtonsoft.Json.Linq;
 using Newtonsoft.Json.Schema;
 using Newtonsoft.Json.Schema.Generation;
+using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
@@ -28,9 +29,24 @@ namespace DialogGenerator.DataAccess.Helper
 
         public static bool Validate(string _jsonString, out IList<string> messages)
         {
-            JObject _jObject = JObject.Parse(_jsonString);
+            try
+            {
+                JObject _jObject = JObject.Parse(_jsonString);
 
-            return _jObject.IsValid(msSchema, out messages);
+                return _jObject.IsValid(msSchema, out messages);
+            }
+            catch(Newtonsoft.Json.JsonReaderException e)
+            {
+                messages = new List<string>();
+                messages.Add(e.Message);
+            }
+            catch(Exception e)
+            {
+                messages = new List<string>();
+                messages.Add(e.Message);
+            }
+
+            return false;
         }
     }
 }

@@ -16,5 +16,6 @@ namespace DialogGenerator.DataAccess
         void Export(Character character,string _directoryPath);
         Task SaveAsync(Character character);
         Task Remove(Character character,string _imageFileName);
+        void RemovePhrase(Character character, PhraseEntry phrase);
     }
 }
