@@ -4,6 +4,7 @@ using DialogGenerator.Model.Enum;
 using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
+using System.Collections.ObjectModel;
 using System.ComponentModel;
 using System.ComponentModel.DataAnnotations;
 
@@ -15,7 +16,7 @@ namespace DialogGenerator.Model
 
         private string mCharacterName;
         private CharacterState mState;
-        private List<PhraseEntry> mPhrases;
+        private ObservableCollection<PhraseEntry> mPhrases;
         private int mRadioNum =-1;
         private PhraseEntry mPhraseTotals;
         private string mCharacterImage = ApplicationData.Instance.DefaultImage;
@@ -113,12 +114,12 @@ namespace DialogGenerator.Model
         }
 
         [JsonProperty("Phrases")]
-        public List<PhraseEntry> Phrases
+        public ObservableCollection<PhraseEntry> Phrases
         {
             get
             {
                 if (mPhrases == null)
-                    mPhrases = new List<PhraseEntry>();
+                    mPhrases = new ObservableCollection<PhraseEntry>();
 
                 return mPhrases;
             }

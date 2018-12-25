@@ -93,7 +93,7 @@
                     </Grid>
                 </materialDesign:ColorZone>
 
-                    <Grid x:Name="WizardMainGrid" Grid.Column="1" Margin="20"  Background="White">
+                    <Grid x:Name="WizardMainGrid" Grid.Column="1" Margin="20"  Background="Transparent">
                         <Grid.ColumnDefinitions>
                             <ColumnDefinition Width="*" />
                             <ColumnDefinition Width="100"/>

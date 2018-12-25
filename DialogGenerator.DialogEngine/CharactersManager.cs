@@ -91,9 +91,11 @@ namespace DialogGenerator.DialogEngine
             var _maxParentalRating = ParentalRatings.GetNumeric(ApplicationData.Instance.CurrentParentalRating);
             var _minParentalRating = ParentalRatings.GetNumeric("G");
 
-            _inCharacter.Phrases.RemoveAll(_item =>
-                                              ParentalRatings.GetNumeric(_item.PhraseRating) > _maxParentalRating
-                                           || ParentalRatings.GetNumeric(_item.PhraseRating) < _minParentalRating);
+            _inCharacter.Phrases.Where(ph => ParentalRatings.GetNumeric(ph.PhraseRating) > _maxParentalRating
+                                             || ParentalRatings.GetNumeric(ph.PhraseRating) < _minParentalRating)
+                                .ToList()
+                                .All(i => _inCharacter.Phrases.Remove(i));
+
         }
 
         #endregion

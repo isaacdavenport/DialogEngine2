@@ -339,14 +339,16 @@ namespace DialogGenerator.UI.ViewModels
         {
             try
             {
-                Character.CharacterName = Character.CharacterName.Trim();
                 if (IsEditing)
                 {
+                    Character.CharacterName = Character.CharacterName.Trim();
                     await mCharacterDataProvider.SaveAsync(Character.Model);
                 }
                 else
                 {                    
-                    Character.CharacterPrefix = $"{Character.CharacterPrefix}_{UniqueIdentifier}".Trim();
+                    string _prefix  = $"{Character.CharacterPrefix}_{UniqueIdentifier}".Trim();
+                    Character.CharacterName = Character.CharacterName.Trim();
+                    Character.CharacterPrefix = _prefix;
                     await mCharacterDataProvider.AddAsync(Character.Model);
                 }
 
