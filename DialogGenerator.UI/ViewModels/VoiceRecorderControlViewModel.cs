@@ -43,7 +43,6 @@ namespace DialogGenerator.UI.ViewModels
 
             StateMachine.PropertyChanged += _stateMachine_PropertyChanged;
             mWizardWorkflow.PropertyChanged += _mWizardWorkflow_PropertyChanged;
-            mSoundPlayer.PropertyChanged += _soundPlayer_PropertyChanged;
             this.PropertyChanged += _voiceRecorderControlViewModel_PropertyChanged;
 
             _configureStateMachine();
@@ -59,6 +58,8 @@ namespace DialogGenerator.UI.ViewModels
         public ICommand StartPlayingCommand { get; set; }
         public ICommand PlayInContextCommand { get; set; }
         public ICommand StopPlayingInContextCommand { get; set; }
+        public ICommand LoadedCommand { get; set; }
+        public ICommand UnloadedCommand { get; set; }
 
         #endregion
 
@@ -102,6 +103,8 @@ namespace DialogGenerator.UI.ViewModels
                         if (StateMachine.CanFire(Triggers.On))
                             StateMachine.Fire(Triggers.On);
 
+                        ((DelegateCommand)StartPlayingCommand).RaiseCanExecuteChanged();
+                        ((DelegateCommand)StartRecordingCommand).RaiseCanExecuteChanged();
                         break;
                     }
                 case WizardStates.UserActionStarted:
@@ -191,6 +194,18 @@ namespace DialogGenerator.UI.ViewModels
             StopRecorderCommand = new DelegateCommand(_stopRecorder_Execute);
             PlayInContextCommand = new DelegateCommand(_playInContext_Execute, _playInContext_CanExecute);
             StopPlayingInContextCommand = new DelegateCommand(_stopPlayingInContext_Execute,_stopPlayingInContext_CanExecute);
+            LoadedCommand = new DelegateCommand(_loaded_Execute);
+            UnloadedCommand = new DelegateCommand(_unloaded_Execute);
+        }
+
+        private void _unloaded_Execute()
+        {
+            mSoundPlayer.PropertyChanged -= _soundPlayer_PropertyChanged;
+        }
+
+        private void _loaded_Execute()
+        {
+            mSoundPlayer.PropertyChanged += _soundPlayer_PropertyChanged;
         }
 
         private bool _playInContext_CanExecute()

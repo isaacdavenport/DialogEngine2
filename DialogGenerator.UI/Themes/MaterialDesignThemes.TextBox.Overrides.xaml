@@ -25,7 +25,7 @@
         <Setter Property="BorderBrush" Value="Red" />
         <Setter Property="BorderThickness" Value="2"/>
         <Setter Property="wpf:TextFieldAssist.TextBoxViewMargin" Value="0 0 0 0" />
-        <Setter Property="Background" Value="Transparent"/>
+        <Setter Property="Background" Value="White"/>
         <Setter Property="CaretBrush" Value="{DynamicResource PrimaryHueMidBrush}"/>
         <Setter Property="KeyboardNavigation.TabNavigation" Value="None"/>
         <Setter Property="HorizontalContentAlignment" Value="Stretch"/>
@@ -122,7 +122,7 @@
                         </Trigger>
                         <Trigger Property="wpf:TextFieldAssist.HasTextAreaBox" Value="True">
                             <Setter Property="VerticalContentAlignment" Value="Top" />
-                            <Setter TargetName="textFieldBoxBorder" Property="Background" Value="transparent" />
+                            <Setter TargetName="textFieldBoxBorder" Property="Background" Value="White" />
                             <Setter TargetName="textFieldBoxBorder" Property="CornerRadius" Value="4" />
                             <Setter TargetName="textFieldBoxBorder" Property="BorderThickness" Value="2" />
                             <Setter TargetName="textFieldBoxBorder" Property="BorderBrush" Value="{DynamicResource MaterialDesignTextAreaBorder}" />
@@ -139,7 +139,7 @@
                                 <Condition Property="IsEnabled" Value="false" />
                                 <Condition Property="wpf:TextFieldAssist.HasTextAreaBox" Value="True" />
                             </MultiTrigger.Conditions>
-                            <Setter TargetName="textFieldBoxBorder" Property="Background" Value="WhiteSmoke" />
+                            <Setter TargetName="textFieldBoxBorder" Property="Background" Value="White" />
                             <Setter TargetName="textFieldBoxBorder" Property="BorderBrush" Value="{DynamicResource MaterialDesignTextAreaBorder}" />
                         </MultiTrigger>
                         <MultiTrigger>

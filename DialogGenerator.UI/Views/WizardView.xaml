@@ -126,6 +126,7 @@
                         <TextBox x:Name="dialogStrTb"
                                 Style="{DynamicResource MaterialDesignTextAreaTextBox}" 
                                 Grid.Row="1"
+                                Background="White"
                                 Text="{Binding DialogStr}"
                                 IsEnabled="{Binding CurrentTutorialStep.CollectUserInput}"
                                 VerticalAlignment="Stretch"

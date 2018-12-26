@@ -55,13 +55,13 @@
         </Border>
 
         <StackPanel Grid.Row="2" HorizontalAlignment="Stretch" VerticalAlignment="Center"  Orientation="Horizontal">
-            <Button x:Name="PlayBtn" Margin="10,10,10,10" Command="{Binding StartPlayingCommand}" Width="25" Height="25"  
+            <Button x:Name="PlayBtn" Margin="10,10,10,10" Command="{Binding StartPlayingFileCommand}" Width="25" Height="25"  
                 Visibility="{Binding Path=Visibility, ElementName=StopPlayingBtn,Converter={StaticResource InvertVisibilityValueConverter}}">
                 <materialDesign:PackIcon  Kind="Play" />
             </Button>
             <Button x:Name="StopPlayingBtn" Margin="10,10,10,10" Width="25" Height="25"
                     Visibility="{Binding StopBtnVisibility}" 
-                    Command="{Binding StopPlayingCommand}" >
+                    Command="{Binding StopPlayingFileCommand}" >
                 <materialDesign:PackIcon Kind="Stop" />
             </Button>
         </StackPanel>

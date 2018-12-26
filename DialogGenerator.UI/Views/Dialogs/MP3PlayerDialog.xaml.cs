@@ -33,8 +33,8 @@ namespace DialogGenerator.UI.Views.Dialogs
 
             SoundPlayer = NAudioEngine.Instance;
             SoundPlayer.PropertyChanged += _soundPlayer_PropertyChanged;
-            StartPlayingCommand = new DelegateCommand(_startPlaying_Execute,_startPlaying_CanExecute);
-            StopPlayingCommand = new DelegateCommand(_stopPlaying_Execute);
+            StartPlayingFileCommand = new DelegateCommand(_startPlayingFile_Execute,_startPlayingFile_CanExecute);
+            StopPlayingFileCommand = new DelegateCommand(_stopPlayingFile_Execute);
             CloseDialogCommand = new DelegateCommand(_closeDialog_Execute);
             FilePath = _filePath;
         }
@@ -43,8 +43,8 @@ namespace DialogGenerator.UI.Views.Dialogs
 
         #region - commands - 
 
-        public ICommand StartPlayingCommand { get; set; }
-        public ICommand StopPlayingCommand { get; set; }
+        public ICommand StartPlayingFileCommand { get; set; }
+        public ICommand StopPlayingFileCommand { get; set; }
         public ICommand CloseDialogCommand { get; set; }
 
         #endregion
@@ -67,18 +67,18 @@ namespace DialogGenerator.UI.Views.Dialogs
 
         #region - private methods -
 
-        private void _stopPlaying_Execute()
+        private void _stopPlayingFile_Execute()
         {
             if(SoundPlayer.CanStop)
                 SoundPlayer.Stop();
         }
 
-        private bool _startPlaying_CanExecute()
+        private bool _startPlayingFile_CanExecute()
         {
             return !string.IsNullOrEmpty(FilePath) && File.Exists(FilePath);
         }
 
-        private void _startPlaying_Execute()
+        private void _startPlayingFile_Execute()
         {
             SoundPlayer.OpenFile(FilePath);
             SoundPlayer.Play();
@@ -132,7 +132,7 @@ namespace DialogGenerator.UI.Views.Dialogs
             set
             {
                 mFilePath = value;
-                ((DelegateCommand)StartPlayingCommand)?.RaiseCanExecuteChanged();
+                ((DelegateCommand)StartPlayingFileCommand)?.RaiseCanExecuteChanged();
             }
         }
 

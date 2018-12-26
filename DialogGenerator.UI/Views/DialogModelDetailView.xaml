@@ -35,8 +35,9 @@
         </Border>
 
         <ListView Grid.Row="1"
-                  Background="WhiteSmoke"
+                  Background="Transparent"
                   x:Name="DialogModelsListView"
+                  ScrollViewer.CanContentScroll="True"
                   ScrollViewer.VerticalScrollBarVisibility="Auto"
                   ScrollViewer.HorizontalScrollBarVisibility="Auto"
                   SelectedIndex="{Binding SelectedDialogModelIndex,Mode=TwoWay}"
@@ -81,19 +82,14 @@
                 </DataTemplate>
             </ListView.ItemTemplate>
             <ListView.ItemContainerStyle>
-                <Style TargetType="ListViewItem">
+                <Style TargetType="ListViewItem" BasedOn="{StaticResource MaterialDesignListBoxItem}">
+                    <Setter Property="Padding" Value="0" />
                     <Setter Property="HorizontalContentAlignment" Value="Stretch" />
                     <Setter Property="BorderBrush" Value="LightGray" />
                     <Setter Property="BorderThickness" Value="0,0,0,1" />
                 </Style>
             </ListView.ItemContainerStyle>
-            
-            <ListView.ItemsPanel>
-                <ItemsPanelTemplate>
-                    <VirtualizingStackPanel />
-                </ItemsPanelTemplate>
-            </ListView.ItemsPanel>
-            
+ 
             <ListView.Template>
                 <ControlTemplate TargetType="ListView">
                     <Grid>
@@ -142,7 +138,8 @@
                                 </TextBlock>
                             </Grid>
                         </Border>
-                        <ScrollViewer Grid.Row="1">
+                        <ScrollViewer Grid.Row="1" CanContentScroll="True" VirtualizingStackPanel.IsVirtualizing="True" 
+                                      VirtualizingStackPanel.VirtualizationMode="Recycling">
                             <Grid>
                                 <Grid.RowDefinitions>
                                     <RowDefinition Height="53"/>

@@ -146,6 +146,7 @@
                                 </Grid>
                                 <ControlTemplate.Triggers>
                                     <Trigger Property="IsSelected" Value="False">
+                                        <Setter TargetName="ContentSite" Property="TextElement.FontWeight" Value="SemiBold" />
                                         <Setter TargetName="ContentSite" Property="TextElement.Foreground" Value="{DynamicResource MaterialDesignBody}" />
                                     </Trigger>
                                     <Trigger Property="IsSelected" Value="True">
@@ -358,7 +359,9 @@
                                         <RowDefinition Height="auto" />
                                         <RowDefinition Height="auto" />
                                     </Grid.RowDefinitions>
-                                    <Expander HorizontalAlignment="Stretch" TextBlock.FontSize="13" TextElement.FontSize="13" TextElement.FontWeight="Regular">
+                                    <Expander HorizontalAlignment="Stretch" Opacity="1" TextOptions.TextFormattingMode="Ideal" TextOptions.TextRenderingMode="Auto"
+                                              TextElement.Foreground="{DynamicResource MaterialDesignBody}" TextBlock.FontSize="13"  
+                                              TextElement.FontWeight="Regular">
                                         <Expander.Header>
                                             <Grid>
                                                 <Grid.ColumnDefinitions>
@@ -444,10 +447,10 @@
                                         </Grid>
                                     </Expander>
                                     <Border Grid.Row="1"
-                                Background="{DynamicResource MaterialDesignDivider}"
-                              Height="1"
-                              HorizontalAlignment="Stretch"
-                              SnapsToDevicePixels="True" />
+                                            Background="{DynamicResource MaterialDesignDivider}"
+                                            Height="1"
+                                            HorizontalAlignment="Stretch"
+                                            SnapsToDevicePixels="True" />
                                 </Grid>
                             </DataTemplate>
                         </ItemsControl.ItemTemplate>
@@ -464,7 +467,8 @@
                                     BorderBrush="{TemplateBinding Border.BorderBrush}"
                                     Background="{TemplateBinding Panel.Background}"
                                     SnapsToDevicePixels="True">
-                                    <ScrollViewer Padding="{TemplateBinding Control.Padding}" Focusable="False">
+                                    <ScrollViewer Padding="{TemplateBinding Control.Padding}" VirtualizingStackPanel.VirtualizationMode="Recycling"
+                                        ScrollViewer.CanContentScroll="True" Focusable="False">
                                         <ItemsPresenter SnapsToDevicePixels="{TemplateBinding UIElement.SnapsToDevicePixels}" />
                                     </ScrollViewer>
                                 </Border>

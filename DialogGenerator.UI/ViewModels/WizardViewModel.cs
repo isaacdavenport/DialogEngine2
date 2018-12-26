@@ -42,8 +42,6 @@ namespace DialogGenerator.UI.ViewModels
         private IRegionManager mRegionManager;
         private int mCurrentStepIndex;
         private string mDialogStr;
-        private bool mIsPhraseEditable;
-        private PhraseEntry mCurrentPhrase;
         private WizardFormDialog mWizardFormDialog;
         private MediaPlayerControlViewModel mMediaPlayerControlViewModel;
         private VoiceRecorderControlViewModel mVoiceRecorderControlViewModel;
@@ -78,9 +76,6 @@ namespace DialogGenerator.UI.ViewModels
 
             Workflow.PropertyChanged += _workflow_PropertyChanged;
             this.PropertyChanged += _wizardViewModel_PropertyChanged;
-            VoiceRecorderControlViewModel.StateMachine.PropertyChanged += _vrc_stateMachine_PropertyChanged;
-            MediaPlayerControlViewModel.StateMachine.PropertyChanged += _mpc_stateMachine_PropertyChanged;
-
             _configureWorkflow();
             _bindCommands();
         }
@@ -182,6 +177,7 @@ namespace DialogGenerator.UI.ViewModels
         private void _configureWorkflow()
         {
             Workflow.Configure(WizardStates.Started)
+                .OnExit(() =>_startExited())
                 .Permit(WizardTriggers.ShowChooseWizardDialog, WizardStates.ChooseWizardDialogShown);
 
             Workflow.Configure(WizardStates.ChooseWizardDialogShown)
@@ -221,6 +217,12 @@ namespace DialogGenerator.UI.ViewModels
                 .OnEntry(t => _leaveWizard())
                 .OnExit(t => _resetData())
                 .Permit(WizardTriggers.Start, WizardStates.Started);
+        }
+
+        private void _startExited()
+        {
+            VoiceRecorderControlViewModel.StateMachine.PropertyChanged += _vrc_stateMachine_PropertyChanged;
+            MediaPlayerControlViewModel.StateMachine.PropertyChanged += _mpc_stateMachine_PropertyChanged;
         }
 
         private void _bindCommands()
@@ -373,7 +375,8 @@ namespace DialogGenerator.UI.ViewModels
                 }
             });
 
-            _setDataForTutorialStep(CurrentStepIndex);
+            CurrentTutorialStep = CurrentWizard.TutorialSteps[CurrentStepIndex];
+            MediaPlayerControlViewModel.CurrentVideoFilePath = Path.Combine(ApplicationData.Instance.VideoDirectory, CurrentTutorialStep.VideoFileName + ".avi");
             Workflow.Fire(WizardTriggers.ReadyForUserAction);
         }
 
@@ -424,6 +427,8 @@ namespace DialogGenerator.UI.ViewModels
         public void _resetData()
         {
             mCharacter = null;
+            CurrentTutorialStep = null;
+            CurrentWizard = null;
             CurrentStepIndex = 0;
             DialogStr = "";
         }
@@ -432,6 +437,8 @@ namespace DialogGenerator.UI.ViewModels
         {
             try
             {
+                VoiceRecorderControlViewModel.StateMachine.PropertyChanged -= _vrc_stateMachine_PropertyChanged;
+                MediaPlayerControlViewModel.StateMachine.PropertyChanged -= _mpc_stateMachine_PropertyChanged;
                 mRegionManager.RequestNavigate(Constants.NavigationRegion, typeof(CharactersNavigationView).FullName);
                 var _contentRegion = mRegionManager.Regions[Constants.ContentRegion];
                 _contentRegion.NavigationService.Journal.GoBack();
@@ -513,7 +520,7 @@ namespace DialogGenerator.UI.ViewModels
                 PhraseRating = CurrentTutorialStep.PhraseRating,
                 DialogStr = DialogStr,
                 PhraseWeights = CurrentTutorialStep.PhraseWeights,
-                FileName = $"{_fileNameParts[1]}_{_fileNameParts[2]}"
+                FileName = $"{_fileNameParts[_fileNameParts.Length-2]}_{_fileNameParts.Last()}"
             };
 
             mCharacter.Phrases.Add(_phraseEntry);

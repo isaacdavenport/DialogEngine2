@@ -5,6 +5,7 @@ using System;
 using System.ComponentModel;
 using System.Diagnostics;
 using System.IO;
+using System.Threading.Tasks;
 using System.Windows.Threading;
 using DialogGenerator.Core;
 using DialogGenerator.Utilities.Model;
@@ -242,6 +243,12 @@ namespace DialogGenerator.Utilities
         {
             if (!IsRecording)
             {
+                if(ActiveStream == null)
+                {
+                    Stop();
+                    return;
+                }
+
                 mInChannelTimerUpdate = true;
                 ChannelPosition = ((double)ActiveStream.Position / (double)ActiveStream.Length) * ActiveStream.TotalTime.TotalSeconds;
                 mInChannelTimerUpdate = false;
@@ -310,32 +317,55 @@ namespace DialogGenerator.Utilities
         }
 
 
-        private void _normalizeMP3File()
+        private void _normalizeMP3File(string _filePath)
         {
-            ProcessStartInfo _processStartInfo = new ProcessStartInfo();
-            _processStartInfo.FileName = Path.Combine(ApplicationData.Instance.ToolsDirectory, "mp3gain.exe");
-            Process _mp3GainProcess = Process.Start(_processStartInfo);
-            _mp3GainProcess.WaitForExit(5000);
-
+            if (File.Exists(_filePath))
+            {
+                ProcessStartInfo _processStartInfo = new ProcessStartInfo();
+                _processStartInfo.FileName = Path.Combine(ApplicationData.Instance.ToolsDirectory, "mp3gain.exe");
+                _processStartInfo.Arguments = $"-r -c {_filePath}";
+                _processStartInfo.WindowStyle = ProcessWindowStyle.Hidden;
+                Process _mp3GainProcess = Process.Start(_processStartInfo);
+                _mp3GainProcess.WaitForExit(5000);
+            }
         }
 
-        private void _waveIn_RecordingStopped(object sender, EventArgs e)
+        private void _cleanDirectory(string _directoryPath)
         {
-            string _outputPath = Path.Combine(ApplicationData.Instance.TempDirectory, Path.GetFileName(mCurrentFilePath));
-            try
+            DirectoryInfo di = new DirectoryInfo(_directoryPath);
+            foreach (FileInfo file in di.EnumerateFiles())
             {
-                _trimWavFile(mCurrentFilePath,_outputPath, TimeSpan.Zero, TimeSpan.FromMilliseconds(100));
-                File.Copy(_outputPath, mCurrentFilePath,true);
+                file.Delete();
             }
-            catch { }
-            finally
+            foreach (DirectoryInfo dir in di.EnumerateDirectories())
             {
-                if (File.Exists(_outputPath))
+                dir.Delete(true);
+            }
+        }
+
+        private async void _waveIn_RecordingStopped(object sender, EventArgs e)
+        {
+            await Task.Run(() =>
+            {
+                string _outputPath = Path.Combine(ApplicationData.Instance.TempDirectory, Path.GetFileName(mCurrentFilePath));
+                string _outputPathMP3 = Path.Combine(ApplicationData.Instance.TempDirectory, "temp.mp3");
+                try
                 {
-                    File.Delete(_outputPath);
+                    _trimWavFile(mCurrentFilePath, _outputPath, TimeSpan.Zero, TimeSpan.FromMilliseconds(100));
+                    using (var reader = new WaveFileReader(_outputPath))
+                    {
+                        MediaFoundationEncoder.EncodeToMp3(reader, _outputPathMP3);
+                    }
+                    _normalizeMP3File(_outputPathMP3);
+                    File.Copy(_outputPathMP3, mCurrentFilePath, true);
                 }
-                IsRecording = false;
-            }
+                catch { }
+                finally
+                {
+                    _cleanDirectory(ApplicationData.Instance.TempDirectory);
+                    IsRecording = false;
+                }
+            });
         }
 
         #endregion
@@ -482,7 +512,7 @@ namespace DialogGenerator.Utilities
             
             _stopAndCloseStream();            
 
-            if (System.IO.File.Exists(path))
+            if (File.Exists(path))
             {
                 try
                 {
@@ -490,7 +520,7 @@ namespace DialogGenerator.Utilities
                     {
                         DesiredLatency = 100
                     };
-                    ActiveStream = new WaveFileReader(path); 
+                    ActiveStream = new Mp3FileReader(path); 
                     mInputStream = new WaveChannel32(ActiveStream);
                     mSampleAggregator = new SampleAggregator(mcfftDataSize);
                     mInputStream.Sample += _inputStream_Sample;
@@ -498,7 +528,7 @@ namespace DialogGenerator.Utilities
                     ChannelLength = mInputStream.TotalTime.TotalSeconds;
                     CanPlay = true;
                 }
-                catch(Exception)
+                catch(Exception ex)
                 {
                     ActiveStream = null;
                     CanPlay = false;

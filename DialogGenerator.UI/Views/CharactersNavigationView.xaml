@@ -15,29 +15,32 @@
              d:DesignHeight="450" d:DesignWidth="800">
     <UserControl.Resources>
         <ResourceDictionary>
-            <converters:CharacterStateToColorValueConverter x:Key="CharacterStateToColorValueConverter" />
-            <converters:CloneValuesConverter x:Key="CloneValuesConverter" />
-            <converters:ImageToFullPathValueConverter x:Key="ImageToFullPathValueConverter" />
+            <ResourceDictionary.MergedDictionaries>
+                <ResourceDictionary>
+                    <converters:CharacterStateToColorValueConverter x:Key="CharacterStateToColorValueConverter" />
+                    <converters:CloneValuesConverter x:Key="CloneValuesConverter" />
+                    <converters:ImageToFullPathValueConverter x:Key="ImageToFullPathValueConverter" />
 
-            <Style TargetType="{x:Type Button}">
-                <Setter Property="Template">
-                    <Setter.Value>
-                        <ControlTemplate TargetType="Button">
-                            <Border x:Name="btnBorder" CornerRadius="5">
-                                <ContentPresenter HorizontalAlignment="Center" VerticalAlignment="Center" />
-                            </Border>
-                            <ControlTemplate.Triggers>
-                                <Trigger Property="IsMouseOver" Value="true">
-                                    <Setter TargetName="btnBorder" Property="BorderBrush" Value="LightGray" />
-                                    <Setter TargetName="btnBorder" Property="BorderThickness" Value="1" />
-                                    <Setter TargetName="btnBorder" Property="Background" Value="WhiteSmoke" />
-                                </Trigger>
-                            </ControlTemplate.Triggers>
-                        </ControlTemplate>
-                    </Setter.Value>
-                </Setter>
-            </Style>
-            
+                    <Style TargetType="{x:Type Button}">
+                        <Setter Property="Template">
+                            <Setter.Value>
+                                <ControlTemplate TargetType="Button">
+                                    <Border x:Name="btnBorder" CornerRadius="5">
+                                        <ContentPresenter HorizontalAlignment="Center" VerticalAlignment="Center" />
+                                    </Border>
+                                    <ControlTemplate.Triggers>
+                                        <Trigger Property="IsMouseOver" Value="true">
+                                            <Setter TargetName="btnBorder" Property="BorderBrush" Value="LightGray" />
+                                            <Setter TargetName="btnBorder" Property="BorderThickness" Value="1" />
+                                            <Setter TargetName="btnBorder" Property="Background" Value="WhiteSmoke" />
+                                        </Trigger>
+                                    </ControlTemplate.Triggers>
+                                </ControlTemplate>
+                            </Setter.Value>
+                        </Setter>
+                    </Style>
+                </ResourceDictionary>
+            </ResourceDictionary.MergedDictionaries>
         </ResourceDictionary>
     </UserControl.Resources>
     <Grid>
@@ -116,11 +119,10 @@
                   BorderThickness="20"
                   AlternationCount="10000"
                   ScrollViewer.VerticalScrollBarVisibility="Auto"
-                  BorderBrush="WhiteSmoke"
+                  BorderBrush="Black"
                   x:Name="CharactersListView"
                   SelectionChanged="_listView_SelectionChanged"
                   SelectedValue="{Binding SelectedCharacter,Mode=TwoWay,UpdateSourceTrigger=PropertyChanged}">
-                        
             <ListView.ItemTemplate>
                 <DataTemplate>
                     <Grid HorizontalAlignment="Stretch"  Height="50">
@@ -205,9 +207,11 @@
                 </DataTemplate>
             </ListView.ItemTemplate>
             <ListView.ItemContainerStyle>
-                <Style TargetType="ListViewItem">
+                <Style TargetType="ListViewItem"  BasedOn="{StaticResource MaterialDesignListBoxItem}">
                     <Setter Property="HorizontalContentAlignment" Value="Stretch" />
                     <Setter Property="BorderBrush" Value="LightGray" />
+                    <Setter Property="Padding" Value="0" />
+                    <Setter Property="Margin" Value="0" />
                     <Setter Property="BorderThickness" Value="0,0,0,1" />
                 </Style>
             </ListView.ItemContainerStyle>
