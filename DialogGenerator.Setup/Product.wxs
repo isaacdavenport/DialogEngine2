@@ -6,7 +6,7 @@
   <?define SkuName = "DialogGenerator"?>
   <?define VersionNumber="!(bind.FileVersion.DialogGenerator.exe)"?>
   
-	<Product Id="*" Name="$(var.SkuName)" Language="1033" Version="$(var.VersionNumber)" 
+	<Product Id="*" Name="$(var.SkuName)" Language="1033" Version="1.0.5.0" 
    Manufacturer="$(var.Manufacturer)" UpgradeCode="880cbb5f-2d77-425a-8d96-a8000443c1f2">
         
 		<Package InstallerVersion="200" Compressed="yes" InstallScope="perMachine" />
@@ -31,6 +31,14 @@
 		<Feature Id="DialogEngine" Title="DialogEngine" Level="1">
 			<ComponentGroupRef Id="ProductComponents" />
       <ComponentRef Id="ApplicationShortcut" />
+      <ComponentRef Id="Tools"/>
+      <ComponentRef Id="JSONedit.exe"/>
+      <ComponentRef Id="mp3gain.exe"/>
+      <ComponentRef Id="Tutorial"/>
+      <ComponentRef Id="tutorial.pdf"/>
+      <ComponentRef Id="tutorial.docx"/>
+      <ComponentRef Id="PhraseTypes.txt"/>
+      <ComponentRef Id="PhraseTypeGlossary.docx"/>
 		</Feature>
 
     <Feature Id="Data" Title="Data" Level="1">

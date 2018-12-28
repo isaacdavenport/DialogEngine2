@@ -8,12 +8,14 @@
   <Fragment>
     <ComponentGroup Id="ProductComponents" Directory="INSTALLFOLDER">
       <!-- Tools and Tutorial  -->
-       <Component Id="Tools" Guid="01245c22-61f4-42db-920f-6652ce99f07b" KeyPath="yes">
+      
+       <!--<Component Id="Tools" Guid="01245c22-61f4-42db-920f-6652ce99f07b" KeyPath="yes">
+         <CreateFolder /
         <CopyFile Id="ToolsDir" SourceProperty="TOOLS_DIR" DestinationDirectory="Tools" SourceName="*" />
       </Component>
       <Component Id="Tutorial" Guid="b884174f-5619-4e1d-84f2-6229982c4df5" KeyPath="yes">
         <CopyFile Id="TutorialDir" SourceProperty="TUTORIAL_DIR" DestinationDirectory="Tutorial" SourceName="*" />
-      </Component>
+      </Component>-->
 
       <!-- I had to add this manually because wax editor didn't recognize this extension -->
       <Component Id="Windows.winmd" Guid="44a7ab6c-0300-4990-808e-cca3a579f3ca" KeyPath="yes">
@@ -128,6 +130,56 @@
     </DirectoryRef> 
   </Fragment>
 
+    <Fragment>
+    <DirectoryRef Id="Tutorial">
+      <Component Id="Tutorial" Guid="33a417ca-1a1a-48de-959a-f77e787e4eb3" KeyPath="yes">
+        <CreateFolder />
+      </Component>
+      <Component Id="tutorial.pdf" Guid="67f484e4-719d-4e21-9067-925928ab4e0f" KeyPath="yes" >
+        <File Id="tutorial.pdf"  Name="tutorial.pdf" Source="$(var.DialogGenerator_TargetDir)Tutorial\tutorial.pdf" />
+      </Component>
+      <Component Id="PhraseTypes.txt" Guid="3bd45917-e153-4ae3-85cb-93bd7d4f3973"  KeyPath="yes">
+        <File Id="PhraseTypes.txt"  Name="PhraseTypes.txt" Source="$(var.DialogGenerator_TargetDir)Tutorial\PhraseTypes.txt" />
+      </Component>
+          <Component Id="tutorial.docx" Guid="f4b646c6-89d5-4a91-b43e-4b9dde58515f"  KeyPath="yes">
+        <File Id="tutorial.docx"  Name="tutorial.docx" Source="$(var.DialogGenerator_TargetDir)Tutorial\tutorial.docx" />
+      </Component>
+          <Component Id="PhraseTypeGlossary.docx" Guid="8105321b-bed7-44f4-bd52-233fd6ce9a2a"  KeyPath="yes">
+        <File Id="PhraseTypeGlossary.docx"  Name="PhraseTypeGlossary.docx" Source="$(var.DialogGenerator_TargetDir)Tutorial\PhraseTypeGlossary.docx" />
+      </Component>
+    </DirectoryRef>
+  </Fragment>
+    
+  <Fragment>
+    <DirectoryRef Id="Tools">
+      <Component Id="JSONedit.exe" Guid="bafab659-84af-4742-8e87-f83e7d2cc101" KeyPath="yes" >
+        <File Id="JSONedit.exe"  Name="JSONedit.exe" Source="$(var.DialogGenerator_TargetDir)Tools\JSONedit.exe" />
+      </Component>
+      <Component Id="mp3gain.exe" Guid="4694ec38-ac0d-4e92-bcd8-fcb7a5539ba7"  KeyPath="yes">
+        <File Id="mp3gain.exe"  Name="mp3gain.exe" Source="$(var.DialogGenerator_TargetDir)Tools\mp3gain.exe" />
+      </Component>    
+    </DirectoryRef>
+  </Fragment>
+    
+  <Fragment>
+    <DirectoryRef Id="Tools">
+      <Component Id="Tools" Guid="ac34b5c2-d6ed-484c-aa3a-3243d46f62ba" KeyPath="yes">
+        <CreateFolder />
+      </Component>
+    </DirectoryRef>
+  </Fragment>
+    
+  <Fragment>
+    <DirectoryRef Id="Tools">
+      <Component Id="JSONedit.exe" Guid="bafab659-84af-4742-8e87-f83e7d2cc101" KeyPath="yes" >
+        <File Id="JSONedit.exe"  Name="JSONedit.exe" Source="$(var.DialogGenerator_TargetDir)Tools\JSONedit.exe" />
+      </Component>
+      <Component Id="mp3gain.exe" Guid="4694ec38-ac0d-4e92-bcd8-fcb7a5539ba7"  KeyPath="yes">
+        <File Id="mp3gain.exe"  Name="mp3gain.exe" Source="$(var.DialogGenerator_TargetDir)Tools\mp3gain.exe" />
+      </Component>    
+    </DirectoryRef>
+  </Fragment>
+      
   <Fragment>
     <DirectoryRef Id="Temp">
       <Component Id="Temp" Guid="7f567390-6d81-48ef-939e-7e6eddc0d6fb" KeyPath="yes">
