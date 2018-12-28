@@ -4,13 +4,14 @@
   <?define DialogGenerator_TargetDir=$(var.DialogGenerator.TargetDir)?>
   <?define Manufacturer="Toys2Life"?>
   <?define SkuName = "DialogGenerator"?>
+  <?define VersionNumber="!(bind.FileVersion.DialogGenerator.exe)"?>
   
-	<Product Id="*" Name="$(var.SkuName)" Language="1033" Version="1.0.0.0" 
+	<Product Id="*" Name="$(var.SkuName)" Language="1033" Version="$(var.VersionNumber)" 
    Manufacturer="$(var.Manufacturer)" UpgradeCode="880cbb5f-2d77-425a-8d96-a8000443c1f2">
         
 		<Package InstallerVersion="200" Compressed="yes" InstallScope="perMachine" />
 
-		<MajorUpgrade DowngradeErrorMessage="A newer version of [ProductName] is already installed." AllowDowngrades="no" />
+		<MajorUpgrade DowngradeErrorMessage="A newer version of [ProductName] is already installed." AllowSameVersionUpgrades="yes" AllowDowngrades="no" />
 		<MediaTemplate EmbedCab="yes" />
 
     <Property Id="WIXUI_INSTALLDIR" Value="INSTALLDIR" />
