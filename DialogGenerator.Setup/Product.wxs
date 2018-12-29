@@ -6,7 +6,7 @@
   <?define SkuName = "DialogGenerator"?>
   <?define VersionNumber="!(bind.FileVersion.DialogGenerator.exe)"?>
   
-	<Product Id="*" Name="$(var.SkuName)" Language="1033" Version="1.0.5.0" 
+	<Product Id="*" Name="$(var.SkuName)" Language="1033" Version="$(var.VersionNumber)" 
    Manufacturer="$(var.Manufacturer)" UpgradeCode="880cbb5f-2d77-425a-8d96-a8000443c1f2">
         
 		<Package InstallerVersion="200" Compressed="yes" InstallScope="perMachine" />
@@ -52,7 +52,7 @@
       <ComponentRef Id="DataFiles" />
       <ComponentRef Id="AudioFiles" />
       <ComponentRef Id="ImagesFiles" />
-      <ComponentRef Id="CleanupData" />
+      <!--<ComponentRef Id="CleanupData" />-->
       <ComponentRef Id="Application.xml" />
       <Condition Level="1">NOT Installed</Condition>
     </Feature>

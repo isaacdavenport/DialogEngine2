@@ -318,7 +318,7 @@ namespace DialogGenerator.DialogEngine
                 var _selectedPhrase = mContext.CharactersList[_speakingCharacter].Phrases[0]; //initialize to unused placeholder phrase
 
                 string _debugMessage = "_startDialog " + mContext.CharactersList[mContext.Character1Num].CharacterPrefix + " and " +
-                    mContext.CharactersList[mContext.Character2Num].CharacterPrefix + " " + mContext.DialogModelsList[mIndexOfCurrentDialogModel].Name;
+                    mContext.CharactersList[mContext.Character2Num].CharacterPrefix + " " + string.Join("; --,",mContext.DialogModelsList[mIndexOfCurrentDialogModel].PhraseTypeSequence.ToArray());
 
                 mLogger.Debug(_debugMessage,ApplicationData.Instance.DialogLoggerKey);
                 mUserLogger.Info(_debugMessage);

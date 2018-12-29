@@ -152,25 +152,9 @@
     
   <Fragment>
     <DirectoryRef Id="Tools">
-      <Component Id="JSONedit.exe" Guid="bafab659-84af-4742-8e87-f83e7d2cc101" KeyPath="yes" >
-        <File Id="JSONedit.exe"  Name="JSONedit.exe" Source="$(var.DialogGenerator_TargetDir)Tools\JSONedit.exe" />
-      </Component>
-      <Component Id="mp3gain.exe" Guid="4694ec38-ac0d-4e92-bcd8-fcb7a5539ba7"  KeyPath="yes">
-        <File Id="mp3gain.exe"  Name="mp3gain.exe" Source="$(var.DialogGenerator_TargetDir)Tools\mp3gain.exe" />
-      </Component>    
-    </DirectoryRef>
-  </Fragment>
-    
-  <Fragment>
-    <DirectoryRef Id="Tools">
       <Component Id="Tools" Guid="ac34b5c2-d6ed-484c-aa3a-3243d46f62ba" KeyPath="yes">
         <CreateFolder />
       </Component>
-    </DirectoryRef>
-  </Fragment>
-    
-  <Fragment>
-    <DirectoryRef Id="Tools">
       <Component Id="JSONedit.exe" Guid="bafab659-84af-4742-8e87-f83e7d2cc101" KeyPath="yes" >
         <File Id="JSONedit.exe"  Name="JSONedit.exe" Source="$(var.DialogGenerator_TargetDir)Tools\JSONedit.exe" />
       </Component>
@@ -179,7 +163,7 @@
       </Component>    
     </DirectoryRef>
   </Fragment>
-      
+         
   <Fragment>
     <DirectoryRef Id="Temp">
       <Component Id="Temp" Guid="7f567390-6d81-48ef-939e-7e6eddc0d6fb" KeyPath="yes">
@@ -228,14 +212,14 @@
     </DirectoryRef>
   </Fragment>
   
-  <Fragment>
+  <!--<Fragment>
     <DirectoryRef Id="UserDocumentsFolder">
       <Component Id="CleanupData" Guid="*">
         <RegistryValue Root="HKLM" Key="SOFTWARE\$(var.Manufacturer)\$(var.SkuName)" Name="Path" Type="string" Value="[UserDocumentsFolder]" KeyPath="yes" />
         <util:RemoveFolderEx On="uninstall" Property="USER_DOCUMENTS_FOLDER_PATH" />
       </Component>
     </DirectoryRef>
-  </Fragment>
+  </Fragment>-->
   
   <Fragment>
     <DirectoryRef Id="ApplicationProgramsFolder">

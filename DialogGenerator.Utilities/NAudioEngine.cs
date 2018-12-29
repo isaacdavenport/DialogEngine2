@@ -359,7 +359,10 @@ namespace DialogGenerator.Utilities
                     _normalizeMP3File(_outputPathMP3);
                     File.Copy(_outputPathMP3, mCurrentFilePath, true);
                 }
-                catch { }
+                catch (Exception ex)
+                {
+                    
+                }
                 finally
                 {
                     _cleanDirectory(ApplicationData.Instance.TempDirectory);
