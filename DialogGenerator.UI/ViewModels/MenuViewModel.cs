@@ -119,10 +119,14 @@ namespace DialogGenerator.UI.ViewModels
             {
                 mSelectionMode = value;
                 RaisePropertyChanged();
+
+
             }
         }
 
-        public string Version => $"v: {Assembly.GetExecutingAssembly().GetName().Version.ToString()}";
+
+        public string Version => $"v: { FileVersionInfo.GetVersionInfo(Path.Combine(ApplicationData.Instance.RootDirectory, "DialogGenerator.exe")).FileVersion.ToString()}";
+
 
         #endregion
     }

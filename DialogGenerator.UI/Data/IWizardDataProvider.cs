@@ -8,5 +8,7 @@ namespace DialogGenerator.UI.Data
         List<Wizard> GetAll();
 
         Wizard GetByIndex(int index);
+
+        Wizard GetByName(string _wizardName);
     }
 }

@@ -123,20 +123,9 @@ namespace DialogGenerator.CharacterSelection
         }
 
 
-        private async Task<Triggers> _initialize()
+        private  Triggers _initialize()
         {
-            var _localAdapter = await BluetoothAdapter.GetDefaultAsync();
-
-            if (_localAdapter.IsLowEnergySupported)
-            {
-                mCurrentDataProvider = mBLEDataProviderFactory.Create(BLEDataProviderType.WinBLEWatcher);
-                Session.Set(Constants.BLE_DATA_PROVIDER, BLEDataProviderType.WinBLEWatcher);
-            }
-            else
-            {
-                mCurrentDataProvider = mBLEDataProviderFactory.Create(BLEDataProviderType.Serial);
-                Session.Set(Constants.BLE_DATA_PROVIDER, BLEDataProviderType.Serial);
-            }
+            mCurrentDataProvider = mBLEDataProviderFactory.Create(BLEDataProviderType.WinBLEWatcher);
 
             return Triggers.ProcessMessage;
         }
@@ -396,7 +385,7 @@ namespace DialogGenerator.CharacterSelection
 
                 mWorkflow.Fire(Triggers.Initialize);
                 mcHeatMapUpdateTimer.Start();
-                Triggers next = await _initialize();
+                Triggers next = _initialize();
                 Task _BLEDataReaderTask = mCurrentDataProvider.StartReadingData();
 
                 do
@@ -405,7 +394,7 @@ namespace DialogGenerator.CharacterSelection
                     {
                         case Triggers.Initialize:
                             {
-                                next = await _initialize();
+                                next =  _initialize();
                                 break;
                             }
                         case Triggers.ProcessMessage:

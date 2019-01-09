@@ -72,7 +72,5 @@ namespace DialogGenerator.Tests.UI.ViewModel
             _eventAggregatorSetup();
             _characterDataProviderSetup();
         }
-
-
     }
 }

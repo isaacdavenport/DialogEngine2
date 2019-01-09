@@ -198,46 +198,81 @@ namespace DialogGenerator.UI.ViewModels
                     ZipFile.ExtractToDirectory(_openFileDialog.FileName, ApplicationData.Instance.TempDirectory);
                 });
 
-                IList<string> errors;
-                var _JSONObjectsTypesList = mDialogDataRepository.LoadFromDirectory(ApplicationData.Instance.TempDirectory,out errors);
-                // validate against json schema
-                if(errors.Count > 0)
-                {
-                    mMessageDialogService.CloseBusyDialog();
-                    await mMessageDialogService.ShowMessagesDialogAsync("Error", "Imported file has errors: ",errors, "Close message", false);
-                    return;
-                }
-                // validate is character found
-                if(_JSONObjectsTypesList.Characters.Count == 0)
-                {
-                    mMessageDialogService.CloseBusyDialog();
-                    await mMessageDialogService.ShowMessage("Error", "Couldn't find character inside loaded file.");
-                    return;
-                }
+                DirectoryInfo _directoryInfo = new DirectoryInfo(ApplicationData.Instance.TempDirectory);
 
-                var _importedCharacter = _JSONObjectsTypesList.Characters.First();
-                if (mCharacterDataProvider.GetByInitials(_importedCharacter.CharacterPrefix) != null)
+                foreach(FileInfo file in _directoryInfo.EnumerateFiles("*.json"))
                 {
-                    MessageDialogResult result = MessageDialogResult.Cancel;
-                    mMessageDialogService.CloseBusyDialog();
-                    result = await mMessageDialogService.ShowOKCancelDialogAsync($"Character '{_importedCharacter.CharacterName}' already exists." +
-                            $" Do you want to overwrite this characters?", "Warning", "Yes", "No");
-
-                    if (result == MessageDialogResult.Cancel)
+                    IList<string> errors;
+                    var _JSONObjectsTypesList = mDialogDataRepository.LoadFromFile(file.FullName, out errors);
+                    // validate against json schema
+                    if (errors.Count > 0)
                     {
-                        return;
+                        mMessageDialogService.CloseBusyDialog();
+                        await mMessageDialogService.ShowMessagesDialogAsync("Error", "Imported file has errors: ", errors, "Close message", false);
+                        continue;
                     }
 
-                    mMessageDialogService.ShowBusyDialog();
+                    foreach (var _importedCharacter in  _JSONObjectsTypesList.Characters.ToList()?? Enumerable.Empty<Character>())
+                    {
+                        if (mCharacterDataProvider.GetByInitials(_importedCharacter.CharacterPrefix) != null)
+                        {
+                            MessageDialogResult result = MessageDialogResult.Cancel;
+                            mMessageDialogService.CloseBusyDialog();
+                            result = await mMessageDialogService.ShowOKCancelDialogAsync($"Character '{_importedCharacter.CharacterName}' already exists." +
+                                    $" Do you want to overwrite this characters?", "Warning", "Yes", "No");
 
-                    var _oldCharacter = mCharacterDataProvider.GetByInitials(_importedCharacter.CharacterPrefix);
-                    string _imageFileName = _oldCharacter.CharacterImage;
-                    _oldCharacter.CharacterImage = ApplicationData.Instance.DefaultImage;
+                            if (result == MessageDialogResult.Cancel)
+                            {
+                                _JSONObjectsTypesList.Characters.Remove(_importedCharacter);
+                                mMessageDialogService.ShowBusyDialog();
+                                continue;
+                            }
 
-                    await mCharacterDataProvider.Remove(_oldCharacter, _imageFileName);
+                            mMessageDialogService.ShowBusyDialog();
+
+                            var _oldCharacter = mCharacterDataProvider.GetByInitials(_importedCharacter.CharacterPrefix);
+                            string _imageFileName = _oldCharacter.CharacterImage;
+                            _oldCharacter.CharacterImage = ApplicationData.Instance.DefaultImage;
+
+                            await mCharacterDataProvider.Remove(_oldCharacter, _imageFileName);
+                        }
+
+                        _importedCharacter.RadioNum = -1;
+                        _importedCharacter.State = CharacterState.Available;
+                        mCharacterDataProvider.GetAll().Add(_importedCharacter);
+                    }
+
+                    foreach (var _importedDialogModel in _JSONObjectsTypesList.DialogModels.ToList()?? Enumerable.Empty<ModelDialogInfo>())
+                    {
+                        if (mDialogModelDataProvider.GetByName(_importedDialogModel.ModelsCollectionName) == null)
+                        {
+                            mDialogModelDataProvider.GetAll().Add(_importedDialogModel);
+                        }
+                        else
+                        {
+                            _JSONObjectsTypesList.DialogModels.Remove(_importedDialogModel);
+                        }
+                    }
+
+                    foreach (var _importedWizard in _JSONObjectsTypesList.Wizards.ToList()?? Enumerable.Empty<Wizard>())
+                    {
+                        if (mWizardDataProvider.GetByName(_importedWizard.WizardName) == null)
+                        {
+                            mWizardDataProvider.GetAll().Add(_importedWizard);
+                        }
+                        else
+                        {
+                            _JSONObjectsTypesList.Wizards.Remove(_importedWizard);
+                        }
+                    }
+                    
+                    if(_JSONObjectsTypesList.Characters.Count > 0 
+                       || _JSONObjectsTypesList.Wizards.Count > 0 
+                       || _JSONObjectsTypesList.DialogModels.Count > 0)
+                    {
+                        await _processImportedData(_JSONObjectsTypesList, Path.Combine(ApplicationData.Instance.DataDirectory, file.Name));
+                    }
                 }
-
-                await _processImportedCharacter(_importedCharacter);
             }
             catch (Exception ex)
             {
@@ -248,58 +283,43 @@ namespace DialogGenerator.UI.ViewModels
             }
             finally
             {
-               // FileHelper.ClearDirectory(ApplicationData.Instance.TempDirectory);
+                FileHelper.ClearDirectory(ApplicationData.Instance.TempDirectory);
                 mMessageDialogService.CloseBusyDialog();
             }
         }
 
-        private async Task _processImportedCharacter(Character _importedCharacter)
+        private async Task _processImportedData(JSONObjectsTypesList _importedData,string path)
         {
-            // move character related files from temp to data related folders
-            await _processExtractedFiles();
-
-            _importedCharacter.RadioNum = -1; // unassign imported character to avoid duplicates
-            _importedCharacter.State = CharacterState.Available;
-            mCharacterDataProvider.GetAll().Add(_importedCharacter);
-
-            await mCharacterDataProvider.SaveAsync(_importedCharacter);
-
-            // add character to list of characters
-        }
-
-        private Task _processExtractedFiles()
-        {
-            return Task.Run(() =>
+            await Task.Run(() =>
             {
-                var _directoryInfo = new DirectoryInfo(ApplicationData.Instance.TempDirectory);
-                // copy .json file to Data directory
-
-                foreach (var _jsonFile in _directoryInfo.GetFiles("*.json"))
-                {
-                    File.Copy(_jsonFile.FullName, Path.Combine(ApplicationData.Instance.DataDirectory, _jsonFile.Name), true);
-                }
-
-                // copy .mp3 files to Audio directory
-
-                FileInfo[] _mp3Files = _directoryInfo.GetFiles("*.mp3");
-
-                foreach (FileInfo _mp3File in _mp3Files)
-                {
-                    File.Copy(_mp3File.FullName, Path.Combine(ApplicationData.Instance.AudioDirectory, _mp3File.Name), true);
-                }
-
-                // copy images to Image directory
                 var _supportedExtensions = new string[] { ".jpg", ".jpeg", ".jpe", ".png" };
-                FileInfo[] _imageFiles = _directoryInfo.GetFiles()
-                    .Where(f => _supportedExtensions.Contains(f.Extension.ToLower()))
-                    .ToArray();
 
-                foreach (FileInfo _imageFile in _imageFiles)
+                foreach (var character in _importedData.Characters.ToList()?? Enumerable.Empty<Character>())
                 {
-                    File.Copy(_imageFile.FullName, Path.Combine(ApplicationData.Instance.ImagesDirectory, _imageFile.Name), true);
+                    var _dirInfo = new DirectoryInfo(ApplicationData.Instance.TempDirectory);
+                    FileInfo[] _mp3Files = _dirInfo.GetFiles($"{character.CharacterPrefix}*.mp3");
+
+                    foreach (FileInfo _mp3File in _mp3Files)
+                    {
+                        File.Copy(_mp3File.FullName, Path.Combine(ApplicationData.Instance.AudioDirectory, _mp3File.Name), true);
+                    }
+
+                    FileInfo _imageFile = _dirInfo.GetFiles()
+                        .Where(f => _supportedExtensions.Contains(f.Extension.ToLower()) && f.Name.StartsWith(character.CharacterPrefix))
+                        .ToList().FirstOrDefault();
+
+                    if (_imageFile != null)
+                    {
+                        File.Copy(_imageFile.FullName, Path.Combine(ApplicationData.Instance.ImagesDirectory, _imageFile.Name), true);
+                    }
                 }
 
-                FileHelper.ClearDirectory(ApplicationData.Instance.TempDirectory);
+                if (File.Exists(path))
+                {
+                    path = Path.Combine(ApplicationData.Instance.DataDirectory, $"{Guid.NewGuid()}.json");
+                }
+
+                mDialogDataRepository.Save(_importedData, path);
             });
         }
 

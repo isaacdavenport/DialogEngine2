@@ -21,7 +21,6 @@ namespace DialogGenerator.CharacterSelection
 
         public void Initialize()
         {
-            mContainer.RegisterType<IBLEDataProvider, SerialPortDataProvider>(BLEDataProviderType.Serial.ToString());
             mContainer.RegisterType<IBLEDataProvider, WinBLEWatcherDataProvider>(BLEDataProviderType.WinBLEWatcher.ToString());
 
             Func<BLEDataProviderType, IBLEDataProvider> _dataProviderFactory = (_providerType) =>

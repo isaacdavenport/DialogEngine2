@@ -22,5 +22,10 @@ namespace DialogGenerator.UI.Data
         {
             return mWizardRepository.GetByIndex(index);
         }
+
+        public Wizard GetByName(string _wizardName)
+        {
+            return mWizardRepository.GetByName(_wizardName);
+        }
     }
 }

@@ -52,15 +52,7 @@ namespace DialogGenerator.CharacterSelection.Helper
                 }
 
                 _debugString += ReceivedMessages[ReceivedMessages.Count - 1].SequenceNum.ToString("D3");
-
-                if((BLEDataProviderType)Session.Get<int>(Constants.BLE_DATA_PROVIDER) == BLEDataProviderType.Serial)
-                {
-                    Logger.Info(_debugString,ApplicationData.Instance.DecimalSerialDirectBLELoggerKey);
-                }
-                else
-                {
-                    Logger.Info(ApplicationData.Instance.DecimalSerialDirectBLELoggerKey, _debugString);
-                }
+                Logger.Info(_debugString, ApplicationData.Instance.DecimalSerialDirectBLELoggerKey);
 
                 if (ReceivedMessages.Count > 30000)
                 {
@@ -115,40 +107,22 @@ namespace DialogGenerator.CharacterSelection.Helper
                 // rssiRow also has seqNum from FW at end
                 int _rowNumber = -1;
 
-                if (_message.IndexOf("a5",StringComparison.OrdinalIgnoreCase) < 0)
+                if (_message.IndexOf("a5", StringComparison.OrdinalIgnoreCase) < 0)
                     return _rowNumber;
 
-                if ((BLEDataProviderType)Session.Get<int>(Constants.BLE_DATA_PROVIDER) == BLEDataProviderType.WinBLEWatcher)
+                string[] parts = _message.Split('-');
+
+                if (parts.Count() < ApplicationData.Instance.NumberOfRadios)
+                    return _rowNumber;
+
+                for (int i = 0; i < ApplicationData.Instance.NumberOfRadios; i++)
                 {
-                    string[] parts = _message.Split('-');
+                    _rssiRow[i] = int.Parse(parts[i], System.Globalization.NumberStyles.HexNumber);
 
-                    if (parts.Count() < ApplicationData.Instance.NumberOfRadios)
-                        return _rowNumber;
-
-                    for(int i = 0; i < ApplicationData.Instance.NumberOfRadios; i++)
-                    {
-                        _rssiRow[i] = int.Parse(parts[i], System.Globalization.NumberStyles.HexNumber);
-
-                        if (_rssiRow[i] == 0xFF) _rowNumber = i;
-                    }
-
-                    _rssiRow[ApplicationData.Instance.NumberOfRadios] = int.Parse(parts.Last(), System.Globalization.NumberStyles.HexNumber);
+                    if (_rssiRow[i] == 0xFF) _rowNumber = i;
                 }
-                else
-                {    // we should not be in here anymore unless we have gone back to the USB-Serial CSR dongle because internal BLE laptop HW didn't work
-                    if (_message.Length != 19 || !_message.StartsWith("ff"))
-                        return _rowNumber;
 
-                    for (int i = 0; i < ApplicationData.Instance.NumberOfRadios; i++)
-                    {
-                        string _subMessage = _message.Substring(i * 2 + 2, 2);
-                        _rssiRow[i] = int.Parse(_subMessage, System.Globalization.NumberStyles.HexNumber);
-                        if (_rssiRow[i] == 0xFF) _rowNumber = i;
-                    }
-
-                    // The final int after the receiver for the PC, skipping "a5" key value is sequence number
-                    _rssiRow[ApplicationData.Instance.NumberOfRadios] = int.Parse(_message.Substring(ApplicationData.Instance.NumberOfRadios * 2 + 4, 2), System.Globalization.NumberStyles.HexNumber);
-                }
+                _rssiRow[ApplicationData.Instance.NumberOfRadios] = int.Parse(parts.Last(), System.Globalization.NumberStyles.HexNumber);
 
                 if (_rowNumber == -1 && ApplicationData.Instance.MonitorMessageParseFails)
                     Logger.Error("Failed to parse message.");

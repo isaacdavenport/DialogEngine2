@@ -53,6 +53,12 @@ namespace DialogGenerator.DataAccess
             }
         }
 
+
+        public void Save(JSONObjectsTypesList _JSONObjectsTypesList,string path)
+        {
+            Serializer.Serialize(_JSONObjectsTypesList, path);
+        }
+
         public JSONObjectsTypesList LoadFromFile(string _filePath,out IList<string> errors)
         {
             var _jsonObjectsTypesList = new JSONObjectsTypesList();

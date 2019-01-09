@@ -1,12 +1,9 @@
-﻿using DialogGenerator.Core;
-using DialogGenerator.Model;
+﻿using DialogGenerator.Model;
 using Newtonsoft.Json.Linq;
 using Newtonsoft.Json.Schema;
 using Newtonsoft.Json.Schema.Generation;
 using System;
 using System.Collections.Generic;
-using System.Diagnostics;
-using System.IO;
 
 namespace DialogGenerator.DataAccess.Helper
 {

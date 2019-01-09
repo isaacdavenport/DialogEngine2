@@ -60,7 +60,6 @@
                                         </Label.ToolTip>
                                         <Label.Content>
                                             <MultiBinding Converter="{StaticResource ListBoxItemTextAndIndexValueConverter}">
-                                                <Binding Path="VideoFileName" />
                                                 <Binding RelativeSource="{RelativeSource Mode=FindAncestor, AncestorType={x:Type ListBoxItem}}" />
                                             </MultiBinding>
                                         </Label.Content>

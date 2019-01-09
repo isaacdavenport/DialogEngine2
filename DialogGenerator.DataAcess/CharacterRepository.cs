@@ -73,9 +73,11 @@ namespace DialogGenerator.DataAccess
             }
             else
             {
-                FileSystem.DeleteFile(Path.Combine(ApplicationData.Instance.DataDirectory, _fileName),
-                    UIOption.OnlyErrorDialogs,
-                    RecycleOption.SendToRecycleBin);
+                string _fullPath = Path.Combine(ApplicationData.Instance.DataDirectory, _fileName);
+                if (File.Exists(_fullPath))
+                {
+                    FileSystem.DeleteFile(_fullPath, UIOption.OnlyErrorDialogs, RecycleOption.SendToRecycleBin);
+                }
             }
         }
 

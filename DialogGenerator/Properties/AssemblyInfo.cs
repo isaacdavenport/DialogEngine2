@@ -8,7 +8,7 @@ using System.Windows;
 [assembly: AssemblyTitle("DialogGenerator")]
 [assembly: AssemblyDescription("")]
 [assembly: AssemblyConfiguration("")]
-[assembly: AssemblyCompany("")]
+[assembly: AssemblyCompany("Toys2Life")]
 [assembly: AssemblyProduct("DialogGenerator")]
 [assembly: AssemblyCopyright("Copyright ©  2018")]
 [assembly: AssemblyTrademark("")]
@@ -49,5 +49,5 @@ using System.Windows;
 // You can specify all the values or you can default the Build and Revision Numbers
 // by using the '*' as shown below:
 // [assembly: AssemblyVersion("1.0.*")]
-[assembly: AssemblyVersion("1.0.*")]
-[assembly: AssemblyFileVersion("1.0")]
+[assembly: AssemblyVersion("1.4.*")]
+//[assembly: AssemblyFileVersion(version: "1.0.")] if we comment out this, then AssemblyVersion is equal to AssemblyFileVersion

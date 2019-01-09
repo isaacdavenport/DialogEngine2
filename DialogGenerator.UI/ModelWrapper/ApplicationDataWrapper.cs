@@ -74,16 +74,6 @@ namespace DialogGenerator.UI.Wrapper
             }
         }
 
-        public string ComPortName
-        {
-            get { return getValue<string>(); }
-            set
-            {
-                setValue(value);
-                validateProperty(nameof(ComPortName));
-            }
-        }
-
         public double MaxTimeToPlayFile
         {
             get { return getValue<double>(); }

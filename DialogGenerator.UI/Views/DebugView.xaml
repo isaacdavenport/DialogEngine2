@@ -258,7 +258,7 @@
                     </StackPanel>
                 </TabItem.Header>
 
-                <Grid HorizontalAlignment="Stretch" Background="White" VerticalAlignment="Stretch">
+                <Grid HorizontalAlignment="Stretch" Background="Transparent" VerticalAlignment="Stretch">
                     <Grid.RowDefinitions>
                         <RowDefinition Height="auto"></RowDefinition>
                         <RowDefinition Height="*"></RowDefinition>

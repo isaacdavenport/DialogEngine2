@@ -75,10 +75,6 @@
             <TextBox Grid.Row="3" MinWidth="75" Text="{Binding Settings.MaxTimeToPlayFile, UpdateSourceTrigger=LostFocus,Mode=TwoWay}" 
                      HorizontalAlignment="Left" Margin="10" Grid.Column="2" materialDesign:ValidationAssist.UsePopup="True" />
 
-            <Label Content="COM port name:" HorizontalAlignment="Right" Margin="10" Grid.Row="4" />
-            <TextBox Grid.Row="4" MinWidth="75" Text="{Binding Settings.ComPortName,UpdateSourceTrigger=PropertyChanged,Mode=TwoWay}" 
-                     HorizontalAlignment="Left" Margin="10" Grid.Column="2" materialDesign:ValidationAssist.UsePopup="True" />
-
             <Label Content="Current parental rating:" Grid.Column="0" HorizontalAlignment="Right" Margin="10" Grid.Row="5" />
             <TextBox Grid.Row="5" MinWidth="75" Text="{Binding Settings.CurrentParentalRating,UpdateSourceTrigger=PropertyChanged,Mode=TwoWay}" 
                      HorizontalAlignment="Left" Margin="10" Grid.Column="2" materialDesign:ValidationAssist.UsePopup="True" />

@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Include>
+  <?define DialogGenerator_TargetDir=$(var.DialogGenerator.TargetDir)?>
+  <?define Manufacturer="Toys2Life"?>
+  <?define SkuName = "DialogGenerator"?>
+  <?define VersionNumber="!(bind.FileVersion.DialogGenerator.exe)"?>
+</Include>

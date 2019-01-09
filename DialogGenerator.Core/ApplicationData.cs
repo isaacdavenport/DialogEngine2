@@ -122,12 +122,6 @@ namespace DialogGenerator.Core
         [DisplayName("Use serial port:")]
         public bool UseSerialPort { get; set; } = false;
 
-        [Editable(true)]
-        [Description("COM port name")]
-        [DisplayName("COM port name:")]
-        [RegularExpression(@"^COM{1}\d+$", ErrorMessage = @"Text must starts wit 'COM' and finish with digit.")]
-        public string ComPortName { get; set; } = "COM4";
-
         [Description("Determine how long current dialog can play, if new characters selected. Value is in seconds.")]
         [DisplayName("Max time to play .mp3 file:")]
         [RegularExpression(@"^[0-9]([.,][0-9]{1,3})?$", ErrorMessage = @"Field requires decimal number.")]

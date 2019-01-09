@@ -25,7 +25,12 @@
     <Compile Include="Product.wxs" />
   </ItemGroup>
   <ItemGroup>
+    <Content Include="Config.wxi" />
     <Content Include="DialogGenerator.Setup.wax" />
+    <Content Include="Resources\extension.ico" />
+    <Content Include="Resources\DialogGeneratorIcon.ico" />
+    <Content Include="Resources\licence.rtf" />
+    <Content Include="Resources\T2L_C.jpg.bmp" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\DialogGenerator\DialogGenerator.csproj">
@@ -46,6 +51,9 @@
       <HintPath>$(WixExtDir)\WixUIExtension.dll</HintPath>
       <Name>WixUIExtension</Name>
     </WixExtension>
+  </ItemGroup>
+  <ItemGroup>
+    <Folder Include="Resources" />
   </ItemGroup>
   <Import Project="$(WixTargetsPath)" Condition=" '$(WixTargetsPath)' != '' " />
   <Import Project="$(MSBuildExtensionsPath32)\Microsoft\WiX\v3.x\Wix.targets" Condition=" '$(WixTargetsPath)' == '' AND Exists('$(MSBuildExtensionsPath32)\Microsoft\WiX\v3.x\Wix.targets') " />

@@ -9,6 +9,7 @@ using System.Threading.Tasks;
 using System.Windows.Threading;
 using DialogGenerator.Core;
 using DialogGenerator.Utilities.Model;
+using NAudio.MediaFoundation;
 using NAudio.Wave;
 using NAudio.Wave.SampleProviders;
 
@@ -76,6 +77,7 @@ namespace DialogGenerator.Utilities
         {
             mcPositionTimer.Interval = TimeSpan.FromMilliseconds(25);
             mcPositionTimer.Tick += _positionTimer_Tick;
+            MediaFoundationApi.Startup();
         }
         
         #endregion
@@ -354,18 +356,21 @@ namespace DialogGenerator.Utilities
                     _trimWavFile(mCurrentFilePath, _outputPath, TimeSpan.Zero, TimeSpan.FromMilliseconds(100));
                     using (var reader = new WaveFileReader(_outputPath))
                     {
-                        MediaFoundationEncoder.EncodeToMp3(reader, _outputPathMP3);
+                        MediaFoundationEncoder.EncodeToMp3(reader, _outputPathMP3,44100);
                     }
                     _normalizeMP3File(_outputPathMP3);
                     File.Copy(_outputPathMP3, mCurrentFilePath, true);
                 }
-                catch { }
+                catch(Exception ex)
+                {
+
+                }
                 finally
                 {
                     _cleanDirectory(ApplicationData.Instance.TempDirectory);
                     IsRecording = false;
                 }
-            });
+        });
         }
 
         #endregion

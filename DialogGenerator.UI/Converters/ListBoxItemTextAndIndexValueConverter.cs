@@ -1,5 +1,7 @@
-﻿using System;
+﻿using DialogGenerator.Model;
+using System;
 using System.Globalization;
+using System.Linq;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Data;
@@ -12,13 +14,12 @@ namespace DialogGenerator.UI.Converters
         {
             try
             {
-                DependencyObject item = (DependencyObject)values[1];
+                DependencyObject item = (DependencyObject)values[0];
                 ItemsControl ic = ItemsControl.ItemsControlFromItemContainer(item);
                 int index = ic.ItemContainerGenerator.IndexFromContainer(item) + 1;
-
-                string _tagName = values[0].ToString();
-
-                return index + ". " + _tagName.Substring(5, _tagName.Length - 5);
+                TutorialStep step = (item as ListBoxItem).Content as TutorialStep;
+                string _stepDescription = step.PhraseWeights.Keys.Count > 0 ? step.PhraseWeights.Keys.First() : "Not editable";
+                return index + ". " + _stepDescription;
             }
             catch (Exception)
             {

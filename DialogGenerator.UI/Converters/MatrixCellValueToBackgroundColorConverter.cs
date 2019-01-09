@@ -24,6 +24,11 @@ namespace DialogGenerator.UI.Converters
             }
 
             var characters = Session.Get<ObservableCollection<Character>>(Constants.CHARACTERS);
+            if(characters.Count == 0)
+            {
+                return null;
+            }
+            
             // first column is row header so we need to sub for 1
             int _heatMapColumn = column - 1;
 

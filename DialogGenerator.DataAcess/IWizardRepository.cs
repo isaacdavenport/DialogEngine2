@@ -10,5 +10,6 @@ namespace DialogGenerator.DataAccess
         List<Wizard> GetAll(string _fileName);
 
         Wizard GetByIndex(int index);
+        Wizard GetByName(string _wizardName);
     }
 }

@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 using DialogGenerator.Core;
 using DialogGenerator.Model;
@@ -25,6 +26,14 @@ namespace DialogGenerator.DataAccess
         public Wizard GetByIndex(int index)
         {
             return Session.Get<List<Wizard>>(Constants.WIZARDS)[index];
+        }
+
+        public Wizard GetByName(string _wizardName)
+        {
+            var result = GetAll().Where(w => w.WizardName.Equals(_wizardName, StringComparison.OrdinalIgnoreCase))
+                .FirstOrDefault();
+
+            return result;
         }
     }
 }
