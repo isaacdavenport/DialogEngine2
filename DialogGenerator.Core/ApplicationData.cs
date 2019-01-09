@@ -198,7 +198,7 @@ namespace DialogGenerator.Core
             }
         }
 
-        [XmlIgnore]
+        [XmlIgnore]   
         public string VideoDirectory
         {
             get
