@@ -160,8 +160,7 @@
       </Component>    
     </DirectoryRef>
   </Fragment>
-  
-  <!-- Data folders -->
+      
   <Fragment>
     <Component Id="Data" Directory="Data" Guid="1aae36ae-5ee3-4992-9bb1-109566c0581f" KeyPath="yes">
       <CreateFolder />
@@ -184,7 +183,6 @@
   </Fragment>
   <!--   -->
   
-  <!-- used to clean up data on uninstall -->
   <Fragment>
     <DirectoryRef Id="UserDocumentsFolder">
       <Component Id="CleanupData" Guid="*">
@@ -192,7 +190,7 @@
         <util:RemoveFolderEx  Property="USER_DOCUMENTS_FOLDER_PATH" />
       </Component>
     </DirectoryRef>
-  </Fragment>
+  </Fragment>-->
   
   <!-- Add application to program menu -->
   <Fragment>
