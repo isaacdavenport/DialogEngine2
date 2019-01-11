@@ -183,14 +183,14 @@
   </Fragment>
   <!--   -->
   
-  <Fragment>
+  <!--<Fragment>
     <DirectoryRef Id="UserDocumentsFolder">
       <Component Id="CleanupData" Guid="*">
         <RegistryValue Root="HKLM" Key="SOFTWARE\$(var.Manufacturer)\$(var.SkuName)" Name="Path" Type="string" Value="[UserDocumentsFolder]" KeyPath="yes" />
         <util:RemoveFolderEx  Property="USER_DOCUMENTS_FOLDER_PATH" />
       </Component>
     </DirectoryRef>
-  </Fragment>-->
+  </Fragment>-->-->
   
   <!-- Add application to program menu -->
   <Fragment>

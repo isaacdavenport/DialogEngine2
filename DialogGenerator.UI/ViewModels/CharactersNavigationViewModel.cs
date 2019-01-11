@@ -273,6 +273,8 @@ namespace DialogGenerator.UI.ViewModels
                         await _processImportedData(_JSONObjectsTypesList, Path.Combine(ApplicationData.Instance.DataDirectory, file.Name));
                     }
                 }
+
+                mEventAggregator.GetEvent<InitializeDialogModelEvent>().Publish();
             }
             catch (Exception ex)
             {

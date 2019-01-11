@@ -1,6 +1,7 @@
 ﻿using DialogGenerator.Core;
 using DialogGenerator.DataAccess;
 using DialogGenerator.DialogEngine.Model;
+using DialogGenerator.Events;
 using DialogGenerator.Model;
 using DialogGenerator.Model.Enum;
 using Prism.Events;
@@ -34,11 +35,18 @@ namespace DialogGenerator.DialogEngine
             mEventAggregator = _eventAggregator;
             mDialogModelRepository = _dialogModelRepository;
             mContext = context;
+
+            mEventAggregator.GetEvent<InitializeDialogModelEvent>().Subscribe(_onInitializeDialogModel);
         }
 
         #endregion
 
         #region - private functions -
+
+        private void _onInitializeDialogModel()
+        {
+            Initialize();
+        }
 
         private bool _checkIfDialogPreRequirementMet(int _dialogModel)
         {
