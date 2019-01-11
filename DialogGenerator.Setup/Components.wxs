@@ -190,7 +190,7 @@
         <util:RemoveFolderEx  Property="USER_DOCUMENTS_FOLDER_PATH" />
       </Component>
     </DirectoryRef>
-  </Fragment>-->-->
+  </Fragment>-->
   
   <!-- Add application to program menu -->
   <Fragment>

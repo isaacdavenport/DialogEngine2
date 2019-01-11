@@ -30,7 +30,8 @@ namespace DialogGenerator.DataAccess
 
         public Wizard GetByName(string _wizardName)
         {
-            var result = GetAll().Where(w => w.WizardName.Equals(_wizardName, StringComparison.OrdinalIgnoreCase))
+            var wizards = GetAll();
+            var result = wizards.Where(w => w.WizardName.Equals(_wizardName, StringComparison.OrdinalIgnoreCase))
                 .FirstOrDefault();
 
             return result;
