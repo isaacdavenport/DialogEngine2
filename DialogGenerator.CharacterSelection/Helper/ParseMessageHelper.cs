@@ -39,7 +39,7 @@ namespace DialogGenerator.CharacterSelection.Helper
                 });
 
                 //TODO add a lock around this
-                for (int _i = 0; _i < _rw.msgArray.Length - 2; _i++)
+                for (int _i = 0; _i < ApplicationData.Instance.NumberOfRadios; _i++)
                 {
                     ReceivedMessages.Last().Rssi[_i] = _rw.msgArray[_i];
                 }
