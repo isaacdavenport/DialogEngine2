@@ -5,7 +5,9 @@ using Windows.Devices.Bluetooth.Advertisement;
 using Windows.Storage.Streams;
 using System.Collections.Generic;
 using System.Runtime.InteropServices;
+using System.Runtime.Remoting.Messaging;
 using System.Threading.Tasks;
+using System.Windows.Navigation;
 
 namespace DialogGenerator.CharacterSelection.Data
 {
@@ -16,9 +18,9 @@ namespace DialogGenerator.CharacterSelection.Data
         private ILogger mLogger;
         private BluetoothLEAdvertisementWatcher mWatcher;
         //private BetterScanner bScanner;
-        private string mMessage;
+        private BLE_Message mMessage = new BLE_Message();
         private bool mNewDataAvailable;
-        private static List<string> receivedBLE = new List<string>();
+        //private static List<string> receivedBLE = new List<string>();
         
         #endregion
 
@@ -32,8 +34,6 @@ namespace DialogGenerator.CharacterSelection.Data
 
             mWatcher.Received += _mWatcher_Received;
             mWatcher.ScanningMode = BluetoothLEScanningMode.Passive;  // no need to send scan request packets, as our radios provide no scan response data
-            //bScanner = new BetterScanner();
-            
         }
 
         #endregion
@@ -42,28 +42,62 @@ namespace DialogGenerator.CharacterSelection.Data
 
         private void _mWatcher_Received(BluetoothLEAdvertisementWatcher sender, BluetoothLEAdvertisementReceivedEventArgs args)
         {
+            // TODO rip out support for shorter, old radio data format with 0xA5 key and no Manf ID
+            // We now use the manufacturer ID for the first two bytes after the FF as per BLE spec, 
+            // once we have packet format size check, look for FF Manf Type data field
+            // current format example 0x0201040AFF00FF000000D5FF0036
+            // first segment len 2, type 1, value of flags 0x04
+            // second segment len 10 decimal, type 0xFF, value manf ID 00FF followed by six 
+            // RSSI bytes (including an FF to mark the sender) and seq ID byte
+
             try
             {
                 var sections = args.Advertisement.DataSections;
 
                 if (sections.Count < 2)
-                    return;
+                return;
+
+                uint length = sections[1].Data.Length;
+                var _numRadios = ApplicationData.Instance.NumberOfRadios;
+
+                if (!(length == _numRadios + 3 || length == _numRadios + 2))
+                    return;   // the old CSR radio format was length 8, six radios, A5 key, and seq num.  
+                                // New format loses key and adds 2 byte 0x00FF manf ID
+
 
                 using (var _dataReader = DataReader.FromBuffer(sections[1].Data))
                 {
                     var input = new byte[_dataReader.UnconsumedBufferLength];
                     _dataReader.ReadBytes(input);
 
-                    string message = BitConverter.ToString(input);
-
-                    receivedBLE.Add(message);
-                    if (receivedBLE.Count > 500)
-                        receivedBLE.RemoveRange(0, 100);
-
-                    if (message.IndexOf("a5", StringComparison.OrdinalIgnoreCase) < 0)
+                    if (length == _numRadios + 2 && input[6] != 0xA5)
                         return;
 
-                    mMessage = message;
+                    if (length == _numRadios + 3 && (input[0] != 0x00 || input[1] != 0xFF))  // manf ID no good
+                        return;
+
+                    //string message;
+                    BLE_Message strippedInput = new BLE_Message();  // just RSSIs and seq number
+
+                    if (length == _numRadios + 3)
+                    {
+                        // remove the manufacturer ID since it has been checked
+                        Array.Copy(input, 2, strippedInput.msgArray, 0, strippedInput.msgArray.Length);
+                        //message = BitConverter.ToString(strippedInput);
+                    }
+                    else
+                    {
+                        // remove the 0xA5 key since it has been checked
+                        Array.Copy(input, 0, strippedInput.msgArray, 0, strippedInput.msgArray.Length);
+                        strippedInput.msgArray[_numRadios] = input[_numRadios + 1];  //grab sequence number overwrite 0xA5
+                        //message = BitConverter.ToString(strippedInput);
+                    }
+
+                   /* receivedBLE.Add(message);
+                    if (receivedBLE.Count > 500)
+                        receivedBLE.RemoveRange(0, 100);
+                    */
+                    mMessage = strippedInput.DeepCopy();
                     mNewDataAvailable = true;
                 }
             }
@@ -75,12 +109,13 @@ namespace DialogGenerator.CharacterSelection.Data
 
         #endregion
 
-        public string GetMessage()
+        public BLE_Message GetMessage()
         {
             if (mNewDataAvailable)
             {
                 mNewDataAvailable = false;
-                return mMessage;
+                BLE_Message returnMessage = mMessage.DeepCopy();
+                return returnMessage;
             }
             return null;
         }

@@ -30,10 +30,8 @@ namespace DialogGenerator.CharacterSelection
         private IBLEDataProvider mCurrentDataProvider;
         private States mCurrentState;
         private int mTempCh1;
-        private int mRowNum;
         private int mTempch2;
         private int[,] mStrongRssiCharacterPairBuf = new int[2, StrongRssiBufDepth];
-        private int[] mNewRow = new int[ApplicationData.Instance.NumberOfRadios + 1];
         private CancellationTokenSource mCancellationTokenSource;
         private SerialSelectionWorkflow mWorkflow;
         private readonly DispatcherTimer mcHeatMapUpdateTimer = new DispatcherTimer();
@@ -141,7 +139,7 @@ namespace DialogGenerator.CharacterSelection
             try
             {
                 _resetData();
-                string message = null;
+                BLE_Message message = new BLE_Message();
 
                 message = mCurrentDataProvider.GetMessage();
 
@@ -150,7 +148,9 @@ namespace DialogGenerator.CharacterSelection
                     return Triggers.ProcessMessage;
                 }
 
-                mRowNum = ParseMessageHelper.ParseBle(message, ref mNewRow);
+                BLE_Message mNewRow = new BLE_Message();  // added number holds sequence number
+
+                var mRowNum = ParseMessageHelper.ParseBle(message, mNewRow);
 
                 if (mRowNum < 0 || mRowNum >= ApplicationData.Instance.NumberOfRadios)
                 {
