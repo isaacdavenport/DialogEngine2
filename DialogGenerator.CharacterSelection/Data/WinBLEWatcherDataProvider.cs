@@ -60,9 +60,9 @@ namespace DialogGenerator.CharacterSelection.Data
                 uint length = sections[1].Data.Length;
                 var _numRadios = ApplicationData.Instance.NumberOfRadios;
 
-                if (!(length == _numRadios + 3 || length == _numRadios + 2))
-                    return;   // the old CSR radio format was length 8, six radios, A5 key, and seq num.  
-                                // New format loses key and adds 2 byte 0x00FF manf ID
+                if (!(length == _numRadios + 4 || length == _numRadios + 2))
+                    return;   // the old original CSR radio format was length 8, six radios, A5 key, and seq num.  
+                              // New format loses 0xA5 key and adds 2 byte 0x00FF manf ID and 1 byte filtered recent motion value
 
 
                 using (var _dataReader = DataReader.FromBuffer(sections[1].Data))
@@ -73,30 +73,24 @@ namespace DialogGenerator.CharacterSelection.Data
                     if (length == _numRadios + 2 && input[6] != 0xA5)
                         return;
 
-                    if (length == _numRadios + 3 && (input[0] != 0x00 || input[1] != 0xFF))  // manf ID no good
+                    if (length == _numRadios + 4 && (input[0] != 0x00 || input[1] != 0xFF))  // manf ID no good
                         return;
 
                     //string message;
                     BLE_Message strippedInput = new BLE_Message();  // just RSSIs and seq number
 
-                    if (length == _numRadios + 3)
+                    if (length == _numRadios + 4)
                     {
                         // remove the manufacturer ID since it has been checked
                         Array.Copy(input, 2, strippedInput.msgArray, 0, strippedInput.msgArray.Length);
-                        //message = BitConverter.ToString(strippedInput);
                     }
                     else
                     {
                         // remove the 0xA5 key since it has been checked
                         Array.Copy(input, 0, strippedInput.msgArray, 0, strippedInput.msgArray.Length);
                         strippedInput.msgArray[_numRadios] = input[_numRadios + 1];  //grab sequence number overwrite 0xA5
-                        //message = BitConverter.ToString(strippedInput);
                     }
 
-                   /* receivedBLE.Add(message);
-                    if (receivedBLE.Count > 500)
-                        receivedBLE.RemoveRange(0, 100);
-                    */
                     mMessage = strippedInput.DeepCopy();
                     mNewDataAvailable = true;
                 }

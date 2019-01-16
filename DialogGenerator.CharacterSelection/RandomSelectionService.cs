@@ -19,9 +19,8 @@ namespace DialogGenerator.CharacterSelection
         private IEventAggregator mEventAggregator;
         private ICharacterRepository mCharacterRepository;
         private IMessageDialogService mMessageDialogService;
-        private static Random msRandom = new Random();
-        public static int NextCharacter1 = 1;
-        public static int NextCharacter2 = 2;
+        private static int mRandGenNextCharacter1 = 1;
+        private static int mRandGenNextCharacter2 = 2;
         private CancellationTokenSource mCancellationTokenSource;
 
         public RandomSelectionService(ILogger logger,IEventAggregator _eventAggregator
@@ -115,38 +114,38 @@ namespace DialogGenerator.CharacterSelection
                         case 0:
                             {
                                 int _nextCharacter1Index = await GetNextCharacter();
-                                int _nextCharacter2Index = await GetNextCharacter(_nextCharacter1Index >= 0 ? _nextCharacter1Index : NextCharacter1);
+                                int _nextCharacter2Index = await GetNextCharacter(_nextCharacter1Index >= 0 ? _nextCharacter1Index : mRandGenNextCharacter1);
 
-                                NextCharacter1 = _nextCharacter1Index >= 0 ? _nextCharacter1Index : NextCharacter1; //lower bound inclusive, upper exclusive
-                                NextCharacter2 = _nextCharacter2Index >= 0 ? _nextCharacter2Index : NextCharacter2; //lower bound inclusive, upper exclusive
+                                mRandGenNextCharacter1 = _nextCharacter1Index >= 0 ? _nextCharacter1Index : mRandGenNextCharacter1; //lower bound inclusive, upper exclusive
+                                mRandGenNextCharacter2 = _nextCharacter2Index >= 0 ? _nextCharacter2Index : mRandGenNextCharacter2; //lower bound inclusive, upper exclusive
 
                                 break;
                             }
                         case 1:
                             {
-                                NextCharacter1 = Session.Get<int>(Constants.FORCED_CH_1);
-                                int _nextCharacter2Index = await GetNextCharacter(NextCharacter1);
+                                mRandGenNextCharacter1 = Session.Get<int>(Constants.FORCED_CH_1);
+                                int _nextCharacter2Index = await GetNextCharacter(mRandGenNextCharacter1);
 
-                                NextCharacter2 = _nextCharacter2Index >= 0 ? _nextCharacter2Index : NextCharacter2;
+                                mRandGenNextCharacter2 = _nextCharacter2Index >= 0 ? _nextCharacter2Index : mRandGenNextCharacter2;
 
                                 break;
                             }
                         case 2:
                             {
-                                NextCharacter1 = Session.Get<int>(Constants.FORCED_CH_1);
-                                NextCharacter2 = Session.Get<int>(Constants.FORCED_CH_2);
+                                mRandGenNextCharacter1 = Session.Get<int>(Constants.FORCED_CH_1);
+                                mRandGenNextCharacter2 = Session.Get<int>(Constants.FORCED_CH_2);
                                 break;
                             }
                     }
 
-                    Session.Set(Constants.NEXT_CH_1, NextCharacter1);
-                    Session.Set(Constants.NEXT_CH_2, NextCharacter2);
+                    Session.Set(Constants.NEXT_CH_1, mRandGenNextCharacter1);
+                    Session.Set(Constants.NEXT_CH_2, mRandGenNextCharacter2);
 
                     mEventAggregator.GetEvent<SelectedCharactersPairChangedEvent>().
                         Publish(new SelectedCharactersPairEventArgs
                         {
-                            Character1Index = NextCharacter1,
-                            Character2Index = NextCharacter2
+                            Character1Index = mRandGenNextCharacter1,
+                            Character2Index = mRandGenNextCharacter2
                         });
                 }
 

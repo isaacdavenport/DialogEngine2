@@ -34,6 +34,7 @@ namespace DialogGenerator.CharacterSelection.Helper
                 ReceivedMessages.Add(new ReceivedMessage()
                 {
                     ReceivedTime = _timeStamp,
+                    Motion =      _rw.msgArray[_rw.msgArray.Length - 2],
                     SequenceNum = _rw.msgArray[_rw.msgArray.Length - 1],
                     CharacterPrefix = CharacterRepository.GetByAssignedRadio(_characterRowNum).CharacterPrefix
                 });
@@ -52,6 +53,7 @@ namespace DialogGenerator.CharacterSelection.Helper
                     _debugString += " ";
                 }
 
+                _debugString += ReceivedMessages[ReceivedMessages.Count - 1].Motion.ToString("D3") + " ";
                 _debugString += ReceivedMessages[ReceivedMessages.Count - 1].SequenceNum.ToString("D3");
                 Logger.Info(_debugString, ApplicationData.Instance.DecimalSerialDirectBLELoggerKey);
 
@@ -90,6 +92,7 @@ namespace DialogGenerator.CharacterSelection.Helper
                 var _currentDateTime = DateTime.Now;
 
                 BLESelectionService.CharactersLastHeatMapUpdateTime[_rowNum] = _currentDateTime;
+                BLESelectionService.MotionVector[_rowNum] = _newRow.msgArray[ApplicationData.Instance.NumberOfRadios];
 
                 _addMessageToReceivedBuffer(_rowNum, _newRow, _currentDateTime);
             }
@@ -107,22 +110,16 @@ namespace DialogGenerator.CharacterSelection.Helper
                 // rssiRow also has seqNum from FW at end
                 int _rowNumber = -1;
 
-               // already checked if (_message.Length == && _message.IndexOf("a5", StringComparison.OrdinalIgnoreCase) < 0)
-               //      return _rowNumber;
-
-                //string[] parts = _message.Split('-');
-
-              // already checked  if (parts.Count() < ApplicationData.Instance.NumberOfRadios)
-              //      return _rowNumber;
-
                 for (int i = 0; i < ApplicationData.Instance.NumberOfRadios; i++)
                 {
-                    _rssiRow.msgArray[i] = _message.msgArray[i];//int.Parse(parts[i], System.Globalization.NumberStyles.HexNumber);
+                    _rssiRow.msgArray[i] = _message.msgArray[i];
 
-                    if (_rssiRow.msgArray[i] == 0xFF) _rowNumber = i;
+                    if (_rssiRow.msgArray[i] == 0xFF)
+                        _rowNumber = i;
                 }
 
-                _rssiRow.msgArray[_rssiRow.msgArray.Length - 1] = _message.msgArray[_message.msgArray.Length - 1]; //int.Parse(parts.Last(), System.Globalization.NumberStyles.HexNumber);
+                _rssiRow.msgArray[_rssiRow.msgArray.Length - 2] = _message.msgArray[_message.msgArray.Length - 2];   // motion byte
+                _rssiRow.msgArray[_rssiRow.msgArray.Length - 1] = _message.msgArray[_message.msgArray.Length - 1];   //  sequence number
 
                 if (_rowNumber == -1 && ApplicationData.Instance.MonitorMessageParseFails)
                     Logger.Error("Failed to parse message.");

@@ -13,7 +13,6 @@ using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using System.Windows.Threading;
-using Windows.Devices.Bluetooth;
 
 namespace DialogGenerator.CharacterSelection
 {
@@ -28,7 +27,6 @@ namespace DialogGenerator.CharacterSelection
         private ICharacterRepository mCharacterRepository;
         private IBLEDataProviderFactory mBLEDataProviderFactory;
         private IBLEDataProvider mCurrentDataProvider;
-        private States mCurrentState;
         private int mTempCh1;
         private int mTempch2;
         private int[,] mStrongRssiCharacterPairBuf = new int[2, StrongRssiBufDepth];
@@ -36,13 +34,15 @@ namespace DialogGenerator.CharacterSelection
         private SerialSelectionWorkflow mWorkflow;
         private readonly DispatcherTimer mcHeatMapUpdateTimer = new DispatcherTimer();
         private Random mRandom = new Random();
+        private States mCurrentState;
 
-        public int BigRssi = 0;
-        public int CurrentCharacter1;
-        public int CurrentCharacter2 = 1;
-        public static int NextCharacter1 = 1;
-        public static int NextCharacter2 = 2;
+        private int BigRssi = 0;
+        private int CurrentCharacter1;
+        private int CurrentCharacter2 = 1;
+        private static int NextCharacter1 = 1;
+        private static int NextCharacter2 = 2;
         public static int[,] HeatMap = new int[ApplicationData.Instance.NumberOfRadios, ApplicationData.Instance.NumberOfRadios];
+        public static int[] MotionVector = new int[ApplicationData.Instance.NumberOfRadios];
         public static DateTime[] CharactersLastHeatMapUpdateTime = new DateTime[ApplicationData.Instance.NumberOfRadios];
         public readonly TimeSpan MaxLastSeenInterval = new TimeSpan(0, 0, 0, 3, 100);
 
@@ -83,6 +83,7 @@ namespace DialogGenerator.CharacterSelection
             mEventAggregator.GetEvent<HeatMapUpdateEvent>().Publish(new HeatMapData
             {
                 HeatMap = HeatMap,
+                MotionVector = MotionVector,
                 LastHeatMapUpdateTime = CharactersLastHeatMapUpdateTime,
                 Character1Index = NextCharacter1,
                 Character2Index = NextCharacter2
@@ -174,6 +175,9 @@ namespace DialogGenerator.CharacterSelection
             mTempCh1 = 0;
             mTempch2 = 0;
         }
+
+        // TODO create _calculateMotionStable()  go through last 250ms of motion bytes to see if they are stable don't switch 
+        //  characters until they are stable just after a recent motion.  Character Selection changes should happen 
 
         private bool _calculateRssiStable(int _ch1, int _ch2)
         {
@@ -280,7 +284,7 @@ namespace DialogGenerator.CharacterSelection
             try
             {
                 bool _rssiStable = false;
-                int i = 0, j = 0;
+                int i = 0, j = 0, k = 0;
 
                 var _currentTime = DateTime.Now;
                 mTempCh1 = NextCharacter1;
@@ -301,9 +305,9 @@ namespace DialogGenerator.CharacterSelection
                     // it shouldn't happen often that a character has dissapeared, if so zero him out
                     if (_currentTime - CharactersLastHeatMapUpdateTime[i] > MaxLastSeenInterval)
                     {
-                        for (j = 0; j < ApplicationData.Instance.NumberOfRadios; j++)
+                        for (k = 0; k < ApplicationData.Instance.NumberOfRadios; k++)
                         {
-                            HeatMap[i, j] = 0;
+                            HeatMap[i, k] = 0;
                         }
                     }
                     for (j = i + 1; j < ApplicationData.Instance.NumberOfRadios; j++)

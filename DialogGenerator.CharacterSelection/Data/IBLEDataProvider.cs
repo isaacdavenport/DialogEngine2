@@ -7,13 +7,13 @@ namespace DialogGenerator.CharacterSelection.Data
 {
     public class BLE_Message
     {
-        // the +1 is for the sequence number at the end of the RSSI values for each radio
-        public int[] msgArray = new int[ApplicationData.Instance.NumberOfRadios + 1];
+        // the +2 is for the motion byte and sequence number at the end of the RSSI values for each radio
+        public int[] msgArray = new int[ApplicationData.Instance.NumberOfRadios + 2];
 
         public BLE_Message DeepCopy()
         {
             BLE_Message other = (BLE_Message) this.MemberwiseClone();
-            other.msgArray = new int[ApplicationData.Instance.NumberOfRadios + 1];
+            other.msgArray = new int[ApplicationData.Instance.NumberOfRadios + 2];
             Array.Copy(this.msgArray, other.msgArray, other.msgArray.Length );
             return other; 
         }
