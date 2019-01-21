@@ -134,8 +134,6 @@ namespace DialogGenerator.DialogEngine
 
         private void _onSelectedCharactersPairChanged(SelectedCharactersPairEventArgs obj)
         {
-            mLogger.Debug($"_onSelectedCharactersPairChanged - character1:{obj.Character1Index} Character2: {obj.Character2Index} ",ApplicationData.Instance.DialogLoggerKey);
-
             if (!ApplicationData.Instance.UseSerialPort && mRandomSelectionDataCached != null
                && Session.Get<int>(Constants.COMPLETED_DLG_MODELS) < ApplicationData.Instance.NumberOfDialogModelsCompleted)
             {
@@ -150,6 +148,9 @@ namespace DialogGenerator.DialogEngine
                 mStateMachineTaskTokenSource.Cancel();
                 mWorkflow.Fire(Triggers.PrepareDialogParameters);
             }
+
+            mLogger.Debug($"_onSelectedCharactersPairChanged- c_ch1 - {mRandomSelectionDataCached?.Character1Index} c_ch2-{mRandomSelectionDataCached?.Character2Index} " +
+                $"- ch1:{obj.Character1Index} ch2: {obj.Character2Index} ", ApplicationData.Instance.DialogLoggerKey);
         }
 
         private void _playAudio(string _pathAndFileName)

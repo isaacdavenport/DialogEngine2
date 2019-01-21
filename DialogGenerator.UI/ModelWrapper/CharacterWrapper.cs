@@ -27,14 +27,14 @@ namespace DialogGenerator.UI.Wrapper
 
             switch (_propertyName)
             {
-                case nameof(CharacterPrefix):
-                    {
-                        var character = mCharacterDataProvider.GetByInitials(CharacterPrefix);
+                //case nameof(CharacterPrefix):
+                //    {
+                //        var character = mCharacterDataProvider.GetByInitials(CharacterPrefix);
 
-                        if (character != null)
-                            errors.Add("Character initials must be unique.");
-                        break;
-                    }                    
+                //        if (character != null)
+                //            errors.Add("Character initials must be unique.");
+                //        break;
+                //    }                    
             }
 
             return errors;

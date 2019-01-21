@@ -13,7 +13,7 @@
 
       <!--  data  -->
       <Directory Id="UserDocumentsFolder">
-        <Directory Id="DataFolder" Name="DialogGenerator">
+        <Directory Id="DataFolder" Name="DialogGenerator" ComponentGuidGenerationSeed="02cf3501-2e35-45cc-8fc4-06bc06859c49">
           <Directory Id="Data" Name="Data" />
           <Directory Id="Audio" Name="Audio" />
           <Directory Id="Temp" Name="Temp" />
@@ -27,7 +27,8 @@
       <Directory Id="ProgramMenuFolder">
         <Directory Id="ApplicationProgramsFolder" Name="DialogGenerator"/>
       </Directory>
-            
+
+      <Directory Id="DesktopFolder" Name="Desktop"></Directory>
     </Directory>
   </Fragment>
 </Wix>

@@ -1,0 +1,83 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Wix xmlns="http://schemas.microsoft.com/wix/2006/wi">
+    <Fragment>
+        <DirectoryRef Id="DataFolder">
+            <Directory Id="dirD8F55AB23910A4D7B3DD5FB229E3AEBA" Name="Audio" />
+            <Directory Id="dir2D8468FCD13CA657E52A81EC9BCAD2FB" Name="Data" />
+            <Directory Id="dirCC781AAE351457540D978B937FA3F0F0" Name="EditorTemp" />
+            <Directory Id="dir60FE8674BAD8BA5A760E24CFA02FEBB3" Name="Log" />
+            <Directory Id="dir538142187E0EC39EE6EF5420D1EDDB29" Name="Temp" />
+            <Directory Id="dir1755F2FDF1C51B9BAF86418374D5835C" Name="Video" />
+        </DirectoryRef>
+    </Fragment>
+    <Fragment>
+        <ComponentGroup Id="DataFiles">
+            <Component Id="cmp4C18AD20A095DE870D8694E1F9B87989" Directory="DataFolder" Guid="{0C4149C1-3C63-44F2-96FF-ED66228852A6}">
+                <File Id="fil434119E47F4C744CC5A60CADA2A12468" KeyPath="yes" Source="$(var.HarvestPath)\Application.xml" />
+            </Component>
+            <Component Id="cmpE1B31AD6E0F266EEDB4261F768890AE2" Directory="dirD8F55AB23910A4D7B3DD5FB229E3AEBA" Guid="{929EC2C3-2C91-4326-B5FC-35C8303E1E68}" KeyPath="yes">
+                <CreateFolder />
+            </Component>
+            <Component Id="cmp8F510F60CBF8B3EC42E31505CE4F0E34" Directory="dir2D8468FCD13CA657E52A81EC9BCAD2FB" Guid="{AF109E31-AC52-4826-BA6C-E468D599406F}">
+                <File Id="fil87C9C2C394CA5BC0E0FDDFC11F334F92" KeyPath="yes" Source="$(var.HarvestPath)\Data\Advanced1Wizard.json" />
+            </Component>
+            <Component Id="cmp645BD8DCE895410D2E36D4B7AECC8F95" Directory="dir2D8468FCD13CA657E52A81EC9BCAD2FB" Guid="{E75EB615-84B7-4D10-82DA-3A523AD4D349}">
+                <File Id="filA6F509AAA7E51EB1FD8E3F5B0272B550" KeyPath="yes" Source="$(var.HarvestPath)\Data\AdvancedDialogs.json" />
+            </Component>
+            <Component Id="cmpC07DCB0A5685D0E322CBE3C0DDE87570" Directory="dir2D8468FCD13CA657E52A81EC9BCAD2FB" Guid="{19DA4E98-C644-449F-8BD0-D654C340B25C}">
+                <File Id="fil40F1A5EEF90D9328748E4FA95B4F0F43" KeyPath="yes" Source="$(var.HarvestPath)\Data\BettyTChich.json" />
+            </Component>
+            <Component Id="cmp31B9181056DC67EA8008EEE929A2F530" Directory="dir2D8468FCD13CA657E52A81EC9BCAD2FB" Guid="{DF7682A3-E0F1-459E-8F8E-8D3F2E51880A}">
+                <File Id="filAB6C3634EF61F6AD25E3E1E1B5FB87D6" KeyPath="yes" Source="$(var.HarvestPath)\Data\BjornOresson.json" />
+            </Component>
+            <Component Id="cmp0F169660709CA304229A385F41D78BC5" Directory="dir2D8468FCD13CA657E52A81EC9BCAD2FB" Guid="{57A75E32-B121-4EC7-A22B-C92C8D4A2447}">
+                <File Id="filCB1B579481A89D57886278CD0A248A68" KeyPath="yes" Source="$(var.HarvestPath)\Data\CowboyBill.json" />
+            </Component>
+            <Component Id="cmp75DBBBAA64F6A03F87572915D15FB15B" Directory="dir2D8468FCD13CA657E52A81EC9BCAD2FB" Guid="{B4C3AA08-FF39-4AE9-9DAA-46690252751C}">
+                <File Id="fil3724FAAA2D16F5E4D6F1D28762319367" KeyPath="yes" Source="$(var.HarvestPath)\Data\DannyPatel.json" />
+            </Component>
+            <Component Id="cmp94099959E4CD9231A7C20D4E7DE7E6B6" Directory="dir2D8468FCD13CA657E52A81EC9BCAD2FB" Guid="{06FB1477-CA3D-42A5-AA4C-347312EE178F}">
+                <File Id="fil01FD8CE443D1D45B58D95C60A926B811" KeyPath="yes" Source="$(var.HarvestPath)\Data\Ponies.json" />
+            </Component>
+            <Component Id="cmpAAB9818A60E0AEDB3A5329E8421C49BB" Directory="dir2D8468FCD13CA657E52A81EC9BCAD2FB" Guid="{A1BCE9A9-5249-447C-880D-FDCB7A2A4A50}">
+                <File Id="fil85D72BA9A6E26A10FEB3457C2795286E" KeyPath="yes" Source="$(var.HarvestPath)\Data\sasasss.json" />
+            </Component>
+            <Component Id="cmp5DE6B7C40C2E081CEEEE81AFB9A4FC6C" Directory="dir2D8468FCD13CA657E52A81EC9BCAD2FB" Guid="{F083B90A-25A9-48F5-97CF-9108F785EB4C}">
+                <File Id="filD4FA18184BB4B8D433315C8A9F076312" KeyPath="yes" Source="$(var.HarvestPath)\Data\Skylar.json" />
+            </Component>
+            <Component Id="cmpD30280463E278AD4AADA21ECF517F6E5" Directory="dir2D8468FCD13CA657E52A81EC9BCAD2FB" Guid="{14DA414F-3883-4B4C-8C36-0B87601E2E78}">
+                <File Id="filDB70B9A908630A70C635C0DB9F579F96" KeyPath="yes" Source="$(var.HarvestPath)\Data\StarlightGlimmer.json" />
+            </Component>
+            <Component Id="cmpB533FAD5635B6783C6521D235921ECFE" Directory="dir2D8468FCD13CA657E52A81EC9BCAD2FB" Guid="{DF863307-67C4-4DD0-85FF-A52962EF37BC}">
+                <File Id="fil0DEF3BC4688961835020C3306A72966C" KeyPath="yes" Source="$(var.HarvestPath)\Data\StarterCharacterWizardBasicAndIntermediateDialogModels.json" />
+            </Component>
+            <Component Id="cmp46A3FA60B5DF40C5C174E4391ED8808F" Directory="dir2D8468FCD13CA657E52A81EC9BCAD2FB" Guid="{18A274BA-0266-4038-8187-F08B1078222C}">
+                <File Id="filB3B11901C4C5FA1B6F5A6CEAAE496152" KeyPath="yes" Source="$(var.HarvestPath)\Data\test.json" />
+            </Component>
+            <Component Id="cmpA85971E43EA71C16ADDE8B43A6B8C63E" Directory="dir2D8468FCD13CA657E52A81EC9BCAD2FB" Guid="{483B6A21-A861-4AEC-B758-E8A3B7989F8A}">
+                <File Id="filEC5A66A6E0F2D42EA27A460EAB0B665F" KeyPath="yes" Source="$(var.HarvestPath)\Data\ttt.json" />
+            </Component>
+            <Component Id="cmp5F0E9506AE51A52E8213C66A83D1278E" Directory="dir2D8468FCD13CA657E52A81EC9BCAD2FB" Guid="{D829AB66-6A15-4F25-819A-AE9AD75500D9}">
+                <File Id="filEA478752534D8F076C77D2BDD1B59C7E" KeyPath="yes" Source="$(var.HarvestPath)\Data\TwinkleTwinkle.json" />
+            </Component>
+            <Component Id="cmp9F3590D2ECB2387F93A3C6282646F3B1" Directory="dirCC781AAE351457540D978B937FA3F0F0" Guid="{2071DF44-C2BA-469C-900C-B87DC21445F5}" KeyPath="yes">
+                <CreateFolder />
+            </Component>
+            <Component Id="cmp2840A776911FB50132E04BDFF6571C22" Directory="dir60FE8674BAD8BA5A760E24CFA02FEBB3" Guid="{F2A01695-5B58-4B43-8557-262301C6EDD3}">
+                <File Id="filF1B54C4D584D710F301406D25B5A3C2D" KeyPath="yes" Source="$(var.HarvestPath)\Log\DecimalSerialLogDirectBLE.log" />
+            </Component>
+            <Component Id="cmpD09BA8FB3E9CFC8FA4ADDDF96AB9D994" Directory="dir60FE8674BAD8BA5A760E24CFA02FEBB3" Guid="{DF2C36D2-654D-4D8C-8CF6-4CCCA1166DFB}">
+                <File Id="fil65E7D8A3CB6747B475BC9DA6D6D15D70" KeyPath="yes" Source="$(var.HarvestPath)\Log\DialogGenerator.log" />
+            </Component>
+            <Component Id="cmp7BE47E7A410C6D63319A8EBDEDD8B1EF" Directory="dir60FE8674BAD8BA5A760E24CFA02FEBB3" Guid="{231DFD8A-D09E-4C15-A268-CB77F5E9E2DF}">
+                <File Id="fil3E34F40C1783E4CB5DFE7509CC3B1A47" KeyPath="yes" Source="$(var.HarvestPath)\Log\LogDialog.log" />
+            </Component>
+            <Component Id="cmp92D8B904F9983B06F8BE9465A96CC617" Directory="dir538142187E0EC39EE6EF5420D1EDDB29" Guid="{AA823963-9BA0-4D6D-A9B1-AE3E7BFB0C2F}" KeyPath="yes">
+                <CreateFolder />
+            </Component>
+            <Component Id="cmp22F5D7F9FCE16B3FC4484A2ADA4A7BC6" Directory="dir1755F2FDF1C51B9BAF86418374D5835C" Guid="{623CEAC3-DF1C-433E-BB6D-3194B28D8FDD}" KeyPath="yes">
+                <CreateFolder />
+            </Component>
+        </ComponentGroup>
+    </Fragment>
+</Wix>

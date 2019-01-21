@@ -105,26 +105,6 @@
     </ComponentGroup>
 	</Fragment>
   
-  <Fragment>
-    <DirectoryRef Id="UserDocumentsFolder">      
-      <!--<Component Id="VideoFiles" Guid="4aae8932-5230-44ba-846e-1eba7b1d719e" KeyPath="yes">
-        <CopyFile Id="VideoDir" SourceProperty="VIDEO_DIR" DestinationDirectory="Video" SourceName="*" />
-      </Component>
-      <Component Id="DataFiles" Guid="99cffd35-7b93-45b9-92e3-b83341b031df" KeyPath="yes">
-        <CopyFile Id="DataDir" SourceProperty="DATA_DIR" DestinationDirectory="Data" SourceName="*" />
-      </Component>
-      <Component Id="ImagesFiles" Guid="abf88d29-26ec-401c-ac50-f810e4d786cf" KeyPath="yes">
-        <CopyFile Id="ImagesDir" SourceProperty="IMAGES_DIR" DestinationDirectory="Images" SourceName="*" />
-      </Component>
-      <Component Id="AudioFiles" Guid="64d947da-8e22-4db1-898f-e9c7cd10c74b" KeyPath="yes">
-        <CopyFile Id="AudioDir" SourceProperty="AUDIO_DIR" DestinationDirectory="Audio" SourceName="*" />
-      </Component>-->
-      <Component Id="Application.xml" Guid="fc31ce71-a5e6-4635-805a-c77dc388bca9">
-        <File Id="Application.xml" Name="Application.xml" Source="$(var.DialogGenerator_TargetDir)Application.xml" />
-      </Component>
-    </DirectoryRef> 
-  </Fragment>
-
   <!--  Tutorial folder and tutorial files inside -->
   <Fragment>
     <DirectoryRef Id="Tutorial">
@@ -171,9 +151,9 @@
     <Component Id="Video" Directory="Video" Guid="f67a3494-696d-4ca0-8dfe-c5b2e885aaf4" KeyPath="yes">
       <CreateFolder />
     </Component>
-    <Component Id="Audio" Directory="Audio" Guid="8f251466-50c2-4cd7-b579-1cb5db552a2a" KeyPath="yes">
+    <!--<Component Id="Audio" Directory="Audio" Guid="8f251466-50c2-4cd7-b579-1cb5db552a2a" KeyPath="yes">
       <CreateFolder />
-    </Component>
+    </Component>-->
     <Component Id="EditorTemp" Directory="EditorTemp" Guid="b18f981d-68b2-4847-ad45-efb187162107" KeyPath="yes">
       <CreateFolder />
     </Component>
@@ -190,10 +170,10 @@
         <util:RemoveFolderEx  Property="USER_DOCUMENTS_FOLDER_PATH" />
       </Component>
     </DirectoryRef>
-  </Fragment>-->-->
+  </Fragment>-->
   
-  <!-- Add application to program menu -->
   <Fragment>
+    <!-- Add application to program menu -->
     <DirectoryRef Id="ApplicationProgramsFolder">
       <Component Id="ApplicationShortcut" Guid="4b8cf9eb-43ae-43c6-b8e8-2fed92a1af46">
         <Shortcut Id="ApplicationStartMenuShortcut"  Name="Dialog generator"
@@ -202,5 +182,14 @@
         <RegistryValue Root="HKCU" Key="Software\[Manufacturer]\[ProductName]" Type="integer" Value="1" KeyPath="yes"  />
       </Component>
     </DirectoryRef>
-  </Fragment>  
+    <!-- Add shortcut to desktop folder -->
+    <DirectoryRef Id="DesktopFolder">
+      <Component Id="DesktopShortcut" Guid="30d36332-90a0-4078-9e9d-e6fa8d1f1bf6" >
+        <Shortcut Id="ApplicationDesktopShortcut" Name="Dialog generator"  Target="[#DialogGenerator.exe]" WorkingDirectory="INSTALLFOLDER" />
+        <RemoveFolder Id="RemoveDesktopFolder" Directory="DesktopFolder" On="uninstall" />
+        <RegistryValue Root="HKCU" Key="Software\[Manufacturer]\[ProductName]" Name="installed" Type="integer" Value="1" KeyPath="yes" />
+      </Component>
+    </DirectoryRef>
+  </Fragment>
+
 </Wix>

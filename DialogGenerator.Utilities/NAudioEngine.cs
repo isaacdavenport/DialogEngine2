@@ -353,7 +353,7 @@ namespace DialogGenerator.Utilities
                 string _outputPathMP3 = Path.Combine(ApplicationData.Instance.TempDirectory, "temp.mp3");
                 try
                 {
-                    _trimWavFile(mCurrentFilePath, _outputPath, TimeSpan.Zero, TimeSpan.FromMilliseconds(100));
+                    _trimWavFile(mCurrentFilePath, _outputPath, TimeSpan.FromMilliseconds(100), TimeSpan.FromMilliseconds(100));
                     using (var reader = new WaveFileReader(_outputPath))
                     {
                         MediaFoundationEncoder.EncodeToMp3(reader, _outputPathMP3,44100);
