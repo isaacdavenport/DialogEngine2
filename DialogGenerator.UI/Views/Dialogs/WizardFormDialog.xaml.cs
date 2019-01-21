@@ -30,6 +30,7 @@ namespace DialogGenerator.UI.Views.Dialogs
 
         private void _wizardFormDialog_Loaded(object sender, System.Windows.RoutedEventArgs e)
         {
+            this.WizardTypesCbx.Items.Refresh();
             SelectedWizardIndex = Wizards.Count > 0 ? 0 : -1;
             ((DelegateCommand)StartWizardCommand).RaiseCanExecuteChanged();
         }

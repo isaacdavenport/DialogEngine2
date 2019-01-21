@@ -1,5 +1,4 @@
 ﻿using DialogGenerator.Core;
-using System;
 using System.ComponentModel.DataAnnotations;
 
 namespace DialogGenerator.Model.Attributes
