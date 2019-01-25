@@ -111,6 +111,7 @@
     </Compile>
     <Compile Include="Converters\ActiveDialogModelBtnVisibilityValueConverter.cs" />
     <Compile Include="Converters\AssignedCharacter2NameValueConverter.cs" />
+    <Compile Include="Converters\CharaccterStateToNameValueConverter.cs" />
     <Compile Include="Converters\CharacterDataTemplateSelectorValueConverter.cs" />
     <Compile Include="Converters\CharacterGenderValueConverter.cs" />
     <Compile Include="Converters\CharacterRadioNumberToTextValueConverter.cs" />
@@ -118,13 +119,18 @@
     <Compile Include="Converters\CloneValuesConverter.cs" />
     <Compile Include="Converters\DivideBy2ValueConverter.cs" />
     <Compile Include="Converters\DollNumberToAssignedCharacterValueConverter.cs" />
+    <Compile Include="Converters\DollNumberToAssignedChForegroundValueConverter.cs" />
     <Compile Include="Converters\DollStatusColorValueConverter.cs" />
     <Compile Include="Converters\DollStatusValueConverter.cs" />
+    <Compile Include="Converters\DollToAssignedCharacterValueConverter.cs" />
+    <Compile Include="Converters\ImageContentSmallSizeValueConverter.cs" />
+    <Compile Include="Converters\ImageContentValueConverter.cs" />
     <Compile Include="Converters\ImageToFullPathValueConverter.cs" />
     <Compile Include="Converters\IncrementValueConverter.cs" />
     <Compile Include="Converters\InvertValueConverter.cs" />
     <Compile Include="Converters\InvertVisibilityValueConverter.cs" />
     <Compile Include="Converters\IsActiveModelDialogValueConverter.cs" />
+    <Compile Include="Converters\IsChangeCharacterStateBtnEnabledValueConverter.cs" />
     <Compile Include="Converters\IsDialogBtnVisibleValueConverter.cs" />
     <Compile Include="Converters\IsRunOverWizardBtnEnabledValueConverter.cs" />
     <Compile Include="Converters\IsStatesEqualValueConverter.cs" />
@@ -149,9 +155,11 @@
     <Compile Include="Data\WizardDataProvider.cs" />
     <Compile Include="Helpers\FileHelper.cs" />
     <Compile Include="UIModule.cs" />
+    <Compile Include="ViewModels\AssignCharactersToDollsBindingProxy.cs" />
     <Compile Include="ViewModels\AssignCharactersToDollsViewModel.cs" />
     <Compile Include="ViewModels\CharacterDetailViewModel.cs" />
-    <Compile Include="ViewModels\CharactersNavigationViewModel.cs" />
+    <Compile Include="ViewModels\ComputerSelectsViewModel.cs" />
+    <Compile Include="ViewModels\CreateViewModel.cs" />
     <Compile Include="ViewModels\DebugViewModel.cs" />
     <Compile Include="ViewModels\DialogModelDetailViewModel.cs" />
     <Compile Include="ViewModels\DialogModelsNavigationViewModel.cs" />
@@ -159,18 +167,28 @@
     <Compile Include="ViewModels\IDetailViewModel.cs" />
     <Compile Include="ViewModels\INavigationViewModel.cs" />
     <Compile Include="ViewModels\MediaPlayerControlViewModel.cs" />
-    <Compile Include="ViewModels\MenuViewModel.cs" />
+    <Compile Include="ViewModels\HomeViewModel.cs" />
     <Compile Include="ViewModels\VoiceRecorderControlViewModel.cs" />
     <Compile Include="ViewModels\WizardViewModel.cs" />
     <Compile Include="Views\AssignCharactersToDollsView.xaml.cs">
       <DependentUpon>AssignCharactersToDollsView.xaml</DependentUpon>
     </Compile>
+    <Compile Include="Views\CharacterDataTemplateSelector.cs" />
     <Compile Include="Views\CharacterDetailView.xaml.cs">
       <DependentUpon>CharacterDetailView.xaml</DependentUpon>
     </Compile>
     <Compile Include="Views\CharactersDataTemplateSelector.cs" />
+    <Compile Include="Views\CharacterSelectionView.xaml.cs">
+      <DependentUpon>CharacterSelectionView.xaml</DependentUpon>
+    </Compile>
     <Compile Include="Views\CharactersNavigationView.xaml.cs">
       <DependentUpon>CharactersNavigationView.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="Views\ComputerSelectsView.xaml.cs">
+      <DependentUpon>ComputerSelectsView.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="Views\CreateView.xaml.cs">
+      <DependentUpon>CreateView.xaml</DependentUpon>
     </Compile>
     <Compile Include="Views\DebugView.xaml.cs">
       <DependentUpon>DebugView.xaml</DependentUpon>
@@ -192,6 +210,9 @@
     </Compile>
     <Compile Include="Views\DialogView.xaml.cs">
       <DependentUpon>DialogView.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="Views\HomeView.xaml.cs">
+      <DependentUpon>HomeView.xaml</DependentUpon>
     </Compile>
     <Compile Include="Views\MenuView.xaml.cs">
       <DependentUpon>MenuView.xaml</DependentUpon>
@@ -239,7 +260,19 @@
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
+    <Page Include="Views\CharacterSelectionView.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
     <Page Include="Views\CharactersNavigationView.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="Views\ComputerSelectsView.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="Views\CreateView.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
@@ -268,6 +301,10 @@
       <Generator>MSBuild:Compile</Generator>
     </Page>
     <Page Include="Views\DialogView.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="Views\HomeView.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>

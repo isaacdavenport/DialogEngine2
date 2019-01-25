@@ -8,6 +8,9 @@
              xmlns:prism="http://prismlibrary.com/"            
              prism:ViewModelLocator.AutoWireViewModel="True"
              xmlns:converters="clr-namespace:DialogGenerator.UI.Converters"
+             xmlns:inf="clr-namespace:DialogGenerator.Core;assembly=DialogGenerator.Core"
+             xmlns:view="clr-namespace:DialogGenerator.UI.Views"
+             xmlns:i="clr-namespace:System.Windows.Interactivity;assembly=System.Windows.Interactivity"             
              xmlns:s="clr-namespace:System;assembly=mscorlib"
              xmlns:views="clr-namespace:DialogGenerator.UI.Views"
              TextElement.FontWeight="Regular"
@@ -24,15 +27,26 @@
             <converters:IsDialogBtnVisibleValueConverter x:Key="IsDialogBtnVisibleValueConverter" />
             <converters:DivideBy2ValueConverter x:Key="DivideBy2ValueConverter" />
             <converters:InvertVisibilityValueConverter x:Key="InvertVisibilityValueConverter" />
+            <converters:CloneValuesConverter x:Key="CloneValuesConverter" />
+            <converters:ImageContentSmallSizeValueConverter x:Key="ImageContentSmallSizeValueConverter" />
         </ResourceDictionary>
     </UserControl.Resources>
-    
+
+    <i:Interaction.Triggers>
+        <i:EventTrigger EventName="Loaded">
+            <i:InvokeCommandAction Command="{Binding ViewLoadedCommand}" />
+        </i:EventTrigger>
+        <i:EventTrigger EventName="Unloaded">
+            <i:InvokeCommandAction Command="{Binding ViewUnloadedCommand}" />
+        </i:EventTrigger>
+    </i:Interaction.Triggers>
+
     <Grid>
         <Grid.RowDefinitions>
             <RowDefinition Height="*"/>
             <RowDefinition Height="Auto" />
             <RowDefinition Height="Auto"/>
-            <RowDefinition Height="60" />
+            <RowDefinition Height="Auto" />
         </Grid.RowDefinitions> 
 
         <ItemsControl   x:Name="TextOutput"
@@ -55,11 +69,9 @@
                                 <ColumnDefinition Width="auto" />
                                 <ColumnDefinition />
                             </Grid.ColumnDefinitions>
-                            <Ellipse Height="40" Stroke="LightGray" VerticalAlignment="Top" Margin="0,10,0,0" Width="40">
-                                <Ellipse.Fill>
-                                    <ImageBrush ImageSource="{Binding Character.CharacterImage,Converter={StaticResource ImageToFullPathValueConverter}}" />
-                                </Ellipse.Fill>
-                            </Ellipse>                            
+                            <materialDesign:ColorZone  Background="Transparent" VerticalAlignment="Stretch" 
+                                                      Content="{Binding Character.CharacterImage, Converter={StaticResource ImageContentSmallSizeValueConverter}}" >
+                            </materialDesign:ColorZone>
                             <StackPanel Grid.Column="1">
                                 <TextBlock Padding="8,10,4,4" TextWrapping="Wrap" FontWeight="Bold"
                                            Text="{Binding Character.CharacterName }" Width="auto" HorizontalAlignment="Left"  />
@@ -125,31 +137,75 @@
             <views:DebugView HorizontalAlignment="Stretch" VerticalAlignment="Stretch" />
         </Border>
 
-        <Border  Grid.Row="3"  Height="60" BorderBrush="LightGray" BorderThickness="0,1,0,0">
+        <Border  Grid.Row="3" Background="White"   BorderBrush="LightGray" BorderThickness="0,1,0,0">
             <Grid>
-                <StackPanel Orientation="Horizontal" HorizontalAlignment="Center" Margin="10">
-                    <Button Command="{Binding ConfigureDialogCommand}">
-                        <Button.Content>
-                            <StackPanel Orientation="Horizontal">
-                                <materialDesign:PackIcon Kind="Settings" VerticalAlignment="Center" />
-                                <Label Content="Configure" VerticalAlignment="Center" Padding="0" Margin="4,0,0,0" Foreground="White" />
-                            </StackPanel>
-                        </Button.Content>
-                    </Button>
-                    <Button Visibility="{Binding IsDialogStarted, Converter={StaticResource IsDialogBtnVisibleValueConverter},ConverterParameter=StartDialog}" 
-                            Command="{Binding StartDialogCommand}" Margin="20,0,0,0"  VerticalAlignment="Center" Content="Start dialog" x:Name="StartDialogBtn"/>
-                    <Button Content="Stop dialog" Visibility="{Binding IsDialogStarted,Converter={StaticResource IsDialogBtnVisibleValueConverter},ConverterParameter=StopDialog}" 
-                            IsEnabled="{Binding IsStopBtnEnabled}" Command="{Binding StopDialogCommand}"  Margin="20,0,0,0" VerticalAlignment="Center" />
-                </StackPanel>
 
-                <StackPanel Orientation="Horizontal" VerticalAlignment="Center" Margin="0,0,5,0" HorizontalAlignment="Right">
-                    <Button HorizontalAlignment="Right" Command="{Binding ChangeDebugVisibilityCommand}" CommandParameter="{Binding  ElementName=TextOutput}"
-                            Visibility="{Binding IsDebugViewVisible, Converter={StaticResource InvertVisibilityValueConverter}}" 
-                            Content="Show debug view" Background="DarkGray" BorderBrush="DarkGray" Foreground="{DynamicResource MaterialDesignBody}" Margin="0,0,10,0" Padding="5">
-                    </Button>
-                    <Button Content="Hide debug view" Visibility="{Binding IsDebugViewVisible}" Command="{Binding ChangeDebugVisibilityCommand}"
-                            CommandParameter="{Binding ElementName=TextOutput}"
-                            BorderBrush="DarkGray" Background="DarkGray" Foreground="{DynamicResource MaterialDesignBody}" Margin="0,0,10,0" Padding="5" />
+                <StackPanel Orientation="Horizontal" VerticalAlignment="Center" Margin="0,0,5,0" HorizontalAlignment="Left">
+
+                    <materialDesign:Card Width="150" HorizontalAlignment="Left" VerticalAlignment="Center"  Height="150" Margin="10" Background="#017a84" >
+                        <Grid>
+                            <StackPanel HorizontalAlignment="Center" VerticalAlignment="Center">
+                                <materialDesign:PackIcon Kind="Home" HorizontalAlignment="Center" Height="50" Width="50" Foreground="White" />
+                                <TextBlock Text="Home" Foreground="White" FontSize="20" HorizontalAlignment="Center" VerticalAlignment="Center" />
+                            </StackPanel>
+                            <Grid.InputBindings>
+                                <MouseBinding MouseAction="LeftClick" Command="NavigationCommands.GoToPage">
+                                    <MouseBinding.CommandParameter>
+                                        <MultiBinding Converter="{StaticResource CloneValuesConverter}">
+                                            <Binding Source="{x:Static inf:Constants.ContentRegion}" />
+                                            <Binding Source="{x:Type view:CreateView}" />
+                                        </MultiBinding>
+                                    </MouseBinding.CommandParameter>
+                                </MouseBinding>
+                            </Grid.InputBindings>
+                        </Grid>
+                    </materialDesign:Card>
+
+                    <materialDesign:Card Width="150" HorizontalAlignment="Left" Height="150" Margin="10" Background="#51cb8c" >
+                        <Grid>
+                            <StackPanel HorizontalAlignment="Center" VerticalAlignment="Center">
+                                <materialDesign:PackIcon Kind="Settings" HorizontalAlignment="Center" Height="50" Width="50" Foreground="White" />
+                                <TextBlock Text="Doll with radio" Foreground="White" FontSize="20" HorizontalAlignment="Center" VerticalAlignment="Center" />
+                            </StackPanel>
+                            <Grid.InputBindings>
+                                <MouseBinding MouseAction="LeftClick" Command="NavigationCommands.GoToPage">
+                                    <MouseBinding.CommandParameter>
+                                        <MultiBinding Converter="{StaticResource CloneValuesConverter}">
+                                            <Binding Source="{x:Static inf:Constants.ContentRegion}" />
+                                            <Binding Source="{x:Type view:CharacterSelectionView}" />
+                                        </MultiBinding>
+                                    </MouseBinding.CommandParameter>
+                                </MouseBinding>
+                            </Grid.InputBindings>
+                        </Grid>
+                    </materialDesign:Card>
+
+                    <materialDesign:Card Width="150" HorizontalAlignment="Left" Visibility="{Binding IsDebugViewVisible}"  
+                         Height="150" Margin="10" Background="#51cb8c" >
+                        <Grid>
+                            <StackPanel HorizontalAlignment="Center" VerticalAlignment="Center">
+                                <materialDesign:PackIcon Kind="WindowMinimize" HorizontalAlignment="Center" Height="50" Width="50" Foreground="White" />
+                                <TextBlock Text="Hide debug view" Foreground="White" FontSize="20" HorizontalAlignment="Center" VerticalAlignment="Center" />
+                            </StackPanel>
+                            <Grid.InputBindings>
+                                <MouseBinding MouseAction="LeftClick" Command="{Binding ChangeDebugVisibilityCommand}" CommandParameter="{Binding ElementName=TextOutput}" />
+                            </Grid.InputBindings>
+                        </Grid>
+                    </materialDesign:Card>
+
+                    <materialDesign:Card Width="150" HorizontalAlignment="Left"  Height="150" Margin="10" Background="#51cb8c"                           
+                        Visibility="{Binding IsDebugViewVisible, Converter={StaticResource InvertVisibilityValueConverter}}" >
+                        <Grid>
+                            <StackPanel HorizontalAlignment="Center" VerticalAlignment="Center">
+                                <materialDesign:PackIcon Kind="Bug" HorizontalAlignment="Center" Height="50" Width="50" Foreground="White" />
+                                <TextBlock Text="Debug View" Foreground="White" FontSize="20" HorizontalAlignment="Center" VerticalAlignment="Center" />
+                            </StackPanel>
+                            <Grid.InputBindings>
+                                <MouseBinding MouseAction="LeftClick" 
+                                              Command="{Binding ChangeDebugVisibilityCommand}" CommandParameter="{Binding ElementName=TextOutput}" />
+                            </Grid.InputBindings>
+                        </Grid>
+                    </materialDesign:Card>
                 </StackPanel>
             </Grid>
         </Border>

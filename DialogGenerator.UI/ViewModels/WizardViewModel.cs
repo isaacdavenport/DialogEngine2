@@ -439,7 +439,6 @@ namespace DialogGenerator.UI.ViewModels
             {
                 VoiceRecorderControlViewModel.StateMachine.PropertyChanged -= _vrc_stateMachine_PropertyChanged;
                 MediaPlayerControlViewModel.StateMachine.PropertyChanged -= _mpc_stateMachine_PropertyChanged;
-                mRegionManager.RequestNavigate(Constants.NavigationRegion, typeof(CharactersNavigationView).FullName);
                 var _contentRegion = mRegionManager.Regions[Constants.ContentRegion];
                 _contentRegion.NavigationService.Journal.GoBack();
 

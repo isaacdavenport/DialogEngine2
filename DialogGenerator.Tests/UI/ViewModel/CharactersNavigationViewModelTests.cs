@@ -6,11 +6,11 @@ namespace DialogGenerator.Tests.UI.ViewModel
 {
     public class CharactersNavigationViewModelTests:ViewModelTestBase
     {
-        private CharactersNavigationViewModel mViewModel;
+        private CreateViewModel mViewModel;
 
         public CharactersNavigationViewModelTests()
         {
-            mViewModel =new  CharactersNavigationViewModel(loggerMock.Object, eventAggregatorMock.Object
+            mViewModel =new  CreateViewModel(loggerMock.Object, eventAggregatorMock.Object
                 ,dialogDataRepositoryMock.Object
                 ,wizardDataProviderMock.Object
                 ,dialogModelDataProviderMock.Object

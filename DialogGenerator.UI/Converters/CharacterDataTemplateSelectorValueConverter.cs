@@ -9,12 +9,23 @@ namespace DialogGenerator.UI.Converters
     {
         public object Convert(object value, Type targetType, object parameter, CultureInfo culture)
         {
-            int _currentDoll = int.Parse(value.ToString());
             CharactersDataTemplateSelector selector = new CharactersDataTemplateSelector();
 
-            selector.CurrentDoll = _currentDoll;
+            try
+            {
+                int _currentDoll = int.Parse(value.ToString());
 
+                selector.CurrentDoll = _currentDoll;
+
+                return selector;
+            }
+            catch (Exception)
+            {
+            }
+
+            selector.CurrentDoll = -1;
             return selector;
+
         }
 
         public object ConvertBack(object value, Type targetType, object parameter, CultureInfo culture)

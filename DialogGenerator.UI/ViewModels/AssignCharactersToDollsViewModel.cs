@@ -1,13 +1,12 @@
 ﻿using DialogGenerator.Core;
 using DialogGenerator.Model;
 using DialogGenerator.UI.Data;
-using MaterialDesignThemes.Wpf;
+using DialogGenerator.UI.Helper;
 using Prism.Commands;
 using Prism.Events;
 using Prism.Mvvm;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
-using System.IO;
 using System.Linq;
 using System.Windows.Controls;
 
@@ -16,8 +15,6 @@ namespace DialogGenerator.UI.ViewModels
     public class AssignCharactersToDollsViewModel : BindableBase
     {
         #region - fields -
-
-        private const string mDollFileName = "doll.jpg";
 
         private ILogger mLogger;
         private IEventAggregator mEventAggregator;
@@ -59,12 +56,13 @@ namespace DialogGenerator.UI.ViewModels
         private async void _saveConfigurationCommand_Execute(object param)
         {
             object[] parametes = (object[])param;
-            int _indexOfSelectedCharacter = int.Parse(parametes[1].ToString());
-            var popup = parametes[3] as PopupBox;
-
+            Button btn = parametes[1] as Button;
+            Grid parent = btn.Parent as Grid;
+            ComboBox cbx = (ComboBox)parent.Children[0];
+             
+            int _indexOfSelectedCharacter = cbx.SelectedIndex;
             if (_indexOfSelectedCharacter < 0)
             {
-                popup.IsPopupOpen = false;
                 return;
             }
 
@@ -83,9 +81,8 @@ namespace DialogGenerator.UI.ViewModels
 
             await mCharacterDataProvider.SaveAsync(_selectedCharacter);
 
-            popup.IsPopupOpen = false;
-            var _itemsControl = parametes[2] as ItemsControl;
-            _itemsControl.Items.Refresh();
+            var _itemsControl = VisualHelper.GetNearestContainer<ItemsControl>(parent);
+            _itemsControl?.Items.Refresh();
         }
 
         private async void _unbindCharacterCommand_Execute(object parameters)
@@ -101,7 +98,7 @@ namespace DialogGenerator.UI.ViewModels
 
             await mCharacterDataProvider.SaveAsync(_assignedCharacter);
 
-            var _itemsControl = args[1] as ItemsControl;
+            var _itemsControl = VisualHelper.GetNearestContainer<ItemsControl>(args[1] as Button);
             _itemsControl.Items.Refresh();
         }
 
@@ -122,11 +119,6 @@ namespace DialogGenerator.UI.ViewModels
                 mDolls = value;
                 RaisePropertyChanged();
             }
-        }
-
-        public string DollFileName
-        {
-            get { return Path.Combine(ApplicationData.Instance.ImagesDirectory, mDollFileName); }
         }
 
         #endregion

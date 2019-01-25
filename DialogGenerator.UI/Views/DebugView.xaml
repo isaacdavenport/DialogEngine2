@@ -12,7 +12,7 @@
              IsVisibleChanged="_debugView_VisibleChanged"
              SizeChanged="_debugView_SizeChanged"
              mc:Ignorable="d"
-             Background="Transparent"
+             Background="#f9f9f9"
              d:DesignHeight="450" d:DesignWidth="800">
     <UserControl.Resources>
         <ResourceDictionary>
@@ -22,7 +22,6 @@
                     <converters:MatrixCellValueToBackgroundColorConverter x:Key="MatrixCellValueToBackgroundColorConverter" />
                     <converters:StarWidthConverter x:Key="StarWidthConverter" />
                 </ResourceDictionary>
-                <!--<ResourceDictionary Source="pack://application:,,,/DialogGenerator.UI;component/Themes/TabControlStyle.xaml" />-->
             </ResourceDictionary.MergedDictionaries>
         </ResourceDictionary>
     </UserControl.Resources>
@@ -42,29 +41,38 @@
                      MinHeight="10"
                      Margin="1,0,0,0"
                      VerticalAlignment="Stretch"
-                     Background="Transparent"
+                     Background="#f9f9f9"
                      Style="{x:Null}"
                      x:Name="LoggerMessagesTabControl">
             <TabControl.Resources>
+                <Style TargetType="TabPanel">
+                    <Setter Property="HorizontalAlignment" Value="Center" />
+                </Style>
                 <Style TargetType="TabItem">
                     <Setter Property="Template">
                         <Setter.Value>
                             <ControlTemplate TargetType="TabItem">
-                                <Grid Name="Panel">
+                                <Grid Name="Panel" Background="#f9f9f9">
                                     <Grid.RowDefinitions>
                                         <RowDefinition />
                                     </Grid.RowDefinitions>
-                                    <ContentPresenter   Grid.Row="0" x:Name="ContentSite" VerticalAlignment="Center"
-                                                        HorizontalAlignment="Center" ContentSource="Header" Height="auto" Margin="10,3,10,3"/>
+                                    <Border BorderThickness="0,0,0,2" x:Name="border">
+                                        <ContentPresenter   Grid.Row="0" x:Name="ContentSite" VerticalAlignment="Center"
+                                            HorizontalAlignment="Center" ContentSource="Header" Height="auto" Margin="10,3,10,3" />
+                                    </Border>
                                 </Grid>
                                 <ControlTemplate.Triggers>
+                                    <Trigger Property="IsSelected" Value="False">
+                                        <Setter Property="TextElement.Foreground" Value="#41444b" />
+                                        <Setter Property="BorderBrush" Value="Transparent" TargetName="border" />
+                                    </Trigger>
                                     <Trigger Property="IsSelected" Value="True">
-                                        <Setter TargetName="Panel" Property="Background" Value="{DynamicResource PrimaryHueMidBrush}" />
-                                        <Setter Property="TextElement.Foreground" Value="White" />
+                                        <Setter Property="BorderBrush" TargetName="border" Value="#017a84" />
+                                        <Setter Property="TextElement.Foreground" Value="#017a84" />
+                                        <Setter Property="TextElement.FontSize" Value="15" />
                                     </Trigger>
                                     <Trigger Property="IsMouseOver" Value="True">
-                                        <Setter TargetName="Panel" Property="Background" Value="{DynamicResource SecondaryAccentBrush}" />
-                                        <Setter Property="Foreground" Value="White" />
+                                        <Setter Property="Foreground" Value="#017a84" />
                                     </Trigger>
                                 </ControlTemplate.Triggers>
                             </ControlTemplate>
@@ -92,8 +100,8 @@
                 <TabItem.Header>
                     <StackPanel Orientation="Horizontal" VerticalAlignment="Center" >
                         <materialDesign:PackIcon Kind="CloseCircle" Foreground="Red" VerticalAlignment="Center" />
-                        <TextBlock Margin="2,0,0,0" Foreground="{DynamicResource MaterialDesignBody}" Text="{Binding UserLogger.ErrorsCollection.Count}"/>
-                        <TextBlock Margin="5,0,0,0" Foreground="{DynamicResource MaterialDesignBody}" Text="Errors"/>
+                        <TextBlock Margin="2,0,0,0" Text="{Binding UserLogger.ErrorsCollection.Count}"/>
+                        <TextBlock Margin="5,0,0,0" Text="Errors"/>
                     </StackPanel>
                 </TabItem.Header>
                 <ListView Margin="0,0,1,0" 
@@ -125,8 +133,6 @@
                                                             AncestorType=ListView}, 
                                                             Converter={StaticResource StarWidthConverter}}"                                               
                                             DisplayMemberBinding="{Binding Message}" />
-                            <!--<GridViewColumn Header="File" Width="200"  DisplayMemberBinding="{Binding FileName}" />
-                            <GridViewColumn Header="Line" Width="100" DisplayMemberBinding="{Binding Line}" />-->
                         </GridView>
                     </ListView.View>
                 </ListView>
@@ -146,8 +152,8 @@
                 <TabItem.Header>
                     <StackPanel Orientation="Horizontal" VerticalAlignment="Center" >
                         <materialDesign:PackIcon Kind="Alert" Foreground="Orange" VerticalAlignment="Center" />
-                        <TextBlock Margin="2,0,0,0" Foreground="{DynamicResource MaterialDesignBody}" Text="{Binding UserLogger.WarningsCollection.Count}"/>
-                        <TextBlock Margin="5,0,0,0" Foreground="{DynamicResource MaterialDesignBody}" Text="Warnings"/>
+                        <TextBlock Margin="2,0,0,0"  Text="{Binding UserLogger.WarningsCollection.Count}"/>
+                        <TextBlock Margin="5,0,0,0"  Text="Warnings"/>
                     </StackPanel>
 
                 </TabItem.Header>
@@ -177,13 +183,10 @@
                     <ListView.View>
                         <GridView >
                             <GridViewColumn x:Name="WarningGridViewColumn" Header="Description"
-                                                Width="{Binding RelativeSource={RelativeSource Mode=FindAncestor,
-                                                                AncestorType=ListView}, 
-                                                                Converter={StaticResource StarWidthConverter}}" 
-                                                DisplayMemberBinding="{Binding Message}" />
-
-                            <!--<GridViewColumn Header="File" Width="200" DisplayMemberBinding="{Binding FileName}" />
-                            <GridViewColumn Header="Line" Width="100" DisplayMemberBinding="{Binding Line}" />-->
+                                            Width="{Binding RelativeSource={RelativeSource Mode=FindAncestor,
+                                                            AncestorType=ListView}, 
+                                                            Converter={StaticResource StarWidthConverter}}" 
+                                            DisplayMemberBinding="{Binding Message}" />
                         </GridView>
                     </ListView.View>
                 </ListView>
@@ -203,8 +206,8 @@
                 <TabItem.Header>
                     <StackPanel  Orientation="Horizontal"  VerticalAlignment="Center" >
                         <materialDesign:PackIcon Kind="Information" Foreground="LightBlue" VerticalAlignment="Center" />
-                        <TextBlock Margin="2,0,0,0" Foreground="{DynamicResource MaterialDesignBody}" Text="{Binding UserLogger.InformationsCollection.Count}"/>
-                        <TextBlock Margin="5,0,0,0" Foreground="{DynamicResource MaterialDesignBody}" Text="Info"/>
+                        <TextBlock Margin="2,0,0,0"  Text="{Binding UserLogger.InformationsCollection.Count}"/>
+                        <TextBlock Margin="5,0,0,0"  Text="Info"/>
                     </StackPanel>
                 </TabItem.Header>
 
@@ -243,8 +246,6 @@
                                     </DataTemplate>
                                 </GridViewColumn.CellTemplate>
                             </GridViewColumn>
-                            <!--<GridViewColumn Header="File" Width="200"  DisplayMemberBinding="{Binding FileName}" />
-                            <GridViewColumn Header="Line" Width="100" DisplayMemberBinding="{Binding Line}" />-->
                         </GridView>
                     </ListView.View>
                 </ListView>
@@ -253,8 +254,8 @@
             <TabItem Tag="HeatMapUpdate" >
                 <TabItem.Header>
                     <StackPanel  Orientation="Horizontal" VerticalAlignment="Center" >
-                        <materialDesign:PackIcon Kind="RadioTower"  VerticalAlignment="Center" />
-                        <TextBlock Margin="5,0,0,0" Foreground="{DynamicResource MaterialDesignBody}" Text="HeatMapUpdate" VerticalAlignment="Center" />
+                        <materialDesign:PackIcon Kind="RadioTower" Foreground="Black" VerticalAlignment="Center" />
+                        <TextBlock Margin="5,0,0,0" Text="HeatMapUpdate" VerticalAlignment="Center" />
                     </StackPanel>
                 </TabItem.Header>
 
@@ -293,7 +294,7 @@
                                 </Style>
                             </DataGrid.CellStyle>
                         </DataGrid>
-                        <Grid Width="200"  Height="auto">
+                        <Grid Width="Auto"  Height="auto">
 
                             <Grid.RowDefinitions>
                                 <RowDefinition Height="auto"/>
@@ -308,7 +309,7 @@
 
                                 <Label HorizontalAlignment="Right" VerticalAlignment="Center" Grid.Column="0" Content="Character 1:" />
                                 <TextBlock Grid.Column="1" VerticalAlignment="Center" TextAlignment="Left"   IsEnabled="False" >                                    
-                                        <Run FontWeight="Bold" Foreground="Black" Text="{Binding Character1Prefix }" />
+                                        <Run FontWeight="SemiBold" Foreground="Black" Text="{Binding Character1Prefix }" />
                                 </TextBlock>
                             </Grid>
 
@@ -318,9 +319,9 @@
                                     <ColumnDefinition Width="*" />
                                 </Grid.ColumnDefinitions>
 
-                                <Label HorizontalAlignment="Right" VerticalAlignment="Center" Grid.Column="0" Content="Character 2:" />
+                                <Label HorizontalAlignment="Left" VerticalAlignment="Center" Grid.Column="0" Content="Character 2:" />
                                 <TextBlock Grid.Column="1" VerticalAlignment="Center" HorizontalAlignment="Left" IsEnabled="False" >                                   
-                                        <Run FontWeight="Bold" Foreground="Black" Text="{Binding Character2Prefix}" />
+                                        <Run FontWeight="SemiBold" Foreground="Black" Text="{Binding Character2Prefix}" />
                                 </TextBlock>
                             </Grid>
                         </Grid>

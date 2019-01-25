@@ -105,6 +105,7 @@ namespace DialogGenerator.CharacterSelection
 
             mWorkflow.Configure(States.MessageProcessing)
                 .PermitReentry(Triggers.ProcessMessage)
+                .Permit(Triggers.Finish,States.Finished)
                 .Permit(Triggers.CalculateClosestPair, States.CalculatingClosestPair);
 
             mWorkflow.Configure(States.CalculatingClosestPair)

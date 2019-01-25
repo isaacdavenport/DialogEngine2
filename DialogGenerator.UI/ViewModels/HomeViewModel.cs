@@ -9,12 +9,11 @@ using Prism.Mvvm;
 using System;
 using System.Diagnostics;
 using System.IO;
-using System.Reflection;
 using System.Windows.Input;
 
 namespace DialogGenerator.UI.ViewModels
 {
-    public class MenuViewModel:BindableBase
+    public class HomeViewModel:BindableBase
     {
         #region - fields -
 
@@ -27,7 +26,7 @@ namespace DialogGenerator.UI.ViewModels
 
         #region - constructor -
 
-        public MenuViewModel(ILogger logger,IEventAggregator _eventAggregator,IMessageDialogService _messageDialogService)
+        public HomeViewModel(ILogger logger,IEventAggregator _eventAggregator,IMessageDialogService _messageDialogService)
         {
             mLogger = logger;
             mEventAggregator = _eventAggregator;

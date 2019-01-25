@@ -18,7 +18,7 @@ namespace DialogGenerator.UI.Views
 
         private void _charactersNavigationView_Loaded(object sender, System.Windows.RoutedEventArgs e)
         {
-            (this.DataContext as CharactersNavigationViewModel).Load();
+            (this.DataContext as CreateViewModel).Load();
         }
 
         private void _listView_SelectionChanged(object sender, SelectionChangedEventArgs e)

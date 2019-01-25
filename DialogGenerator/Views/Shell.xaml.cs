@@ -71,9 +71,8 @@ namespace DialogGenerator.Views
                     return;
                 }
 
-                if (parameters[1].ToString().Contains(typeof(WizardView).Name))
+                if(parameters.Length == 3)
                 {
-                    mRegionManager.Regions[Constants.NavigationRegion].RemoveAll();
                     mRegionManager.Regions[Constants.ContentRegion].Context = parameters[2] as Character;
                 }
 

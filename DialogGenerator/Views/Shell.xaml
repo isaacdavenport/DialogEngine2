@@ -15,7 +15,7 @@
         xmlns:materialDesign="http://materialdesigninxaml.net/winfx/xaml/themes"
         xmlns:inf="clr-namespace:DialogGenerator.Core;assembly=DialogGenerator.Core"
         WindowState="Maximized"
-        Background="{DynamicResource MaterialDesignPaper}"
+        Background="#f2f2f2"
         TextElement.FontWeight="Regular"
         TextElement.FontSize="13"
         TextOptions.TextFormattingMode="Ideal" 
@@ -26,23 +26,6 @@
     <materialDesign:DialogHost x:Name="MainDialogHost" Identifier="MainDialogHost"  HorizontalAlignment="Stretch" VerticalAlignment="Stretch">
 
         <Grid x:Name="mainGrid">
-            <Grid.RowDefinitions>
-                <RowDefinition Height="Auto" />
-                <RowDefinition Height="*" />
-            </Grid.RowDefinitions>
-            <Grid.ColumnDefinitions>
-                <ColumnDefinition Width="Auto" />
-                <ColumnDefinition Width="*" />
-            </Grid.ColumnDefinitions>
-
-            <!-- Menu region-->
-            <ContentControl prism:RegionManager.RegionName="{x:Static inf:Constants.MenuRegion}" Grid.ColumnSpan="2" />
-
-            <!-- Navigation region -->
-            <Border Grid.Column="0" Grid.Row="1" BorderBrush="LightGray" BorderThickness="0,0,1,0">
-                <ContentControl  prism:RegionManager.RegionName="{x:Static inf:Constants.NavigationRegion}" />
-            </Border>
-
             <!-- Content region -->
             <materialDesign:DialogHost Grid.Column="1" Grid.Row="1" Identifier="ContentDialogHost" HorizontalAlignment="Stretch" VerticalAlignment="Stretch">
                 <ContentControl Grid.Column="1"  Grid.Row="1" prism:RegionManager.RegionName="{x:Static inf:Constants.ContentRegion}" />
