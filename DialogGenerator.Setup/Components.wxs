@@ -105,9 +105,9 @@
     </ComponentGroup>
 	</Fragment>
   
-  <Fragment>
+  <!--<Fragment>
     <DirectoryRef Id="UserDocumentsFolder">      
-      <!--<Component Id="VideoFiles" Guid="4aae8932-5230-44ba-846e-1eba7b1d719e" KeyPath="yes">
+      --><!--<Component Id="VideoFiles" Guid="4aae8932-5230-44ba-846e-1eba7b1d719e" KeyPath="yes">
         <CopyFile Id="VideoDir" SourceProperty="VIDEO_DIR" DestinationDirectory="Video" SourceName="*" />
       </Component>
       <Component Id="DataFiles" Guid="99cffd35-7b93-45b9-92e3-b83341b031df" KeyPath="yes">
@@ -118,12 +118,12 @@
       </Component>
       <Component Id="AudioFiles" Guid="64d947da-8e22-4db1-898f-e9c7cd10c74b" KeyPath="yes">
         <CopyFile Id="AudioDir" SourceProperty="AUDIO_DIR" DestinationDirectory="Audio" SourceName="*" />
-      </Component>-->
+      </Component>--><!--
       <Component Id="Application.xml" Guid="fc31ce71-a5e6-4635-805a-c77dc388bca9">
         <File Id="Application.xml" Name="Application.xml" Source="$(var.DialogGenerator_TargetDir)Application.xml" />
       </Component>
     </DirectoryRef> 
-  </Fragment>
+  </Fragment>-->
 
   <!--  Tutorial folder and tutorial files inside -->
   <Fragment>

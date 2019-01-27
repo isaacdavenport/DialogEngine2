@@ -26,7 +26,7 @@
 
                     <DataTemplate x:Key="CreateNewCharacterTemplate">
                         <materialDesign:Card Width="200" Margin="10" Height="220" Background="#51cb8c" >
-                            <Grid HorizontalAlignment="Stretch" VerticalAlignment="Stretch">
+                            <Grid Style="{StaticResource CardGrid}" >
                                 <StackPanel VerticalAlignment="Center" HorizontalAlignment="Center">
                                     <materialDesign:PackIcon Kind="AccountPlus" Height="50" Width="50" Foreground="White" HorizontalAlignment="Center" />
                                     <TextBlock Text="Create new" Foreground="White" FontSize="20" HorizontalAlignment="Center" />
@@ -143,7 +143,7 @@
             <Grid  Background="White" >
                 <StackPanel Orientation="Horizontal" HorizontalAlignment="Left" VerticalAlignment="Bottom">
                     <materialDesign:Card Width="150" HorizontalAlignment="Left" VerticalAlignment="Center" Height="150" Margin="10" Background="#017a84" >
-                        <Grid>
+                        <Grid Style="{StaticResource CardGrid}">
                             <StackPanel HorizontalAlignment="Center" VerticalAlignment="Center">
                                 <materialDesign:PackIcon Kind="Home" HorizontalAlignment="Center" Height="50" Width="50" Foreground="White" />
                                 <TextBlock Text="Home" Foreground="White" FontSize="20" HorizontalAlignment="Center" VerticalAlignment="Center" />
@@ -165,7 +165,7 @@
                         <materialDesign:Card.InputBindings>
                             <MouseBinding MouseAction="LeftClick" Command="{Binding ImportCharacterCommand}" />
                         </materialDesign:Card.InputBindings>
-                        <Grid>
+                        <Grid Style="{StaticResource CardGrid}">
                             <StackPanel HorizontalAlignment="Center" VerticalAlignment="Center">
                                 <materialDesign:PackIcon Kind="FileImport" HorizontalAlignment="Center" Height="50" Width="50" Foreground="White" />
                                 <TextBlock Text="Import file" Foreground="White" FontSize="20" HorizontalAlignment="Center" VerticalAlignment="Center" />

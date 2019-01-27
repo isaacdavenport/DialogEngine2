@@ -235,7 +235,7 @@
 
                         <Grid>
                             <StackPanel HorizontalAlignment="Left" VerticalAlignment="Center" Orientation="Horizontal">
-                                <materialDesign:Card Width="150"  VerticalAlignment="Bottom" HorizontalAlignment="Left" Focusable="True" Height="150" Margin="10" Background="#017a84" >
+                                <materialDesign:Card Width="150"  VerticalAlignment="Bottom" HorizontalAlignment="Left" Height="150" Margin="10" Background="#017a84" >
                                         <materialDesign:Card.InputBindings>
                                             <MouseBinding MouseAction="LeftClick" Command="NavigationCommands.GoToPage">
                                                 <MouseBinding.CommandParameter>
@@ -246,7 +246,7 @@
                                                 </MouseBinding.CommandParameter>
                                             </MouseBinding>
                                         </materialDesign:Card.InputBindings>
-                                        <Grid>
+                                        <Grid Style="{StaticResource CardGrid}">
                                             <StackPanel HorizontalAlignment="Center" VerticalAlignment="Center">
                                                 <materialDesign:PackIcon Kind="Home" HorizontalAlignment="Center" Height="50" Width="50" Foreground="White" />
                                                 <TextBlock Text="Home" Foreground="White" FontSize="20" HorizontalAlignment="Center" VerticalAlignment="Center" />
@@ -254,7 +254,7 @@
                                         </Grid>
                                 </materialDesign:Card>
 
-                                <materialDesign:Card Width="150"  VerticalAlignment="Bottom" HorizontalAlignment="Left" Focusable="True" Height="150" Margin="10" Background="#017a84" >
+                                <materialDesign:Card Width="150"  VerticalAlignment="Bottom" HorizontalAlignment="Left"  Height="150" Margin="10" Background="#017a84" >
                                         <materialDesign:Card.InputBindings>
                                             <MouseBinding MouseAction="LeftClick" Command="NavigationCommands.GoToPage">
                                                 <MouseBinding.CommandParameter>
@@ -265,7 +265,7 @@
                                                 </MouseBinding.CommandParameter>
                                             </MouseBinding>
                                         </materialDesign:Card.InputBindings>
-                                        <Grid>
+                                        <Grid Style="{StaticResource CardGrid}">
                                             <StackPanel HorizontalAlignment="Center" VerticalAlignment="Center">
                                                 <materialDesign:PackIcon Kind="ArrowLeft" HorizontalAlignment="Center" Height="50" Width="50" Foreground="White" />
                                                 <TextBlock Text="Back" Foreground="White" FontSize="20" HorizontalAlignment="Center" VerticalAlignment="Center" />
@@ -277,7 +277,7 @@
                                         <materialDesign:Card.InputBindings>
                                             <MouseBinding MouseAction="LeftClick" Command="{Binding ExportCharacterCommand}" />
                                         </materialDesign:Card.InputBindings>
-                                        <Grid>
+                                        <Grid Style="{StaticResource CardGrid}">
                                             <StackPanel HorizontalAlignment="Center" VerticalAlignment="Center">
                                                 <materialDesign:PackIcon Kind="FileExport" HorizontalAlignment="Center" Height="50" Width="50" Foreground="White" />
                                                 <TextBlock Text="Export character" Foreground="White" FontSize="20" HorizontalAlignment="Center" VerticalAlignment="Center" />
@@ -289,7 +289,7 @@
                                         <materialDesign:Card.InputBindings>
                                             <MouseBinding MouseAction="LeftClick" Command="{Binding EditWithJSONEditorCommand}" />
                                         </materialDesign:Card.InputBindings>
-                                        <Grid>
+                                        <Grid Style="{StaticResource CardGrid}">
                                             <StackPanel HorizontalAlignment="Center" VerticalAlignment="Center">
                                                 <materialDesign:PackIcon Kind="Json" HorizontalAlignment="Center" Height="50" Width="50" Foreground="White" />
                                                 <TextBlock Text="JSON editor" Foreground="White" FontSize="20" HorizontalAlignment="Center" VerticalAlignment="Center" />
@@ -305,9 +305,10 @@
                                                         <Binding Source="{x:Type view:WizardView}" />
                                                         <Binding Path="Character.Model" />
                                                     </MultiBinding>
-                                                </MouseBinding.CommandParameter>                                            </MouseBinding>
+                                                </MouseBinding.CommandParameter>                                            
+                                            </MouseBinding>
                                         </materialDesign:Card.InputBindings>
-                                        <Grid>
+                                        <Grid Style="{StaticResource CardGrid}">
                                             <StackPanel HorizontalAlignment="Center" VerticalAlignment="Center">
                                                 <materialDesign:PackIcon Kind="AccountEdit" HorizontalAlignment="Center" Height="50" Width="50" Foreground="White" />
                                                 <TextBlock Text="Choose wizard" Foreground="White" FontSize="20" HorizontalAlignment="Center" VerticalAlignment="Center" />

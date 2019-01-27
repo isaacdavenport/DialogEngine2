@@ -51,7 +51,7 @@
       <ComponentRef Id="Data" />
       <ComponentRef Id="Audio" />
       <ComponentRef Id="Images" />
-      <ComponentRef Id="Application.xml" />
+      <!--<ComponentRef Id="Application.xml" />-->
       <Condition Level="1">NOT Installed</Condition>
     </Feature>
       

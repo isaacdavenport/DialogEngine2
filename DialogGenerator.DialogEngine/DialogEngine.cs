@@ -10,6 +10,7 @@ using DialogGenerator.Utilities;
 using Prism.Events;
 using System;
 using System.IO;
+using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 
@@ -323,7 +324,7 @@ namespace DialogGenerator.DialogEngine
                 mLogger.Debug(_debugMessage,ApplicationData.Instance.DialogLoggerKey);
                 mUserLogger.Info(_debugMessage);
 
-                if (!mContext.SameCharactersAsLast)
+                if (ApplicationData.Instance.TextDialogsOn && !mContext.SameCharactersAsLast)
                 {
                     mEventAggregator.GetEvent<ActiveCharactersEvent>().
                         Publish($" {mContext.CharactersList[mContext.Character1Num].CharacterName} , {mContext.CharactersList[mContext.Character2Num].CharacterName} ");

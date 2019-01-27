@@ -22,8 +22,8 @@ namespace DialogGenerator.UI.Converters
             {
                 PackIcon icon = new PackIcon();
                 icon.Foreground = Brushes.DarkGray;
-                icon.Height = 40;
-                icon.Width = 40;
+                icon.Height = 46;
+                icon.Width = 46;
                 icon.HorizontalAlignment = System.Windows.HorizontalAlignment.Center;
                 icon.VerticalAlignment = System.Windows.VerticalAlignment.Center;
                 icon.Kind = PackIconKind.AccountCircle;

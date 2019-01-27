@@ -240,6 +240,10 @@
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
+    <Page Include="Themes\GridStyle.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
     <Page Include="Themes\MaterialDesignThemes.GroupBox.Overrides.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>

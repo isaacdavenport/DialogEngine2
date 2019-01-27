@@ -6,6 +6,8 @@ using System;
 using System.IO;
 using System.Collections.Generic;
 using DialogGenerator.Utilities;
+using DialogGenerator.Model;
+using DialogGenerator.Model.Enum;
 
 namespace DialogGenerator
 {
@@ -141,7 +143,9 @@ namespace DialogGenerator
         private void _setInitialValues()
         {
             var characters = mCharacterRepository.GetAll();
-            var _forcedCharacters = mCharacterRepository.GetAllByState(Model.Enum.CharacterState.On);
+            characters.Insert(0, new Character { CharacterName = "", State = CharacterState.Off, FileName = $"{Guid.NewGuid()}.json" });
+
+            var _forcedCharacters = mCharacterRepository.GetAllByState(CharacterState.On);
 
             switch (_forcedCharacters.Count)
             {

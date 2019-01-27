@@ -271,12 +271,13 @@ namespace DialogGenerator.UI.ViewModels
         public void Load()
         {
             var characters = mCharacterDataProvider.GetAll();
-            var _firstCharacter = characters.FirstOrDefault();
+            //var _firstCharacter = characters.FirstOrDefault();
 
-            if(_firstCharacter == null || !string.IsNullOrEmpty(_firstCharacter.CharacterName))
-            {
-                characters.Insert(0, new Character { CharacterName = "", State = CharacterState.Off, FileName = $"{Guid.NewGuid()}.json" });
-            }
+            //if(_firstCharacter == null || !string.IsNullOrEmpty(_firstCharacter.CharacterName))
+            //{
+            //    characters.Insert(0, new Character { CharacterName = "", State = CharacterState.Off, FileName = $"{Guid.NewGuid()}.json" });
+
+            //}
 
             mCharactersCollectionViewSource.Source =  characters;
             RaisePropertyChanged(nameof(CharactersViewSource));

@@ -22,7 +22,6 @@
         TextOptions.TextRenderingMode="Auto"
         TextElement.Foreground="{DynamicResource MaterialDesignBody}">
 
-
     <materialDesign:DialogHost x:Name="MainDialogHost" Identifier="MainDialogHost"  HorizontalAlignment="Stretch" VerticalAlignment="Stretch">
 
         <Grid x:Name="mainGrid">

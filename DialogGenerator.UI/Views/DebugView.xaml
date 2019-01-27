@@ -155,7 +155,6 @@
                         <TextBlock Margin="2,0,0,0"  Text="{Binding UserLogger.WarningsCollection.Count}"/>
                         <TextBlock Margin="5,0,0,0"  Text="Warnings"/>
                     </StackPanel>
-
                 </TabItem.Header>
 
                 <ListView Margin="0,0,1,0" 
@@ -301,29 +300,19 @@
                                 <RowDefinition Height="auto"/>
                             </Grid.RowDefinitions>
 
-                            <Grid Grid.Row="0">
-                                <Grid.ColumnDefinitions>
-                                    <ColumnDefinition Width="*"/>
-                                    <ColumnDefinition Width="*"/>
-                                </Grid.ColumnDefinitions>
-
-                                <Label HorizontalAlignment="Right" VerticalAlignment="Center" Grid.Column="0" Content="Character 1:" />
-                                <TextBlock Grid.Column="1" VerticalAlignment="Center" TextAlignment="Left"   IsEnabled="False" >                                    
+                            <StackPanel Orientation="Horizontal" HorizontalAlignment="Left" Grid.Row="0">
+                                <Label HorizontalAlignment="Left" VerticalAlignment="Center" Grid.Column="0" FontSize="13" Content="Character 1:" />
+                                <TextBlock Grid.Column="1" VerticalAlignment="Center" TextAlignment="Left" FontSize="13"  IsEnabled="False" >                                    
                                         <Run FontWeight="SemiBold" Foreground="Black" Text="{Binding Character1Prefix }" />
                                 </TextBlock>
-                            </Grid>
+                            </StackPanel>
 
-                            <Grid Grid.Row="1">
-                                <Grid.ColumnDefinitions>
-                                    <ColumnDefinition Width="*"/>
-                                    <ColumnDefinition Width="*" />
-                                </Grid.ColumnDefinitions>
-
-                                <Label HorizontalAlignment="Left" VerticalAlignment="Center" Grid.Column="0" Content="Character 2:" />
+                            <StackPanel Grid.Row="1" HorizontalAlignment="Left" Orientation="Horizontal" >
+                                <Label HorizontalAlignment="Left" VerticalAlignment="Center" Grid.Column="0" FontSize="13" Content="Character 2:" />
                                 <TextBlock Grid.Column="1" VerticalAlignment="Center" HorizontalAlignment="Left" IsEnabled="False" >                                   
-                                        <Run FontWeight="SemiBold" Foreground="Black" Text="{Binding Character2Prefix}" />
+                                        <Run FontWeight="SemiBold" Foreground="Black" Text="{Binding Character2Prefix}" FontSize="13" />
                                 </TextBlock>
-                            </Grid>
+                            </StackPanel>
                         </Grid>
                     </StackPanel>
                 </Grid>
