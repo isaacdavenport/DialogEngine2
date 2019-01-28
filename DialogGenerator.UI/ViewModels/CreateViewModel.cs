@@ -20,7 +20,7 @@ using System.Windows.Data;
 
 namespace DialogGenerator.UI.ViewModels
 {
-    public class CharactersNavigationViewModel : BindableBase, INavigationViewModel
+    public class CreateViewModel : BindableBase, INavigationViewModel
     {
         #region - fields -
 
@@ -39,7 +39,7 @@ namespace DialogGenerator.UI.ViewModels
 
         #region - constructor -
 
-        public CharactersNavigationViewModel(ILogger logger,IEventAggregator _eventAggregator
+        public CreateViewModel(ILogger logger,IEventAggregator _eventAggregator
             ,IDialogDataRepository _dialogDataRepository
             ,IWizardDataProvider _wizardDataProvider
             ,IDialogModelDataProvider _dialogModelDataProvider
@@ -69,7 +69,6 @@ namespace DialogGenerator.UI.ViewModels
 
         public DelegateCommand CreateNewCharacterCommand { get; set; }
         public DelegateCommand ImportCharacterCommand { get; set; }
-        public DelegateCommand<object> ChangeCharacterStatusCommand { get; set; }
         public DelegateCommand OnlineCharactersCommand { get; set; }
 
         #endregion
@@ -85,7 +84,7 @@ namespace DialogGenerator.UI.ViewModels
             }
 
             var character = e.Item as Character;
-            if (character.CharacterName.ToUpper().Contains(FilterText.ToUpper()))
+            if (character.CharacterName.ToUpper().Contains(FilterText.ToUpper()) || string.IsNullOrEmpty(character.CharacterName))
             {
                 e.Accepted = true;
             }
@@ -104,7 +103,6 @@ namespace DialogGenerator.UI.ViewModels
         {
             CreateNewCharacterCommand = new DelegateCommand(_createNewCharacterCommand_Execute);
             ImportCharacterCommand = new DelegateCommand(_importCharacterCommand_Execute);
-            ChangeCharacterStatusCommand = new DelegateCommand<object>( (p) => _changeCharacterStatusCommand_Execute(p));
             OnlineCharactersCommand = new DelegateCommand(_onOnlineCharacters_Execute);
         }
 
@@ -113,71 +111,7 @@ namespace DialogGenerator.UI.ViewModels
             //await mMessageDialogService.ShowDedicatedDialogAsync<bool>(mOnlineCharactersDialog);
         }
 
-        private async void _changeCharacterStatusCommand_Execute(object obj)
-        {
-            try
-            {
-                var parameters = (object[])obj;
-                var character = parameters[0] as Character;
-                var _newState = (CharacterState)parameters[1];
-                int index = int.Parse(parameters[2].ToString());
-                int _forcedCharactersCount = Session.Get<int>(Constants.FORCED_CH_COUNT);
 
-                if (_newState == character.State)
-                    return;
-
-                if (_newState == CharacterState.On)
-                {                    
-                    if(_forcedCharactersCount == 0)
-                    {
-                        Session.Set(Constants.FORCED_CH_1, index);
-                        Session.Set(Constants.FORCED_CH_COUNT, 1);
-                    }
-                    else if(_forcedCharactersCount == 1)
-                    {
-                        Session.Set(Constants.FORCED_CH_2, index);
-                        Session.Set(Constants.FORCED_CH_COUNT, 2);
-                    }
-                    else
-                    {
-                        return;
-                    }
-                }
-                else
-                {
-                    if(character.State == CharacterState.On)
-                    {
-                        if (Session.Get<int>(Constants.FORCED_CH_1) == index)
-                        {
-                            Session.Set(Constants.FORCED_CH_1, -1);
-                            Session.Set(Constants.FORCED_CH_COUNT, _forcedCharactersCount - 1);
-
-                            if(Session.Get<int>(Constants.FORCED_CH_COUNT) == 1)
-                            {
-                                Session.Set(Constants.FORCED_CH_1, Session.Get<int>(Constants.FORCED_CH_2));
-                                Session.Set(Constants.FORCED_CH_2, -1);
-                            }
-                        }
-
-                        if (Session.Get<int>(Constants.FORCED_CH_2) == index)
-                        {
-                            Session.Set(Constants.FORCED_CH_2, -1);
-                            Session.Set(Constants.FORCED_CH_COUNT, _forcedCharactersCount - 1);
-                        }
-                    }
-                }
-
-                character.State = _newState;
-                await mCharacterDataProvider.SaveAsync(character);
-
-                mEventAggregator.GetEvent<ChangedCharacterStateEvent>().Publish();
-                mEventAggregator.GetEvent<StopPlayingCurrentDialogLineEvent>().Publish();
-            }
-            catch (Exception ex)
-            {
-                mLogger.Error("_changeCharacterStatusCommand_Execute " + ex.Message);
-            }
-        }
 
         private async void _importCharacterCommand_Execute()
         {
@@ -336,7 +270,16 @@ namespace DialogGenerator.UI.ViewModels
 
         public void Load()
         {
-            mCharactersCollectionViewSource.Source =  mCharacterDataProvider.GetAll();
+            var characters = mCharacterDataProvider.GetAll();
+            //var _firstCharacter = characters.FirstOrDefault();
+
+            //if(_firstCharacter == null || !string.IsNullOrEmpty(_firstCharacter.CharacterName))
+            //{
+            //    characters.Insert(0, new Character { CharacterName = "", State = CharacterState.Off, FileName = $"{Guid.NewGuid()}.json" });
+
+            //}
+
+            mCharactersCollectionViewSource.Source =  characters;
             RaisePropertyChanged(nameof(CharactersViewSource));
         }
 

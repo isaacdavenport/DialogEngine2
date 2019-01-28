@@ -6,7 +6,7 @@
 	<Product Id="*" Name="$(var.SkuName)" Language="1033" Version="$(var.VersionNumber)" 
    Manufacturer="$(var.Manufacturer)" UpgradeCode="880cbb5f-2d77-425a-8d96-a8000443c1f2">
         
-		<Package InstallerVersion="200" Compressed="yes" InstallScope="perMachine"  />
+		<Package InstallerVersion="200" Compressed="yes" InstallScope="perMachine" />
 		<MajorUpgrade DowngradeErrorMessage="A newer version of [ProductName] is already installed." 
       AllowSameVersionUpgrades="yes" AllowDowngrades="no" />
 		<MediaTemplate EmbedCab="yes" />
@@ -16,6 +16,10 @@
     <Property Id="WIXUI_EXITDIALOGOPTIONALTEXT" Value="Thank you for installing Toys2Life." />
     <Property Id="ARPPRODUCTICON" Value="DialogGeneratorIcon" />    
     <Property Id="WIXUI_INSTALLDIR" Value="INSTALLDIR" />
+    <!--<Property Id="DATA_DIR" Value="$(var.DialogGenerator_TargetDir)Data" />
+    <Property Id="VIDEO_DIR" Value="$(var.DialogGenerator_TargetDir)Video" />
+    <Property Id="AUDIO_DIR" Value="$(var.DialogGenerator_TargetDir)Audio" />
+    <Property Id="IMAGES_DIR" Value="$(var.DialogGenerator_TargetDir)Images" />-->
     <Property Id="TOOLS_DIR" Value="$(var.DialogGenerator_TargetDir)Tools" />
     <Property Id="TUTORIAL_DIR" Value="$(var.DialogGenerator_TargetDir)Tutorial" />
     <Property Id="USER_DOCUMENTS_FOLDER_PATH">
@@ -30,7 +34,7 @@
 		<Feature Id="DialogEngine" Title="DialogEngine" Level="1">
 			<ComponentGroupRef Id="ProductComponents" />
       <ComponentRef Id="ApplicationShortcut" />
-      <ComponentRef Id="DesktopShortcut" />
+      <ComponentRef Id="DesktopShortcut"/>
       <ComponentRef Id="Tools"/>
       <ComponentRef Id="JSONedit.exe"/>
       <ComponentRef Id="mp3gain.exe"/>
@@ -41,17 +45,18 @@
       <ComponentRef Id="PhraseTypeGlossary.docx"/>
 		</Feature>
 
+    
     <Feature Id="Data" Title="Data" Level="1">
       <ComponentGroupRef Id="DataFiles" />
-
-      <!--
-      <ComponentRef Id="Temp" />
+      <!--<ComponentRef Id="Temp" />
       <ComponentRef Id="EditorTemp" />
       <ComponentRef Id="Video" />
       <ComponentRef Id="Data" />
+      <ComponentRef Id="Audio" />
       <ComponentRef Id="Images" />
       <ComponentRef Id="Application.xml" />
       <Condition Level="1">NOT Installed</Condition>-->
-    </Feature>      
+    </Feature>
+    
 	</Product>
 </Wix>

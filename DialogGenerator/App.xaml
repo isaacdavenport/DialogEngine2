@@ -6,6 +6,17 @@
         <ResourceDictionary>
             <ResourceDictionary.MergedDictionaries>
                 <ResourceDictionary Source="pack://application:,,,/DialogGenerator.UI;component/Themes/Generic.xaml" />
+                    <ResourceDictionary>
+                    <SolidColorBrush x:Key="PrimaryHueLightBrush" Color="#f9f9f9"/>
+                        <SolidColorBrush x:Key="PrimaryHueLightForegroundBrush" Color="Black"/>
+                    <SolidColorBrush x:Key="PrimaryHueMidBrush" Color="#51cb8c"/>
+                        <SolidColorBrush x:Key="PrimaryHueMidForegroundBrush" Color="White"/>
+                        <SolidColorBrush x:Key="PrimaryHueDarkBrush" Color="DarkBlue"/>
+                        <SolidColorBrush x:Key="PrimaryHueDarkForegroundBrush" Color="White"/>
+                        <!--  accent -->
+                        <SolidColorBrush x:Key="SecondaryAccentBrush" Color="Yellow"/>
+                        <SolidColorBrush x:Key="SecondaryAccentForegroundBrush" Color="Black"/>
+                </ResourceDictionary>
             </ResourceDictionary.MergedDictionaries>
         </ResourceDictionary>
     </Application.Resources>

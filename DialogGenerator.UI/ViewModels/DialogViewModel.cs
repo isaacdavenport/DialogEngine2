@@ -57,6 +57,8 @@ namespace DialogGenerator.UI.ViewModels
         public ICommand ConfigureDialogCommand { get; set; } 
         public ICommand ClearAllMessagesCommand { get; set; }
         public DelegateCommand<object> ChangeDebugVisibilityCommand { get; set; }
+        public DelegateCommand ViewLoadedCommand { get; set; }
+        public DelegateCommand ViewUnloadedCommand { get; set; }
 
         #endregion
 
@@ -69,6 +71,32 @@ namespace DialogGenerator.UI.ViewModels
             ConfigureDialogCommand = new DelegateCommand(_configureDialogCommand_Execute);
             ClearAllMessagesCommand = new DelegateCommand(_clearAllMessages_Execute);
             ChangeDebugVisibilityCommand = new DelegateCommand<object>(_changeDebugVisibilityCommand_Execute);
+            ViewLoadedCommand = new DelegateCommand(_viewLoaded_Execute);
+            ViewUnloadedCommand = new DelegateCommand(_viewUnloaded_Execute);
+        }
+
+        private void _viewUnloaded_Execute()
+        {
+            try
+            {
+                mDialogEngine.StopDialogEngine();
+            }
+            catch (Exception ex)
+            {
+                mLogger.Error(ex.Message);
+            }
+        }
+
+        private async void _viewLoaded_Execute()
+        {
+            try
+            {
+                await mDialogEngine.StartDialogEngine();
+            }
+            catch (Exception ex)
+            {
+                mLogger.Error(ex.Message);
+            }
         }
 
         private void _changeDebugVisibilityCommand_Execute(object param)

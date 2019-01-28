@@ -9,6 +9,7 @@ using DialogGenerator.Utilities;
 using Prism.Commands;
 using Prism.Events;
 using Prism.Mvvm;
+using Prism.Regions;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
@@ -33,25 +34,33 @@ namespace DialogGenerator.UI.ViewModels
         private ICharacterDataProvider mCharacterDataProvider;
         private IMessageDialogService mMessageDialogService;
         private IMP3Player mMP3Player;
+        private IRegionManager mRegionManager;
         private CharacterWrapper mCharacter;
         private CollectionViewSource mPhrasesCollectionViewSource;
         private string mFilterText;
         private bool mIsDialogStarted;
         private bool mIsEditing;
         private string mUniqueIdentifier;
+        private ILogger object1;
+        private IEventAggregator object2;
+        private ICharacterDataProvider object3;
+        private IMessageDialogService object4;
+        private IMP3Player object5;
         #endregion
 
         #region -constructor-
         public CharacterDetailViewModel(ILogger logger, IEventAggregator _eventAggregator
             , ICharacterDataProvider _characterDataProvider
             , IMessageDialogService  _messageDialogService
-            , IMP3Player _mp3Player)
+            , IMP3Player _mp3Player
+            , IRegionManager _regionManager)
         {
             mLogger = logger;
             mEventAggregator = _eventAggregator;
             mCharacterDataProvider = _characterDataProvider;
             mMessageDialogService = _messageDialogService;
             mMP3Player = _mp3Player;
+            mRegionManager = _regionManager;
             mPhrasesCollectionViewSource = new CollectionViewSource();
             FilterText = "";
             mPhrasesCollectionViewSource.Filter += _phrases_Filter;
@@ -60,6 +69,15 @@ namespace DialogGenerator.UI.ViewModels
             mEventAggregator.GetEvent<CharacterSelectionActionChangedEvent>().Subscribe(_onCharacterSelectionActionChanged);
 
             _bindCommands();
+        }
+
+        public CharacterDetailViewModel(ILogger object1, IEventAggregator object2, ICharacterDataProvider object3, IMessageDialogService object4, IMP3Player object5)
+        {
+            this.object1 = object1;
+            this.object2 = object2;
+            this.object3 = object3;
+            this.object4 = object4;
+            this.object5 = object5;
         }
 
         #endregion
@@ -72,6 +90,7 @@ namespace DialogGenerator.UI.ViewModels
         public ICommand ExportCharacterCommand { get; set; }
         public ICommand ChooseImageCommand { get; set; }
         public ICommand CopyToClipboardCommand { get; set; }
+        public ICommand ViewLoadedCommand { get; set; }
         public DelegateCommand<PhraseEntry> DeletePhraseCommand { get; set; }
         public DelegateCommand<string> PlayDialogLineCommand { get; set; }
 
@@ -107,10 +126,17 @@ namespace DialogGenerator.UI.ViewModels
             DeleteCommand = new DelegateCommand(_deleteCommand_Execute, _deleteCommand_CanExecute);
             EditWithJSONEditorCommand = new DelegateCommand(_editWithJSONEditorCommand_Execute, _editWithJSONEditorCommand_CanExecute);
             ExportCharacterCommand = new DelegateCommand(_exportCharacterCommand_Execute, _exportCharacterCommand_CanExecute);
-            ChooseImageCommand = new DelegateCommand(_chooseImage_Execute,_chooseImage_CanExecute);
+            ChooseImageCommand = new DelegateCommand(_chooseImage_Execute);
             CopyToClipboardCommand = new DelegateCommand(_copyToClipboard_Execute);
+            ViewLoadedCommand = new DelegateCommand(_viewLoaded_Execute);
             DeletePhraseCommand = new DelegateCommand<PhraseEntry>(_deletePhrase_Execute,_deletePrhase_CanExecute);
             PlayDialogLineCommand = new DelegateCommand<string>(_playDialogLine_Execute,_playDialogLine_CanExecute);
+        }
+
+        private void _viewLoaded_Execute()
+        {
+            var character =mRegionManager.Regions[Constants.ContentRegion].Context as Character;
+            Load(string.IsNullOrEmpty(character.CharacterPrefix) ? "" : character.CharacterPrefix);
         }
 
         private bool _deletePrhase_CanExecute(PhraseEntry arg)
@@ -137,7 +163,6 @@ namespace DialogGenerator.UI.ViewModels
             try
             {
                 MessageDialogResult result = await mMessageDialogService.ShowOKCancelDialogAsync("Are you sure about deleting this line?", "Warning");
-
                 if (result == MessageDialogResult.Cancel)
                     return;
 
@@ -180,6 +205,9 @@ namespace DialogGenerator.UI.ViewModels
         {
             try
             {
+                if (!_chooseImage_CanExecute())
+                    return;
+
                 System.Windows.Forms.OpenFileDialog _openFileDialog = new System.Windows.Forms.OpenFileDialog();
                 _openFileDialog.Filter = "Image files (*.jpg, *.jpeg, *.jpe, *.jfif, *.png) | *.jpg; *.jpeg; *.jpe; *.jfif; *.png";
 

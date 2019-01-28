@@ -1,4 +1,5 @@
-﻿using System.Windows;
+﻿using Prism.Regions;
+using System.Windows;
 using System.Windows.Controls;
 
 namespace DialogGenerator.UI.Views
