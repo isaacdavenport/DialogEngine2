@@ -16,10 +16,10 @@
     <Property Id="WIXUI_EXITDIALOGOPTIONALTEXT" Value="Thank you for installing Toys2Life." />
     <Property Id="ARPPRODUCTICON" Value="DialogGeneratorIcon" />    
     <Property Id="WIXUI_INSTALLDIR" Value="INSTALLDIR" />
-    <Property Id="DATA_DIR" Value="$(var.DialogGenerator_TargetDir)Data" />
+    <!--<Property Id="DATA_DIR" Value="$(var.DialogGenerator_TargetDir)Data" />
     <Property Id="VIDEO_DIR" Value="$(var.DialogGenerator_TargetDir)Video" />
     <Property Id="AUDIO_DIR" Value="$(var.DialogGenerator_TargetDir)Audio" />
-    <Property Id="IMAGES_DIR" Value="$(var.DialogGenerator_TargetDir)Images" />
+    <Property Id="IMAGES_DIR" Value="$(var.DialogGenerator_TargetDir)Images" />-->
     <Property Id="TOOLS_DIR" Value="$(var.DialogGenerator_TargetDir)Tools" />
     <Property Id="TUTORIAL_DIR" Value="$(var.DialogGenerator_TargetDir)Tutorial" />
     <Property Id="USER_DOCUMENTS_FOLDER_PATH">
@@ -44,16 +44,21 @@
       <ComponentRef Id="PhraseTypeGlossary.docx"/>
 		</Feature>
 
+    
     <Feature Id="Data" Title="Data" Level="1">
-      <ComponentRef Id="Temp" />
+      <ComponentGroupRef Id="DataFiles" />
+      <ComponentRef Id="fff"/>
+      <!--<ComponentRef Id="Temp" />
       <ComponentRef Id="EditorTemp" />
       <ComponentRef Id="Video" />
       <ComponentRef Id="Data" />
       <ComponentRef Id="Audio" />
       <ComponentRef Id="Images" />
-      <!--<ComponentRef Id="Application.xml" />-->
-      <Condition Level="1">NOT Installed</Condition>
+      <ComponentRef Id="Application.xml" />
+      <Condition Level="1">NOT Installed</Condition>-->
     </Feature>
+
+
       
 	</Product>
 </Wix>

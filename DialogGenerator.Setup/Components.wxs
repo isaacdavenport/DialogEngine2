@@ -160,7 +160,7 @@
       </Component>    
     </DirectoryRef>
   </Fragment>
-      
+  <!--
   <Fragment>
     <Component Id="Data" Directory="Data" Guid="1aae36ae-5ee3-4992-9bb1-109566c0581f" KeyPath="yes">
       <CreateFolder />
@@ -181,7 +181,7 @@
       <CreateFolder />
     </Component>
   </Fragment>
-  <!--   -->
+  -->
   
   <!--<Fragment>
     <DirectoryRef Id="UserDocumentsFolder">
@@ -193,6 +193,13 @@
   </Fragment>-->
   
   <!-- Add application to program menu -->
+
+  <Fragment>
+    <Component Id="fff" Guid="f94578a0-1e8c-4920-a7c4-c5bdea39340c" Directory="DataFolder">
+      <CreateFolder />
+    </Component>
+  </Fragment>
+  
   <Fragment>
     <DirectoryRef Id="ApplicationProgramsFolder">
       <Component Id="ApplicationShortcut" Guid="4b8cf9eb-43ae-43c6-b8e8-2fed92a1af46">

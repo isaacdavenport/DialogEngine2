@@ -1,0 +1,26 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Wix xmlns="http://schemas.microsoft.com/wix/2006/wi">
+    <Fragment>
+        <DirectoryRef Id="DataFolder">
+            <Directory Id="dirD8F55AB23910A4D7B3DD5FB229E3AEBA" Name="Audio" />
+            <Directory Id="dir2D8468FCD13CA657E52A81EC9BCAD2FB" Name="Data" />
+            <Directory Id="dirCC781AAE351457540D978B937FA3F0F0" Name="EditorTemp" />
+            <Directory Id="dir4C846E997FDE299C0F69F365EC6CFC0C" Name="Images" />
+            <Directory Id="dir60FE8674BAD8BA5A760E24CFA02FEBB3" Name="Log" />
+            <Directory Id="dir538142187E0EC39EE6EF5420D1EDDB29" Name="Temp" />
+            <Directory Id="dir1755F2FDF1C51B9BAF86418374D5835C" Name="Video" />
+        </DirectoryRef>
+    </Fragment>
+    <Fragment>
+        <ComponentGroup Id="DataFiles">
+            <Component Permanent="yes" KeyPath="yes" Id="cmp4C18AD20A095DE870D8694E1F9B87989" Directory="DataFolder" Guid="{ABC6178C-8EBE-41D4-B411-FA557EBAA49C}" />
+            <Component Permanent="yes" Id="cmpE1B31AD6E0F266EEDB4261F768890AE2" Directory="dirD8F55AB23910A4D7B3DD5FB229E3AEBA" Guid="{6A96BB5C-BDEA-496A-89A3-23DF0C518B28}" KeyPath="yes" />
+            <Component Permanent="yes" KeyPath="yes" Id="cmp92994BE05D048067F0E51FFC66BF5CD1" Directory="dir2D8468FCD13CA657E52A81EC9BCAD2FB" Guid="{1276C90D-A4BA-4B2A-9E41-DE7B005CCC4F}" />
+            <Component Permanent="yes" Id="cmp9F3590D2ECB2387F93A3C6282646F3B1" Directory="dirCC781AAE351457540D978B937FA3F0F0" Guid="{6C428FF9-8136-4F23-923F-CD5DEE2BDE87}" KeyPath="yes" />
+            <Component Permanent="yes" Id="cmpED7B7B4F9F784F28CA5AAACADD7921A6" Directory="dir4C846E997FDE299C0F69F365EC6CFC0C" Guid="{CF780144-79D2-4445-95FF-540979F1889F}" KeyPath="yes" />
+            <Component Permanent="yes" Id="cmpAFB83D32001DCF63B5CB567B3A692357" Directory="dir60FE8674BAD8BA5A760E24CFA02FEBB3" Guid="{75C78D6A-FF6A-41C4-A873-CF1387CC4EF4}" KeyPath="yes" />
+            <Component Permanent="yes" Id="cmp92D8B904F9983B06F8BE9465A96CC617" Directory="dir538142187E0EC39EE6EF5420D1EDDB29" Guid="{5899CD0D-291A-4963-896C-DFAA092C2CAD}" KeyPath="yes" />
+            <Component Permanent="yes" Id="cmp22F5D7F9FCE16B3FC4484A2ADA4A7BC6" Directory="dir1755F2FDF1C51B9BAF86418374D5835C" Guid="{46A3F8DF-926F-43A0-B22E-09A16ACE2F5B}" KeyPath="yes" />
+        </ComponentGroup>
+    </Fragment>
+</Wix>
