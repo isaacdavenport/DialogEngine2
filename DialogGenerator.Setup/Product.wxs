@@ -34,6 +34,7 @@
 		<Feature Id="DialogEngine" Title="DialogEngine" Level="1">
 			<ComponentGroupRef Id="ProductComponents" />
       <ComponentRef Id="ApplicationShortcut" />
+      <ComponentRef Id="DesktopShortcut"/>
       <ComponentRef Id="Tools"/>
       <ComponentRef Id="JSONedit.exe"/>
       <ComponentRef Id="mp3gain.exe"/>
@@ -47,7 +48,6 @@
     
     <Feature Id="Data" Title="Data" Level="1">
       <ComponentGroupRef Id="DataFiles" />
-      <ComponentRef Id="fff"/>
       <!--<ComponentRef Id="Temp" />
       <ComponentRef Id="EditorTemp" />
       <ComponentRef Id="Video" />
@@ -57,8 +57,6 @@
       <ComponentRef Id="Application.xml" />
       <Condition Level="1">NOT Installed</Condition>-->
     </Feature>
-
-
-      
+    
 	</Product>
 </Wix>

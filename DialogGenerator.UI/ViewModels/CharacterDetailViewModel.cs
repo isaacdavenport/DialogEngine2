@@ -41,6 +41,11 @@ namespace DialogGenerator.UI.ViewModels
         private bool mIsDialogStarted;
         private bool mIsEditing;
         private string mUniqueIdentifier;
+        private ILogger object1;
+        private IEventAggregator object2;
+        private ICharacterDataProvider object3;
+        private IMessageDialogService object4;
+        private IMP3Player object5;
         #endregion
 
         #region -constructor-
@@ -64,6 +69,15 @@ namespace DialogGenerator.UI.ViewModels
             mEventAggregator.GetEvent<CharacterSelectionActionChangedEvent>().Subscribe(_onCharacterSelectionActionChanged);
 
             _bindCommands();
+        }
+
+        public CharacterDetailViewModel(ILogger object1, IEventAggregator object2, ICharacterDataProvider object3, IMessageDialogService object4, IMP3Player object5)
+        {
+            this.object1 = object1;
+            this.object2 = object2;
+            this.object3 = object3;
+            this.object4 = object4;
+            this.object5 = object5;
         }
 
         #endregion

@@ -209,5 +209,13 @@
         <RegistryValue Root="HKCU" Key="Software\[Manufacturer]\[ProductName]" Type="integer" Value="1" KeyPath="yes"  />
       </Component>
     </DirectoryRef>
+
+    <DirectoryRef Id="DesktopFolder">
+      <Component Id="DesktopShortcut" Guid="30d36332-90a0-4078-9e9d-e6fa8d1f1bf6" >
+        <Shortcut Id="ApplicationDesktopShortcut" Name="Dialog generator"  Target="[#DialogGenerator.exe]" WorkingDirectory="INSTALLFOLDER" />
+        <RemoveFolder Id="RemoveDesktopFolder" Directory="DesktopFolder" On="uninstall" />
+        <RegistryValue Root="HKCU" Key="Software\[Manufacturer]\[ProductName]" Name="installed" Type="integer" Value="1" KeyPath="yes" />
+      </Component>
+    </DirectoryRef>
   </Fragment>  
 </Wix>

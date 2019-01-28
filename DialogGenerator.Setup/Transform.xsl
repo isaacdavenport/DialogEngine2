@@ -14,9 +14,11 @@ xmlns:wix="http://schemas.microsoft.com/wix/2006/wi">
 
   <xsl:template match="wix:Component">
     <xsl:copy>
+
       <xsl:attribute name="Permanent">yes</xsl:attribute>
-      <xsl:attribute name="KeyPath">yes</xsl:attribute>
-      <xsl:copy-of select="@*"/>
+
+      <xsl:apply-templates select="@*|node()"/>
+
     </xsl:copy>
   </xsl:template>
 

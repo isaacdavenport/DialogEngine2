@@ -29,10 +29,7 @@
         <Directory Id="ApplicationProgramsFolder" Name="DialogGenerator"/>
       </Directory>
 
-      <Directory Id="DesktopFolder">
-        
-      </Directory>
-            
+      <Directory Id="DesktopFolder" Name="Desktop" />            
     </Directory>
   </Fragment>
 </Wix>
