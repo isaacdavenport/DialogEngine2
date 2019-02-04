@@ -9,6 +9,7 @@
              xmlns:materialDesign="http://materialdesigninxaml.net/winfx/xaml/themes"
              xmlns:vm="clr-namespace:DialogGenerator.UI.ViewModels"
              xmlns:inf="clr-namespace:DialogGenerator.Core;assembly=DialogGenerator.Core"
+             xmlns:i="clr-namespace:System.Windows.Interactivity;assembly=System.Windows.Interactivity" 
              prism:ViewModelLocator.AutoWireViewModel="True"
              mc:Ignorable="d" 
              d:DesignHeight="450" d:DesignWidth="800">
@@ -26,22 +27,9 @@
                     <converters:DollNumberToAssignedCharacterValueConverter x:Key="DollNumberToAssignedCharacterValueConverter" />
                     <converters:DollNumberToAssignedChForegroundValueConverter x:Key="DollNumberToAssignedChForegroundValueConverter" />
                     <converters:DollToAssignedCharacterValueConverter x:Key="DollToAssignedCharacterValueConverter" />
+                    <converters:DollNumberToAssignedCharacterImageValueConverter x:Key="DollNumberToAssignedCharacterImageValueConverter" />
 
                     <vm:AssignCharactersToDollsBindingProxy x:Key="viewModel" ViewModel="{Binding}" />
-                    
-                    <DataTemplate x:Key="AssignedCharacterTemplate">
-                        <Grid>
-                            <Grid.ColumnDefinitions>
-                                <ColumnDefinition Width="*" />
-                                <ColumnDefinition Width="auto"/>
-                            </Grid.ColumnDefinitions>
-                            <TextBlock Text="{Binding Path=CharacterName}"/>
-                            <TextBlock HorizontalAlignment="Right" Grid.Column="1" Margin="10,0,0,0" Text="{Binding Path=RadioNum}" Foreground="Orange"/>
-                        </Grid>
-                    </DataTemplate>
-                    <DataTemplate x:Key="UnassignedCharacterTemplate">
-                        <TextBlock Text="{Binding}" />
-                    </DataTemplate>
                 </ResourceDictionary>
                 <ResourceDictionary Source="pack://application:,,,/MaterialDesignThemes.Wpf;component/Themes/MaterialDesignTheme.Flipper.xaml" />
             </ResourceDictionary.MergedDictionaries>
@@ -67,22 +55,25 @@
                         <DataTemplate>
                             <materialDesign:Flipper Style="{StaticResource MaterialDesignCardFlipper}">
                                 <materialDesign:Flipper.FrontContent>
-                                    <Grid Height="256" Width="200">
+                                    <Grid Height="265" Width="200">
                                         <Grid.RowDefinitions>
+                                            <RowDefinition Height="30" />
                                             <RowDefinition Height="160" />
                                             <RowDefinition Height="*" />
                                         </Grid.RowDefinitions>
-                                        <materialDesign:ColorZone Mode="PrimaryLight" VerticalAlignment="Stretch">
+                                        <StackPanel Grid.Row="0" Orientation="Horizontal"   VerticalAlignment="Center" HorizontalAlignment="Center">
+                                          <TextBlock Text="Doll" FontWeight="SemiBold" FontSize="15"  HorizontalAlignment="Center" VerticalAlignment="Bottom"/>
+                                          <TextBlock Text="{Binding}"  Margin="5,0,0,0" FontSize="15" FontWeight="SemiBold" />
+                                        </StackPanel>
+                                        <materialDesign:ColorZone Grid.Row="1" Mode="PrimaryLight" VerticalAlignment="Stretch">
                                             <Grid HorizontalAlignment="Stretch" VerticalAlignment="Stretch">
-                                                <Ellipse HorizontalAlignment="Center" Stroke="DarkGray" Fill="DarkGray"  VerticalAlignment="Center" Height="128" Width="128"/>
-                                                <StackPanel Orientation="Horizontal"   VerticalAlignment="Center" HorizontalAlignment="Center">
-                                                    <TextBlock Text="Doll" FontWeight="SemiBold" FontSize="15"  HorizontalAlignment="Center" VerticalAlignment="Bottom"/>
-                                                    <TextBlock Text="{Binding}"  Margin="5,0,0,0" FontSize="15" FontWeight="SemiBold" />
-                                                </StackPanel>
+                                              <materialDesign:ColorZone Mode="PrimaryLight" VerticalAlignment="Stretch"
+                                                            Content="{Binding Converter={StaticResource DollNumberToAssignedCharacterImageValueConverter}}" >
+                                              </materialDesign:ColorZone>
                                             </Grid>
                                         </materialDesign:ColorZone>
-                                        <StackPanel Grid.Row="1" HorizontalAlignment="Center" VerticalAlignment="Center">
-                                            <TextBlock Text="{Binding Converter={StaticResource DollNumberToAssignedCharacterValueConverter}}" 
+                                        <StackPanel Grid.Row="2" HorizontalAlignment="Center" VerticalAlignment="Center">
+                                            <TextBlock FontSize="16" Text="{Binding Converter={StaticResource DollNumberToAssignedCharacterValueConverter}}" 
                                                        FontWeight="Bold" Margin="5" HorizontalAlignment="Center"
                                                        Foreground="{Binding Converter={StaticResource DollNumberToAssignedChForegroundValueConverter}}"  />
                                             <Button Style="{StaticResource MaterialDesignFlatButton}" 
@@ -91,7 +82,7 @@
                                     </Grid>
                                 </materialDesign:Flipper.FrontContent>
                                 <materialDesign:Flipper.BackContent>
-                                    <Grid Height="256" Width="200">
+                                    <Grid Height="265" Width="200">
                                         <Grid.RowDefinitions>
                                             <RowDefinition Height="Auto" />
                                             <RowDefinition Height="*" />
@@ -111,35 +102,28 @@
                                                 <RowDefinition />
                                                 <RowDefinition />
                                             </Grid.RowDefinitions>
-                                            <ComboBox ItemsSource="{Binding Source={StaticResource viewModel}, Path=ViewModel.Characters}"
-                                                      Style="{StaticResource MaterialDesignFloatingHintComboBox}"
-                                                      materialDesign:HintAssist.Hint="Select character:"
-                                                      materialDesign:HintAssist.IsFloating="True"
-                                                      Width="156" HorizontalContentAlignment="Stretch" 
-                                                      SelectedValue="{Binding Converter={StaticResource DollToAssignedCharacterValueConverter}, Mode=OneWay}" 
-                                                      x:Name="CharactersCbx"
-                                                      x:Uid="CharactersCbx"
-                                                      ItemTemplateSelector="{Binding Converter={StaticResource CharacterDataTemplateSelectorValueConverter}}"
-                                                      Margin="10,10,0,10" HorizontalAlignment="Left" />
-                                            <Button Style="{StaticResource MaterialDesignFlatButton}" Grid.Row="1" Margin="0 4 0 0" Content="Save changes"
-                                                    Command="{Binding Source={StaticResource viewModel}, Path=ViewModel.SaveConfigurationCommand}"  >
-                                                <Button.CommandParameter>
+                                          <ComboBox ItemsSource="{Binding Source={StaticResource viewModel}, Path=ViewModel.Characters}"
+                                                    Style="{StaticResource MaterialDesignFloatingHintComboBox}"
+                                                    materialDesign:HintAssist.Hint="Select character:"
+                                                    materialDesign:HintAssist.IsFloating="True"
+                                                    Width="156" HorizontalContentAlignment="Stretch"
+                                                    SelectedValue="{Binding Converter={StaticResource DollToAssignedCharacterValueConverter}, Mode=OneWay}"
+                                                    x:Name="CharactersCbx"
+                                                    x:Uid="CharactersCbx"
+                                                    Margin="10,10,0,10" HorizontalAlignment="Left">
+                                            <i:Interaction.Triggers>
+                                              <i:EventTrigger EventName="SelectionChanged">
+                                                <i:InvokeCommandAction Command="{Binding Source={StaticResource viewModel}, Path=ViewModel.SaveConfigurationCommand}">
+                                                  <i:InvokeCommandAction.CommandParameter>
                                                     <MultiBinding Converter="{StaticResource CloneValuesConverter}">
-                                                        <Binding />
-                                                        <Binding Path="." RelativeSource="{RelativeSource Mode=Self}"  />
+                                                      <Binding />
+                                                      <Binding RelativeSource="{RelativeSource Mode=FindAncestor, AncestorType={x:Type ComboBox}}"  />
                                                     </MultiBinding>
-                                                </Button.CommandParameter>
-                                            </Button>
-                                            <Button Style="{StaticResource MaterialDesignFlatButton}" Grid.Row="2"  Margin="0 4 0 0" Content="Reset" 
-                                                    Command="{Binding Source={StaticResource viewModel}, Path=ViewModel.UnbindCharacterCommand}">
-                                                <Button.CommandParameter>
-                                                    <MultiBinding Converter="{StaticResource CloneValuesConverter}">
-                                                        <Binding />
-                                                        <Binding Path="." RelativeSource="{RelativeSource Mode=Self}" />
-                                                    </MultiBinding>
-                                                </Button.CommandParameter>
-                                            </Button>
-
+                                                 </i:InvokeCommandAction.CommandParameter>                                                 
+                                                </i:InvokeCommandAction>
+                                              </i:EventTrigger>
+                                            </i:Interaction.Triggers>
+                                          </ComboBox>
                                         </Grid>
                                     </Grid>
                                 </materialDesign:Flipper.BackContent>

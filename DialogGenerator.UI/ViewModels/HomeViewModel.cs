@@ -43,7 +43,6 @@ namespace DialogGenerator.UI.ViewModels
 
         public ICommand ReadTutorialCommand { get; set; }
         public ICommand AboutToys2LifeCommand { get; set; }
-        public ICommand OpenSettingsDialogCommand { get; set; }
         public ICommand CheckForUpdatesCommand { get; set; }
 
         #endregion
@@ -54,7 +53,6 @@ namespace DialogGenerator.UI.ViewModels
         {
             ReadTutorialCommand = new DelegateCommand(_onReadTutorial_Execute);
             AboutToys2LifeCommand = new DelegateCommand(_onAboutToys2Life_Execute);
-            OpenSettingsDialogCommand = new DelegateCommand(_onOpenSettingsDialog_Execute);
             CheckForUpdatesCommand = new DelegateCommand(_onCheckForUpdates_Execute);
         }
 

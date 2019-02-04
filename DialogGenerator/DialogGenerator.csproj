@@ -229,6 +229,9 @@
     </COMReference>
   </ItemGroup>
   <ItemGroup>
+    <Resource Include="Resources\logo.jpg">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Resource>
     <Content Include="Resources\Silence.mp3" />
     <Resource Include="Resources\T2L_C.jpg.ico" />
   </ItemGroup>

@@ -118,11 +118,13 @@
     <Compile Include="Converters\CharacterStateToColorValueConverter.cs" />
     <Compile Include="Converters\CloneValuesConverter.cs" />
     <Compile Include="Converters\DivideBy2ValueConverter.cs" />
+    <Compile Include="Converters\DollNumberToAssignedCharacterImageValueConverter.cs" />
     <Compile Include="Converters\DollNumberToAssignedCharacterValueConverter.cs" />
     <Compile Include="Converters\DollNumberToAssignedChForegroundValueConverter.cs" />
     <Compile Include="Converters\DollStatusColorValueConverter.cs" />
     <Compile Include="Converters\DollStatusValueConverter.cs" />
     <Compile Include="Converters\DollToAssignedCharacterValueConverter.cs" />
+    <Compile Include="Converters\EndWizardBtnVisibilityConverter.cs" />
     <Compile Include="Converters\ImageContentSmallSizeValueConverter.cs" />
     <Compile Include="Converters\ImageContentValueConverter.cs" />
     <Compile Include="Converters\ImageToFullPathValueConverter.cs" />
@@ -349,10 +351,6 @@
       <LastGenOutput>Settings.Designer.cs</LastGenOutput>
     </None>
   </ItemGroup>
-  <ItemGroup>
-    <None Include="App.config" />
-  </ItemGroup>
-  <ItemGroup />
   <ItemGroup>
     <ProjectReference Include="..\DialogGenerator.Core\DialogGenerator.Core.csproj">
       <Project>{de5ab434-bc15-4a64-b275-3e7379d6fcfd}</Project>

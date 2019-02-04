@@ -35,7 +35,7 @@
                                                           Content="{Binding CharacterImage,Converter={StaticResource ImageContentValueConverter}}" VerticalAlignment="Stretch">
                                 </materialDesign:ColorZone>
                                 <StackPanel Grid.Row="1" Margin="8 15 8 15" HorizontalAlignment="Center" Orientation="Vertical" >
-                                    <TextBlock FontWeight="SemiBold" Text="{Binding CharacterName}" HorizontalAlignment="Center"></TextBlock>
+                                    <TextBlock FontSize="16" FontWeight="Bold" Text="{Binding CharacterName}" HorizontalAlignment="Center"></TextBlock>
                                     <StackPanel Orientation="Horizontal">
                                         <TextBlock Margin="0,6,0,0" FontWeight="Bold" Text="{Binding State,Converter={StaticResource CharaccterStateToNameValueConverter}}" />
                                         <materialDesign:PopupBox Width="25"

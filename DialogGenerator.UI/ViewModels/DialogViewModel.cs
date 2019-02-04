@@ -56,6 +56,7 @@ namespace DialogGenerator.UI.ViewModels
         public ICommand StopDialogCommand { get; set; }
         public ICommand ConfigureDialogCommand { get; set; } 
         public ICommand ClearAllMessagesCommand { get; set; }
+        public ICommand OpenSettingsDialogCommand { get; set; }
         public DelegateCommand<object> ChangeDebugVisibilityCommand { get; set; }
         public DelegateCommand ViewLoadedCommand { get; set; }
         public DelegateCommand ViewUnloadedCommand { get; set; }
@@ -70,6 +71,7 @@ namespace DialogGenerator.UI.ViewModels
             StopDialogCommand = new DelegateCommand(_stopDialogCommand_Execute);
             ConfigureDialogCommand = new DelegateCommand(_configureDialogCommand_Execute);
             ClearAllMessagesCommand = new DelegateCommand(_clearAllMessages_Execute);
+            OpenSettingsDialogCommand = new DelegateCommand(_onOpenSettingsDialog_Execute);
             ChangeDebugVisibilityCommand = new DelegateCommand<object>(_changeDebugVisibilityCommand_Execute);
             ViewLoadedCommand = new DelegateCommand(_viewLoaded_Execute);
             ViewUnloadedCommand = new DelegateCommand(_viewUnloaded_Execute);
@@ -123,6 +125,11 @@ namespace DialogGenerator.UI.ViewModels
         private void _clearAllMessages_Execute()
         {
             DialogLinesCollection.Clear();
+        }
+
+        private async void _onOpenSettingsDialog_Execute()
+        {
+            await mMessageDialogService.ShowDedicatedDialogAsync<int?>(new SettingsDialog());
         }
 
         private async void _configureDialogCommand_Execute()

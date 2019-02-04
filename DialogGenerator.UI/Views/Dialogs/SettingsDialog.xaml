@@ -13,7 +13,7 @@
             <converters:InvertValueConverter x:Key="InvertValueConverter" />
         </ResourceDictionary>
     </UserControl.Resources>
-    <GroupBox   
+    <GroupBox Background="WhiteSmoke"
               BorderThickness="0" 
               Style="{DynamicResource MaterialDesignGroupBox}"  
               UseLayoutRounding="True" 
@@ -56,42 +56,37 @@
                 <RowDefinition Height="auto" />
                 <RowDefinition Height="auto" />
                 <RowDefinition Height="auto" />
-                <RowDefinition Height="auto" />
             </Grid.RowDefinitions>
 
             <Label Content="Check tag usage:" Margin="10" HorizontalAlignment="Right" />
-            <ToggleButton Grid.Column="2" Margin="10" Background="LightGray"
+            <ToggleButton Grid.Column="2" Margin="10" Foreground="#F5FFFA"
                           IsChecked="{Binding Settings.TagUsageCheck,UpdateSourceTrigger=PropertyChanged,Mode=TwoWay}" HorizontalAlignment="Left" />
 
             <Label Content="Text dialog enabled:" Margin="10" HorizontalAlignment="Right"  Grid.Row="1" />
-            <ToggleButton Grid.Row="1" Grid.Column="2" Margin="10" 
+            <ToggleButton Grid.Row="1" Grid.Column="2" Margin="10" Foreground="#F5FFFA"
                           IsChecked="{Binding Settings.TextDialogsOn, UpdateSourceTrigger=PropertyChanged,Mode=TwoWay}" HorizontalAlignment="Left" />
 
-            <Label Content="Selection by dolls:" Margin="10" HorizontalAlignment="Right" Grid.Row="2" />
-            <ToggleButton Grid.Row="2" Margin="10" IsChecked="{Binding Settings.UseSerialPort,UpdateSourceTrigger=PropertyChanged,Mode=TwoWay}" 
-                          HorizontalAlignment="Left" Grid.Column="2" />
-
-            <Label Content="Max time for playing of .mp3 file(seconds):" Margin="10" Grid.Row="3" HorizontalAlignment="Right" />
-            <TextBox Grid.Row="3" MinWidth="75" Text="{Binding Settings.MaxTimeToPlayFile, UpdateSourceTrigger=LostFocus,Mode=TwoWay}" 
+            <Label Content="Max time for playing of .mp3 file(seconds):" Margin="10" Grid.Row="2" HorizontalAlignment="Right" />
+            <TextBox Grid.Row="2" MinWidth="75" Text="{Binding Settings.MaxTimeToPlayFile, UpdateSourceTrigger=LostFocus,Mode=TwoWay}" 
                      HorizontalAlignment="Left" Margin="10" Grid.Column="2" materialDesign:ValidationAssist.UsePopup="True" />
 
-            <Label Content="Current parental rating:" Grid.Column="0" HorizontalAlignment="Right" Margin="10" Grid.Row="5" />
-            <TextBox Grid.Row="5" MinWidth="75" Text="{Binding Settings.CurrentParentalRating,UpdateSourceTrigger=PropertyChanged,Mode=TwoWay}" 
+            <Label Content="Current parental rating:" Grid.Column="0" HorizontalAlignment="Right" Margin="10" Grid.Row="4" />
+            <TextBox Grid.Row="4" MinWidth="75" Text="{Binding Settings.CurrentParentalRating,UpdateSourceTrigger=PropertyChanged,Mode=TwoWay}" 
                      HorizontalAlignment="Left" Margin="10" Grid.Column="2" materialDesign:ValidationAssist.UsePopup="True" />
 
-            <Label Content="Delay between phrases(seconds):" Grid.Column="0" HorizontalAlignment="Right" Margin="10" Grid.Row="6" />
-            <TextBox Grid.Row="6" MinWidth="75" Text="{Binding Settings.DelayBetweenPhrases,UpdateSourceTrigger=LostFocus,Mode=TwoWay}" 
+            <Label Content="Delay between phrases(seconds):" Grid.Column="0" HorizontalAlignment="Right" Margin="10" Grid.Row="5" />
+            <TextBox Grid.Row="5" MinWidth="75" Text="{Binding Settings.DelayBetweenPhrases,UpdateSourceTrigger=LostFocus,Mode=TwoWay}" 
                      HorizontalAlignment="Left" Margin="10" Grid.Column="2" materialDesign:ValidationAssist.UsePopup="True" />
 
-            <Label Content="Dlg models completed(random mode):" Grid.Column="0" HorizontalAlignment="Right" Margin="10" Grid.Row="7" />
-            <TextBox Grid.Row="7" MinWidth="75" Text="{Binding Settings.NumberOfDialogModelsCompleted,UpdateSourceTrigger=PropertyChanged,Mode=TwoWay}" 
+            <Label Content="Dlg models completed(random mode):" Grid.Column="0" HorizontalAlignment="Right" Margin="10" Grid.Row="6" />
+            <TextBox Grid.Row="6" MinWidth="75" Text="{Binding Settings.NumberOfDialogModelsCompleted,UpdateSourceTrigger=PropertyChanged,Mode=TwoWay}" 
                      HorizontalAlignment="Left" Margin="10" Grid.Column="2" materialDesign:ValidationAssist.UsePopup="True" />
 
             <Button Content="Close"
                     x:Name="CloseBtn"
                     Style="{StaticResource MaterialDesignRaisedButton}"
                     Grid.ColumnSpan="3"
-                    Grid.Row="8"
+                    Grid.Row="7"
                     IsEnabled="{Binding Settings.HasErrors,Converter={StaticResource InvertValueConverter}}"
                     Command="{Binding CloseCommand}"
                     Margin="0,20,0,0"

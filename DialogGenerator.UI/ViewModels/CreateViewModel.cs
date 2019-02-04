@@ -11,6 +11,7 @@ using Prism.Events;
 using Prism.Mvvm;
 using System;
 using System.Collections.Generic;
+using System.Collections.ObjectModel;
 using System.ComponentModel;
 using System.IO;
 using System.IO.Compression;
@@ -270,14 +271,9 @@ namespace DialogGenerator.UI.ViewModels
 
         public void Load()
         {
-            var characters = mCharacterDataProvider.GetAll();
-            //var _firstCharacter = characters.FirstOrDefault();
+            var characters = new ObservableCollection<Character>(mCharacterDataProvider.GetAll());
 
-            //if(_firstCharacter == null || !string.IsNullOrEmpty(_firstCharacter.CharacterName))
-            //{
-            //    characters.Insert(0, new Character { CharacterName = "", State = CharacterState.Off, FileName = $"{Guid.NewGuid()}.json" });
-
-            //}
+            characters.Insert(0, new Character { CharacterName = "", State = CharacterState.Off, FileName = $"{Guid.NewGuid()}.json" });
 
             mCharactersCollectionViewSource.Source =  characters;
             RaisePropertyChanged(nameof(CharactersViewSource));

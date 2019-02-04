@@ -40,7 +40,6 @@ namespace DialogGenerator.UI.ViewModels
 
         #region - commands -
 
-        public DelegateCommand<object> UnbindCharacterCommand { get; set; }
         public DelegateCommand<object> SaveConfigurationCommand { get; set; }
 
         #endregion
@@ -49,16 +48,13 @@ namespace DialogGenerator.UI.ViewModels
 
         private void _bindCommands()
         {
-            UnbindCharacterCommand = new DelegateCommand<object>(_unbindCharacterCommand_Execute);
             SaveConfigurationCommand = new DelegateCommand<object>(_saveConfigurationCommand_Execute);
         }
 
         private async void _saveConfigurationCommand_Execute(object param)
         {
-            object[] parametes = (object[])param;
-            Button btn = parametes[1] as Button;
-            Grid parent = btn.Parent as Grid;
-            ComboBox cbx = (ComboBox)parent.Children[0];
+            object[] parameters = (object[])param;
+            var cbx = parameters[1] as ComboBox;
              
             int _indexOfSelectedCharacter = cbx.SelectedIndex;
             if (_indexOfSelectedCharacter < 0)
@@ -66,8 +62,8 @@ namespace DialogGenerator.UI.ViewModels
                 return;
             }
 
-            int _currentDoll = int.Parse(parametes[0].ToString());
-            var _selectedCharacter = mCharacterDataProvider.GetAll()[_indexOfSelectedCharacter];
+            int _currentDoll = int.Parse(parameters[0].ToString());
+            var _selectedCharacter = Characters[_indexOfSelectedCharacter];
 
             if(mCharacterDataProvider.GetByAssignedRadio(_currentDoll) != null)
             {
@@ -77,29 +73,15 @@ namespace DialogGenerator.UI.ViewModels
                 await mCharacterDataProvider.SaveAsync(_oldCharacter);
             }
 
-            _selectedCharacter.RadioNum = _currentDoll;
+            if (!_selectedCharacter.Unassigned)
+            {
+                _selectedCharacter.RadioNum = _currentDoll;
 
-            await mCharacterDataProvider.SaveAsync(_selectedCharacter);
+                await mCharacterDataProvider.SaveAsync(_selectedCharacter);
+            }           
 
-            var _itemsControl = VisualHelper.GetNearestContainer<ItemsControl>(parent);
+            var _itemsControl = VisualHelper.GetNearestContainer<ItemsControl>(cbx.Parent);
             _itemsControl?.Items.Refresh();
-        }
-
-        private async void _unbindCharacterCommand_Execute(object parameters)
-        {
-            var args = (object[])parameters;
-            int _dollNumber = int.Parse(args[0].ToString());
-            var _assignedCharacter = mCharacterDataProvider.GetByAssignedRadio(_dollNumber);
-
-            if (_assignedCharacter == null)
-                return;
-
-            _assignedCharacter.RadioNum = -1;
-
-            await mCharacterDataProvider.SaveAsync(_assignedCharacter);
-
-            var _itemsControl = VisualHelper.GetNearestContainer<ItemsControl>(args[1] as Button);
-            _itemsControl.Items.Refresh();
         }
 
         #endregion
@@ -108,7 +90,23 @@ namespace DialogGenerator.UI.ViewModels
 
         public ObservableCollection<Character> Characters
         {
-            get { return mCharacterDataProvider.GetAll(); }
+            get
+            {
+                var characters = new ObservableCollection<Character>(mCharacterDataProvider.GetAll());
+
+                if (!characters.Any(c => c.Unassigned))
+                {
+                    var unassigned = new Character
+                    {
+                        CharacterName = "Unassigned",
+                        Unassigned = true
+                    };
+
+                    characters.Insert(0, unassigned);
+                }
+
+                return characters;
+            }
         }
 
         public List<int> Dolls

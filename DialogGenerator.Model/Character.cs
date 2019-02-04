@@ -141,6 +141,9 @@ namespace DialogGenerator.Model
         [JsonIgnore]
         public int JsonArrayIndex { get; set; }
 
+        [JsonIgnore]
+        public bool Unassigned { get; set; }
+
         public event PropertyChangedEventHandler PropertyChanged;
         #endregion
 
