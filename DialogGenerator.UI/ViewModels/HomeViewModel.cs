@@ -65,7 +65,7 @@ namespace DialogGenerator.UI.ViewModels
         {
             if (_isStarted)
             {
-                if (ApplicationData.Instance.UseSerialPort)
+                if (ApplicationData.Instance.UseBLERadios)
                     SelectionMode = "Selection by dolls";
                 else
                     SelectionMode = "Random selection";

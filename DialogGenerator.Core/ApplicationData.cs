@@ -118,9 +118,9 @@ namespace DialogGenerator.Core
         public bool TextDialogsOn { get; set; } = true;
 
         [Editable(true)]
-        [Description(" Use serial or random selection of characters.")]
-        [DisplayName("Use serial port:")]
-        public bool UseSerialPort { get; set; } = false;
+        [Description(" Use BLE radios or random selection of characters.")]
+        [DisplayName("Use BLE radios:")]
+        public bool UseBLERadios { get; set; } = false;
 
         [Description("Determine how long current dialog can play, if new characters selected. Value is in seconds.")]
         [DisplayName("Max time to play .mp3 file:")]
