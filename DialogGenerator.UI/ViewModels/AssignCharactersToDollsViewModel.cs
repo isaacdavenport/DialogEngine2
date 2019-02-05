@@ -40,6 +40,7 @@ namespace DialogGenerator.UI.ViewModels
 
         #region - commands -
 
+        public DelegateCommand ViewLoadedCommand { get; set; }
         public DelegateCommand<object> SaveConfigurationCommand { get; set; }
 
         #endregion
@@ -48,7 +49,14 @@ namespace DialogGenerator.UI.ViewModels
 
         private void _bindCommands()
         {
+            ViewLoadedCommand = new DelegateCommand(_viewLoaded_Execute);
             SaveConfigurationCommand = new DelegateCommand<object>(_saveConfigurationCommand_Execute);
+        }
+
+        private void _viewLoaded_Execute()
+        {
+            ApplicationData.Instance.UseBLERadios = true;
+            ApplicationData.Instance.Save();
         }
 
         private async void _saveConfigurationCommand_Execute(object param)

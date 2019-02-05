@@ -36,6 +36,13 @@
         </ResourceDictionary>
 
     </UserControl.Resources>
+
+    <i:Interaction.Triggers>
+      <i:EventTrigger EventName="Loaded">
+        <i:InvokeCommandAction Command="{Binding ViewLoadedCommand}" />
+      </i:EventTrigger>
+    </i:Interaction.Triggers>
+  
     <Grid>
         <Grid.RowDefinitions>
             <RowDefinition Height="*"/>

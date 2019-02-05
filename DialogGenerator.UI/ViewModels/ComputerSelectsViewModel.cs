@@ -77,6 +77,9 @@ namespace DialogGenerator.UI.ViewModels
 
         private void _viewLoaded_Execute()
         {
+            ApplicationData.Instance.UseBLERadios = false;
+            ApplicationData.Instance.Save();
+
             var characters = mCharacterDataProvider.GetAll();
             mCharactersCollectionViewSource.Source = characters.Where(ch => !string.IsNullOrEmpty(ch.CharacterName));
             RaisePropertyChanged(nameof(CharactersViewSource));
