@@ -39,6 +39,7 @@ namespace DialogGenerator.UI.ViewModels
             mEventAggregator.GetEvent<HeatMapUpdateEvent>().Subscribe(_onHeatMapUpdate);
             mHeatMap = new HeatMapData();
             HeatMap.HeatMap = new int[ApplicationData.Instance.NumberOfRadios, ApplicationData.Instance.NumberOfRadios];
+            HeatMap.MotionVector = new int[ApplicationData.Instance.NumberOfRadios];
             HeatMap.LastHeatMapUpdateTime = new DateTime[ApplicationData.Instance.NumberOfRadios];
 
             _bindCommands();

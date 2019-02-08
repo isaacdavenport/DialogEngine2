@@ -144,6 +144,9 @@ namespace DialogGenerator.Model
         [JsonIgnore]
         public bool Unassigned { get; set; }
 
+        [JsonIgnore]
+        public bool Editable { get; set; }
+
         public event PropertyChangedEventHandler PropertyChanged;
         #endregion
 

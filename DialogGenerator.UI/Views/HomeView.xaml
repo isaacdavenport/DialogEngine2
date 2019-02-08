@@ -20,11 +20,30 @@
     <Grid Background="#E2E540">
       <Grid Margin="10">
         <Grid.RowDefinitions>
+          <RowDefinition Height="70"/>
           <RowDefinition Height="200"/>
           <RowDefinition Height="*"/>
         </Grid.RowDefinitions>
-        <Image Grid.Row="0" VerticalAlignment="Top" HorizontalAlignment="Center" Height="200" Source="pack://application:,,,/DialogGenerator;component/Resources/logo.jpg"/>
-        <StackPanel Grid.Row="1" Orientation="Horizontal" HorizontalAlignment="Center" VerticalAlignment="Center">
+
+
+        <materialDesign:Card Grid.Row="0" Width="60" Height="50" Focusable="True" Margin="10" VerticalAlignment="Top" HorizontalAlignment="Right" Background="Transparent" >
+          <materialDesign:Card.InputBindings>
+            <MouseBinding MouseAction="LeftClick" Command="{Binding ReadTutorialCommand}" />
+          </materialDesign:Card.InputBindings>
+          <Grid Style="{StaticResource CardGrid}">
+            <Grid.RowDefinitions>
+              <RowDefinition Height="*" />
+            </Grid.RowDefinitions>
+            <StackPanel Orientation="Vertical" VerticalAlignment="Center" HorizontalAlignment="Center">
+              <materialDesign:PackIcon Kind="FilePdf" Height="30" Width="30" HorizontalAlignment="Center" VerticalAlignment="Center" Foreground="#DC143C" />
+              <TextBlock Text="Tutorial" Foreground="#DC143C" FontSize="16" HorizontalAlignment="Center" VerticalAlignment="Center" />
+            </StackPanel>
+          </Grid>
+        </materialDesign:Card>
+
+
+        <Image Grid.Row="1" VerticalAlignment="Top" HorizontalAlignment="Center" Height="200" Source="pack://application:,,,/DialogGenerator;component/Resources/logo.jpg"/>
+        <StackPanel Grid.Row="2" Orientation="Horizontal" HorizontalAlignment="Center" VerticalAlignment="Center">
             <materialDesign:Card Width="200" Height="200" Background="#F57921" Margin="10" >
                 <materialDesign:Card.InputBindings>
                     <MouseBinding MouseAction="LeftClick" Command="NavigationCommands.GoToPage">

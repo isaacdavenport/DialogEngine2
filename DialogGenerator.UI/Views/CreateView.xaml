@@ -48,7 +48,7 @@
                     </DataTemplate>
                     <DataTemplate x:Key="RegularCharacterTemplate">
                         <materialDesign:Card Width="200" Margin="10" Height="220">
-                          <Grid Style="{StaticResource CardGrid}" >
+                          <Grid Style="{StaticResource CardGrid}" IsEnabled="{Binding Editable}">
                             <Grid HorizontalAlignment="Stretch" VerticalAlignment="Stretch">
                               <Grid.RowDefinitions>
                                 <RowDefinition Height="140" />

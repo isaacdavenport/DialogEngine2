@@ -20,6 +20,7 @@
                     <converters:ListBoxItemTextAndIndexValueConverter x:Key="ListBoxItemTextAndIndexValueConverter" />
                     <converters:SaveAndNextBtnContentConverter x:Key="SaveAndNextBtnContentConverter" />
                     <converters:EndWizardBtnVisibilityConverter x:Key="EndWizardBtnVisibilityConverter" />
+                    <converters:SkipBtnContentConverter x:Key="SkipBtnContentConverter" />
                 </ResourceDictionary>
                 <ResourceDictionary Source="pack://application:,,,/DialogGenerator.UI;component/Themes/VoiceRecorderStyle.xaml" />
                 <ResourceDictionary Source="pack://application:,,,/DialogGenerator.UI;component/Themes/MaterialDesignThemes.TextBox.Overrides.xaml" />
@@ -188,8 +189,10 @@
                               </Button.Visibility>
                             </Button>
 
-                            <Button Content="Skip" Command="{Binding SkipStep}" 
-                                    Style="{DynamicResource MaterialDesignRaisedButton}" Margin="20,0,0,0"/>
+                            <Button Command="{Binding SkipStep}"
+                                    Style="{DynamicResource MaterialDesignRaisedButton}" Margin="20,0,0,0"
+                                    Content="{Binding CurrentTutorialStep.CollectUserInput,
+                                                           Converter={StaticResource SkipBtnContentConverter}}" />
 
                             <Button Command="{Binding SaveAndNext}" Style="{DynamicResource MaterialDesignRaisedButton}" Margin="20,0,0,0">
                                 <Button.Content>

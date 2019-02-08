@@ -362,6 +362,7 @@ namespace DialogGenerator.CharacterSelection
                     mEventAggregator.GetEvent<HeatMapUpdateEvent>().Publish(new HeatMapData
                     {
                         HeatMap = HeatMap,
+                        MotionVector = MotionVector,
                         LastHeatMapUpdateTime = CharactersLastHeatMapUpdateTime,
                         Character1Index = NextCharacter1,
                         Character2Index = NextCharacter2

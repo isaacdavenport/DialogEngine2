@@ -21,6 +21,9 @@ namespace DialogGenerator.Model
         [JsonIgnore]
         public int JsonArrayIndex { get; set; }
 
+        [JsonIgnore]
+        public bool Editable { get; set; }
+
         public bool Equals(Wizard other)
         {
             return this.WizardName.Equals(other.WizardName);

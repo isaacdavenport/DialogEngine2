@@ -193,6 +193,25 @@
                     </Grid>
                   </materialDesign:Card>
 
+                  <materialDesign:Card Width="150" HorizontalAlignment="Left" Height="150" Margin="10" Background="#51cb8c" Visibility="{Binding IsDebugViewVisible}" >
+                    <Grid Style="{StaticResource CardGrid}">
+                      <StackPanel HorizontalAlignment="Center" VerticalAlignment="Center">
+                        <materialDesign:PackIcon Kind="Forum" HorizontalAlignment="Center" Height="50" Width="50" Foreground="White" />
+                        <TextBlock Text="Show Dialog Models" Foreground="White" FontSize="20" TextWrapping="Wrap" HorizontalAlignment="Center" VerticalAlignment="Center" />
+                      </StackPanel>
+                      <Grid.InputBindings>
+                        <MouseBinding MouseAction="LeftClick" Command="NavigationCommands.GoToPage">
+                          <MouseBinding.CommandParameter>
+                            <MultiBinding Converter="{StaticResource CloneValuesConverter}">
+                              <Binding Source="{x:Static inf:Constants.ContentRegion}" />
+                              <Binding Source="{x:Type view:DialogModelsView}" />
+                            </MultiBinding>
+                          </MouseBinding.CommandParameter>
+                        </MouseBinding>
+                      </Grid.InputBindings>
+                    </Grid>
+                  </materialDesign:Card>
+
                   <materialDesign:Card Width="150" Height="150" Margin="10" Background="#51cb8c" HorizontalAlignment="Left" Visibility="{Binding IsDebugViewVisible}" >
                     <Grid Style="{StaticResource CardGrid}">
                       <StackPanel HorizontalAlignment="Center" VerticalAlignment="Center">
