@@ -135,7 +135,7 @@ namespace DialogGenerator.DialogEngine
 
         private void _onSelectedCharactersPairChanged(SelectedCharactersPairEventArgs obj)
         {
-            if (!ApplicationData.Instance.UseSerialPort && mRandomSelectionDataCached != null
+            if (!ApplicationData.Instance.UseBLERadios && mRandomSelectionDataCached != null
                && Session.Get<int>(Constants.COMPLETED_DLG_MODELS) < ApplicationData.Instance.NumberOfDialogModelsCompleted)
             {
                 return;
@@ -144,7 +144,7 @@ namespace DialogGenerator.DialogEngine
             mRandomSelectionDataCached = obj;
             Session.Set(Constants.COMPLETED_DLG_MODELS, 0);
 
-            if (ApplicationData.Instance.UseSerialPort && mCurrentState != States.PreparingDialogParameters)
+            if (ApplicationData.Instance.UseBLERadios && mCurrentState != States.PreparingDialogParameters)
             {
                 mStateMachineTaskTokenSource.Cancel();
                 mWorkflow.Fire(Triggers.PrepareDialogParameters);
@@ -379,7 +379,7 @@ namespace DialogGenerator.DialogEngine
 
                         _playAudio(_pathAndFileName); // vb: code stops here so commented out for debugging purpose
 
-                        if (!_dialogTrackerAndSerialComsCharactersSame() && ApplicationData.Instance.UseSerialPort)
+                        if (!_dialogTrackerAndSerialComsCharactersSame() && ApplicationData.Instance.UseBLERadios)
                         {
                             mContext.SameCharactersAsLast = false;
                             return Triggers.PrepareDialogParameters; // the characters have moved  TODO break into charactersSame() and use also with prior
@@ -432,7 +432,7 @@ namespace DialogGenerator.DialogEngine
         {
             mIsDialogCancelled = false;
             Task _characterSelectionTask;
-            mCharacterSelection = ApplicationData.Instance.UseSerialPort
+            mCharacterSelection = ApplicationData.Instance.UseBLERadios
                   ? mCharacterSelectionFactory.Create(SelectionMode.SerialSelectionMode)
                   : mCharacterSelectionFactory.Create(SelectionMode.RandomSelectionModel);
             mCancellationTokenSource = new CancellationTokenSource();

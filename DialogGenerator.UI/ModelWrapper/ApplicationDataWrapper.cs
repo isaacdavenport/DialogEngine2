@@ -64,13 +64,13 @@ namespace DialogGenerator.UI.Wrapper
             }
         }
 
-        public bool UseSerialPort
+        public bool UseBLERadios
         {
             get { return getValue<bool>(); }
             set
             {
                 setValue(value);
-                validateProperty(nameof(UseSerialPort));
+                validateProperty(nameof(UseBLERadios));
             }
         }
 

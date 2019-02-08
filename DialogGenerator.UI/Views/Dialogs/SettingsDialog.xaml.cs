@@ -4,6 +4,8 @@ using MaterialDesignThemes.Wpf;
 using Prism.Commands;
 using System;
 using System.ComponentModel;
+using System.Diagnostics;
+using System.IO;
 using System.Windows.Controls;
 using System.Windows.Input;
 
@@ -19,6 +21,8 @@ namespace DialogGenerator.UI.Views.Dialogs
         public SettingsDialog()
         {
             DataContext = this;
+
+            WebsiteCommand = new DelegateCommand(_websiteCommand_Execute);
             CloseCommand = new DelegateCommand(_closeCommand_Execute);
 
             InitializeComponent();
@@ -26,7 +30,13 @@ namespace DialogGenerator.UI.Views.Dialogs
             Settings = new ApplicationDataWrapper(ApplicationData.Instance);
         }
 
+        public ICommand WebsiteCommand { get; set; }
         public ICommand CloseCommand { get; set; }
+
+        private void _websiteCommand_Execute()
+        {
+            Process.Start(ApplicationData.Instance.WebsiteUrl);
+        }
 
         private void _closeCommand_Execute()
         {
@@ -47,6 +57,16 @@ namespace DialogGenerator.UI.Views.Dialogs
                 mSettings = value;
                 OnPropertyChanged("Settings");
             }
+        }
+
+        public string Website
+        {
+            get { return ApplicationData.Instance.WebsiteUrl; }
+        }
+
+        public string Version
+        {
+            get { return $"v: { FileVersionInfo.GetVersionInfo(Path.Combine(ApplicationData.Instance.RootDirectory, "DialogGenerator.exe")).FileVersion.ToString()}"; }
         }
 
         public event PropertyChangedEventHandler PropertyChanged;

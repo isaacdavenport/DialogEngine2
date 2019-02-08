@@ -59,6 +59,9 @@ namespace DialogGenerator.Model
         [JsonIgnore]
         public int JsonArrayIndex { get; set; }
 
+        [JsonIgnore]
+        public bool Editable { get; set; }
+
         public event PropertyChangedEventHandler PropertyChanged;
 
         public bool Equals(ModelDialogInfo other)

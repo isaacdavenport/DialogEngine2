@@ -77,6 +77,9 @@ namespace DialogGenerator.UI.ViewModels
 
         private void _viewLoaded_Execute()
         {
+            ApplicationData.Instance.UseBLERadios = false;
+            ApplicationData.Instance.Save();
+
             var characters = mCharacterDataProvider.GetAll();
             mCharactersCollectionViewSource.Source = characters.Where(ch => !string.IsNullOrEmpty(ch.CharacterName));
             RaisePropertyChanged(nameof(CharactersViewSource));
@@ -89,7 +92,7 @@ namespace DialogGenerator.UI.ViewModels
                 var parameters = (object[])obj;
                 var character = parameters[0] as Character;
                 var _newState = (CharacterState)parameters[1];
-                int index = int.Parse(parameters[2].ToString())+1; // add 1 bcs we have dammy character at first position
+                int index = int.Parse(parameters[2].ToString());
                 int _forcedCharactersCount = Session.Get<int>(Constants.FORCED_CH_COUNT);
 
                 if (_newState == character.State)

@@ -28,8 +28,6 @@
             <RowDefinition Height="*" />
         </Grid.RowDefinitions>
 
-        <view:ToolbarView Grid.Row="0" />
-
         <Border Grid.Row="1" BorderThickness="0,0,0,1" BorderBrush="LightGray">
             <Grid>
                 <TextBox Margin="15,10,15,10" VerticalContentAlignment="Center" >

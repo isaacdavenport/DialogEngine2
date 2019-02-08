@@ -131,6 +131,8 @@ namespace DialogGenerator.DataAccess
                 {
                     foreach (var character in data.Characters)
                     {
+                        character.Editable = data.Editable;
+
                         _JSONObjectTypesList.Characters.Add(character);
                     }
                 }
@@ -139,6 +141,8 @@ namespace DialogGenerator.DataAccess
                 {
                     foreach (var _dialogModel in data.DialogModels)
                     {
+                        _dialogModel.Editable = data.Editable;
+
                         _JSONObjectTypesList.DialogModels.Add(_dialogModel);
                     }
                 }
@@ -147,6 +151,8 @@ namespace DialogGenerator.DataAccess
                 {
                     foreach (var wizard in data.Wizards)
                     {
+                        wizard.Editable = data.Editable;
+
                         _JSONObjectTypesList.Wizards.Add(wizard);
                     }
                 }

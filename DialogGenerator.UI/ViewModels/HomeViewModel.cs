@@ -42,8 +42,6 @@ namespace DialogGenerator.UI.ViewModels
         #region - commands -
 
         public ICommand ReadTutorialCommand { get; set; }
-        public ICommand AboutToys2LifeCommand { get; set; }
-        public ICommand OpenSettingsDialogCommand { get; set; }
         public ICommand CheckForUpdatesCommand { get; set; }
 
         #endregion
@@ -53,8 +51,6 @@ namespace DialogGenerator.UI.ViewModels
         private void _bindCommands()
         {
             ReadTutorialCommand = new DelegateCommand(_onReadTutorial_Execute);
-            AboutToys2LifeCommand = new DelegateCommand(_onAboutToys2Life_Execute);
-            OpenSettingsDialogCommand = new DelegateCommand(_onOpenSettingsDialog_Execute);
             CheckForUpdatesCommand = new DelegateCommand(_onCheckForUpdates_Execute);
         }
 
@@ -67,7 +63,7 @@ namespace DialogGenerator.UI.ViewModels
         {
             if (_isStarted)
             {
-                if (ApplicationData.Instance.UseSerialPort)
+                if (ApplicationData.Instance.UseBLERadios)
                     SelectionMode = "Selection by dolls";
                 else
                     SelectionMode = "Random selection";
@@ -75,23 +71,6 @@ namespace DialogGenerator.UI.ViewModels
             else
             {
                 SelectionMode = "";
-            }
-        }
-
-        private async void _onOpenSettingsDialog_Execute()
-        {
-            await mMessageDialogService.ShowDedicatedDialogAsync<int?>(new SettingsDialog());
-        }
-
-        private void _onAboutToys2Life_Execute()
-        {
-            try
-            {
-                Process.Start(ApplicationData.Instance.WebsiteUrl);
-            }
-            catch (Exception ex)
-            {
-                mLogger.Error("_onAboutToys2Life_Execute " + ex.Message);
             }
         }
 
@@ -122,10 +101,6 @@ namespace DialogGenerator.UI.ViewModels
 
             }
         }
-
-
-        public string Version => $"v: { FileVersionInfo.GetVersionInfo(Path.Combine(ApplicationData.Instance.RootDirectory, "DialogGenerator.exe")).FileVersion.ToString()}";
-
 
         #endregion
     }

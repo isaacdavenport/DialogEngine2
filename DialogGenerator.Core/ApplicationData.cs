@@ -96,13 +96,13 @@ namespace DialogGenerator.Core
         public bool MonitorReceiveBufferSize { get; set; } = false;
         public bool ShowDupePhrases { get; set; } = false;
         public string JSONEditorExeFileName { get; set; } = "JSONedit.exe"; 
-        public string WebsiteUrl { get; set; } = "www.toys2life.net";
+        public string WebsiteUrl { get; set; } = "www.toys2life.org";
         public string TutorialFileName { get; set; } = "tutorial.pdf";
         public string DecimalSerialDirectBLELoggerKey { get; set; } = "DecimalSerialLogDirectBLE";
         public string DialogLoggerKey { get; set; } = "LogDialog";
         public string DefaultLoggerKey { get; set; } = "DefaultLog";
         public string DefaultImage { get; set; } = "avatar.png";
-        public string JSONFilesVersion { get; set; } = "1.1";
+        public string JSONFilesVersion { get; set; } = "1.2";
         public int NumberOfRadios { get; set; } = 6;
         public string URLToUpdateFile { get; set; } = "http://drive.google.com/uc?export=download&id=1nkflu9P-y1gQMajnxv58BRU7TqrgBh9U";
         public int CheckForUpdateInterval { get; set; } = 30; // minutes
@@ -118,9 +118,9 @@ namespace DialogGenerator.Core
         public bool TextDialogsOn { get; set; } = true;
 
         [Editable(true)]
-        [Description(" Use serial or random selection of characters.")]
-        [DisplayName("Use serial port:")]
-        public bool UseSerialPort { get; set; } = false;
+        [Description(" Use BLE radios or random selection of characters.")]
+        [DisplayName("Use BLE radios:")]
+        public bool UseBLERadios { get; set; } = false;
 
         [Description("Determine how long current dialog can play, if new characters selected. Value is in seconds.")]
         [DisplayName("Max time to play .mp3 file:")]

@@ -46,12 +46,12 @@ namespace DialogGenerator.ViewModels
 
         private void _onOpenDialogModelDetailView(string obj)
         {
-            var _activeView = mRegionManager.Regions[Constants.ContentRegion].GetView(typeof(DialogModelDetailView).FullName);
+            //var _activeView = mRegionManager.Regions[Constants.ContentRegion].GetView(typeof(DialogModelDetailView).FullName);
 
-            if (_activeView == null)
-            {
-                mRegionManager.RequestNavigate(Constants.ContentRegion, typeof(DialogModelDetailView).FullName);
-            }
+            //if (_activeView == null)
+            //{
+            //    mRegionManager.RequestNavigate(Constants.ContentRegion, typeof(DialogModelDetailView).FullName);
+            //}
         }
 
         private void _onOpenCharacterDetailView(string obj)

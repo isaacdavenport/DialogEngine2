@@ -25,37 +25,5 @@ namespace DialogGenerator.Tests.UI.ViewModel
             Assert.Equal(ApplicationData.Instance.NumberOfRadios, mViewModel.Dolls.Count);
             Assert.Equal(mViewModel.Characters.Count, characters.Count);
         }
-
-        [Fact]
-        public async void UnbindCharacterCommand_ShouldSetCharacterToDefalutValue_WhenUserClickOnUnbindBtn()
-        {
-            await STATaskHelper.StartSTATask(() =>
-            {
-                const int _dollNumber = 1;
-                var args = new object[] { _dollNumber, new ItemsControl() };
-
-                mViewModel.UnbindCharacterCommand.Execute(args);
-
-                Assert.Equal(-1, characters.First().RadioNum);
-
-                characterDataProviderMock.Verify(m => m.SaveAsync(characters.First()), Times.Once);
-            });
-        }
-
-        [Fact]
-        public async void UnbindCharacterCommand_ShouldNotSaveChanges_WhenIsInvalidRadioNumber()
-        {
-            await STATaskHelper.StartSTATask(() =>
-            {
-                const int _dollNumber = -1;
-                var args = new object[] { _dollNumber, new ItemsControl() };
-
-                mViewModel.UnbindCharacterCommand.Execute(args);
-                characterDataProviderMock.Verify(m => m.SaveAsync(characters.First()), Times.Never);
-            });
-        }
-
-        //public async void SaveConfigurationCommand_
-
     }
 }

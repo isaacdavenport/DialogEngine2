@@ -10,6 +10,9 @@ namespace DialogGenerator.Model
         [JsonProperty("Version")]
         public string Version { get; set; } = ApplicationData.Instance.JSONFilesVersion;
 
+        [JsonProperty("Editable", Required = Required.Default)]
+        public bool Editable { get; set; } = true;
+
         [JsonProperty("Wizards",DefaultValueHandling = DefaultValueHandling.Ignore)]
         public List<Wizard> Wizards { get; set; } = new List<Wizard>();
 

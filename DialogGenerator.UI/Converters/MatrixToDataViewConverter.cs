@@ -30,6 +30,8 @@ namespace DialogGenerator.UI.Converters
                 t.Columns.Add(new DataColumn(c.ToString()));
             }
 
+            t.Columns.Add(new DataColumn("M"));
+
             t.Columns.Add(new DataColumn("Update time"));
 
             // Add data to DataTable
@@ -43,7 +45,8 @@ namespace DialogGenerator.UI.Converters
                     newRow[c] = array[r, c - 1];
                 }
 
-                newRow[columns + 1] = data.LastHeatMapUpdateTime[r].ToString("mm.ss.fff");
+                newRow[columns + 1] = data.MotionVector[r];
+                newRow[columns + 2] = data.LastHeatMapUpdateTime[r].ToString("mm.ss.fff");
                 t.Rows.Add(newRow);
             }
 

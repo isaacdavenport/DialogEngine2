@@ -23,13 +23,13 @@ namespace DialogGenerator.UI.Converters
         public object Convert(object value, Type targetType, object parameter, CultureInfo culture)
         {
             if (value == null)
-                return "Not assigned";
+                return "Unassigned";
 
             int _dollNumber = int.Parse(value.ToString());
 
             var _assignedCharacter = mCharacters.Where(ch => ch.RadioNum == _dollNumber).FirstOrDefault();
 
-            return _assignedCharacter == null ?  "Not assigned"  :_assignedCharacter.ToString();
+            return _assignedCharacter == null ?  "Unassigned" : _assignedCharacter.ToString();
         }
 
         public object ConvertBack(object value, Type targetType, object parameter, CultureInfo culture)
