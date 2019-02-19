@@ -180,7 +180,7 @@ namespace DialogGenerator.CharacterSelection
         // TODO create _calculateMotionStable()  go through last 250ms of motion bytes to see if they are stable don't switch 
         //  characters until they are stable just after a recent motion.  Character Selection changes should happen 
 
-        private bool _calculateRssiStable(int _ch1, int _ch2)
+        private bool _calculateRssiStableAfterMotion(int _ch1, int _ch2)
         {
             try
             {
@@ -324,7 +324,7 @@ namespace DialogGenerator.CharacterSelection
                     }
                 }
 
-                _rssiStable = _calculateRssiStable(mTempCh1, mTempch2);
+                _rssiStable = _calculateRssiStableAfterMotion(mTempCh1, mTempch2);
 
                 if (_rssiStable)
                 {
