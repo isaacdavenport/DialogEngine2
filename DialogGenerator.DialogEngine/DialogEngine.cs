@@ -260,7 +260,7 @@ namespace DialogGenerator.DialogEngine
             return true;
         }
 
-        private bool _dialogTrackerAndSerialComsCharactersSame()
+        private bool _dialogTrackerAndBLESelectedCharactersSame()
         {
             if ((mContext.Character1Num == Session.Get<int>(Constants.NEXT_CH_1)
                  || mContext.Character1Num == Session.Get<int>(Constants.NEXT_CH_2))
@@ -379,7 +379,7 @@ namespace DialogGenerator.DialogEngine
 
                         _playAudio(_pathAndFileName); // vb: code stops here so commented out for debugging purpose
 
-                        if (!_dialogTrackerAndSerialComsCharactersSame() && ApplicationData.Instance.UseBLERadios)
+                        if (!_dialogTrackerAndBLESelectedCharactersSame() && ApplicationData.Instance.UseBLERadios)
                         {
                             mContext.SameCharactersAsLast = false;
                             return Triggers.PrepareDialogParameters; // the characters have moved  TODO break into charactersSame() and use also with prior

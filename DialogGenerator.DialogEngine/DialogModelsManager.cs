@@ -275,11 +275,11 @@ namespace DialogGenerator.DialogEngine
                 {
                     _dialogModelFits = true;
                 }
-                if (_attempts == 100)
+                if (_attempts == 500)
                 {
                     var attemptsWarningMsg = "Characters " + mContext.CharactersList[mContext.Character1Num].CharacterPrefix +
                         " and " + mContext.CharactersList[mContext.Character2Num].CharacterPrefix +
-                        " took over 100 attempts to find a workable dialog model.";
+                        " took over 500 attempts to find a workable dialog model.";
                     Debug.WriteLine(attemptsWarningMsg);
                     // DODO uncomment 
                     //DialogDataHelper.AddMessage(new WarningMessage(attemptsWarningMsg));

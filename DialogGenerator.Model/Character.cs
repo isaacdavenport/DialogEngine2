@@ -45,11 +45,11 @@ namespace DialogGenerator.Model
         [JsonProperty("CharacterAge"),Required]
         public int CharacterAge { get; set; } = 10;
 
-        [RegularExpression(@"^(?:M|F)$",ErrorMessage = "Alloed letters: 'M' (Male) and 'F' (Female).")]
+        [RegularExpression(@"^(?:M|F)$", ErrorMessage = "Alloed letters: 'M' (Male) and 'F' (Female).")]
         [JsonProperty("CharacterGender")]
         public string CharacterGender { get; set; } = "M";
 
-        [RegularExpression("^[a-zA-Z' ]+$")]
+        [RegularExpression("^[-a-zA-Z0-9_' ]+$")]
         [StringLength(30,MinimumLength =3)]
         [JsonProperty("CharacterName"),Required(ErrorMessage ="Character name is required.")]
         public string CharacterName
@@ -145,7 +145,7 @@ namespace DialogGenerator.Model
         public bool Unassigned { get; set; }
 
         [JsonIgnore]
-        public bool Editable { get; set; }
+        public bool Editable { get; set; } = true;
 
         public event PropertyChangedEventHandler PropertyChanged;
         #endregion

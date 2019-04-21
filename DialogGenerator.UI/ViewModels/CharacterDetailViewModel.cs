@@ -482,7 +482,7 @@ namespace DialogGenerator.UI.ViewModels
             {
                 Character.CharacterName = "";
                 Character.CharacterPrefix = "";
-                UniqueIdentifier = Guid.NewGuid().ToString();
+                UniqueIdentifier = Guid.NewGuid().ToString().Substring(0, 4);
             }
             else
             {
