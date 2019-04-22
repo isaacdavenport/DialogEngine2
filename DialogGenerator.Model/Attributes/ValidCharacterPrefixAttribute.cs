@@ -1,12 +1,12 @@
 ﻿using System.ComponentModel.DataAnnotations;
 using System.Text.RegularExpressions;
+using DialogGenerator.Core;
 
 namespace DialogGenerator.Model.Attributes
 {
     public class ValidCharacterPrefixAttribute:ValidationAttribute
     {
-        // TODO make this a global constant to use in character.cs line 52 as well
-        private const string mcPattern = @"^[-a-zA-Z0-9_' ]+$";
+        private const string mcPattern = Constants.FILENAME_CHECK_REGEX;
         public ValidCharacterPrefixAttribute()
         {
             ErrorMessage = "Only letters and numbers in names please.";

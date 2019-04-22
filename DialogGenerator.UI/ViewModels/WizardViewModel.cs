@@ -403,21 +403,6 @@ namespace DialogGenerator.UI.ViewModels
 
             VoiceRecorderControlViewModel.
                 CurrentFilePath = $"{Character.CharacterPrefix}_{CurrentTutorialStep.PhraseWeights.Keys.First()}_{DateTime.Now.ToString("yyyy-dd-MM-HH-mm-ss")}";
-            //var _currentPhrase = _findPhraseInCharacterForTutorialStep(CurrentTutorialStep);
-
-            //if (_currentPhrase == null)
-            //{
-            //    mIsPhraseEditable = false;
-            //    DialogStr = "";
-            //    //VoiceRecorderControlViewModel.CurrentFilePath = "";
-
-            //    return;
-            //}
-            //mIsPhraseEditable = false;  //TODO make 
-            //DialogStr = _currentPhrase.DialogStr;
-            //VoiceRecorderControlViewModel.CurrentFilePath = $"{Character.CharacterPrefix}_{_currentPhrase.FileName}";
-            //mCurrentPhrase = _currentPhrase;
-            //mIsPhraseEditable = true;
         }
 
         #endregion
@@ -487,7 +472,7 @@ namespace DialogGenerator.UI.ViewModels
 
         private async void _saveStep()
         {
-            if (CurrentStepIndex >= CurrentWizard.TutorialSteps.Count - 1 || !mCurrentTutorialStep.CollectUserInput)
+            if (/* CurrentStepIndex >= CurrentWizard.TutorialSteps.Count - 1 || */ !mCurrentTutorialStep.CollectUserInput)
             {
                 Workflow.Fire(WizardTriggers.Finish);
                 return;
@@ -505,15 +490,7 @@ namespace DialogGenerator.UI.ViewModels
                     return;
                 }
             }
-
-            //if (mIsPhraseEditable)
-            //{
-            //    mCurrentPhrase.DialogStr = DialogStr;
-            //}
-            //else
-            //{
             string[] _fileNameParts = VoiceRecorderControlViewModel.CurrentFilePath.Split('_');
-
             var _phraseEntry = new PhraseEntry
             {
                 PhraseRating = CurrentTutorialStep.PhraseRating,
@@ -523,9 +500,14 @@ namespace DialogGenerator.UI.ViewModels
             };
 
             mCharacter.Phrases.Add(_phraseEntry);
-            //}
 
             await mCharacterDataProvider.SaveAsync(Character);
+
+            if (CurrentStepIndex >= CurrentWizard.TutorialSteps.Count - 1)  
+            {
+                Workflow.Fire(WizardTriggers.Finish);
+                return;
+            }
 
             Workflow.Fire(WizardTriggers.LoadNextStep);
         }

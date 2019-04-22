@@ -10,7 +10,7 @@ using System.Windows;
 [assembly: AssemblyConfiguration("")]
 [assembly: AssemblyCompany("Toys2Life")]
 [assembly: AssemblyProduct("DialogGenerator")]
-[assembly: AssemblyCopyright("Copyright ©  2018")]
+[assembly: AssemblyCopyright("Copyright ©  2019")]
 [assembly: AssemblyTrademark("")]
 [assembly: AssemblyCulture("")]
 
@@ -38,16 +38,5 @@ using System.Windows;
                                               // app, or any theme specific resource dictionaries)
 )]
 
-
-// Version information for an assembly consists of the following four values:
-//
-//      Major Version
-//      Minor Version
-//      Build Number
-//      Revision
-//
-// You can specify all the values or you can default the Build and Revision Numbers
-// by using the '*' as shown below:
-// [assembly: AssemblyVersion("1.0.*")]
-[assembly: AssemblyVersion("1.89.*")]
-//[assembly: AssemblyFileVersion(version: "1.0.")] if we comment out this, then AssemblyVersion is equal to AssemblyFileVersion
+//This is the version number picked up for display in debug/settings screen
+[assembly: AssemblyVersion("1.90.*")]

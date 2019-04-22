@@ -49,7 +49,7 @@ namespace DialogGenerator.Model
         [JsonProperty("CharacterGender")]
         public string CharacterGender { get; set; } = "M";
 
-        [RegularExpression("^[-a-zA-Z0-9_' ]+$")]
+        [RegularExpression(Constants.FILENAME_CHECK_REGEX)]
         [StringLength(30,MinimumLength =3)]
         [JsonProperty("CharacterName"),Required(ErrorMessage ="Character name is required.")]
         public string CharacterName

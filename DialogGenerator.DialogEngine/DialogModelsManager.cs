@@ -281,7 +281,7 @@ namespace DialogGenerator.DialogEngine
                         " and " + mContext.CharactersList[mContext.Character2Num].CharacterPrefix +
                         " took over 500 attempts to find a workable dialog model.";
                     Debug.WriteLine(attemptsWarningMsg);
-                    // DODO uncomment 
+                    // TODO uncomment 
                     //DialogDataHelper.AddMessage(new WarningMessage(attemptsWarningMsg));
                     mLogger.Debug(attemptsWarningMsg);
                 }
