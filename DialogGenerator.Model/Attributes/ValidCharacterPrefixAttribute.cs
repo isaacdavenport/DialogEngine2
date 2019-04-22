@@ -5,10 +5,11 @@ namespace DialogGenerator.Model.Attributes
 {
     public class ValidCharacterPrefixAttribute:ValidationAttribute
     {
-        private const string mcPattern = @"^[a-zA-Z]+$";
+        // TODO make this a global constant to use in character.cs line 52 as well
+        private const string mcPattern = @"^[-a-zA-Z0-9_' ]+$";
         public ValidCharacterPrefixAttribute()
         {
-            ErrorMessage = "Allowed only letters.";
+            ErrorMessage = "Only letters and numbers in names please.";
         }
         public override bool IsValid(object value)
         {
