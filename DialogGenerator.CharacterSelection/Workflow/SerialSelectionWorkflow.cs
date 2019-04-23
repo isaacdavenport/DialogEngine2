@@ -4,13 +4,14 @@ using System.Windows.Input;
 
 namespace DialogGenerator.CharacterSelection.Workflow
 {
+    //The word Serial is often used as the bluetooth input used to come in over a serial interface dongle
     public enum States
     {
         Waiting,
-        Init,
-        MessageProcessing,
+        Initializing,
+        ProcessingMessage,
         CalculatingClosestPair,
-        SelectNextCharacters,
+        SelectingNextCharacters,
         Finished
     }
 
@@ -24,11 +25,11 @@ namespace DialogGenerator.CharacterSelection.Workflow
         Finish
     }
 
-    public class SerialSelectionWorkflow : Stateless.StateMachine<States, Triggers>, INotifyPropertyChanged
+    public class BLESelectionWorkflow : Stateless.StateMachine<States, Triggers>, INotifyPropertyChanged
     {
         public event PropertyChangedEventHandler PropertyChanged;
 
-        public SerialSelectionWorkflow(Action action):base(States.Waiting)
+        public BLESelectionWorkflow(Action action):base(States.Waiting)
         {
             OnTransitioned
             (

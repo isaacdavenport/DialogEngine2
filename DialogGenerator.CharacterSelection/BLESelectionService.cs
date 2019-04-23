@@ -31,7 +31,7 @@ namespace DialogGenerator.CharacterSelection
         private int mTempch2;
         private int[,] mStrongRssiCharacterPairBuf = new int[2, StrongRssiBufDepth];
         private CancellationTokenSource mCancellationTokenSource;
-        private SerialSelectionWorkflow mWorkflow;
+        private BLESelectionWorkflow mWorkflow;
         private readonly DispatcherTimer mcHeatMapUpdateTimer = new DispatcherTimer();
         private Random mRandom = new Random();
         private States mCurrentState;
@@ -58,7 +58,7 @@ namespace DialogGenerator.CharacterSelection
             mCharacterRepository =  _characterRepository ;
             mBLEDataProviderFactory = _BLEDataProviderFactory;
 
-            mWorkflow = new SerialSelectionWorkflow(() => { });
+            mWorkflow = new BLESelectionWorkflow(() => { });
             mWorkflow.PropertyChanged += _mWorkflow_PropertyChanged;
             mcHeatMapUpdateTimer.Interval = TimeSpan.FromMilliseconds(300);
             mcHeatMapUpdateTimer.Tick += _heatMapUpdateTimer_Tick;
@@ -97,24 +97,24 @@ namespace DialogGenerator.CharacterSelection
         private void _configureWorkflow()
         {
             mWorkflow.Configure(States.Waiting)
-                .Permit(Triggers.Initialize, States.Init);
+                .Permit(Triggers.Initialize, States.Initializing);
 
-            mWorkflow.Configure(States.Init)
-                .Permit(Triggers.ProcessMessage, States.MessageProcessing)
+            mWorkflow.Configure(States.Initializing)
+                .Permit(Triggers.ProcessMessage, States.ProcessingMessage)
                 .Permit(Triggers.Finish, States.Finished);
 
-            mWorkflow.Configure(States.MessageProcessing)
+            mWorkflow.Configure(States.ProcessingMessage)
                 .PermitReentry(Triggers.ProcessMessage)
                 .Permit(Triggers.Finish,States.Finished)
                 .Permit(Triggers.CalculateClosestPair, States.CalculatingClosestPair);
 
             mWorkflow.Configure(States.CalculatingClosestPair)
-                .Permit(Triggers.ProcessMessage, States.MessageProcessing)
-                .Permit(Triggers.SelectNextCharacters, States.SelectNextCharacters)
+                .Permit(Triggers.ProcessMessage, States.ProcessingMessage)
+                .Permit(Triggers.SelectNextCharacters, States.SelectingNextCharacters)
                 .Permit(Triggers.Finish, States.Finished);
 
-            mWorkflow.Configure(States.SelectNextCharacters)
-                .Permit(Triggers.ProcessMessage, States.MessageProcessing)
+            mWorkflow.Configure(States.SelectingNextCharacters)
+                .Permit(Triggers.ProcessMessage, States.ProcessingMessage)
                 .Permit(Triggers.Finish, States.Finished);
 
             mWorkflow.Configure(States.Finished)
@@ -140,7 +140,8 @@ namespace DialogGenerator.CharacterSelection
         {
             try
             {
-                _resetData();
+                mTempCh1 = 0;
+                mTempch2 = 0;
                 BLE_Message message = new BLE_Message();
 
                 message = mCurrentDataProvider.GetMessage();
@@ -170,39 +171,84 @@ namespace DialogGenerator.CharacterSelection
                 return Triggers.ProcessMessage;
             }
         }
-
-        private void _resetData()
+ 
+        /// <summary>
+        /// This method calculates whether all characters have been "still" for a set number (300) of milliseconds since 
+        /// motion was last detected.  The talking characters should not change unless the dolls moved.  The talking
+        /// characters should not change unless the dolls have been as still as they can be when held in the hand for
+        /// a set number of milliseconds in the case the user is holding one or more of the dolls they wish to speak.
+        /// </summary>
+        /// <returns></returns>
+        private bool _calculateIfInMotionWindow()
         {
-            mTempCh1 = 0;
-            mTempch2 = 0;
+            try
+            {
+                DateTime _currentTime = DateTime.Now;
+                int i = ParseMessageHelper.ReceivedMessages.Count - 1;
+
+                if (i < 8)
+                    return false;  // not enough readings even if over timespan of > 300ms
+
+                while (i >= 0)
+                {
+                    if (i<=0)
+                    {
+                        return false;  // didn't have two seconds of data in ReceivedMessages
+                    }
+                    var _timeAgoOfMessage_i = _currentTime - ParseMessageHelper.ReceivedMessages[i].ReceivedTime;
+                    if (_timeAgoOfMessage_i < TimeSpan.FromMilliseconds(300))
+                    {  // in the needsToBeStableWindow
+                        if (ParseMessageHelper.ReceivedMessages[i].Motion > 38)
+                        {  // if the motion was high in the last 300 ms we aren't done moving
+                            return false;
+                        }
+                    }
+                    if (_timeAgoOfMessage_i >= TimeSpan.FromMilliseconds(300)) 
+                    {  // in the needsToBeStableWindow
+                        if (ParseMessageHelper.ReceivedMessages[i].Motion > 35)  // we had motion between 300-1500ms ago
+                        {
+                            return true;
+                        }
+                    }
+                    i--;
+                    if (_timeAgoOfMessage_i > TimeSpan.FromMilliseconds(1500))  //we are past the window
+                        return false;
+                }
+                return false;  
+            }
+            catch (Exception ex)
+            {
+                throw ex;
+            }
+
         }
-
-        // TODO create _calculateMotionStable()  go through last 250ms of motion bytes to see if they are stable don't switch 
-        //  characters until they are stable just after a recent motion.  Character Selection changes should happen 
-
-        private bool _calculateRssiStableAfterMotion(int _ch1, int _ch2)
+        private bool _calculateRssiStableAfterChangeNew(int _ch1, int _ch2)
         {
             try
             {
                 bool _rssiStable = true;
-
-                for (int _i = 0; _i < StrongRssiBufDepth - 1; _i++)
+                DateTime _currentTime = DateTime.Now;
+                int i = ParseMessageHelper.ReceivedMessages.Count - 1;
+                while (i >= 0)
                 {
                     // scoot data in buffer back by one to make room for next
-                    mStrongRssiCharacterPairBuf[0, _i] = mStrongRssiCharacterPairBuf[0, _i + 1];
-                    mStrongRssiCharacterPairBuf[1, _i] = mStrongRssiCharacterPairBuf[1, _i + 1];
+                    mStrongRssiCharacterPairBuf[0, i] = mStrongRssiCharacterPairBuf[0, i + 1];
+                    mStrongRssiCharacterPairBuf[1, i] = mStrongRssiCharacterPairBuf[1, i + 1];
+                    i--;
+                    if (_currentTime - ParseMessageHelper.ReceivedMessages[i].ReceivedTime < TimeSpan.FromMilliseconds(300))
+                        break;
                 }
 
                 mStrongRssiCharacterPairBuf[0, StrongRssiBufDepth - 1] = _ch1;
                 mStrongRssiCharacterPairBuf[1, StrongRssiBufDepth - 1] = _ch2;
 
-                for (int _i = 0; _i < StrongRssiBufDepth - 2; _i++)
+                for (int j = 0; j < StrongRssiBufDepth - 2; j++)
                 {
-                    if ((mStrongRssiCharacterPairBuf[0, _i] != mStrongRssiCharacterPairBuf[0, _i + 1]
-                        || mStrongRssiCharacterPairBuf[1, _i] != mStrongRssiCharacterPairBuf[1, _i + 1])
+                    if ((mStrongRssiCharacterPairBuf[0, j] != mStrongRssiCharacterPairBuf[0, j + 1]
+                        || mStrongRssiCharacterPairBuf[1, j] != mStrongRssiCharacterPairBuf[1, j + 1])
                         &&
-                          (mStrongRssiCharacterPairBuf[0, _i] != mStrongRssiCharacterPairBuf[1, _i + 1]
-                        || mStrongRssiCharacterPairBuf[1, _i] != mStrongRssiCharacterPairBuf[0, _i + 1]))
+                          (mStrongRssiCharacterPairBuf[0, j] != mStrongRssiCharacterPairBuf[1, j + 1]
+                        || mStrongRssiCharacterPairBuf[1, j] != mStrongRssiCharacterPairBuf[0, j + 1]))
                     {
                         _rssiStable = false;
                         break;
@@ -213,7 +259,43 @@ namespace DialogGenerator.CharacterSelection
             }
             catch (Exception ex)
             {
+                throw ex;
+            }
+        }
 
+        private bool _calculateRssiStableAfterChange(int _ch1, int _ch2)
+        {
+            try
+            {
+                bool _rssiStable = true;
+
+                for (int i = 0; i < StrongRssiBufDepth - 1; i++)
+                {
+                    // scoot data in buffer back by one to make room for next
+                    mStrongRssiCharacterPairBuf[0, i] = mStrongRssiCharacterPairBuf[0, i + 1];
+                    mStrongRssiCharacterPairBuf[1, i] = mStrongRssiCharacterPairBuf[1, i + 1];
+                }
+
+                mStrongRssiCharacterPairBuf[0, StrongRssiBufDepth - 1] = _ch1;
+                mStrongRssiCharacterPairBuf[1, StrongRssiBufDepth - 1] = _ch2;
+
+                for (int i = 0; i < StrongRssiBufDepth - 2; i++)
+                {
+                    if ((mStrongRssiCharacterPairBuf[0, i] != mStrongRssiCharacterPairBuf[0, i + 1]
+                        || mStrongRssiCharacterPairBuf[1, i] != mStrongRssiCharacterPairBuf[1, i + 1])
+                        &&
+                          (mStrongRssiCharacterPairBuf[0, i] != mStrongRssiCharacterPairBuf[1, i + 1]
+                        || mStrongRssiCharacterPairBuf[1, i] != mStrongRssiCharacterPairBuf[0, i + 1]))
+                    {
+                        _rssiStable = false;
+                        break;
+                    }
+                }
+
+                return _rssiStable;
+            }
+            catch (Exception ex)
+            {
                 throw ex;
             }
         }
@@ -324,9 +406,11 @@ namespace DialogGenerator.CharacterSelection
                     }
                 }
 
-                _rssiStable = _calculateRssiStableAfterMotion(mTempCh1, mTempch2);
+                // TODO, _calculateRssiStableAfterChange and _calculateIfInMotionWindow should be their own states
+                _rssiStable = _calculateRssiStableAfterChange(mTempCh1, mTempch2);
+                var _inMovementWindow = _calculateIfInMotionWindow();
 
-                if (_rssiStable)
+                if (_rssiStable && _inMovementWindow)
                 {
                     return Triggers.SelectNextCharacters;
                 }
@@ -381,6 +465,10 @@ namespace DialogGenerator.CharacterSelection
 
         #region - public functions - 
 
+        /// <summary>
+        /// This task starts the BLEWatcher and begins reading and processing of BLE messages.
+        /// as well as looking for the bigest RSSI pairs to select the next characters
+        /// </summary>
         public async Task StartCharacterSelection()
         {
             mCancellationTokenSource = new CancellationTokenSource();
