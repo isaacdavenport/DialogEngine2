@@ -44,7 +44,7 @@ namespace DialogGenerator.CharacterSelection
         public static int[,] HeatMap = new int[ApplicationData.Instance.NumberOfRadios, ApplicationData.Instance.NumberOfRadios];
         public static int[] MotionVector = new int[ApplicationData.Instance.NumberOfRadios];
         public static DateTime[] CharactersLastHeatMapUpdateTime = new DateTime[ApplicationData.Instance.NumberOfRadios];
-        public readonly TimeSpan MaxLastSeenInterval = new TimeSpan(0, 0, 0, 3, 100);
+        public readonly TimeSpan MaxLastSeenInterval = new TimeSpan(0, 0, 0, 4, 100);
 
         #endregion
 
@@ -222,7 +222,7 @@ namespace DialogGenerator.CharacterSelection
             }
 
         }
-        private bool _calculateRssiStableAfterChangeNew(int _ch1, int _ch2)
+        private bool _calculateRssiStableAfterChangeNew(int _ch1, int _ch2)  // TODO we want this to be time based not number of BLE vector based
         {
             try
             {
