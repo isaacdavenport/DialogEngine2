@@ -198,14 +198,14 @@ namespace DialogGenerator.CharacterSelection
                     var _timeAgoOfMessage_i = _currentTime - ParseMessageHelper.ReceivedMessages[i].ReceivedTime;
                     if (_timeAgoOfMessage_i < TimeSpan.FromMilliseconds(300))
                     {  // in the needsToBeStableWindow
-                        if (ParseMessageHelper.ReceivedMessages[i].Motion > 38)
+                        if (ParseMessageHelper.ReceivedMessages[i].Motion > 48)
                         {  // if the motion was high in the last 300 ms we aren't done moving
                             return false;
                         }
                     }
                     if (_timeAgoOfMessage_i >= TimeSpan.FromMilliseconds(300)) 
                     {  // in the needsToBeStableWindow
-                        if (ParseMessageHelper.ReceivedMessages[i].Motion > 35)  // we had motion between 300-1500ms ago
+                        if (ParseMessageHelper.ReceivedMessages[i].Motion > 40)  // we had motion between 300-1500ms ago
                         {
                             return true;
                         }
@@ -388,9 +388,15 @@ namespace DialogGenerator.CharacterSelection
                     // it shouldn't happen often that a character has dissapeared, if so zero him out
                     if (_currentTime - CharactersLastHeatMapUpdateTime[i] > MaxLastSeenInterval)
                     {
+                        int alreadyZero = 0;   // to prevent logging messages each time we pass through
                         for (k = 0; k < ApplicationData.Instance.NumberOfRadios; k++)
                         {
+                            alreadyZero += HeatMap[i, k];
                             HeatMap[i, k] = 0;
+                        }
+                        if (alreadyZero > 0)
+                        {
+                            mLogger.Error("_findBiggestRssiPair MaxLastSeenInterval radio # " + i);
                         }
                     }
                     for (j = i + 1; j < ApplicationData.Instance.NumberOfRadios; j++)
