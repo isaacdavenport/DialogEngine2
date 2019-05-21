@@ -118,12 +118,12 @@
     <Compile Include="Converters\CharacterStateToColorValueConverter.cs" />
     <Compile Include="Converters\CloneValuesConverter.cs" />
     <Compile Include="Converters\DivideBy2ValueConverter.cs" />
-    <Compile Include="Converters\DollNumberToAssignedCharacterImageValueConverter.cs" />
-    <Compile Include="Converters\DollNumberToAssignedCharacterValueConverter.cs" />
-    <Compile Include="Converters\DollNumberToAssignedChForegroundValueConverter.cs" />
-    <Compile Include="Converters\DollStatusColorValueConverter.cs" />
-    <Compile Include="Converters\DollStatusValueConverter.cs" />
-    <Compile Include="Converters\DollToAssignedCharacterValueConverter.cs" />
+    <Compile Include="Converters\ToyNumberToAssignedCharacterImageValueConverter.cs" />
+    <Compile Include="Converters\ToyNumberToAssignedCharacterValueConverter.cs" />
+    <Compile Include="Converters\ToyNumberToAssignedChForegroundValueConverter.cs" />
+    <Compile Include="Converters\ToyStatusColorValueConverter.cs" />
+    <Compile Include="Converters\ToyStatusValueConverter.cs" />
+    <Compile Include="Converters\ToyToAssignedCharacterValueConverter.cs" />
     <Compile Include="Converters\EndWizardBtnVisibilityConverter.cs" />
     <Compile Include="Converters\ImageContentSmallSizeValueConverter.cs" />
     <Compile Include="Converters\ImageContentValueConverter.cs" />
@@ -158,8 +158,8 @@
     <Compile Include="Data\WizardDataProvider.cs" />
     <Compile Include="Helpers\FileHelper.cs" />
     <Compile Include="UIModule.cs" />
-    <Compile Include="ViewModels\AssignCharactersToDollsBindingProxy.cs" />
-    <Compile Include="ViewModels\AssignCharactersToDollsViewModel.cs" />
+    <Compile Include="ViewModels\AssignCharactersToToysBindingProxy.cs" />
+    <Compile Include="ViewModels\AssignCharactersToToysViewModel.cs" />
     <Compile Include="ViewModels\CharacterDetailViewModel.cs" />
     <Compile Include="ViewModels\ComputerSelectsViewModel.cs" />
     <Compile Include="ViewModels\CreateViewModel.cs" />
@@ -174,8 +174,8 @@
     <Compile Include="ViewModels\HomeViewModel.cs" />
     <Compile Include="ViewModels\VoiceRecorderControlViewModel.cs" />
     <Compile Include="ViewModels\WizardViewModel.cs" />
-    <Compile Include="Views\AssignCharactersToDollsView.xaml.cs">
-      <DependentUpon>AssignCharactersToDollsView.xaml</DependentUpon>
+    <Compile Include="Views\AssignCharactersToToysView.xaml.cs">
+      <DependentUpon>AssignCharactersToToysView.xaml</DependentUpon>
     </Compile>
     <Compile Include="Views\CharacterDataTemplateSelector.cs" />
     <Compile Include="Views\CharacterDetailView.xaml.cs">
@@ -263,7 +263,7 @@
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
-    <Page Include="Views\AssignCharactersToDollsView.xaml">
+    <Page Include="Views\AssignCharactersToToysView.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
