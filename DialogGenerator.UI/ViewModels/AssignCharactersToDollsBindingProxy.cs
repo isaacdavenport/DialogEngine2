@@ -2,11 +2,11 @@
 
 namespace DialogGenerator.UI.ViewModels
 {
-    public class AssignCharactersToDollsBindingProxy : Freezable
+    public class AssignCharactersToToysBindingProxy : Freezable
     {
         protected override Freezable CreateInstanceCore()
         {
-            return new AssignCharactersToDollsBindingProxy();
+            return new AssignCharactersToToysBindingProxy();
         }
 
         public object ViewModel
@@ -16,6 +16,6 @@ namespace DialogGenerator.UI.ViewModels
         }
 
         public static readonly DependencyProperty CharactersProperty = 
-            DependencyProperty.Register("ViewModel", typeof(object), typeof(AssignCharactersToDollsBindingProxy), new UIPropertyMetadata(null));
+            DependencyProperty.Register("ViewModel", typeof(object), typeof(AssignCharactersToToysBindingProxy), new UIPropertyMetadata(null));
     }
 }

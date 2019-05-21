@@ -6,7 +6,7 @@ namespace DialogGenerator.UI.Views
 {
     public class CharactersDataTemplateSelector : DataTemplateSelector
     {
-        private int mCurrentDoll;
+        private int mCurrentToy;
 
         public override DataTemplate SelectTemplate(object item, DependencyObject container)
         {
@@ -27,8 +27,8 @@ namespace DialogGenerator.UI.Views
 
         public int CurrentToy
         {
-            get { return mCurrentDoll; }
-            set { mCurrentDoll = value; }
+            get { return mCurrentToy; }
+            set { mCurrentToy = value; }
         }
     }
 }

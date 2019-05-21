@@ -9,11 +9,11 @@ using System.Windows.Data;
 
 namespace DialogGenerator.UI.Converters
 {
-    public class DollToAssignedCharacterValueConverter : IValueConverter
+    public class ToyToAssignedCharacterValueConverter : IValueConverter
     {
         private ObservableCollection<Character> mCharacters;
 
-        public DollToAssignedCharacterValueConverter()
+        public ToyToAssignedCharacterValueConverter()
         {
             mCharacters = Session.Get<ObservableCollection<Character>>(Constants.CHARACTERS);
         }
@@ -23,8 +23,8 @@ namespace DialogGenerator.UI.Converters
             if (value == null)
                 return DependencyProperty.UnsetValue;
 
-            int _dollNumber = int.Parse(value.ToString());
-            var _assignedCharacter = mCharacters.Where(ch => ch.RadioNum == _dollNumber).FirstOrDefault();
+            int _toyNumber = int.Parse(value.ToString());
+            var _assignedCharacter = mCharacters.Where(ch => ch.RadioNum == _toyNumber).FirstOrDefault();
 
             return _assignedCharacter;
         }

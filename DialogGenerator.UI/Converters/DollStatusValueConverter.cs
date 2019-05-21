@@ -8,11 +8,11 @@ using System.Windows.Data;
 
 namespace DialogGenerator.UI.Converters
 {
-    public class DollStatusValueConverter : IValueConverter
+    public class ToyStatusValueConverter : IValueConverter
     {
         private ObservableCollection<Character> mCharacters;
 
-        public DollStatusValueConverter()
+        public ToyStatusValueConverter()
         {
             mCharacters = Session.Get<ObservableCollection<Character>>(Constants.CHARACTERS);
         }

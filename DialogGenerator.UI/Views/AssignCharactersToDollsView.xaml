@@ -21,15 +21,15 @@
                     <converters:AssignedCharacter2NameValueConverter x:Key="AssignedCharacter2NameValueConverter" />
                     <converters:CloneValuesConverter x:Key="CloneValuesConverter" />
                     <converters:CharacterDataTemplateSelectorValueConverter x:Key="CharacterDataTemplateSelectorValueConverter" />
-                    <converters:DollStatusColorValueConverter x:Key="DollStatusColorValueConverter" />
-                    <converters:DollStatusValueConverter x:Key="DollStatusValueConverter" />
+                    <converters:ToyStatusColorValueConverter x:Key="ToyStatusColorValueConverter" />
+                    <converters:ToyStatusValueConverter x:Key="ToyStatusValueConverter" />
                     <converters:ImageToFullPathValueConverter x:Key="ImageToFullPathValueConverter" />
-                    <converters:ToyNumberToAssignedCharacterValueConverter x:Key="DollNumberToAssignedCharacterValueConverter" />
-                    <converters:DollNumberToAssignedChForegroundValueConverter x:Key="DollNumberToAssignedChForegroundValueConverter" />
-                    <converters:DollToAssignedCharacterValueConverter x:Key="DollToAssignedCharacterValueConverter" />
-                    <converters:ToyNumberToAssignedCharacterImageValueConverter x:Key="DollNumberToAssignedCharacterImageValueConverter" />
+                    <converters:ToyNumberToAssignedCharacterValueConverter x:Key="ToyNumberToAssignedCharacterValueConverter" />
+                    <converters:ToyNumberToAssignedChForegroundValueConverter x:Key="ToyNumberToAssignedChForegroundValueConverter" />
+                    <converters:ToyToAssignedCharacterValueConverter x:Key="ToyToAssignedCharacterValueConverter" />
+                    <converters:ToyNumberToAssignedCharacterImageValueConverter x:Key="ToyNumberToAssignedCharacterImageValueConverter" />
 
-                    <vm:AssignCharactersToDollsBindingProxy x:Key="viewModel" ViewModel="{Binding}" />
+                    <vm:AssignCharactersToToysBindingProxy x:Key="viewModel" ViewModel="{Binding}" />
                 </ResourceDictionary>
                 <ResourceDictionary Source="pack://application:,,,/MaterialDesignThemes.Wpf;component/Themes/MaterialDesignTheme.Flipper.xaml" />
             </ResourceDictionary.MergedDictionaries>
@@ -52,7 +52,7 @@
             <Grid HorizontalAlignment="Stretch" Grid.Row="1"  Margin="10,10,10,10"  VerticalAlignment="Stretch" >
                 <ItemsControl HorizontalAlignment="Center" ScrollViewer.CanContentScroll="True" 
                               ScrollViewer.HorizontalScrollBarVisibility="Auto" ScrollViewer.VerticalScrollBarVisibility="Auto" 
-                              x:Name="ItemsControl" VerticalAlignment="Center" ItemsSource="{Binding Dolls}">
+                              x:Name="ItemsControl" VerticalAlignment="Center" ItemsSource="{Binding Toys}">
                     <ItemsControl.ItemsPanel>
                         <ItemsPanelTemplate>
                             <WrapPanel />
@@ -75,14 +75,14 @@
                                         <materialDesign:ColorZone Grid.Row="1" Mode="PrimaryLight" VerticalAlignment="Stretch">
                                             <Grid HorizontalAlignment="Stretch" VerticalAlignment="Stretch">
                                               <materialDesign:ColorZone Mode="PrimaryLight" VerticalAlignment="Stretch"
-                                                            Content="{Binding Converter={StaticResource DollNumberToAssignedCharacterImageValueConverter}}" >
+                                                            Content="{Binding Converter={StaticResource ToyNumberToAssignedCharacterImageValueConverter}}" >
                                               </materialDesign:ColorZone>
                                             </Grid>
                                         </materialDesign:ColorZone>
                                         <StackPanel Grid.Row="2" HorizontalAlignment="Center" VerticalAlignment="Center">
-                                            <TextBlock FontSize="16" Text="{Binding Converter={StaticResource DollNumberToAssignedCharacterValueConverter}}" 
+                                            <TextBlock FontSize="16" Text="{Binding Converter={StaticResource ToyNumberToAssignedCharacterValueConverter}}" 
                                                        FontWeight="Bold" Margin="5" HorizontalAlignment="Center"
-                                                       Foreground="{Binding Converter={StaticResource DollNumberToAssignedChForegroundValueConverter}}"  />
+                                                       Foreground="{Binding Converter={StaticResource ToyNumberToAssignedChForegroundValueConverter}}"  />
                                             <Button Style="{StaticResource MaterialDesignFlatButton}" 
                                                     Command="{x:Static materialDesign:Flipper.FlipCommand}" Margin="0 4 0 0">EDIT</Button>
                                         </StackPanel>
@@ -114,7 +114,7 @@
                                                     materialDesign:HintAssist.Hint="Select character:"
                                                     materialDesign:HintAssist.IsFloating="True"
                                                     Width="156" HorizontalContentAlignment="Stretch"
-                                                    SelectedValue="{Binding Converter={StaticResource DollToAssignedCharacterValueConverter}, Mode=OneWay}"
+                                                    SelectedValue="{Binding Converter={StaticResource ToyToAssignedCharacterValueConverter}, Mode=OneWay}"
                                                     x:Name="CharactersCbx"
                                                     x:Uid="CharactersCbx"
                                                     Margin="10,10,0,10" HorizontalAlignment="Left">

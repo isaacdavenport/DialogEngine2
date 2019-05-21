@@ -9,11 +9,11 @@ using System.Windows.Media;
 
 namespace DialogGenerator.UI.Converters
 {
-    public class DollNumberToAssignedChForegroundValueConverter : IValueConverter
+    public class ToyNumberToAssignedChForegroundValueConverter : IValueConverter
     {
         private ObservableCollection<Character> mCharacters;
 
-        public DollNumberToAssignedChForegroundValueConverter()
+        public ToyNumberToAssignedChForegroundValueConverter()
         {
             mCharacters = Session.Get<ObservableCollection<Character>>(Constants.CHARACTERS);
         }

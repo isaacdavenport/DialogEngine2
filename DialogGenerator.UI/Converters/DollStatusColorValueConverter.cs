@@ -9,11 +9,11 @@ using System.Windows.Media;
 
 namespace DialogGenerator.UI.Converters
 {
-    public class DollStatusColorValueConverter : IValueConverter
+    public class ToyStatusColorValueConverter : IValueConverter
     {
         private ObservableCollection<Character> mCharacters;
 
-        public DollStatusColorValueConverter()
+        public ToyStatusColorValueConverter()
         {
             mCharacters = Session.Get<ObservableCollection<Character>>(Constants.CHARACTERS);
         }
