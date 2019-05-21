@@ -25,7 +25,7 @@ namespace DialogGenerator.UI.Views
             return null;
         }
 
-        public int CurrentDoll
+        public int CurrentToy
         {
             get { return mCurrentDoll; }
             set { mCurrentDoll = value; }

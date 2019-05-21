@@ -174,9 +174,9 @@ namespace DialogGenerator.CharacterSelection
  
         /// <summary>
         /// This method calculates whether all characters have been "still" for a set number (300) of milliseconds since 
-        /// motion was last detected.  The talking characters should not change unless the dolls moved.  The talking
-        /// characters should not change unless the dolls have been as still as they can be when held in the hand for
-        /// a set number of milliseconds in the case the user is holding one or more of the dolls they wish to speak.
+        /// motion was last detected.  The talking characters should not change unless the toys moved.  The talking
+        /// characters should not change unless the toys have been as still as they can be when held in the hand for
+        /// a set number of milliseconds in the case the user is holding one or more of the toys they wish to speak.
         /// </summary>
         /// <returns></returns>
         private bool _calculateIfInMotionWindow()

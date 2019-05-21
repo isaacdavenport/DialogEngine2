@@ -11,11 +11,11 @@ using System.Windows.Media;
 
 namespace DialogGenerator.UI.Converters
 {
-    public class DollNumberToAssignedCharacterValueConverter : IValueConverter
+    public class ToyNumberToAssignedCharacterValueConverter : IValueConverter
     {
         private ObservableCollection<Character> mCharacters;
 
-        public DollNumberToAssignedCharacterValueConverter()
+        public ToyNumberToAssignedCharacterValueConverter()
         {
             mCharacters = Session.Get<ObservableCollection<Character>>(Constants.CHARACTERS);
         }
@@ -25,9 +25,9 @@ namespace DialogGenerator.UI.Converters
             if (value == null)
                 return "Unassigned";
 
-            int _dollNumber = int.Parse(value.ToString());
+            int _toyNumber = int.Parse(value.ToString());
 
-            var _assignedCharacter = mCharacters.Where(ch => ch.RadioNum == _dollNumber).FirstOrDefault();
+            var _assignedCharacter = mCharacters.Where(ch => ch.RadioNum == _toyNumber).FirstOrDefault();
 
             return _assignedCharacter == null ?  "Unassigned" : _assignedCharacter.ToString();
         }

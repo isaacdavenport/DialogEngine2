@@ -50,7 +50,7 @@
                         <MouseBinding.CommandParameter>
                             <MultiBinding Converter="{StaticResource CloneValuesConverter}">
                                 <Binding Source="{x:Static inf:Constants.ContentRegion}" />
-                                <Binding Source="{x:Type view:AssignCharactersToDollsView}" />
+                                <Binding Source="{x:Type view:AssignCharactersToToysView}" />
                             </MultiBinding>
                         </MouseBinding.CommandParameter>
                     </MouseBinding>

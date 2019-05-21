@@ -8,13 +8,13 @@ using Xunit;
 
 namespace DialogGenerator.Tests.UI.ViewModel
 {
-    public class AssignCharactersToDollsViewModelTests:ViewModelTestBase
+    public class AssignCharactersToToysViewModelTests:ViewModelTestBase
     {
-        private AssignCharactersToDollsViewModel mViewModel;
+        private AssignCharactersToToysViewModel mViewModel;
 
-        public AssignCharactersToDollsViewModelTests()
+        public AssignCharactersToToysViewModelTests()
         {
-            mViewModel = new AssignCharactersToDollsViewModel(loggerMock.Object, eventAggregatorMock.Object, characterDataProviderMock.Object);
+            mViewModel = new AssignCharactersToToysViewModel(loggerMock.Object, eventAggregatorMock.Object, characterDataProviderMock.Object);
 
             testSetup();
         }
@@ -22,7 +22,7 @@ namespace DialogGenerator.Tests.UI.ViewModel
         [Fact]
         public void TestIsDataProperlyInitialized()
         {
-            Assert.Equal(ApplicationData.Instance.NumberOfRadios, mViewModel.Dolls.Count);
+            Assert.Equal(ApplicationData.Instance.NumberOfRadios, mViewModel.Toys.Count);
             Assert.Equal(mViewModel.Characters.Count, characters.Count);
         }
     }

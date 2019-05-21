@@ -13,9 +13,9 @@ namespace DialogGenerator.UI.Converters
 
             try
             {
-                int _currentDoll = int.Parse(value.ToString());
+                int _currentToy = int.Parse(value.ToString());
 
-                selector.CurrentDoll = _currentDoll;
+                selector.CurrentToy = _currentToy;
 
                 return selector;
             }
@@ -23,7 +23,7 @@ namespace DialogGenerator.UI.Converters
             {
             }
 
-            selector.CurrentDoll = -1;
+            selector.CurrentToy = -1;
             return selector;
 
         }

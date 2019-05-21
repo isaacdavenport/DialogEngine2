@@ -20,9 +20,9 @@ namespace DialogGenerator.UI.Converters
 
         public object Convert(object value, Type targetType, object parameter, CultureInfo culture)
         {
-            int _dollNumber = int.Parse(value.ToString());
+            int _toyNumber = int.Parse(value.ToString());
 
-            var _assignedCharacter = mCharacters.Where(ch => ch.RadioNum == _dollNumber).FirstOrDefault();
+            var _assignedCharacter = mCharacters.Where(ch => ch.RadioNum == _toyNumber).FirstOrDefault();
 
             if(_assignedCharacter != null)
             {

@@ -19,8 +19,8 @@ namespace DialogGenerator.UI.Converters
 
         public object Convert(object value, Type targetType, object parameter, CultureInfo culture)
         {
-            int _dollNumber = int.Parse(value.ToString());
-            var _assignedCharacter = mCharacters.Where(ch => ch.RadioNum == _dollNumber).FirstOrDefault();
+            int _toyNumber = int.Parse(value.ToString());
+            var _assignedCharacter = mCharacters.Where(ch => ch.RadioNum == _toyNumber).FirstOrDefault();
 
             return _assignedCharacter != null ? "Enabled" : "Disabled";
         }

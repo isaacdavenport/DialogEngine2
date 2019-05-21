@@ -183,8 +183,8 @@ namespace DialogGenerator.Handlers
             foreach(var duplicate in duplicates)
             {
                 if(duplicate.Count() > 1)
-                    errors.Add($"Characters: '{string.Join(", ", duplicate.Select(ch => ch.CharacterName).ToArray())}' assigned to doll {duplicate.Key}." +
-                        $" Only one character can be assigned to doll. Please change value for 'RadioNum' property.");
+                    errors.Add($"Characters: '{string.Join(", ", duplicate.Select(ch => ch.CharacterName).ToArray())}' assigned to toy {duplicate.Key}." +
+                        $" Only one character can be assigned to a toy. Please change the value for 'RadioNum' property.");
             }        
         }
 
@@ -216,8 +216,8 @@ namespace DialogGenerator.Handlers
 
                     if (_assignedCharacter != null)
                     {
-                        errors.Add($"You tried to assign character {character.CharacterName} to doll {character.RadioNum}," +
-                            $" but doll {character.RadioNum} already assigned to character '{_assignedCharacter.CharacterName}'.");
+                        errors.Add($"You tried to assign character {character.CharacterName} to toy {character.RadioNum}," +
+                            $" but toy {character.RadioNum} already assigned to character '{_assignedCharacter.CharacterName}'.");
                     }
                 }
             }

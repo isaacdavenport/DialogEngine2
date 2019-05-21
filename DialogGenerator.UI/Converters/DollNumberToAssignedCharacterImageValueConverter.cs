@@ -13,11 +13,11 @@ using System.Windows.Shapes;
 
 namespace DialogGenerator.UI.Converters
 {
-    public class DollNumberToAssignedCharacterImageValueConverter : IValueConverter
+    public class ToyNumberToAssignedCharacterImageValueConverter : IValueConverter
     {
         private ObservableCollection<Character> mCharacters;
 
-        public DollNumberToAssignedCharacterImageValueConverter()
+        public ToyNumberToAssignedCharacterImageValueConverter()
         {
             mCharacters = Session.Get<ObservableCollection<Character>>(Constants.CHARACTERS);
         }
@@ -37,9 +37,9 @@ namespace DialogGenerator.UI.Converters
                 return icon;
             }
 
-            int _dollNumber = int.Parse(value.ToString());
+            int _toyNumber = int.Parse(value.ToString());
 
-            var _assignedCharacter = mCharacters.Where(ch => ch.RadioNum == _dollNumber).FirstOrDefault();
+            var _assignedCharacter = mCharacters.Where(ch => ch.RadioNum == _toyNumber).FirstOrDefault();
             if (_assignedCharacter == null)
             {
                 return icon;

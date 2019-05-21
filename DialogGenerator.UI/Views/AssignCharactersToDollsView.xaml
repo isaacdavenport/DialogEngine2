@@ -1,4 +1,4 @@
-﻿<UserControl x:Class="DialogGenerator.UI.Views.AssignCharactersToDollsView"
+﻿<UserControl x:Class="DialogGenerator.UI.Views.AssignCharactersToToysView"
              xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
@@ -24,10 +24,10 @@
                     <converters:DollStatusColorValueConverter x:Key="DollStatusColorValueConverter" />
                     <converters:DollStatusValueConverter x:Key="DollStatusValueConverter" />
                     <converters:ImageToFullPathValueConverter x:Key="ImageToFullPathValueConverter" />
-                    <converters:DollNumberToAssignedCharacterValueConverter x:Key="DollNumberToAssignedCharacterValueConverter" />
+                    <converters:ToyNumberToAssignedCharacterValueConverter x:Key="DollNumberToAssignedCharacterValueConverter" />
                     <converters:DollNumberToAssignedChForegroundValueConverter x:Key="DollNumberToAssignedChForegroundValueConverter" />
                     <converters:DollToAssignedCharacterValueConverter x:Key="DollToAssignedCharacterValueConverter" />
-                    <converters:DollNumberToAssignedCharacterImageValueConverter x:Key="DollNumberToAssignedCharacterImageValueConverter" />
+                    <converters:ToyNumberToAssignedCharacterImageValueConverter x:Key="DollNumberToAssignedCharacterImageValueConverter" />
 
                     <vm:AssignCharactersToDollsBindingProxy x:Key="viewModel" ViewModel="{Binding}" />
                 </ResourceDictionary>
@@ -69,7 +69,7 @@
                                             <RowDefinition Height="*" />
                                         </Grid.RowDefinitions>
                                         <StackPanel Grid.Row="0" Orientation="Horizontal"   VerticalAlignment="Center" HorizontalAlignment="Center">
-                                          <TextBlock Text="Doll" FontWeight="SemiBold" FontSize="15"  HorizontalAlignment="Center" VerticalAlignment="Bottom"/>
+                                          <TextBlock Text="Toy" FontWeight="SemiBold" FontSize="15"  HorizontalAlignment="Center" VerticalAlignment="Bottom"/>
                                           <TextBlock Text="{Binding}"  Margin="5,0,0,0" FontSize="15" FontWeight="SemiBold" />
                                         </StackPanel>
                                         <materialDesign:ColorZone Grid.Row="1" Mode="PrimaryLight" VerticalAlignment="Stretch">

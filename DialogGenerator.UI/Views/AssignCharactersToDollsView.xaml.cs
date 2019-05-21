@@ -9,22 +9,22 @@ using System.Windows.Controls;
 namespace DialogGenerator.UI.Views
 {
     /// <summary>
-    /// Interaction logic for AssignCharactersToDollsView.xaml
+    /// Interaction logic for AssignCharactersToToysView.xaml
     /// </summary>
-    public partial class AssignCharactersToDollsView : UserControl
+    public partial class AssignCharactersToToysView : UserControl
     {
         private ICharacterDataProvider mCharacterDataProvider;
 
-        public AssignCharactersToDollsView(ICharacterDataProvider _characterDataProvider)
+        public AssignCharactersToToysView(ICharacterDataProvider _characterDataProvider)
         {
             mCharacterDataProvider = _characterDataProvider;
 
             InitializeComponent();
 
-            Loaded += _assignCharactersToDollsView_Loaded;
+            Loaded += _assignCharactersToToysView_Loaded;
         }
 
-        private void _assignCharactersToDollsView_Loaded(object sender, RoutedEventArgs e)
+        private void _assignCharactersToToysView_Loaded(object sender, RoutedEventArgs e)
         {
             this.ItemsControl.Items.Refresh();
         }

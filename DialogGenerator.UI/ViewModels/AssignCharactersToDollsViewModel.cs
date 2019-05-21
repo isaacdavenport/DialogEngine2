@@ -12,26 +12,26 @@ using System.Windows.Controls;
 
 namespace DialogGenerator.UI.ViewModels
 {
-    public class AssignCharactersToDollsViewModel : BindableBase
+    public class AssignCharactersToToysViewModel : BindableBase
     {
         #region - fields -
 
         private ILogger mLogger;
         private IEventAggregator mEventAggregator;
         private ICharacterDataProvider mCharacterDataProvider;
-        private List<int> mDolls;
+        private List<int> mToys;
 
         #endregion
 
         #region - constructor -
-        public AssignCharactersToDollsViewModel(ILogger _logger, IEventAggregator _eventAggregator,
+        public AssignCharactersToToysViewModel(ILogger _logger, IEventAggregator _eventAggregator,
             ICharacterDataProvider _characterDataProvider)
         {
             mLogger = _logger;
             mEventAggregator = _eventAggregator;
             mCharacterDataProvider = _characterDataProvider;
 
-            Dolls = Enumerable.Range(0, ApplicationData.Instance.NumberOfRadios).ToList();
+            Toys = Enumerable.Range(0, ApplicationData.Instance.NumberOfRadios).ToList();
 
             _bindCommands();
         }
@@ -70,12 +70,12 @@ namespace DialogGenerator.UI.ViewModels
                 return;
             }
 
-            int _currentDoll = int.Parse(parameters[0].ToString());
+            int _currentToy = int.Parse(parameters[0].ToString());
             var _selectedCharacter = Characters[_indexOfSelectedCharacter];
 
-            if(mCharacterDataProvider.GetByAssignedRadio(_currentDoll) != null)
+            if(mCharacterDataProvider.GetByAssignedRadio(_currentToy) != null)
             {
-                var _oldCharacter = mCharacterDataProvider.GetByAssignedRadio(_currentDoll);
+                var _oldCharacter = mCharacterDataProvider.GetByAssignedRadio(_currentToy);
                 _oldCharacter.RadioNum = -1;
 
                 await mCharacterDataProvider.SaveAsync(_oldCharacter);
@@ -83,7 +83,7 @@ namespace DialogGenerator.UI.ViewModels
 
             if (!_selectedCharacter.Unassigned)
             {
-                _selectedCharacter.RadioNum = _currentDoll;
+                _selectedCharacter.RadioNum = _currentToy;
 
                 await mCharacterDataProvider.SaveAsync(_selectedCharacter);
             }           
@@ -117,12 +117,12 @@ namespace DialogGenerator.UI.ViewModels
             }
         }
 
-        public List<int> Dolls
+        public List<int> Toys
         {
-            get { return mDolls; }
+            get { return mToys; }
             set
             {
-                mDolls = value;
+                mToys = value;
                 RaisePropertyChanged();
             }
         }

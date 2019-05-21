@@ -31,7 +31,7 @@ namespace DialogGenerator.UI
             mContainer.RegisterType<object, DialogModelDetailView>(typeof(DialogModelDetailView).FullName);
             mContainer.RegisterType<object, DialogModelsNavigationView>(typeof(DialogModelsNavigationView).FullName);
             mContainer.RegisterType<object, DialogView>(typeof(DialogView).FullName);
-            mContainer.RegisterType<object, AssignCharactersToDollsView>(typeof(AssignCharactersToDollsView).FullName,new TransientLifetimeManager());
+            mContainer.RegisterType<object, AssignCharactersToToysView>(typeof(AssignCharactersToToysView).FullName,new TransientLifetimeManager());
             mContainer.RegisterType<object, WizardView>(typeof(WizardView).FullName,new ContainerControlledLifetimeManager());
             mContainer.RegisterType<object, HomeView>(typeof(HomeView).FullName, new ContainerControlledLifetimeManager());
             mContainer.RegisterType<object, CharacterSelectionView>(typeof(CharacterSelectionView).FullName, new ContainerControlledLifetimeManager());
