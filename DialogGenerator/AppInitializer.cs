@@ -6,9 +6,8 @@ using System;
 using System.IO;
 using System.Collections.Generic;
 using DialogGenerator.Utilities;
-using DialogGenerator.Model;
 using DialogGenerator.Model.Enum;
-using System.Linq;
+using System.Diagnostics;
 
 namespace DialogGenerator
 {
@@ -77,6 +76,9 @@ namespace DialogGenerator
 
         private  void _loadData()
         {
+            mLogger.Info("Starting DialogEngine Version " +                 
+                $"{ FileVersionInfo.GetVersionInfo(Path.Combine(ApplicationData.Instance.RootDirectory, "DialogGenerator.exe")).FileVersion.ToString()}");
+            mUserLogger.Info("Starting DialogEngine Ver mUserLogger add ver" + 0.1);  //TODO this doesn't show in log
             _checkDirectories();
 
             IList<string> errors;
