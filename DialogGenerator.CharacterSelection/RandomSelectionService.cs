@@ -22,6 +22,7 @@ namespace DialogGenerator.CharacterSelection
         private static int mRandGenNextCharacter1 = 1;
         private static int mRandGenNextCharacter2 = 2;
         private CancellationTokenSource mCancellationTokenSource;
+        private Random random = new Random();
 
         public RandomSelectionService(ILogger logger,IEventAggregator _eventAggregator
             ,ICharacterRepository _characterRepository
@@ -71,7 +72,6 @@ namespace DialogGenerator.CharacterSelection
                     }
                 default:  // more than 1 available characters 
                     {
-                        Random random = new Random();
                         bool _isIndexTheSame;
                         // get random element form list with indexes of available characters
                         do
@@ -103,8 +103,7 @@ namespace DialogGenerator.CharacterSelection
             {
                 Thread.CurrentThread.Name = "OccasionallyChangeToRandNewCharacterAsyncThread";
 
-                // used for computers with no serial input radio for random, or forceCharacter mode
-                // TODO is this still true?  does not include final character the silent schoolhouse, not useful in noSerial mode 
+                // used for computers with no radios for dolls, users select "Do Talk" Don't Talk, and Maybe Talk
 
                 while (!mCancellationTokenSource.Token.IsCancellationRequested)
                 {
@@ -112,7 +111,7 @@ namespace DialogGenerator.CharacterSelection
                     switch (Session.Get<int>(Constants.FORCED_CH_COUNT))
                     {
                         case 0:
-                            {
+                            {  // the method handles the coin flip on who is first
                                 int _nextCharacter1Index = await GetNextCharacter();
                                 int _nextCharacter2Index = await GetNextCharacter(_nextCharacter1Index >= 0 ? _nextCharacter1Index : mRandGenNextCharacter1);
 
@@ -123,17 +122,33 @@ namespace DialogGenerator.CharacterSelection
                             }
                         case 1:
                             {
-                                mRandGenNextCharacter1 = Session.Get<int>(Constants.FORCED_CH_1);
-                                int _nextCharacter2Index = await GetNextCharacter(mRandGenNextCharacter1);
-
-                                mRandGenNextCharacter2 = _nextCharacter2Index >= 0 ? _nextCharacter2Index : mRandGenNextCharacter2;
-
+                                // coin flip for who is first
+                                if (random.NextDouble() > 0.5)
+                                {
+                                    mRandGenNextCharacter1 = Session.Get<int>(Constants.FORCED_CH_1);
+                                    int _nextCharacter2Index = await GetNextCharacter(mRandGenNextCharacter1);
+                                    mRandGenNextCharacter2 = _nextCharacter2Index >= 0 ? _nextCharacter2Index : mRandGenNextCharacter2;
+                                }
+                                else
+                                {  
+                                    mRandGenNextCharacter2 = Session.Get<int>(Constants.FORCED_CH_1);
+                                    int _nextCharacter2Index = await GetNextCharacter(mRandGenNextCharacter1);
+                                    mRandGenNextCharacter1 = _nextCharacter2Index >= 0 ? _nextCharacter2Index : mRandGenNextCharacter2;
+                                }
                                 break;
                             }
                         case 2:
                             {
-                                mRandGenNextCharacter1 = Session.Get<int>(Constants.FORCED_CH_1);
-                                mRandGenNextCharacter2 = Session.Get<int>(Constants.FORCED_CH_2);
+                                if (random.NextDouble() > 0.5)
+                                {
+                                    mRandGenNextCharacter1 = Session.Get<int>(Constants.FORCED_CH_1);
+                                    mRandGenNextCharacter2 = Session.Get<int>(Constants.FORCED_CH_2);
+                                }
+                                else
+                                {
+                                    mRandGenNextCharacter2 = Session.Get<int>(Constants.FORCED_CH_1);
+                                    mRandGenNextCharacter1 = Session.Get<int>(Constants.FORCED_CH_2);
+                                }
                                 break;
                             }
                     }
