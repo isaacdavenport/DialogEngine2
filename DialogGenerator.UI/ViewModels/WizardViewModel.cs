@@ -256,7 +256,8 @@ namespace DialogGenerator.UI.ViewModels
                     foreach (var _dialogLine in dialog)
                     {
                         if (!_dialogLine.Equals(mcCurrentLineName)
-                            && !File.Exists(Path.Combine(ApplicationData.Instance.VideoDirectory, _dialogLine + ".avi")))
+                            && !(File.Exists(Path.Combine(ApplicationData.Instance.VideoDirectory, _dialogLine + ".avi"))
+                            || File.Exists(Path.Combine(ApplicationData.Instance.VideoDirectory, _dialogLine))))
                             return false;
                     }
                 }
@@ -337,7 +338,16 @@ namespace DialogGenerator.UI.ViewModels
                             else
                             {
 
-                                MediaPlayerControlViewModel.CurrentVideoFilePath = Path.Combine(ApplicationData.Instance.VideoDirectory, _dialogLine + ".avi");
+                                if (Path.HasExtension(_dialogLine))
+                                {
+                                    MediaPlayerControlViewModel.CurrentVideoFilePath = 
+                                       Path.Combine(ApplicationData.Instance.VideoDirectory, _dialogLine);
+                                }
+                                else
+                                {                                    
+                                    MediaPlayerControlViewModel.CurrentVideoFilePath =
+                                       Path.Combine(ApplicationData.Instance.VideoDirectory, _dialogLine + ".avi");
+                                }
                                 Application.Current.Dispatcher.Invoke(() =>
                                 {
                                     if (MediaPlayerControlViewModel.PlayInContextCommand.CanExecute(null))
@@ -376,7 +386,16 @@ namespace DialogGenerator.UI.ViewModels
             });
 
             CurrentTutorialStep = CurrentWizard.TutorialSteps[CurrentStepIndex];
-            MediaPlayerControlViewModel.CurrentVideoFilePath = Path.Combine(ApplicationData.Instance.VideoDirectory, CurrentTutorialStep.VideoFileName + ".avi");
+            if(Path.HasExtension(CurrentTutorialStep.VideoFileName))
+            {
+                MediaPlayerControlViewModel.CurrentVideoFilePath =
+                    Path.Combine(ApplicationData.Instance.VideoDirectory, CurrentTutorialStep.VideoFileName);
+            }
+            else
+            {
+                MediaPlayerControlViewModel.CurrentVideoFilePath =
+                    Path.Combine(ApplicationData.Instance.VideoDirectory, CurrentTutorialStep.VideoFileName + ".avi");
+            }
             Workflow.Fire(WizardTriggers.ReadyForUserAction);
         }
 
@@ -392,7 +411,18 @@ namespace DialogGenerator.UI.ViewModels
         private void _setDataForTutorialStep(int _currentStepIndex)
         {
             CurrentTutorialStep = CurrentWizard.TutorialSteps[_currentStepIndex];
-            MediaPlayerControlViewModel.CurrentVideoFilePath = Path.Combine(ApplicationData.Instance.VideoDirectory, CurrentTutorialStep.VideoFileName + ".avi");
+
+            if (Path.HasExtension(CurrentTutorialStep.VideoFileName))
+            {
+                MediaPlayerControlViewModel.CurrentVideoFilePath =
+                   Path.Combine(ApplicationData.Instance.VideoDirectory, CurrentTutorialStep.VideoFileName);
+            }
+            else
+            {
+                MediaPlayerControlViewModel.CurrentVideoFilePath =
+                   Path.Combine(ApplicationData.Instance.VideoDirectory, CurrentTutorialStep.VideoFileName + ".avi");
+            }
+
             DialogStr = "";
 
             if (!CurrentTutorialStep.CollectUserInput)
@@ -472,7 +502,7 @@ namespace DialogGenerator.UI.ViewModels
 
         private async void _saveStep()
         {
-            if (/* CurrentStepIndex >= CurrentWizard.TutorialSteps.Count - 1 || */ !mCurrentTutorialStep.CollectUserInput)
+            if (!mCurrentTutorialStep.CollectUserInput)
             {
                 Workflow.Fire(WizardTriggers.Finish);
                 return;
