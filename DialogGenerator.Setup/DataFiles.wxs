@@ -6724,9 +6724,6 @@
             <Component Permanent="yes" Id="cmp2840A776911FB50132E04BDFF6571C22" Directory="dir60FE8674BAD8BA5A760E24CFA02FEBB3" Guid="{1C79C039-CCAB-41CE-A49D-BC7C052F0FF5}">
                 <File Id="filF1B54C4D584D710F301406D25B5A3C2D" KeyPath="yes" Source="$(var.HarvestPath)\Log\DecimalSerialLogDirectBLE.log" />
             </Component>
-            <Component Permanent="yes" Id="cmpD09BA8FB3E9CFC8FA4ADDDF96AB9D994" Directory="dir60FE8674BAD8BA5A760E24CFA02FEBB3" Guid="{50BE0BC1-A180-4AD3-810F-0A89CF07E6D1}">
-                <File Id="fil65E7D8A3CB6747B475BC9DA6D6D15D70" KeyPath="yes" Source="$(var.HarvestPath)\Log\DialogGenerator.log" />
-            </Component>
             <Component Permanent="yes" Id="cmp7BE47E7A410C6D63319A8EBDEDD8B1EF" Directory="dir60FE8674BAD8BA5A760E24CFA02FEBB3" Guid="{5353A6D4-E615-42A4-BE1E-8FA47AC4A256}">
                 <File Id="fil3E34F40C1783E4CB5DFE7509CC3B1A47" KeyPath="yes" Source="$(var.HarvestPath)\Log\LogDialog.log" />
             </Component>

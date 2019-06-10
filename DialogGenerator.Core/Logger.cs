@@ -26,7 +26,8 @@ namespace DialogGenerator.Core
             }
             else if (string.Equals(type, ApplicationData.Instance.DialogLoggerKey, StringComparison.OrdinalIgnoreCase))
             {
-                return mcLogDialog;
+                return mcDefaultLog;
+                //return mcLogDialog;  IKE got rid of second log file
             }
             else if (string.Equals(type, ApplicationData.Instance.DecimalSerialDirectBLELoggerKey, StringComparison.OrdinalIgnoreCase))
             {
@@ -58,6 +59,11 @@ namespace DialogGenerator.Core
             [CallerFilePath] string _file = "", [CallerLineNumber] int _line = 0)
         {
             _getLogger(_loggerType)?.Debug(message);
+        }
+        public void Dialog(string message, string _loggerType = null,
+            [CallerFilePath] string _file = "", [CallerLineNumber] int _line = 0)
+        {
+            _getLogger(_loggerType)?.Info(message);
         }
     }
 }

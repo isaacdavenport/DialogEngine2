@@ -94,6 +94,8 @@ namespace DialogGenerator
             Session.Set(Constants.DIALOG_MODELS, _JSONObjectTypesList.DialogModels);
             Session.Set(Constants.WIZARDS, _JSONObjectTypesList.Wizards);
 
+            mLogger.Info("Finished importing characters, dialogModels, Wizards.");
+
             mWorkflow.Fire(Triggers.InitializeDialogEngine);
         }
 
