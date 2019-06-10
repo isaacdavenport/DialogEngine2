@@ -441,6 +441,7 @@ namespace DialogGenerator.DialogEngine
                 Thread.CurrentThread.Name = "DialogGeneratorThread";
 
                 _characterSelectionTask= mCharacterSelection.StartCharacterSelection();
+                mCharactersManager.Initialize();  //TODO Isaac added so that updated characters get phraseweights calculated
 
                 do
                 {
