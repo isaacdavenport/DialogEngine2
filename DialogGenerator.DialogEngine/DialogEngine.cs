@@ -213,9 +213,9 @@ namespace DialogGenerator.DialogEngine
                 StartedTime = DateTime.Now
             });
 
-            mLogger.Info(mContext.CharactersList[_speakingCharacter].CharacterName + ": " + _selectedPhrase.DialogStr,
-                ApplicationData.Instance.DialogLoggerKey);
-        }  //TODO now that we have a single logfile outside of BLE vectors, ApplicationData.Instance.DialogLoggerKey may be redundant all are defaul logfile
+            mLogger.Info(mContext.CharactersList[_speakingCharacter].CharacterName + ": " + _selectedPhrase.DialogStr);
+            mUserLogger.Info(mContext.CharactersList[_speakingCharacter].CharacterName + ": " + _selectedPhrase.DialogStr);
+        }
 
         private void _addDialogModelToHistory(int _dialogModelIndex, int _ch1, int _ch2)
         {
@@ -355,9 +355,6 @@ namespace DialogGenerator.DialogEngine
                         }
 
                         token.ThrowIfCancellationRequested();
-
-                        mUserLogger.Info(_selectedPhrase.DialogStr);
-                        mLogger.Info(_selectedPhrase.DialogStr);
 
                         if (ApplicationData.Instance.TextDialogsOn)
                         {
