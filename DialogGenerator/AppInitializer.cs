@@ -93,7 +93,8 @@ namespace DialogGenerator
             Session.Set(Constants.DIALOG_MODELS, _JSONObjectTypesList.DialogModels);
             Session.Set(Constants.WIZARDS, _JSONObjectTypesList.Wizards);
 
-            mLogger.Info("Finished importing characters, dialogModels, Wizards.");
+            mLogger.Info("Finished importing characters: " + _JSONObjectTypesList.Characters.Count + " DialogModelGroups: " + 
+                _JSONObjectTypesList.DialogModels.Count + " Wizards: " + _JSONObjectTypesList.Wizards.Count);
 
             mWorkflow.Fire(Triggers.InitializeDialogEngine);
         }
