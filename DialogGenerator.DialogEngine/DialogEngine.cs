@@ -170,7 +170,7 @@ namespace DialogGenerator.DialogEngine
                 {
                     _fileName = Path.Combine(ApplicationData.Instance.AudioDirectory, DialogEngineConstants.SilenceFileName);
                     mUserLogger.Warning("File: " + Path.GetFileName(_pathAndFileName) + " doesn't exist.");
-                    mLogger.Info("File: " + Path.GetFileName(_pathAndFileName) + " doesn't exist.", ApplicationData.Instance.DialogLoggerKey);
+                    mLogger.Warning("File: " + Path.GetFileName(_pathAndFileName) + " doesn't exist.", ApplicationData.Instance.DialogLoggerKey);
                 }
 
                 Thread.Sleep(300);
@@ -213,9 +213,9 @@ namespace DialogGenerator.DialogEngine
                 StartedTime = DateTime.Now
             });
 
-            mLogger.Info(mContext.CharactersList[_speakingCharacter].CharacterName + ": " + _selectedPhrase.DialogStr
-                ,ApplicationData.Instance.DialogLoggerKey);
-        }
+            mLogger.Info(mContext.CharactersList[_speakingCharacter].CharacterName + ": " + _selectedPhrase.DialogStr,
+                ApplicationData.Instance.DialogLoggerKey);
+        }  //TODO now that we have a single logfile outside of BLE vectors, ApplicationData.Instance.DialogLoggerKey may be redundant all are defaul logfile
 
         private void _addDialogModelToHistory(int _dialogModelIndex, int _ch1, int _ch2)
         {
@@ -337,8 +337,6 @@ namespace DialogGenerator.DialogEngine
 
                     if (mContext.CharactersList[_speakingCharacter].PhraseTotals.PhraseWeights.ContainsKey(_currentPhraseType))
                     {
-                       // causes duplicate lines mLogger.Info(mContext.CharactersList[_speakingCharacter].CharacterName + ": ",ApplicationData.Instance.DialogLoggerKey);
-
                         if (mContext.CharactersList[_speakingCharacter].PhraseTotals.PhraseWeights[_currentPhraseType] < 0.01f)
                         {
                             mUserLogger.Warning("Missing PhraseType: " + _currentPhraseType);
@@ -359,6 +357,7 @@ namespace DialogGenerator.DialogEngine
                         token.ThrowIfCancellationRequested();
 
                         mUserLogger.Info(_selectedPhrase.DialogStr);
+                        mLogger.Info(_selectedPhrase.DialogStr);
 
                         if (ApplicationData.Instance.TextDialogsOn)
                         {

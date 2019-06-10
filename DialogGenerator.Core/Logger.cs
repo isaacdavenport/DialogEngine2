@@ -8,7 +8,6 @@ namespace DialogGenerator.Core
 {
     public class Logger : ILogger
     {
-        private readonly ILog mcLogDialog = LogManager.GetLogger(ApplicationData.Instance.DialogLoggerKey);
         private readonly ILog mcDefaultLog = LogManager.GetLogger(ApplicationData.Instance.DefaultLoggerKey);
         private readonly ILog mcDecimalSerialLogDirectBLE = LogManager.GetLogger(ApplicationData.Instance.DecimalSerialDirectBLELoggerKey);
 
@@ -59,11 +58,6 @@ namespace DialogGenerator.Core
             [CallerFilePath] string _file = "", [CallerLineNumber] int _line = 0)
         {
             _getLogger(_loggerType)?.Debug(message);
-        }
-        public void Dialog(string message, string _loggerType = null,
-            [CallerFilePath] string _file = "", [CallerLineNumber] int _line = 0)
-        {
-            _getLogger(_loggerType)?.Info(message);
         }
     }
 }

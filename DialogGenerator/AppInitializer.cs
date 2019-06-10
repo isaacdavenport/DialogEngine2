@@ -76,9 +76,8 @@ namespace DialogGenerator
 
         private  void _loadData()
         {
-            mLogger.Info("Starting DialogEngine Version " +                 
+            mLogger.Info(Environment.NewLine, Environment.NewLine, "Starting DialogEngine Version " +                 
                 $"{ FileVersionInfo.GetVersionInfo(Path.Combine(ApplicationData.Instance.RootDirectory, "DialogGenerator.exe")).FileVersion.ToString()}");
-            mUserLogger.Info("Starting DialogEngine Ver mUserLogger add ver" + 0.1);  //TODO this doesn't show in log
             _checkDirectories();
 
             IList<string> errors;
