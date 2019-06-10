@@ -138,18 +138,6 @@ namespace DialogGenerator.Handlers
                     }
                     _existingCharacters.Add(character);
                 }
-
-                //var _existingDialogModels = mDialogModelRepository.GetAll();
-                //foreach (var _dialogModel in _JSONObjectTypesList.DialogModels)
-                //{
-                //    _existingDialogModels.Add(_dialogModel);
-                //}
-
-                //var _existingWizards = mWizardRepository.GetAll();
-                //foreach (var wizard in _JSONObjectTypesList.Wizards)
-                //{
-                //    _existingWizards.Add(wizard);
-                //}
             });
         }
 

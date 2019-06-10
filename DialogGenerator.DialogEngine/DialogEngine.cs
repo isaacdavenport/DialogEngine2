@@ -337,7 +337,7 @@ namespace DialogGenerator.DialogEngine
 
                     if (mContext.CharactersList[_speakingCharacter].PhraseTotals.PhraseWeights.ContainsKey(_currentPhraseType))
                     {
-                        mLogger.Info(mContext.CharactersList[_speakingCharacter].CharacterName + ": ",ApplicationData.Instance.DialogLoggerKey);
+                       // causes duplicate lines mLogger.Info(mContext.CharactersList[_speakingCharacter].CharacterName + ": ",ApplicationData.Instance.DialogLoggerKey);
 
                         if (mContext.CharactersList[_speakingCharacter].PhraseTotals.PhraseWeights[_currentPhraseType] < 0.01f)
                         {
@@ -399,7 +399,7 @@ namespace DialogGenerator.DialogEngine
                     if (mContext.HistoricalPhrases.Count > 8000)
                         mContext.HistoricalPhrases.RemoveRange(0, 100);
 
-                    mContext.RecentDialogs.Dequeue(); //move to use HistoricalDialogs
+                    mContext.RecentDialogs.Dequeue(); //TODO move to use HistoricalDialogs
                     mContext.RecentDialogs.Enqueue(mIndexOfCurrentDialogModel);
                 }
 

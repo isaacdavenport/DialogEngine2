@@ -25,6 +25,8 @@ namespace DialogGenerator.UI.Data
         public void Export(Character character,string _directoryPath)
         {
             mCharacterRepository.Export(character,_directoryPath);
+            mLogger.Info("export character: " + character.CharacterName);
+
         }
 
         public Task SaveAsync(Character character)

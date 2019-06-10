@@ -47,6 +47,8 @@ namespace DialogGenerator.DataAccess
             var _jsonObjectsTypesList = _findDataForFile(_fileName);
 
             Serializer.Serialize(_jsonObjectsTypesList, Path.Combine(ApplicationData.Instance.DataDirectory, _fileName));
+            mLogger.Info("serializing JSON output for: " + character.CharacterName);
+
         }
 
         private JSONObjectsTypesList _findDataForFile(string _fileName)
@@ -79,6 +81,8 @@ namespace DialogGenerator.DataAccess
                     FileSystem.DeleteFile(_fullPath, UIOption.OnlyErrorDialogs, RecycleOption.SendToRecycleBin);
                 }
             }
+            mLogger.Info("removing file: " + _fileName);
+
         }
 
         private void _removeImage(string _imageFileName)
@@ -136,6 +140,7 @@ namespace DialogGenerator.DataAccess
                 FileSystem.DeleteFile(_fileInfo.FullName, UIOption.OnlyErrorDialogs
                     , RecycleOption.SendToRecycleBin);
             }
+            mLogger.Info("removing mp3s for: " + character.CharacterName);
         }
 
         public async Task SaveAsync(Character character)
@@ -144,6 +149,7 @@ namespace DialogGenerator.DataAccess
             {
                 _serializeCharacter(character);
             });
+            mLogger.Info("saving character: " + character.CharacterName);
         }
 
         public void Export(Character character,string _directoryPath)
@@ -260,6 +266,8 @@ namespace DialogGenerator.DataAccess
             }
 
             character.Phrases.Remove(phrase);
+            mLogger.Info("removing phrase: " + phrase.DialogStr);
+
         }
     }
 }
