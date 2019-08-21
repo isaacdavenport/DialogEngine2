@@ -17,6 +17,7 @@ using System.IO;
 using System.IO.Compression;
 using System.Linq;
 using System.Threading.Tasks;
+using System.Windows;
 using System.Windows.Data;
 
 namespace DialogGenerator.UI.ViewModels
@@ -119,7 +120,7 @@ namespace DialogGenerator.UI.ViewModels
             try
             {
                 System.Windows.Forms.OpenFileDialog _openFileDialog = new System.Windows.Forms.OpenFileDialog();
-                _openFileDialog.Filter = "T2l file(*.t2l)|*.t2l";
+                _openFileDialog.Filter = "T2lf file(*.t2lf)|*.t2lf";
 
                 if (_openFileDialog.ShowDialog() != System.Windows.Forms.DialogResult.OK)
                     return;
@@ -130,10 +131,22 @@ namespace DialogGenerator.UI.ViewModels
                 await Task.Run(() =>
                 {
                     FileHelper.ClearDirectory(ApplicationData.Instance.TempDirectory);
-                    ZipFile.ExtractToDirectory(_openFileDialog.FileName, ApplicationData.Instance.TempDirectory);
+                    try
+                    {
+                        FileHelper.LoadCharacter(ApplicationData.Instance.TempDirectory, _openFileDialog.FileName);
+                    } catch (Exception e)
+                    {
+                        MessageBox.Show(e.Message, "Error", MessageBoxButton.OK, MessageBoxImage.Error);
+                    }
+                    
                 });
 
                 DirectoryInfo _directoryInfo = new DirectoryInfo(ApplicationData.Instance.TempDirectory);
+
+                // If the there was the exception while loading of the file, this directory will be empty.
+                // If it is, go out.
+                if (_directoryInfo.GetFiles().Length == 0)
+                    return;
 
                 foreach(FileInfo file in _directoryInfo.EnumerateFiles("*.json"))
                 {

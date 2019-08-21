@@ -252,7 +252,7 @@ namespace DialogGenerator.UI.ViewModels
             {
                 System.Windows.Forms.SaveFileDialog _saveFileDialog = new System.Windows.Forms.SaveFileDialog
                 {
-                    Filter = "T2l file(*.t2l)|*.t2l",
+                    Filter = "T2lf file(*.t2lf)|*.t2lf",
                     FileName = Character.Model.CharacterName.Replace(" ", string.Empty)
                 };
                 System.Windows.Forms.DialogResult result = _saveFileDialog.ShowDialog();
@@ -272,7 +272,8 @@ namespace DialogGenerator.UI.ViewModels
                     mCharacterDataProvider.Export(Character.Model, ApplicationData.Instance.TempDirectory);
 
                     // zip content from temp directory
-                    ZipFile.CreateFromDirectory(ApplicationData.Instance.TempDirectory, _saveFileDialog.FileName);
+                    //ZipFile.CreateFromDirectory(ApplicationData.Instance.TempDirectory, _saveFileDialog.FileName);
+                    FileHelper.ExportCharacter(ApplicationData.Instance.TempDirectory, _saveFileDialog.FileName);
                 });
 
             }
