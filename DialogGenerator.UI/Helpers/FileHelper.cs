@@ -71,9 +71,52 @@ namespace DialogGenerator.UI.Helpers
         /// </summary>
         /// <param name="directory"></param>
         /// <param name="file"></param>
-        public static void LoadCharacter(string directory, string file)
+        public static void LoadCharacter(string directory, string fileName) 
         {
+            // Header content.
+            string headerContent = "MOJJEZIVOT";
+            int headerLength = headerContent.Length;
 
+            // Open file.
+            byte[] initialFileBytes = File.ReadAllBytes(fileName);
+
+            // Read header.
+            byte[] headerBytes = new byte[headerLength];
+            Array.Copy(initialFileBytes, 0, headerBytes, 0, headerLength);
+            char[] headerChars = new char[headerLength];
+            for(int i = 0; i < headerLength; i++)
+            {
+                headerChars[i] = Convert.ToChar(headerBytes[i]);
+            }
+
+            string header = new string(headerChars);
+            if(!header.Equals(headerContent))
+            {
+                throw (new Exception("Wrong file format!"));
+            }
+
+            // Save the rest as temporary file (zip file).
+            byte[] tempFileBytes = new byte[initialFileBytes.Length - headerLength];
+            Array.Copy(initialFileBytes, headerLength, tempFileBytes, 0, tempFileBytes.Length);
+
+            //// Extract file name.
+            string onlyDir = Path.GetDirectoryName(fileName);
+            //// Temporary file name.
+            string tempFileName = onlyDir + "\\tempfile";
+            if (File.Exists(tempFileName))
+            {
+                File.Delete(tempFileName);
+            }
+
+            FileStream sb = new FileStream(tempFileName, FileMode.OpenOrCreate);
+            sb.Write(tempFileBytes, 0, tempFileBytes.Length);
+            sb.Close();
+
+            // Unpack the temp zip file to directory.
+            ZipFile.ExtractToDirectory(tempFileName, directory);
+
+            // Delete temp file.
+            File.Delete(tempFileName);
         }
 
         /// <summ
@@ -83,6 +126,10 @@ namespace DialogGenerator.UI.Helpers
         /// <param name="fileName">Name of the destination zip file.</param>
         public static void ExportCharacter(string directory, string fileName)
         {
+            // Header content.
+            string headerContent = "TOYS2LIFEFILE";
+            int headerLength = headerContent.Length;
+
             // Extract file name.
             string onlyDir = Path.GetDirectoryName(fileName);
 
@@ -97,9 +144,8 @@ namespace DialogGenerator.UI.Helpers
             ZipFile.CreateFromDirectory(directory, tempFileName);
 
             // Create addition to the ZIP file header.
-            string header = "TOYS2LIFEFILE";
-            byte[] headerInBytes = new byte[header.Length];
-            char[] headerInChars = header.ToArray();
+            byte[] headerInBytes = new byte[headerContent.Length];
+            char[] headerInChars = headerContent.ToArray();
             for(int i = 0; i < headerInChars.Length; i ++)
             {
                 headerInBytes[i] = Convert.ToByte(headerInChars[i]);
