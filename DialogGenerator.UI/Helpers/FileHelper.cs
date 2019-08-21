@@ -74,7 +74,7 @@ namespace DialogGenerator.UI.Helpers
         public static void LoadCharacter(string directory, string fileName) 
         {
             // Header content.
-            string headerContent = "MOJJEZIVOT";
+            string headerContent = "TOYS2LIFEFILE";
             int headerLength = headerContent.Length;
 
             // Open file.
