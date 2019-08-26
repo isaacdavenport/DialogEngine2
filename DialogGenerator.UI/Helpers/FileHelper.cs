@@ -74,7 +74,7 @@ namespace DialogGenerator.UI.Helpers
         public static void LoadCharacter(string directory, string fileName) 
         {
             // Header content.
-            string headerContent = "TOYS2LIFEFILE";
+            string headerContent = "TOYS2LIFE_THE_DIALOG_GENERATOR";
             int headerLength = headerContent.Length;
 
             // Open file.
@@ -127,7 +127,7 @@ namespace DialogGenerator.UI.Helpers
         public static void ExportCharacter(string directory, string fileName)
         {
             // Header content.
-            string headerContent = "TOYS2LIFEFILE";
+            string headerContent = "TOYS2LIFE_THE_DIALOG_GENERATOR";
             int headerLength = headerContent.Length;
 
             // Extract file name.

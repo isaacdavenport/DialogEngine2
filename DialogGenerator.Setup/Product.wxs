@@ -40,7 +40,7 @@
       <ComponentRef Id="mp3gain.exe"/>
       <ComponentRef Id="Tutorial"/>
       <ComponentRef Id="tutorial.pdf"/>
-      <ComponentRef Id="tutorial.docx"/>
+      <!--<ComponentRef Id="tutorial.docx"/>-->
       <ComponentRef Id="PhraseTypes.txt"/>
       <ComponentRef Id="PhraseTypeGlossary.docx"/>
 		</Feature>
