@@ -1,0 +1,9 @@
+﻿<Application x:Class="DialogGenerator.ZIPFIleUtility.App"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:local="clr-namespace:DialogGenerator.ZIPFIleUtility"
+             StartupUri="MainWindow.xaml">
+    <Application.Resources>
+         
+    </Application.Resources>
+</Application>
