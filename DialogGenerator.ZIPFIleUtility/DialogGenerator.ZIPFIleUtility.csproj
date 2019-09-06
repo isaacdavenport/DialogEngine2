@@ -94,5 +94,22 @@
   <ItemGroup>
     <None Include="App.config" />
   </ItemGroup>
+  <ItemGroup>
+    <Resource Include="Resources\logo.jpg">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Resource>
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="Resources\appexit.png" />
+    <Resource Include="Resources\openfile.png" />
+    <Resource Include="Resources\process.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="Resources\appexit24.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="Resources\convert24.png" />
+    <Resource Include="Resources\openfile24.png" />
+  </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>

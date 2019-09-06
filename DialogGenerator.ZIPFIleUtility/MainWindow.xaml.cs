@@ -1,19 +1,8 @@
 ﻿using Microsoft.Win32;
 using System;
-using System.Collections.Generic;
 using System.IO;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using System.Windows;
-using System.Windows.Controls;
-using System.Windows.Data;
-using System.Windows.Documents;
-using System.Windows.Input;
-using System.Windows.Media;
-using System.Windows.Media.Imaging;
-using System.Windows.Navigation;
-using System.Windows.Shapes;
 
 namespace DialogGenerator.ZIPFIleUtility
 {
@@ -25,6 +14,7 @@ namespace DialogGenerator.ZIPFIleUtility
         public MainWindow()
         {
             InitializeComponent();
+            this.WindowStartupLocation = WindowStartupLocation.CenterScreen;
         }
 
         #region Event Handlers
@@ -63,12 +53,12 @@ namespace DialogGenerator.ZIPFIleUtility
             }
 
             if (result == true)
-            {
-                MessageBox.Show("The conversion successfully done!");
+            {                
+                MessageBox.Show(Application.Current.MainWindow, "The conversion was done successfully!", "Success", MessageBoxButton.OK, MessageBoxImage.Information);
             }
             else
             {
-                MessageBox.Show("Something went wrong!");
+                MessageBox.Show(Application.Current.MainWindow, "Something went wrong!", "Error", MessageBoxButton.OK, MessageBoxImage.Error);                
             }
         }
 
@@ -150,5 +140,9 @@ namespace DialogGenerator.ZIPFIleUtility
         }
         #endregion
 
+        private void BtnExitApp_Click(object sender, RoutedEventArgs e)
+        {
+            Application.Current.Shutdown();
+        }
     }
 }
