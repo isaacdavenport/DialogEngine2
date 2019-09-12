@@ -70,7 +70,7 @@
                 </Button.Visibility>
                 <materialDesign:PackIcon Kind="Stop" />
             </Button>
-            <Button x:Name="PlayInContextBtn" Content="Play in context" Height="25" Margin="10,10,10,10"  Padding="4,0,4,0" Width="auto"
+            <Button x:Name="PlayInContextBtn" Content="Conversation" Height="25" Margin="10,10,10,10"  Padding="4,0,4,0" Width="auto"
                 Visibility="{Binding Path=Visibility, ElementName=StopPlayingInContextBtn,Converter={StaticResource InvertVisibilityValueConverter}}"    
                 Command="{Binding DataContext.PlayInContext, RelativeSource={RelativeSource Mode=FindAncestor, AncestorType=view:WizardView}}"/>
             <Button x:Name="StopPlayingInContextBtn" Content="Stop" Height="25" Margin="10,10,10,10" Padding="4,0,4,0" Width="auto"

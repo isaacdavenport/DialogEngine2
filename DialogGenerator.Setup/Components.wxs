@@ -153,7 +153,13 @@
         <CreateFolder />
       </Component>
       <Component Id="JSONedit.exe" Guid="bafab659-84af-4742-8e87-f83e7d2cc101" KeyPath="yes" >
+        <File Id="jsonedit.ico" Name="jsonedit.ico" Source="Resources\jsonedit.ico"  />
         <File Id="JSONedit.exe"  Name="JSONedit.exe" Source="$(var.DialogGenerator_TargetDir)Tools\JSONedit.exe" />
+        <ProgId Id="JSONEdit.Document" Description="JSON Edit Document" Icon="jsonedit.ico">
+          <Extension Id="json" ContentType="application/json" >
+            <Verb Id="open" Command="open" TargetFile="JSONedit.exe"  Argument="%1" />
+          </Extension>
+        </ProgId>
       </Component>
       <Component Id="mp3gain.exe" Guid="4694ec38-ac0d-4e92-bcd8-fcb7a5539ba7"  KeyPath="yes">
         <File Id="mp3gain.exe"  Name="mp3gain.exe" Source="$(var.DialogGenerator_TargetDir)Tools\mp3gain.exe" />

@@ -10,7 +10,7 @@ namespace DialogGenerator.UI.Converters
         {
             bool _isPlayingLineInContext = (bool)value;
 
-            return _isPlayingLineInContext ? "Stop" : "Play in context";
+            return _isPlayingLineInContext ? "Stop" : "Conversation";
         }
 
         public object ConvertBack(object value, Type targetType, object parameter, CultureInfo culture)
