@@ -158,10 +158,69 @@ namespace DialogGenerator.DataAccess
             var characters = new ObservableCollection<Character>();
             characters.Add(character);
 
+            // Collection phrase weights keys from character phrases.
+            List<string> _phraseWeights = new List<string>();
+            if(character.Phrases.Count > 0)
+            {
+                foreach(var _phraseEntry in character.Phrases)
+                {
+                    foreach(KeyValuePair<string, double> _entry in _phraseEntry.PhraseWeights)
+                    {
+                        if(!_phraseWeights.Contains(_entry.Key))
+                        {
+                            _phraseWeights.Add(_entry.Key);
+                        }
+                    }
+                }
+            }
+
+            // Find dialog models that match the above selected phrase weights.
+            List<ModelDialog> _matchedDialogModels = new List<ModelDialog>();
+            string _lastCollectionName = String.Empty;
+            if(_phraseWeights.Count > 0)
+            {
+                ObservableCollection<ModelDialogInfo> _dlgModels = Session.Get(Constants.DIALOG_MODELS) as ObservableCollection<ModelDialogInfo>;
+                if(_dlgModels != null && _dlgModels.Count > 0)
+                {
+                    foreach(var _dlginfo in _dlgModels)
+                    {
+                        List<ModelDialog> _dialogModels = _dlginfo.ArrayOfDialogModels;
+                        foreach(var _dialogModel in _dialogModels)
+                        {
+                            foreach (var _phraseType in _dialogModel.PhraseTypeSequence)
+                            {
+                                if(_phraseWeights.Contains(_phraseType))
+                                {
+                                    if(!_matchedDialogModels.Contains(_dialogModel))
+                                    {
+                                        _matchedDialogModels.Add(_dialogModel);
+                                        _lastCollectionName = _dlginfo.ModelsCollectionName;
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+
+            ModelDialogInfo _dialogInfo = new ModelDialogInfo
+            {
+                ArrayOfDialogModels = _matchedDialogModels,               
+            };
+
+            if(!string.IsNullOrEmpty(_lastCollectionName))
+            {
+                _dialogInfo.ModelsCollectionName = _lastCollectionName;
+            }
+            
+
             var _jsonObjectsTypesList = new JSONObjectsTypesList
             {
-                Characters = characters
+                Characters = characters,                
             };
+
+            _jsonObjectsTypesList.DialogModels.Add(_dialogInfo);
+
             Serializer.Serialize(_jsonObjectsTypesList, Path.Combine(_directoryPath, _fileName));
 
             // export mp3 files
