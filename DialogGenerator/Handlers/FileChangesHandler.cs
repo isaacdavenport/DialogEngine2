@@ -1,8 +1,11 @@
 ﻿using DialogGenerator.Core;
 using DialogGenerator.DataAccess;
+using DialogGenerator.DialogEngine;
+using DialogGenerator.Events;
 using DialogGenerator.Model;
 using DialogGenerator.Model.Enum;
 using DialogGenerator.Utilities;
+using Prism.Events;
 using System;
 using System.Collections.Generic;
 using System.IO;
@@ -21,8 +24,9 @@ namespace DialogGenerator.Handlers
         private IWizardRepository mWizardRepository;
         private IDialogModelRepository mDialogModelRepository;
         private FileSystemWatcher mFileWatcher;
+        private IEventAggregator mEventAggregator;
 
-        public FileChangesHandler(ILogger logger,IMessageDialogService _messageDialogService
+        public FileChangesHandler(ILogger logger,IMessageDialogService _messageDialogService, IEventAggregator _eventAgregator
             ,IDialogDataRepository _dialogDataRepository
             ,ICharacterRepository _characterRepository
             ,IWizardRepository _wizardRepository
@@ -34,6 +38,7 @@ namespace DialogGenerator.Handlers
             mCharacterRepository = _characterRepository;
             mWizardRepository = _wizardRepository;
             mDialogModelRepository = _dialogModelRepository;
+            mEventAggregator = _eventAgregator;
         }
 
         private async void _file_Changed(object sender, FileSystemEventArgs e)
@@ -134,9 +139,7 @@ namespace DialogGenerator.Handlers
                 {
                     if (_existingCharacters.Contains(character))
                     {
-                        //_existingCharacters.Remove(character);
                         var _existingCharacter = _existingCharacters.First(c => c.Equals(character));
-                        //_existingCharacter.Merge(character);
                         int _idx = _existingCharacters.IndexOf(_existingCharacter);
                         _existingCharacters.Remove(_existingCharacter);
                         _existingCharacters.Insert(_idx, character);
@@ -165,6 +168,9 @@ namespace DialogGenerator.Handlers
 
                 Session.Set(Constants.CHARACTERS, _existingCharacters);
                 Session.Set(Constants.DIALOG_MODELS, _existingDialogModels);
+
+                mEventAggregator.GetEvent<CharacterUpdatedEvent>().Publish();
+
             });
         }
 

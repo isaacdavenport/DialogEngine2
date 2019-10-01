@@ -91,8 +91,14 @@ namespace DialogGenerator.DialogEngine
             mEventAggregator.GetEvent<SelectedCharactersPairChangedEvent>().Subscribe(_onSelectedCharactersPairChanged);
             mEventAggregator.GetEvent<ChangedCharacterStateEvent>().Subscribe(_onChangedCharacterState);
             mEventAggregator.GetEvent<ChangedDialogModelStateEvent>().Subscribe(_onChangedDialogModelState);
+            mEventAggregator.GetEvent<CharacterUpdatedEvent>().Subscribe(_onCharacterUpdated);
             mWorkflow.PropertyChanged += _mWorkflow_PropertyChanged;
             Session.SessionPropertyChanged += _sessionPropertyChanged;
+        }
+
+        private void _onCharacterUpdated()
+        {
+            this.Initialize();
         }
 
         private void _onChangedDialogModelState()
