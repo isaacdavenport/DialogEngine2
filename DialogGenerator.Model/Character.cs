@@ -160,6 +160,18 @@ namespace DialogGenerator.Model
             return other.CharacterPrefix.Equals(this.CharacterPrefix);
         }
 
+        public void Merge(Character other)
+        {
+            if (!this.Equals(other))
+                return;
+
+            this.Phrases.Clear();
+            foreach(var phrase in other.Phrases)
+            {
+                this.Phrases.Add(phrase);
+            }
+        }
+
         public virtual void OnPropertyChanged(string _propertyName)
         {
             PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(_propertyName));

@@ -134,10 +134,37 @@ namespace DialogGenerator.Handlers
                 {
                     if (_existingCharacters.Contains(character))
                     {
-                        _existingCharacters.Remove(character);
+                        //_existingCharacters.Remove(character);
+                        var _existingCharacter = _existingCharacters.First(c => c.Equals(character));
+                        //_existingCharacter.Merge(character);
+                        int _idx = _existingCharacters.IndexOf(_existingCharacter);
+                        _existingCharacters.Remove(_existingCharacter);
+                        _existingCharacters.Insert(_idx, character);
                     }
-                    _existingCharacters.Add(character);
+                    else
+                    {
+                        _existingCharacters.Add(character);
+                    }
+
                 }
+
+                var _existingDialogModels = mDialogModelRepository.GetAll();
+                foreach(var _dialogModel in _JSONObjectTypesList.DialogModels)
+                {
+                    if(_existingDialogModels.Contains(_dialogModel))
+                    {
+                        var _existingDialogModel = _existingDialogModels.First(d => d.Equals(_dialogModel));
+                        int _dlgModelIdx = _existingDialogModels.IndexOf(_existingDialogModel);
+                        _existingDialogModels.Remove(_existingDialogModel);
+                        _existingDialogModels.Insert(_dlgModelIdx, _dialogModel);
+                    } else
+                    {
+                        _existingDialogModels.Add(_dialogModel);
+                    }
+                }
+
+                Session.Set(Constants.CHARACTERS, _existingCharacters);
+                Session.Set(Constants.DIALOG_MODELS, _existingDialogModels);
             });
         }
 
