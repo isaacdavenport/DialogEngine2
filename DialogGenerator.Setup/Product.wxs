@@ -38,6 +38,7 @@
       <ComponentRef Id="Tools"/>
       <ComponentRef Id="JSONedit.exe"/>
       <ComponentRef Id="mp3gain.exe"/>
+      <ComponentRef Id="DialogGenerator.ZIPFIleUtility.exe"/>
       <ComponentRef Id="Tutorial"/>
       <ComponentRef Id="tutorial.pdf"/>
       <!--<ComponentRef Id="tutorial.docx"/>-->

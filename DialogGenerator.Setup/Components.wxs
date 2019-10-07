@@ -163,7 +163,10 @@
       </Component>
       <Component Id="mp3gain.exe" Guid="4694ec38-ac0d-4e92-bcd8-fcb7a5539ba7"  KeyPath="yes">
         <File Id="mp3gain.exe"  Name="mp3gain.exe" Source="$(var.DialogGenerator_TargetDir)Tools\mp3gain.exe" />
-      </Component>    
+      </Component>
+      <Component Id="DialogGenerator.ZIPFIleUtility.exe" Guid="BFA5887C-286D-437E-8655-03CACC3B52D8"  KeyPath="yes">
+        <File Id="DialogGenerator.ZIPFIleUtility.exe"  Name="DialogGenerator.ZIPFIleUtility.exe" Source="$(var.DialogGenerator_TargetDir)Tools\DialogGenerator.ZIPFIleUtility.exe" />
+      </Component>
     </DirectoryRef>
   </Fragment>
   <!--

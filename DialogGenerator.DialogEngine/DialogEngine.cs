@@ -96,6 +96,10 @@ namespace DialogGenerator.DialogEngine
             Session.SessionPropertyChanged += _sessionPropertyChanged;
         }
 
+        /// <summary>
+        /// S.Ristic Fix of the DLGEN-401 - 10/07/2019.
+        /// Handler of the CharacterUpdatedEvent
+        /// </summary>
         private void _onCharacterUpdated()
         {
             this.Initialize();

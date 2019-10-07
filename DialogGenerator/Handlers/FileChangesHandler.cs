@@ -139,6 +139,11 @@ namespace DialogGenerator.Handlers
                 {
                     if (_existingCharacters.Contains(character))
                     {
+                        // S.Ristic - Fix of DLGEN-401 10/07/2019.
+                        // Instead of removing and adding of character, we will implement
+                        // the removing and inserting of character on the same spot/index 
+                        // in the character collection, in order to maintain the forced 
+                        // character indices.
                         var _existingCharacter = _existingCharacters.First(c => c.Equals(character));
                         int _idx = _existingCharacters.IndexOf(_existingCharacter);
                         _existingCharacters.Remove(_existingCharacter);
@@ -169,6 +174,8 @@ namespace DialogGenerator.Handlers
                 Session.Set(Constants.CHARACTERS, _existingCharacters);
                 Session.Set(Constants.DIALOG_MODELS, _existingDialogModels);
 
+                // S.Ristic - Fix of DLGEN-401 10/07/2019.
+                // Notify the dialog engine that it should re-initialize.
                 mEventAggregator.GetEvent<CharacterUpdatedEvent>().Publish();
 
             });
