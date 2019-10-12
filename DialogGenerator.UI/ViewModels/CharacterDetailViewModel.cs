@@ -342,7 +342,36 @@ namespace DialogGenerator.UI.ViewModels
                 string _imageFileName = Character.CharacterImage;
                 Character.CharacterImage = ApplicationData.Instance.DefaultImage; // set to default image to avoid file in use exception
 
+                int _characterIndex = mCharacterDataProvider.IndexOf(Character.Model);
+
                 await mCharacterDataProvider.Remove(Character.Model, _imageFileName);
+
+                // S.Ristic 10/12/2019
+                // Find out if the deleted character has participated in the conversation and 
+                // if it had, remove it's index from the forced character indices and decrease the 
+                // count of forced characters for 1. 
+                if (Character.Model.State == Model.Enum.CharacterState.On)
+                {
+                    int _forcedCharactersCount = Session.Get<int>(Constants.FORCED_CH_COUNT);
+                    
+                    if (Session.Get<int>(Constants.FORCED_CH_1) == _characterIndex)
+                    {
+                        Session.Set(Constants.FORCED_CH_1, -1);
+                        Session.Set(Constants.FORCED_CH_COUNT, _forcedCharactersCount - 1);
+
+                        if (Session.Get<int>(Constants.FORCED_CH_COUNT) == 1)
+                        {
+                            Session.Set(Constants.FORCED_CH_1, Session.Get<int>(Constants.FORCED_CH_2));
+                            Session.Set(Constants.FORCED_CH_2, -1);
+                        }
+                    }
+
+                    if (Session.Get<int>(Constants.FORCED_CH_2) == _characterIndex)
+                    {
+                        Session.Set(Constants.FORCED_CH_2, -1);
+                        Session.Set(Constants.FORCED_CH_COUNT, _forcedCharactersCount - 1);
+                    }
+                }
 
                 Load("");
             }

@@ -1,4 +1,5 @@
-﻿using System.Collections.ObjectModel;
+﻿using System;
+using System.Collections.ObjectModel;
 using System.Linq;
 using DialogGenerator.Core;
 using DialogGenerator.Model;
@@ -8,6 +9,11 @@ namespace DialogGenerator.DataAccess
 {
     public class DialogModelRepository : IDialogModelRepository
     {
+        public bool Contains(ModelDialogInfo modelDialogInfo)
+        {
+            return Session.Get<ObservableCollection<ModelDialogInfo>>(Constants.DIALOG_MODELS).Contains(modelDialogInfo);
+        }
+
         public ObservableCollection<ModelDialogInfo> GetAll()
         {
             return Session.Get<ObservableCollection<ModelDialogInfo>>(Constants.DIALOG_MODELS);
@@ -33,11 +39,22 @@ namespace DialogGenerator.DataAccess
 
         public ModelDialogInfo GetByName(string name)
         {
-            var _dialogModelInfo = Session.Get<ObservableCollection<ModelDialogInfo>>(Constants.DIALOG_MODELS)
+            var _collection = Session.Get<ObservableCollection<ModelDialogInfo>>(Constants.DIALOG_MODELS);
+            try {
+                var _dialogModelInfo = _collection
                 .Where(dm => dm.ModelsCollectionName.Equals(name))
                 .FirstOrDefault();
+                return _dialogModelInfo;
+            } catch (Exception e)
+            {
+                return null;
+            }
+            
+            //var _dialogModelInfo = Session.Get<ObservableCollection<ModelDialogInfo>>(Constants.DIALOG_MODELS)
+            //    .Where(dm => dm.ModelsCollectionName.Equals(name))
+            //    .FirstOrDefault();
 
-            return _dialogModelInfo;
+            
         }
     }
 }

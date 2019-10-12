@@ -58,5 +58,10 @@ namespace DialogGenerator.UI.Data
         {
             mCharacterRepository.RemovePhrase(character, phrase);
         }
+
+        public int IndexOf(Character character)
+        {
+            return mCharacterRepository.IndexOf(character);
+        }
     }
 }

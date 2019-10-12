@@ -9,6 +9,7 @@ namespace DialogGenerator.DataAccess
     public interface ICharacterRepository
     {
         ObservableCollection<Character> GetAll();
+        int IndexOf(Character character);
         Character GetByInitials(string initials);
         List<Character> GetAllByState(CharacterState state);
         Character GetByAssignedRadio(int _radioNum);

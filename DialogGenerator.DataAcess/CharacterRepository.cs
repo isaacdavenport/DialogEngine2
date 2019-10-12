@@ -71,7 +71,37 @@ namespace DialogGenerator.DataAccess
                 || !_isListNullOrEmpty(_jsonObjectsTypesList.Wizards)
                 || !_isListNullOrEmpty(_jsonObjectsTypesList.DialogModels))
             {
-                Serializer.Serialize(_jsonObjectsTypesList, Path.Combine(ApplicationData.Instance.DataDirectory, _fileName));
+                // S.Ristic 10/12/2019.
+                // For each of the custom dialog models and wizards
+                // create a separate json file.
+                if (_isListNullOrEmpty(_jsonObjectsTypesList.Characters))
+                {
+                    foreach(var _dialogModel in _jsonObjectsTypesList.DialogModels)
+                    {
+                        var _jsonList = new JSONObjectsTypesList();
+                        _jsonList.DialogModels.Add(_dialogModel);
+                        var _separateFileName = _dialogModel.ModelsCollectionName + ".json";
+                        Serializer.Serialize(_jsonList, Path.Combine(ApplicationData.Instance.DataDirectory, _separateFileName));
+                    }
+
+                    foreach( var _wizard in _jsonObjectsTypesList.Wizards)
+                    {
+                        var _jsonList = new JSONObjectsTypesList();
+                        _jsonList.Wizards.Add(_wizard);
+                        var _separateFileName = _wizard.WizardName + ".json";
+                        Serializer.Serialize(_jsonList, Path.Combine(ApplicationData.Instance.DataDirectory, _separateFileName));
+                    }
+
+                    // S.Ristic 10/12/2019.
+                    // And now delete the original file.
+                    string _fullPath = Path.Combine(ApplicationData.Instance.DataDirectory, _fileName);
+                    if (File.Exists(_fullPath))
+                    {
+                        FileSystem.DeleteFile(_fullPath, UIOption.OnlyErrorDialogs, RecycleOption.SendToRecycleBin);
+                    }
+
+                }
+
             }
             else
             {
@@ -174,9 +204,9 @@ namespace DialogGenerator.DataAccess
                 }
             }
 
-            // Find dialog models that match the above selected phrase weights.
-            List<ModelDialog> _matchedDialogModels = new List<ModelDialog>();
-            string _lastCollectionName = String.Empty;
+            // Find dialog models collections that match the above selected phrase weights.            
+            List<ModelDialogInfo> _matchedDialogInfos = new List<ModelDialogInfo>();
+            
             if(_phraseWeights.Count > 0)
             {
                 ObservableCollection<ModelDialogInfo> _dlgModels = Session.Get(Constants.DIALOG_MODELS) as ObservableCollection<ModelDialogInfo>;
@@ -191,10 +221,9 @@ namespace DialogGenerator.DataAccess
                             {
                                 if(_phraseWeights.Contains(_phraseType))
                                 {
-                                    if(!_matchedDialogModels.Contains(_dialogModel))
+                                    if(!_matchedDialogInfos.Contains(_dlginfo))
                                     {
-                                        _matchedDialogModels.Add(_dialogModel);
-                                        _lastCollectionName = _dlginfo.ModelsCollectionName;
+                                        _matchedDialogInfos.Add(_dlginfo);
                                     }
                                 }
                             }
@@ -202,24 +231,16 @@ namespace DialogGenerator.DataAccess
                     }
                 }
             }
-
-            ModelDialogInfo _dialogInfo = new ModelDialogInfo
-            {
-                ArrayOfDialogModels = _matchedDialogModels,               
-            };
-
-            if(!string.IsNullOrEmpty(_lastCollectionName))
-            {
-                _dialogInfo.ModelsCollectionName = _lastCollectionName;
-            }
             
-
             var _jsonObjectsTypesList = new JSONObjectsTypesList
             {
                 Characters = characters,                
             };
 
-            _jsonObjectsTypesList.DialogModels.Add(_dialogInfo);
+            if(_matchedDialogInfos.Count > 0)
+            {
+                _jsonObjectsTypesList.DialogModels.AddRange(_matchedDialogInfos);
+            }
 
             Serializer.Serialize(_jsonObjectsTypesList, Path.Combine(_directoryPath, _fileName));
 
@@ -260,6 +281,11 @@ namespace DialogGenerator.DataAccess
         public ObservableCollection<Character> GetAll()
         {
             return Session.Get<ObservableCollection<Character>>(Constants.CHARACTERS);
+        }
+
+        public int IndexOf(Character character)
+        {
+            return Session.Get<ObservableCollection<Character>>(Constants.CHARACTERS).IndexOf(character);
         }
 
         public Character GetByInitials(string initials)

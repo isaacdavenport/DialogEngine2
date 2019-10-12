@@ -13,5 +13,7 @@ namespace DialogGenerator.DataAccess
         ObservableCollection<ModelDialogInfo> GetAllByState(ModelDialogState state);
 
         ModelDialogInfo GetByName(string name);
+
+        bool Contains(ModelDialogInfo modelDialogInfo);
     }
 }

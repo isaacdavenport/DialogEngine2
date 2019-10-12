@@ -9,6 +9,7 @@ namespace DialogGenerator.UI.Data
         ObservableCollection<Character> GetAll();
         Character GetByInitials(string initials);
         Character GetByAssignedRadio(int _radionNum);
+        int IndexOf(Character character);
         Task AddAsync(Character character);
         Task SaveAsync(Character character);
         void Export(Character character,string _directoryPath);
