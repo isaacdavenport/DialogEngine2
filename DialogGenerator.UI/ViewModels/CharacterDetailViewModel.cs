@@ -67,9 +67,10 @@ namespace DialogGenerator.UI.ViewModels
 
             mEventAggregator.GetEvent<OpenCharacterDetailViewEvent>().Subscribe(_onOpenCharacterDetailView);
             mEventAggregator.GetEvent<CharacterSelectionActionChangedEvent>().Subscribe(_onCharacterSelectionActionChanged);
+            mEventAggregator.GetEvent<CharacterStructureChangedEvent>().Subscribe(_onCharacterStructureChanged);
 
             _bindCommands();
-        }
+        }       
 
         public CharacterDetailViewModel(ILogger object1, IEventAggregator object2, ICharacterDataProvider object3, IMessageDialogService object4, IMP3Player object5)
         {
@@ -136,6 +137,12 @@ namespace DialogGenerator.UI.ViewModels
         private void _viewLoaded_Execute()
         {
             var character =mRegionManager.Regions[Constants.ContentRegion].Context as Character;
+            Load(string.IsNullOrEmpty(character.CharacterPrefix) ? "" : character.CharacterPrefix);
+        }
+
+        private void _onCharacterStructureChanged()
+        {
+            var character = mRegionManager.Regions[Constants.ContentRegion].Context as Character;
             Load(string.IsNullOrEmpty(character.CharacterPrefix) ? "" : character.CharacterPrefix);
         }
 

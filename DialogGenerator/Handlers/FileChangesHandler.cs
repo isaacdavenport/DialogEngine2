@@ -177,6 +177,8 @@ namespace DialogGenerator.Handlers
                 // S.Ristic - Fix of DLGEN-401 10/07/2019.
                 // Notify the dialog engine that it should re-initialize.
                 mEventAggregator.GetEvent<CharacterUpdatedEvent>().Publish();
+                // S.Ristic - Fix of DLGEN-406 10/17/2019.
+                mEventAggregator.GetEvent<CharacterStructureChangedEvent>().Publish();
 
             });
         }
