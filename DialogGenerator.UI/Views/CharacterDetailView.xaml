@@ -50,6 +50,9 @@
         <i:EventTrigger EventName="Loaded">
             <i:InvokeCommandAction Command="{Binding ViewLoadedCommand}" />
         </i:EventTrigger>
+        <i:EventTrigger EventName="Unloaded">
+            <i:InvokeCommandAction Command="{Binding ViewClosedCommand}" />
+        </i:EventTrigger>
     </i:Interaction.Triggers>
 
     <Grid>
