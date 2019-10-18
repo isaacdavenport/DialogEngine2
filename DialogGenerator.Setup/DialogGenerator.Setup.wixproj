@@ -19,6 +19,7 @@
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|x86' ">
     <OutputPath>bin\$(Configuration)\</OutputPath>
     <IntermediateOutputPath>obj\$(Configuration)\</IntermediateOutputPath>
+    <DefineConstants>HarvestPath=C:\Users\$(USERNAME)\Documents\DialogGenerator</DefineConstants>
   </PropertyGroup>
   <ItemGroup>
     <Compile Include="Components.wxs" />
