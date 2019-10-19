@@ -257,8 +257,10 @@ namespace DialogGenerator.UI.ViewModels
                         File.Copy(_mp3File.FullName, Path.Combine(ApplicationData.Instance.AudioDirectory, _mp3File.Name), true);
                     }
 
+                    // S.Ristic - 10/20/2019. Fix of the bug DLGEN-405
+                    // The image file name should not conform to character prefix anymore.
                     FileInfo _imageFile = _dirInfo.GetFiles()
-                        .Where(f => _supportedExtensions.Contains(f.Extension.ToLower()) && f.Name.StartsWith(character.CharacterPrefix))
+                        .Where(f => _supportedExtensions.Contains(f.Extension.ToLower()) /* && f.Name.StartsWith(character.CharacterPrefix) */)
                         .ToList().FirstOrDefault();
 
                     if (_imageFile != null)

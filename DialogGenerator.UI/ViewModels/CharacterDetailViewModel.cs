@@ -144,18 +144,22 @@ namespace DialogGenerator.UI.ViewModels
 
         private void _viewClosed_Execute()
         {
-            // S.Ristic 10/17/2019.
-            // Kill JSONEditor for this character if opened.
-            if (ProcessHandler.Contains(Character.Model.FileName))
-            {
-                ProcessHandler.Remove(Character.Model.FileName);                
-            }
+            // S.Ristic - 10/19/2019 - Fixing of DLGEN-407 Bug
+            // I had to comment this because there were cases when the Character.Model.FileName was null.
+            // Killing of opened JSONEdit process is already implemented on another place. But I will 
+            // leave this handler for the future use.
+
+            //// S.Ristic 10/17/2019.
+            //// Kill JSONEditor for this character if opened.
+            //if (ProcessHandler.Contains(Character.Model.FileName))
+            //{
+            //    ProcessHandler.Remove(Character.Model.FileName);                
+            //}
         }
 
         private void _onCharacterStructureChanged()
         {
-            var character = mRegionManager.Regions[Constants.ContentRegion].Context as Character;
-            Load(string.IsNullOrEmpty(character.CharacterPrefix) ? "" : character.CharacterPrefix);
+            Load(string.IsNullOrEmpty(Character.CharacterPrefix) ? "" : Character.CharacterPrefix);
         }
 
         private bool _deletePrhase_CanExecute(PhraseEntry arg)
