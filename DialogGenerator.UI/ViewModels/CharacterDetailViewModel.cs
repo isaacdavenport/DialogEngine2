@@ -67,9 +67,10 @@ namespace DialogGenerator.UI.ViewModels
 
             mEventAggregator.GetEvent<OpenCharacterDetailViewEvent>().Subscribe(_onOpenCharacterDetailView);
             mEventAggregator.GetEvent<CharacterSelectionActionChangedEvent>().Subscribe(_onCharacterSelectionActionChanged);
+            mEventAggregator.GetEvent<CharacterStructureChangedEvent>().Subscribe(_onCharacterStructureChanged);
 
             _bindCommands();
-        }
+        }       
 
         public CharacterDetailViewModel(ILogger object1, IEventAggregator object2, ICharacterDataProvider object3, IMessageDialogService object4, IMP3Player object5)
         {
@@ -91,6 +92,7 @@ namespace DialogGenerator.UI.ViewModels
         public ICommand ChooseImageCommand { get; set; }
         public ICommand CopyToClipboardCommand { get; set; }
         public ICommand ViewLoadedCommand { get; set; }
+        public ICommand ViewClosedCommand { get; set; }
         public DelegateCommand<PhraseEntry> DeletePhraseCommand { get; set; }
         public DelegateCommand<string> PlayDialogLineCommand { get; set; }
 
@@ -129,6 +131,7 @@ namespace DialogGenerator.UI.ViewModels
             ChooseImageCommand = new DelegateCommand(_chooseImage_Execute);
             CopyToClipboardCommand = new DelegateCommand(_copyToClipboard_Execute);
             ViewLoadedCommand = new DelegateCommand(_viewLoaded_Execute);
+            ViewClosedCommand = new DelegateCommand(_viewClosed_Execute);
             DeletePhraseCommand = new DelegateCommand<PhraseEntry>(_deletePhrase_Execute,_deletePrhase_CanExecute);
             PlayDialogLineCommand = new DelegateCommand<string>(_playDialogLine_Execute,_playDialogLine_CanExecute);
         }
@@ -137,6 +140,26 @@ namespace DialogGenerator.UI.ViewModels
         {
             var character =mRegionManager.Regions[Constants.ContentRegion].Context as Character;
             Load(string.IsNullOrEmpty(character.CharacterPrefix) ? "" : character.CharacterPrefix);
+        }
+
+        private void _viewClosed_Execute()
+        {
+            // S.Ristic - 10/19/2019 - Fixing of DLGEN-407 Bug
+            // I had to comment this because there were cases when the Character.Model.FileName was null.
+            // Killing of opened JSONEdit process is already implemented on another place. But I will 
+            // leave this handler for the future use.
+
+            //// S.Ristic 10/17/2019.
+            //// Kill JSONEditor for this character if opened.
+            //if (ProcessHandler.Contains(Character.Model.FileName))
+            //{
+            //    ProcessHandler.Remove(Character.Model.FileName);                
+            //}
+        }
+
+        private void _onCharacterStructureChanged()
+        {
+            Load(string.IsNullOrEmpty(Character.CharacterPrefix) ? "" : Character.CharacterPrefix);
         }
 
         private bool _deletePrhase_CanExecute(PhraseEntry arg)

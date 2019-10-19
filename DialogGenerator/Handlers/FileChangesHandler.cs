@@ -148,6 +148,14 @@ namespace DialogGenerator.Handlers
                         int _idx = _existingCharacters.IndexOf(_existingCharacter);
                         _existingCharacters.Remove(_existingCharacter);
                         _existingCharacters.Insert(_idx, character);
+
+                        // S.Ristic - Fix of DLGEN-404
+                        // Check if the character file is opened in JSONEditor
+                        // and close it.
+                        if(ProcessHandler.Contains(character.FileName))
+                        {
+                            ProcessHandler.Remove(character.FileName);
+                        }
                     }
                     else
                     {
@@ -177,6 +185,8 @@ namespace DialogGenerator.Handlers
                 // S.Ristic - Fix of DLGEN-401 10/07/2019.
                 // Notify the dialog engine that it should re-initialize.
                 mEventAggregator.GetEvent<CharacterUpdatedEvent>().Publish();
+                // S.Ristic - Fix of DLGEN-406 10/17/2019.
+                mEventAggregator.GetEvent<CharacterStructureChangedEvent>().Publish();                
 
             });
         }
