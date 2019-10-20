@@ -39,4 +39,4 @@ using System.Windows;
 )]
 
 //This is the version number picked up for display in debug/settings screen
-[assembly: AssemblyVersion("2.20.*")]
+[assembly: AssemblyVersion("2.21.*")]
