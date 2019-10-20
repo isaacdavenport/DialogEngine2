@@ -294,3 +294,4 @@ __pycache__/
 
 bin/
 
+/DialogGenerator.Setup/DataFiles.wxs
