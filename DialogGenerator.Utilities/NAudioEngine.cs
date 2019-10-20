@@ -356,7 +356,7 @@ namespace DialogGenerator.Utilities
                     _trimWavFile(mCurrentFilePath, _outputPath, TimeSpan.FromMilliseconds(100), TimeSpan.FromMilliseconds(100));
                     using (var reader = new WaveFileReader(_outputPath))
                     {
-                        MediaFoundationEncoder.EncodeToMp3(reader, _outputPathMP3,44100);
+                        MediaFoundationEncoder.EncodeToMp3(reader, _outputPathMP3, 48000);
                     }
                     _normalizeMP3File(_outputPathMP3);
                     File.Copy(_outputPathMP3, mCurrentFilePath, true);
@@ -408,7 +408,7 @@ namespace DialogGenerator.Utilities
         {
             Stop();
             mWaveInDevice = new WaveIn();
-            mWaveInDevice.WaveFormat = WaveFormat.CreateIeeeFloatWaveFormat(44100,2);
+            mWaveInDevice.WaveFormat = WaveFormat.CreateIeeeFloatWaveFormat(44100,1);  
             mWaveInDevice.DataAvailable += _waveIn_DataAvailable;
             mWaveInDevice.RecordingStopped += _waveIn_RecordingStopped;
 
