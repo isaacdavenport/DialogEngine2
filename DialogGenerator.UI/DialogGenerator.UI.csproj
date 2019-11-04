@@ -162,6 +162,7 @@
     <Compile Include="ViewModels\AssignCharactersToToysViewModel.cs" />
     <Compile Include="ViewModels\CharacterDetailViewModel.cs" />
     <Compile Include="ViewModels\ComputerSelectsViewModel.cs" />
+    <Compile Include="ViewModels\CreateCharacterViewModel.cs" />
     <Compile Include="ViewModels\CreateViewModel.cs" />
     <Compile Include="ViewModels\DebugViewModel.cs" />
     <Compile Include="ViewModels\DialogModelDetailViewModel.cs" />
@@ -190,6 +191,9 @@
     </Compile>
     <Compile Include="Views\ComputerSelectsView.xaml.cs">
       <DependentUpon>ComputerSelectsView.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="Views\CreateCharacterView.xaml.cs">
+      <DependentUpon>CreateCharacterView.xaml</DependentUpon>
     </Compile>
     <Compile Include="Views\CreateView.xaml.cs">
       <DependentUpon>CreateView.xaml</DependentUpon>
@@ -280,6 +284,10 @@
       <Generator>MSBuild:Compile</Generator>
     </Page>
     <Page Include="Views\ComputerSelectsView.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="Views\CreateCharacterView.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>

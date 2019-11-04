@@ -1,0 +1,210 @@
+﻿<UserControl x:Class="DialogGenerator.UI.Views.CreateCharacterView"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
+             xmlns:prism="http://prismlibrary.com/"            
+            prism:ViewModelLocator.AutoWireViewModel="True"
+            xmlns:enums ="clr-namespace:DialogGenerator.Model.Enum;assembly=DialogGenerator.Model"
+            xmlns:materialDesign="http://materialdesigninxaml.net/winfx/xaml/themes"
+            xmlns:inf="clr-namespace:DialogGenerator.Core;assembly=DialogGenerator.Core"
+            xmlns:view="clr-namespace:DialogGenerator.UI.Views"
+            xmlns:converters="clr-namespace:DialogGenerator.UI.Converters"
+             xmlns:local="clr-namespace:DialogGenerator.UI.Views"
+             mc:Ignorable="d" 
+             d:DesignHeight="450" d:DesignWidth="800">
+    <UserControl.Resources>
+        
+        <ResourceDictionary>
+            <ResourceDictionary.MergedDictionaries>
+                <ResourceDictionary>
+                    <converters:CharacterStateToColorValueConverter x:Key="CharacterStateToColorValueConverter" />
+                    <converters:CloneValuesConverter x:Key="CloneValuesConverter" />
+                    <converters:ImageToFullPathValueConverter x:Key="ImageToFullPathValueConverter" />
+                    <converters:ImageContentValueConverter x:Key="ImageContentValueConverter" />
+
+                    <view:CharacterDataTemplateSelector x:Key="CharacterDataTemplateSelector" />
+
+                    <DataTemplate x:Key="CreateNewCharacterTemplate">
+                        <materialDesign:Card Width="200" Margin="10" Height="220" Background="#51cb8c" >
+                            <Grid Style="{StaticResource CardGrid}" >
+                                <StackPanel VerticalAlignment="Center" HorizontalAlignment="Center">
+                                    <materialDesign:PackIcon Kind="AccountPlus" Height="50" Width="50" Foreground="White" HorizontalAlignment="Center" />
+                                    <TextBlock Text="Create new" Foreground="White" FontSize="20" HorizontalAlignment="Center" />
+                                </StackPanel>
+
+                                <Grid.InputBindings>
+                                    <MouseBinding MouseAction="LeftClick" Command="NavigationCommands.GoToPage">
+                                        <MouseBinding.CommandParameter>
+                                            <MultiBinding Converter="{StaticResource CloneValuesConverter}">
+                                                <Binding Source="{x:Static inf:Constants.ContentRegion}" />
+                                                <Binding Source="{x:Type view:CharacterDetailView}" />
+                                                <Binding />
+                                            </MultiBinding>
+                                        </MouseBinding.CommandParameter>
+                                    </MouseBinding>
+                                </Grid.InputBindings>
+                            </Grid>
+                        </materialDesign:Card>
+                    </DataTemplate>
+                    <DataTemplate x:Key="RegularCharacterTemplate">
+                        <materialDesign:Card Width="200" Margin="10" Height="220">
+                            <Grid Style="{StaticResource CardGrid}" IsEnabled="{Binding Editable}">
+                                <Grid HorizontalAlignment="Stretch" VerticalAlignment="Stretch">
+                                    <Grid.RowDefinitions>
+                                        <RowDefinition Height="140" />
+                                        <RowDefinition Height="80" />
+                                    </Grid.RowDefinitions>
+                                    <materialDesign:ColorZone Grid.Row="0" Mode="PrimaryLight"
+                                                          Content="{Binding CharacterImage,Converter={StaticResource ImageContentValueConverter}}" HorizontalAlignment="Stretch" VerticalAlignment="Stretch">
+                                    </materialDesign:ColorZone>
+                                    <TextBlock Grid.Row="1" FontSize="16" FontWeight="Bold" Text="{Binding CharacterName}" HorizontalAlignment="Center" VerticalAlignment="Center"></TextBlock>
+                                </Grid>
+                                <Grid.InputBindings>
+                                    <MouseBinding MouseAction="LeftClick" Command="NavigationCommands.GoToPage">
+                                        <MouseBinding.CommandParameter>
+                                            <MultiBinding Converter="{StaticResource CloneValuesConverter}">
+                                                <Binding Source="{x:Static inf:Constants.ContentRegion}" />
+                                                <Binding Source="{x:Type view:CharacterDetailView}" />
+                                                <Binding />
+                                            </MultiBinding>
+                                        </MouseBinding.CommandParameter>
+                                    </MouseBinding>
+                                </Grid.InputBindings>
+                            </Grid>
+                        </materialDesign:Card>
+                    </DataTemplate>
+                    <ControlTemplate x:Key="NameControl">
+                        <Grid>
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="*"/>
+                                <ColumnDefinition Width="120"/>
+                                <ColumnDefinition Width="200"/>
+                                <ColumnDefinition Width="*"/>
+                            </Grid.ColumnDefinitions>
+                            <Label Grid.Column="1" Height="30" Margin="0, 8, 20, 0">Name:</Label>
+                            <TextBox x:Name="FirstName" Grid.Column="2" Height="30" Text="{Binding CharacterName}"/>
+                        </Grid>
+                    </ControlTemplate>
+                    <ControlTemplate x:Key="InitialsControl">
+                        <Grid>
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="*"/>
+                                <ColumnDefinition Width="120"/>
+                                <ColumnDefinition Width="50"/>
+                                <ColumnDefinition Width="120"/>
+                                <ColumnDefinition Width="*"/>
+                            </Grid.ColumnDefinitions>
+                            <Label Grid.Column="1" Height="30" Margin="0, 8, 20, 0">Prefix:</Label>
+                            <Label Grid.Column="2" Height="30" Margin="0, 8, 0, 0" Content="{Binding CharacterInitials}" />
+                            <TextBox x:Name="Prefix" Grid.Column="3" Height="30" Text="{Binding CharacterInitialsPrefix}" />
+                        </Grid>
+                    </ControlTemplate>
+                    <ControlTemplate x:Key="AgeControl">
+                        <Grid>
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="*"/>
+                                <ColumnDefinition Width="120"/>
+                                <ColumnDefinition Width="100"/>
+                                <ColumnDefinition Width="*"/>
+                            </Grid.ColumnDefinitions>
+                            <Label Grid.Column="1" Height="30" Margin="0, 8, 20, 0">Age:</Label>
+                            <ComboBox 
+                                Grid.Column="2" 
+                                x:Name="CharacterAge" 
+                                ItemsSource="{Binding AgesCollection}" 
+                                SelectedValue="{Binding CharacterAge}"
+                                Style="{StaticResource MaterialDesignComboBox}">
+                                <ComboBox.ItemsPanel>
+                                    <ItemsPanelTemplate>
+                                        <VirtualizingStackPanel />
+                                    </ItemsPanelTemplate>
+                                </ComboBox.ItemsPanel>
+                            </ComboBox>
+                        </Grid>
+                    </ControlTemplate>
+                    <ControlTemplate x:Key="GenderControl">
+                        <Grid>
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="*"/>
+                                <ColumnDefinition Width="120"/>
+                                <ColumnDefinition Width="100"/>
+                                <ColumnDefinition Width="*"/>
+                            </Grid.ColumnDefinitions>
+                            <Label Grid.Column="1" Height="30" Margin="0, 8, 20, 0">Gender:</Label>
+                            <ComboBox 
+                                Grid.Column="2" 
+                                x:Name="CharacterGender" 
+                                ItemsSource="{Binding Genders}" 
+                                SelectedValue="{Binding CharacterGender}"
+                                Style="{StaticResource MaterialDesignComboBox}">
+                                <ComboBox.ItemsPanel>
+                                    <ItemsPanelTemplate>
+                                        <VirtualizingStackPanel />
+                                    </ItemsPanelTemplate>
+                                </ComboBox.ItemsPanel>
+                            </ComboBox>
+                        </Grid>
+                    </ControlTemplate>
+                    <ControlTemplate x:Key="AvatarControl">
+                        <Grid>
+                            <Grid.RowDefinitions>
+                                <RowDefinition Height="*"/>
+                            </Grid.RowDefinitions>
+                            <materialDesign:ColorZone Mode="PrimaryLight" VerticalAlignment="Stretch" 
+                                                              Content="{Binding CharacterImage, Converter={StaticResource ImageContentValueConverter}}" >
+                            </materialDesign:ColorZone>
+                            <Button Grid.Row="0" Command="{Binding ChooseImageCommand}" Style="{StaticResource MaterialDesignFloatingActionMiniAccentButton}" 
+                                        HorizontalAlignment="Center" BorderBrush="#51cb8c" Background="#51cb8c"  VerticalAlignment="Center"
+                                        Margin="0 0 -180 0">
+                                <materialDesign:PackIcon Kind="Pencil" Foreground="White" />
+                            </Button>
+                        </Grid>
+                    </ControlTemplate>
+                </ResourceDictionary>
+            </ResourceDictionary.MergedDictionaries>
+        </ResourceDictionary>
+
+    </UserControl.Resources>
+    <Grid>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="40"/>
+            <RowDefinition Height="*"/>
+            <RowDefinition Height="50"/>
+        </Grid.RowDefinitions>
+        <TextBlock Grid.Row="0" FontSize="25" HorizontalAlignment="Center">Create New Character</TextBlock>
+        <UserControl Name="ContentControl" Grid.Row="1" Margin="5,5,5,5" Template="{StaticResource NameControl}"/>
+        <Grid Grid.Row="2">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="*"/>
+                <ColumnDefinition Width="*"/>
+            </Grid.ColumnDefinitions>
+            <Button Grid.Column="0" HorizontalAlignment="Left" Content="Edit Existing" Width="120" Margin="10,0,0,0">
+                <Button.InputBindings>
+                    <MouseBinding MouseAction="LeftClick" Command="NavigationCommands.GoToPage">
+                        <MouseBinding.CommandParameter>
+                            <MultiBinding Converter="{StaticResource CloneValuesConverter}">
+                                <Binding Source="{x:Static inf:Constants.ContentRegion}" />
+                                <Binding Source="{x:Type view:CreateView}" />
+                            </MultiBinding>
+                        </MouseBinding.CommandParameter>
+                    </MouseBinding>
+                </Button.InputBindings>
+            </Button>
+            <Button Grid.Column="0" HorizontalAlignment="Right" Content="Previous" Margin="0,0,10,0" Width="120" Click="ButtonPrev_Click"/>
+            <Button Grid.Column="1" HorizontalAlignment="Left" Content="Next" Margin="10, 0, 0, 0" Width="120" Click="ButtonNext_Click"/>
+            <Button Grid.Column="1" HorizontalAlignment="Right" Content="Cancel" Width="120" Margin="0,0,10,0">
+                <Button.InputBindings>
+                    <MouseBinding MouseAction="LeftClick" Command="NavigationCommands.GoToPage">
+                        <MouseBinding.CommandParameter>
+                            <MultiBinding Converter="{StaticResource CloneValuesConverter}">
+                                <Binding Source="{x:Static inf:Constants.ContentRegion}" />
+                                <Binding Source="{x:Type view:HomeView}" />
+                            </MultiBinding>
+                        </MouseBinding.CommandParameter>
+                    </MouseBinding>
+                </Button.InputBindings>
+            </Button>
+        </Grid>
+    </Grid>
+</UserControl>
