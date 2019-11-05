@@ -6,7 +6,7 @@
         <ResourceDictionary>
             <ResourceDictionary.MergedDictionaries>
                 <ResourceDictionary Source="pack://application:,,,/DialogGenerator.UI;component/Themes/Generic.xaml" />
-                    <ResourceDictionary>
+                <ResourceDictionary>
                     <SolidColorBrush x:Key="PrimaryHueLightBrush" Color="#f9f9f9"/>
                         <SolidColorBrush x:Key="PrimaryHueLightForegroundBrush" Color="Black"/>
                     <SolidColorBrush x:Key="PrimaryHueMidBrush" Color="#51cb8c"/>

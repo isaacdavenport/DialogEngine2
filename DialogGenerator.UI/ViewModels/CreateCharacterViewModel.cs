@@ -1,4 +1,5 @@
 ﻿using DialogGenerator.Core;
+using DialogGenerator.Model;
 using Prism.Commands;
 using Prism.Mvvm;
 using System;
@@ -15,33 +16,29 @@ namespace DialogGenerator.UI.ViewModels
 {
     public class CreateCharacterViewModel : BindableBase
     {
-        private string characterName = String.Empty;
-        private string characterInitials = String.Empty;
-        private string characterInitialsPrefix = String.Empty;
-        private string characterImage = String.Empty;
-        private string characterGender = "Female";
-        
-        private int characterAge = 10;
-        private List<int> agesCollection = new List<int>();
-        private List<string> steps = new List<string>();
-        private int currentStep = 0;
-
+        private string mCharacterName = String.Empty;
+        private string mCharacterInitials = String.Empty;
+        private string mCharacterInitialsPrefix = String.Empty;
+        private string mCharacterImage = String.Empty;
+        private string mCharacterGender = "Female";        
+        private int mCharacterAge = 10;
+        private List<int> mAgesCollection = new List<int>();
+        private List<string> mSteps = new List<string>();
+        private CreateCharacterWizard mWizard;
+        private CreateCharacterWizardStep mCurrentStep = null;
+        private int mCurrentStepIndex = 0;
         private ILogger mLogger;
 
         public CreateCharacterViewModel(ILogger logger)
         {
             mLogger = logger;
+            mWizard = new CreateCharacterWizard();
+            mCurrentStep = mWizard.Steps[mCurrentStepIndex];
 
             for(int i = 5; i < 100; i++)
             {
-                agesCollection.Add(i);
+                mAgesCollection.Add(i);
             }
-
-            steps.Add("NameControl");
-            steps.Add("InitialsControl");
-            steps.Add("AgeControl");
-            steps.Add("GenderControl");
-            steps.Add("AvatarControl");
 
             _bindCommands();
         }
@@ -50,13 +47,13 @@ namespace DialogGenerator.UI.ViewModels
         {
             get
             {
-                return characterName;
+                return mCharacterName;
             }
 
             set
             {
-                characterName = value;
-                characterInitials = _getCharacterInitials();
+                mCharacterName = value;
+                mCharacterInitials = _getCharacterInitials();
                 RaisePropertyChanged("CharacterName");
                 RaisePropertyChanged("CharacterInitials");
             }
@@ -66,7 +63,7 @@ namespace DialogGenerator.UI.ViewModels
         {
             get
             {
-                return characterInitials;
+                return mCharacterInitials;
             }
         }
 
@@ -74,12 +71,12 @@ namespace DialogGenerator.UI.ViewModels
         {
             get
             {
-                return characterInitialsPrefix;
+                return mCharacterInitialsPrefix;
             }
 
             set
             {
-                characterInitialsPrefix = value;
+                mCharacterInitialsPrefix = value;
                 RaisePropertyChanged("CharacterInitialsPrefix");
             }
         }
@@ -88,12 +85,12 @@ namespace DialogGenerator.UI.ViewModels
         {
             get
             {
-                return characterAge;
+                return mCharacterAge;
             }
 
             set
             {
-                characterAge = value;
+                mCharacterAge = value;
                 RaisePropertyChanged("CharacterAge");
             }
         }
@@ -102,12 +99,12 @@ namespace DialogGenerator.UI.ViewModels
         {
             get
             {
-                return characterGender;
+                return mCharacterGender;
             }
 
             set
             {
-                characterGender = value;
+                mCharacterGender = value;
                 RaisePropertyChanged("CharacterGender");
             }
         }
@@ -116,12 +113,12 @@ namespace DialogGenerator.UI.ViewModels
         {
             get
             {
-                return characterImage;
+                return mCharacterImage;
             }
 
             set
             {
-                characterImage = value;
+                mCharacterImage = value;
                 RaisePropertyChanged("CharacterImage");
             }
         }
@@ -130,7 +127,7 @@ namespace DialogGenerator.UI.ViewModels
         {
             get
             {
-                return agesCollection;
+                return mAgesCollection;
             }
         }
 
@@ -146,34 +143,75 @@ namespace DialogGenerator.UI.ViewModels
             }
         }
 
-        public ICommand ChooseImageCommand { get; set; }
-
-        public string nextStep()
+        public List<string> Steps
         {
-           if(currentStep + 1 < steps.Count)
+            get
             {
-                currentStep++;                
+                var query = mWizard.Steps.Select((step, index) => step.StepName);
+                var results = new List<string>();
+                results.AddRange(query);
+                return results;
             }
-
-            return steps[currentStep];
         }
 
-        public string previousStep()
+        public int CurrentStepIndex
         {
-            if(currentStep > 0)
+            get
             {
-                currentStep--;
+                return mCurrentStepIndex;
             }
 
-            return steps[currentStep];
+            set
+            {
+                mCurrentStepIndex = value;
+                RaisePropertyChanged("CurrentStepIndex");
+                CurrentStep = mWizard.Steps[mCurrentStepIndex];
+            }
+        }
+
+        public CreateCharacterWizardStep CurrentStep
+        {
+            get
+            {
+                return mCurrentStep;
+            }
+
+            set
+            {
+                mCurrentStep = value;
+                RaisePropertyChanged("CurrentStep");
+            }
+        }
+          
+
+        public ICommand ChooseImageCommand { get; set; }
+
+        public CreateCharacterWizardStep nextStep()
+        {
+           if(CurrentStepIndex + 1 < mWizard.Steps.Count)
+            {
+                CurrentStepIndex++;                
+            }
+
+            return mWizard.Steps[CurrentStepIndex];
+        }
+
+        public CreateCharacterWizardStep previousStep()
+        {
+            if(CurrentStepIndex > 0)
+            {
+                CurrentStepIndex--;
+            }
+
+            return mWizard.Steps[CurrentStepIndex];
         }
             
         private string _getCharacterInitials()
         {
-            if (String.IsNullOrEmpty(characterName))
+            if (String.IsNullOrEmpty(mCharacterName))
                 return String.Empty;
 
-            String[] tokens = characterName.Split(' ');
+            String[] tokens = mCharacterName.Split(' ');
             String result = String.Empty;
             for(int i = 0; i < tokens.Length; i++)
             {

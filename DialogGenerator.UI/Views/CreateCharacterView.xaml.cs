@@ -1,4 +1,5 @@
 ﻿using DialogGenerator.Core;
+using DialogGenerator.Model;
 using DialogGenerator.UI.ViewModels;
 using System;
 using System.Collections.Generic;
@@ -33,8 +34,8 @@ namespace DialogGenerator.UI.Views
             CreateCharacterViewModel model = this.DataContext as CreateCharacterViewModel;
             if (model != null)
             {
-                string controlName = model.previousStep();
-                this.ContentControl.Template = Resources[controlName] as ControlTemplate;
+                CreateCharacterWizardStep _step = model.previousStep();
+                this.ContentControl.Template = Resources[_step.StepControl] as ControlTemplate;
             }
         }
 
@@ -43,8 +44,8 @@ namespace DialogGenerator.UI.Views
             CreateCharacterViewModel model = this.DataContext as CreateCharacterViewModel;
             if (model != null)
             {
-                string controlName = model.nextStep();
-                this.ContentControl.Template = Resources[controlName] as ControlTemplate;
+                CreateCharacterWizardStep _step = model.nextStep();
+                this.ContentControl.Template = Resources[_step.StepControl] as ControlTemplate;
             }
         }
     }
