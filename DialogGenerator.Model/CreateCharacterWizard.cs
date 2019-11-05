@@ -14,6 +14,7 @@ namespace DialogGenerator.Model
         {
             mSteps.Add(new CreateCharacterWizardStep
             {
+                StepIndex = 1,
                 StepName = "Set Character Name",
                 StepDescription = "Sets the name the character will have.",
                 StepControl = "NameControl"
@@ -21,6 +22,7 @@ namespace DialogGenerator.Model
 
             mSteps.Add(new CreateCharacterWizardStep
             {
+                StepIndex = 2,
                 StepName = "Set Character Initials",
                 StepDescription = "Sets the character initials.",
                 StepControl = "InitialsControl"
@@ -28,6 +30,7 @@ namespace DialogGenerator.Model
 
             mSteps.Add(new CreateCharacterWizardStep
             {
+                StepIndex = 3,
                 StepName = "Set Character Age",
                 StepDescription = "Sets the age of your character.",
                 StepControl = "AgeControl"
@@ -35,6 +38,7 @@ namespace DialogGenerator.Model
 
             mSteps.Add(new CreateCharacterWizardStep
             {
+                StepIndex = 4,
                 StepName = "Set Character Gender",
                 StepDescription = "Set the gender of the character.",
                 StepControl = "GenderControl"
@@ -42,6 +46,7 @@ namespace DialogGenerator.Model
 
             mSteps.Add(new CreateCharacterWizardStep
             {
+                StepIndex = 5,
                 StepName = "Set Character Avatar",
                 StepDescription = "Choose the avatar image of your character",
                 StepControl = "AvatarControl"

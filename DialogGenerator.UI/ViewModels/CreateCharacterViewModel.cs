@@ -147,7 +147,7 @@ namespace DialogGenerator.UI.ViewModels
         {
             get
             {
-                var query = mWizard.Steps.Select((step, index) => step.StepName);
+                var query = mWizard.Steps.Select((step, index) => "Step " + step.StepIndex + " - " + step.StepName);
                 var results = new List<string>();
                 results.AddRange(query);
                 return results;

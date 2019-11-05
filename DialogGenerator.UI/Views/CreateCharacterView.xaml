@@ -117,30 +117,50 @@
     </ContentControl.Resources>
     <Grid>
         <Grid.RowDefinitions>
-            <RowDefinition Height="60"/>
             <RowDefinition Height="*"/>
             <RowDefinition Height="50"/>
         </Grid.RowDefinitions>
         <Grid Grid.Row="0">
-            <Grid.RowDefinitions>
-                <RowDefinition Height="40" />
-                <RowDefinition Height="*" />
-            </Grid.RowDefinitions>
-            <TextBlock Grid.Row="0" FontSize="25" HorizontalAlignment="Center" Text="{Binding CurrentStep.StepName}"></TextBlock>
-            <TextBlock Grid.Row="1" FontSize="18" HorizontalAlignment="Center" Text="{Binding CurrentStep.StepDescription}"></TextBlock>
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="*"/>
+                <ColumnDefinition Width="4*"/>
+            </Grid.ColumnDefinitions>
+            <Grid Grid.Column="0" Background="#FF51CB8C">
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="100"/>
+                    <RowDefinition Height="5" />
+                    <RowDefinition Height="*"/>
+                </Grid.RowDefinitions>
+                <TextBlock Grid.Row="0" FontSize="30" Foreground="White" TextWrapping="Wrap">Create New Character Wizard</TextBlock>
+                <Separator Grid.Row="1" Foreground="White"/>
+                <ListBox x:Name="StepsList" 
+                     Grid.Row="2" 
+                     Margin="10"
+                     ItemsSource="{Binding Steps}" 
+                     SelectedIndex="{Binding CurrentStepIndex}" 
+                     Background="#FF51CB8C" 
+                     Foreground="White" 
+                     ItemContainerStyle="{StaticResource ContainerStyle}"/>
+            </Grid>
+                        
+            <Grid Grid.Column="1">
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="60"/>
+                    <RowDefinition Height="*"/>
+                </Grid.RowDefinitions>
+                <Grid Grid.Row="0">
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="40" />
+                        <RowDefinition Height="*" />
+                    </Grid.RowDefinitions>
+                    <TextBlock Grid.Row="0" FontSize="25" HorizontalAlignment="Center" Text="{Binding CurrentStep.StepName}"></TextBlock>
+                    <TextBlock Grid.Row="1" FontSize="18" HorizontalAlignment="Center" Text="{Binding CurrentStep.StepDescription}"></TextBlock>
+                </Grid>
+                <ContentControl Name="ContentControl" Grid.Row="1" Margin="5,5,5,5" Template="{StaticResource NameControl}"/>
+            </Grid>
         </Grid>
         
         <Grid Grid.Row="1">
-            <Grid.ColumnDefinitions>
-                <ColumnDefinition Width="*"/>
-                <ColumnDefinition Width="3*"/>
-            </Grid.ColumnDefinitions>
-            <ListBox x:Name="StepsList" Grid.Row="0" ItemsSource="{Binding Steps}" SelectedIndex="{Binding CurrentStepIndex}" Background="#FF51CB8C" Foreground="White" ItemContainerStyle="{StaticResource ContainerStyle}"/>
-            <ContentControl Name="ContentControl" Grid.Column="1" Margin="5,5,5,5" Template="{StaticResource NameControl}"/>
-            
-        </Grid>
-        
-        <Grid Grid.Row="2">
             <Grid.ColumnDefinitions>
                 <ColumnDefinition Width="*"/>
                 <ColumnDefinition Width="*"/>

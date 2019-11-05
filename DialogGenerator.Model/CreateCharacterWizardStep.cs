@@ -8,6 +8,7 @@ namespace DialogGenerator.Model
 {
     public class CreateCharacterWizardStep
     {
+        public int StepIndex { get; set; }
         public string StepName { get; set; }
         public string StepDescription { get; set; }
         public string StepControl { get; set; }
