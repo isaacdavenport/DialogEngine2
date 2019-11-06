@@ -25,7 +25,6 @@ namespace DialogGenerator.UI.Views
     {
         public CreateCharacterView()
         {
-            //this.DataContext = new CreateCharacterViewModel();
             InitializeComponent();
             (this.DataContext as CreateCharacterViewModel).PropertyChanged += CreateCharacterView_PropertyChanged;
         }
@@ -46,20 +45,12 @@ namespace DialogGenerator.UI.Views
         {
             CreateCharacterViewModel model = this.DataContext as CreateCharacterViewModel;
             model?.previousStep();
-            //if (model != null)
-            //{
-            //    model.previousStep();                
-            //}
         }
 
         private void ButtonNext_Click(object sender, RoutedEventArgs e)
         {
             CreateCharacterViewModel model = this.DataContext as CreateCharacterViewModel;
             model?.nextStep();
-            //if (model != null)
-            //{
-            //    model.nextStep();                
-            //}
         }
     }
 }

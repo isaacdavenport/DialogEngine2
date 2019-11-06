@@ -18,7 +18,7 @@ namespace DialogGenerator.UI.ViewModels
     {
         private string mCharacterName = String.Empty;
         private string mCharacterInitials = String.Empty;
-        private string mCharacterInitialsPrefix = String.Empty;
+        private string mCharacterIdentifier = String.Empty;
         private string mCharacterImage = String.Empty;
         private string mCharacterGender = "Female";        
         private int mCharacterAge = 10;
@@ -53,11 +53,13 @@ namespace DialogGenerator.UI.ViewModels
             set
             {
                 mCharacterName = value;
-                mCharacterInitials = _getCharacterInitials();
+                mCharacterInitials = _getCharacterInitials();                
                 RaisePropertyChanged("CharacterName");
                 RaisePropertyChanged("CharacterInitials");
+                CharacterInitials = _getCharacterInitials();
+                CharacterIdentifier = _getCharacterIdentifier();
             }
-        }
+        }        
 
         public string CharacterInitials
         {
@@ -65,19 +67,25 @@ namespace DialogGenerator.UI.ViewModels
             {
                 return mCharacterInitials;
             }
-        }
-
-        public string CharacterInitialsPrefix
-        {
-            get
-            {
-                return mCharacterInitialsPrefix;
-            }
 
             set
             {
-                mCharacterInitialsPrefix = value;
-                RaisePropertyChanged("CharacterInitialsPrefix");
+                mCharacterInitials = value;
+                RaisePropertyChanged("CharacterInitials");
+            }
+        }
+
+        public string CharacterIdentifier
+        {
+            get
+            {
+                return mCharacterIdentifier;
+            }
+
+            set
+            {                                
+                mCharacterIdentifier = value;
+                RaisePropertyChanged("CharacterIdentifier");
             }
         }
 
@@ -217,6 +225,18 @@ namespace DialogGenerator.UI.ViewModels
             }
 
             return result.ToUpper();
+        }
+
+        private string _getCharacterIdentifier()
+        {
+            if(!String.IsNullOrEmpty(CharacterIdentifier))
+            {
+                return CharacterIdentifier;
+            }
+
+            string _identifier = Guid.NewGuid().ToString();
+            _identifier = _identifier.Substring(0, 4);
+            return _identifier;
         }
 
         private void _bindCommands()
