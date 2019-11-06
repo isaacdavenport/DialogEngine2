@@ -24,7 +24,7 @@
                     <converters:ImageContentValueConverter x:Key="ImageContentValueConverter" />
 
                     <ControlTemplate x:Key="NameControl">
-                        <Grid>
+                        <Grid Background="White">
                             <Grid.ColumnDefinitions>
                                 <ColumnDefinition Width="*"/>
                                 <ColumnDefinition Width="120"/>
@@ -36,7 +36,7 @@
                         </Grid>
                     </ControlTemplate>
                     <ControlTemplate x:Key="InitialsControl">
-                        <Grid>
+                        <Grid Background="White">
                             <Grid.ColumnDefinitions>
                                 <ColumnDefinition Width="*"/>
                                 <ColumnDefinition Width="120"/>
@@ -50,7 +50,7 @@
                         </Grid>
                     </ControlTemplate>
                     <ControlTemplate x:Key="AgeControl">
-                        <Grid>
+                        <Grid Background="White">
                             <Grid.ColumnDefinitions>
                                 <ColumnDefinition Width="*"/>
                                 <ColumnDefinition Width="120"/>
@@ -73,7 +73,7 @@
                         </Grid>
                     </ControlTemplate>
                     <ControlTemplate x:Key="GenderControl">
-                        <Grid>
+                        <Grid Background="White">
                             <Grid.ColumnDefinitions>
                                 <ColumnDefinition Width="*"/>
                                 <ColumnDefinition Width="120"/>
@@ -96,7 +96,7 @@
                         </Grid>
                     </ControlTemplate>
                     <ControlTemplate x:Key="AvatarControl">
-                        <Grid>
+                        <Grid Background="White">
                             <Grid.RowDefinitions>
                                 <RowDefinition Height="*"/>
                             </Grid.RowDefinitions>
@@ -115,7 +115,7 @@
         </ResourceDictionary>
 
     </ContentControl.Resources>
-    <Grid>
+    <Grid Background="White">
         <Grid.RowDefinitions>
             <RowDefinition Height="*"/>
             <RowDefinition Height="50"/>
@@ -125,72 +125,85 @@
                 <ColumnDefinition Width="*"/>
                 <ColumnDefinition Width="4*"/>
             </Grid.ColumnDefinitions>
-            <Grid Grid.Column="0" Background="#FF51CB8C">
-                <Grid.RowDefinitions>
-                    <RowDefinition Height="100"/>
-                    <RowDefinition Height="5" />
-                    <RowDefinition Height="*"/>
-                </Grid.RowDefinitions>
-                <TextBlock Grid.Row="0" FontSize="30" Foreground="White" TextWrapping="Wrap">Create New Character Wizard</TextBlock>
-                <Separator Grid.Row="1" Foreground="White"/>
-                <ListBox x:Name="StepsList" 
+            <Border BorderBrush="Gray" BorderThickness="1" Grid.Column="0">
+                <Grid Background="#FF51CB8C">
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="Auto"/>
+                        <RowDefinition Height="5" />
+                        <RowDefinition Height="*"/>
+                    </Grid.RowDefinitions>
+
+                    <StackPanel Orientation="Vertical" Background="#FF51CB8C" Grid.Row="0">
+                        <TextBlock FontSize="30" Foreground="White" TextWrapping="Wrap" Margin="20">Create New Character Wizard</TextBlock>
+                        <TextBlock FontSize="14" Foreground="White" TextWrapping="Wrap" Margin="20">
+                    This wizard helps You create the new character. Just follow the steps. You can navigate forth and back by using the navigation buttons.
+                        </TextBlock>
+                    </StackPanel>
+
+                    <ListBox x:Name="StepsList" 
                      Grid.Row="2" 
-                     Margin="10"
+                     Margin="20"
                      ItemsSource="{Binding Steps}" 
                      SelectedIndex="{Binding CurrentStepIndex}" 
                      Background="#FF51CB8C" 
                      Foreground="White" 
                      ItemContainerStyle="{StaticResource ContainerStyle}"/>
-            </Grid>
+                </Grid>
+            </Border>
                         
-            <Grid Grid.Column="1">
+            <Grid Grid.Column="1" Margin="1,0,0,0">
                 <Grid.RowDefinitions>
-                    <RowDefinition Height="60"/>
+                    <RowDefinition Height="Auto"/>
                     <RowDefinition Height="*"/>
                 </Grid.RowDefinitions>
-                <Grid Grid.Row="0">
-                    <Grid.RowDefinitions>
-                        <RowDefinition Height="40" />
-                        <RowDefinition Height="*" />
-                    </Grid.RowDefinitions>
-                    <TextBlock Grid.Row="0" FontSize="25" HorizontalAlignment="Center" Text="{Binding CurrentStep.StepName}"></TextBlock>
-                    <TextBlock Grid.Row="1" FontSize="18" HorizontalAlignment="Center" Text="{Binding CurrentStep.StepDescription}"></TextBlock>
-                </Grid>
+                <Border BorderBrush="Gray" BorderThickness="1" Grid.Row="0">
+                    <Grid Background="#eeeeee">
+                        <Grid.RowDefinitions>
+                            <RowDefinition Height="Auto" />
+                            <RowDefinition Height="Auto" />
+                            <RowDefinition Height="*"/>
+                        </Grid.RowDefinitions>
+                        <TextBlock Grid.Row="0" FontSize="25" HorizontalAlignment="Center" Text="{Binding CurrentStep.StepName}" Margin="0,20,0,0"></TextBlock>
+                        <TextBlock Grid.Row="1" FontSize="14" HorizontalAlignment="Center" Text="{Binding CurrentStep.StepDescription}" Margin="0,10,0,10"></TextBlock>
+                    </Grid>
+                </Border>
                 <ContentControl Name="ContentControl" Grid.Row="1" Margin="5,5,5,5" Template="{StaticResource NameControl}"/>
             </Grid>
         </Grid>
+        <Border Grid.Row="1" BorderBrush="Gray" BorderThickness="1">
+            <Grid>
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="*"/>
+                    <ColumnDefinition Width="*"/>
+                </Grid.ColumnDefinitions>
+                <Button Grid.Column="0" HorizontalAlignment="Left" Content="Edit Existing" Width="120" Margin="10,0,0,0">
+                    <Button.InputBindings>
+                        <MouseBinding MouseAction="LeftClick" Command="NavigationCommands.GoToPage">
+                            <MouseBinding.CommandParameter>
+                                <MultiBinding Converter="{StaticResource CloneValuesConverter}">
+                                    <Binding Source="{x:Static inf:Constants.ContentRegion}" />
+                                    <Binding Source="{x:Type view:CreateView}" />
+                                </MultiBinding>
+                            </MouseBinding.CommandParameter>
+                        </MouseBinding>
+                    </Button.InputBindings>
+                </Button>
+                <Button Grid.Column="0" HorizontalAlignment="Right" Content="Previous" Margin="0,0,10,0" Width="120" Click="ButtonPrev_Click"/>
+                <Button Grid.Column="1" HorizontalAlignment="Left" Content="Next" Margin="10, 0, 0, 0" Width="120" Click="ButtonNext_Click"/>
+                <Button Grid.Column="1" HorizontalAlignment="Right" Content="Cancel" Width="120" Margin="0,0,10,0">
+                    <Button.InputBindings>
+                        <MouseBinding MouseAction="LeftClick" Command="NavigationCommands.GoToPage">
+                            <MouseBinding.CommandParameter>
+                                <MultiBinding Converter="{StaticResource CloneValuesConverter}">
+                                    <Binding Source="{x:Static inf:Constants.ContentRegion}" />
+                                    <Binding Source="{x:Type view:HomeView}" />
+                                </MultiBinding>
+                            </MouseBinding.CommandParameter>
+                        </MouseBinding>
+                    </Button.InputBindings>
+                </Button>
+            </Grid>
+        </Border>
         
-        <Grid Grid.Row="1">
-            <Grid.ColumnDefinitions>
-                <ColumnDefinition Width="*"/>
-                <ColumnDefinition Width="*"/>
-            </Grid.ColumnDefinitions>
-            <Button Grid.Column="0" HorizontalAlignment="Left" Content="Edit Existing" Width="120" Margin="10,0,0,0">
-                <Button.InputBindings>
-                    <MouseBinding MouseAction="LeftClick" Command="NavigationCommands.GoToPage">
-                        <MouseBinding.CommandParameter>
-                            <MultiBinding Converter="{StaticResource CloneValuesConverter}">
-                                <Binding Source="{x:Static inf:Constants.ContentRegion}" />
-                                <Binding Source="{x:Type view:CreateView}" />
-                            </MultiBinding>
-                        </MouseBinding.CommandParameter>
-                    </MouseBinding>
-                </Button.InputBindings>
-            </Button>
-            <Button Grid.Column="0" HorizontalAlignment="Right" Content="Previous" Margin="0,0,10,0" Width="120" Click="ButtonPrev_Click"/>
-            <Button Grid.Column="1" HorizontalAlignment="Left" Content="Next" Margin="10, 0, 0, 0" Width="120" Click="ButtonNext_Click"/>
-            <Button Grid.Column="1" HorizontalAlignment="Right" Content="Cancel" Width="120" Margin="0,0,10,0">
-                <Button.InputBindings>
-                    <MouseBinding MouseAction="LeftClick" Command="NavigationCommands.GoToPage">
-                        <MouseBinding.CommandParameter>
-                            <MultiBinding Converter="{StaticResource CloneValuesConverter}">
-                                <Binding Source="{x:Static inf:Constants.ContentRegion}" />
-                                <Binding Source="{x:Type view:HomeView}" />
-                            </MultiBinding>
-                        </MouseBinding.CommandParameter>
-                    </MouseBinding>
-                </Button.InputBindings>
-            </Button>
-        </Grid>
     </Grid>
 </UserControl>
