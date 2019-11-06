@@ -24,5 +24,7 @@
         public const string COMPLETED_DLG_MODELS = "CompletedDialogModels";
         public const string BLE_DATA_PROVIDER = "BLEDataProvider";
         public const string FILENAME_CHECK_REGEX = @"^[-a-zA-Z0-9_' ]+$";
+        public const string CHARACTER_EDIT_MODE = "CharacterEditMode";
+        public const string NEW_CHARACTER = "NewCharacter";
     }
 }

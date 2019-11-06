@@ -1,7 +1,11 @@
 ﻿using DialogGenerator.Core;
 using DialogGenerator.Model;
+using DialogGenerator.UI.Data;
+using DialogGenerator.UI.Views;
 using Prism.Commands;
+using Prism.Events;
 using Prism.Mvvm;
+using Prism.Regions;
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
@@ -28,10 +32,20 @@ namespace DialogGenerator.UI.ViewModels
         private CreateCharacterWizardStep mCurrentStep = null;
         private int mCurrentStepIndex = 0;
         private ILogger mLogger;
+        private IEventAggregator mEventAgregator;
+        private ICharacterDataProvider mCharacterDataProvider;
+        private IRegionManager mRegionManager;
 
-        public CreateCharacterViewModel(ILogger logger)
+        public CreateCharacterViewModel(ILogger _logger, 
+            IEventAggregator _eventAggregator,
+            ICharacterDataProvider _characterDataProvider,
+            IRegionManager _regionManager)
         {
-            mLogger = logger;
+            mLogger = _logger;
+            mEventAgregator = _eventAggregator;
+            mCharacterDataProvider = _characterDataProvider;
+            mRegionManager = _regionManager;
+
             mWizard = new CreateCharacterWizard();
             mCurrentStep = mWizard.Steps[mCurrentStepIndex];
 
@@ -40,6 +54,8 @@ namespace DialogGenerator.UI.ViewModels
                 mAgesCollection.Add(i);
             }
 
+
+            _openCreateSession();
             _bindCommands();
         }
 
@@ -86,6 +102,14 @@ namespace DialogGenerator.UI.ViewModels
             {                                
                 mCharacterIdentifier = value;
                 RaisePropertyChanged("CharacterIdentifier");
+            }
+        }
+
+        public string CharacterPrefix
+        {
+            get
+            {
+                return CharacterInitials + (!String.IsNullOrEmpty(CharacterIdentifier) ? "-" + CharacterIdentifier : "");
             }
         }
 
@@ -187,12 +211,14 @@ namespace DialogGenerator.UI.ViewModels
             set
             {
                 mCurrentStep = value;
+                handleStepChange();
                 RaisePropertyChanged("CurrentStep");
             }
         }
-          
 
         public ICommand ChooseImageCommand { get; set; }
+        public ICommand HomeCommand { get; set; }
+        public ICommand CreateCommand { get; set; }
 
         public void nextStep()
         {
@@ -211,7 +237,22 @@ namespace DialogGenerator.UI.ViewModels
             }
             
         }
-            
+
+
+        private void handleStepChange()
+        {
+            if(CurrentStep.StepName.Equals("Run Dialog Wizard"))
+            {
+                Character _character = Session.Get(Constants.NEW_CHARACTER) as Character;
+                _character.CharacterName = CharacterName;
+                _character.CharacterPrefix = CharacterPrefix;
+                _character.CharacterAge = CharacterAge;
+                _character.CharacterGender = CharacterGender;
+                _character.CharacterImage = CharacterImage;
+                Session.Set(Constants.NEW_CHARACTER, _character);
+            }
+        }
+
         private string _getCharacterInitials()
         {
             if (String.IsNullOrEmpty(mCharacterName))
@@ -242,10 +283,45 @@ namespace DialogGenerator.UI.ViewModels
         private void _bindCommands()
         {
             ChooseImageCommand = new DelegateCommand(_onChooseImage_execute);
+            HomeCommand = new DelegateCommand(_onHomeCommand_execute);
+            CreateCommand = new DelegateCommand(_onCreateCommand_execute);
+        }
+
+        
+
+        private void _openCreateSession()
+        {
+            Session.Set(Constants.NEW_CHARACTER, new Character());
+            Session.Set(Constants.CHARACTER_EDIT_MODE, true);
+        }
+
+        private void _closeCreateSession()
+        {
+            Session.Set(Constants.NEW_CHARACTER, null);
+            Session.Set(Constants.CHARACTER_EDIT_MODE, false);
+        }
+
+        private void _onCreateCommand_execute()
+        {
+            if(Session.Contains(Constants.CHARACTER_EDIT_MODE) && (bool) Session.Get(Constants.CHARACTER_EDIT_MODE))
+            {
+                Session.Set(Constants.CHARACTER_EDIT_MODE, false);
+                Session.Set(Constants.NEW_CHARACTER, null);
+            }
+
+            var query = mRegionManager.Regions[Constants.ContentRegion].Views.Select(v => v.ToString());
+
+
+            mRegionManager.Regions[Constants.ContentRegion].RequestNavigate(typeof(DialogView).Name);
+        }
+
+        private void _onHomeCommand_execute()
+        {            
+            mRegionManager.Regions[Constants.ContentRegion].NavigationService.RequestNavigate("HomeView");
         }
 
         private async void _onChooseImage_execute()
-        {
+        {            
             try
             {
                 //if (!_chooseImage_CanExecute())

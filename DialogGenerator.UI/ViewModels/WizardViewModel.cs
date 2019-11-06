@@ -451,7 +451,7 @@ namespace DialogGenerator.UI.ViewModels
         private void _leaveWizard()
         {
             try
-            {
+            {                
                 VoiceRecorderControlViewModel.StateMachine.PropertyChanged -= _vrc_stateMachine_PropertyChanged;
                 MediaPlayerControlViewModel.StateMachine.PropertyChanged -= _mpc_stateMachine_PropertyChanged;
                 var _contentRegion = mRegionManager.Regions[Constants.ContentRegion];
@@ -472,8 +472,15 @@ namespace DialogGenerator.UI.ViewModels
             if (result.HasValue)
             {
                 CurrentWizard = mWizardDataProvider.GetByIndex(result.Value);
-                Character = mRegionManager.Regions[Constants.ContentRegion].Context as Character;
 
+                if(Session.Contains(Constants.CHARACTER_EDIT_MODE) && (bool) Session.Get(Constants.CHARACTER_EDIT_MODE) == true)
+                {
+                    Character = Session.Get(Constants.NEW_CHARACTER) as Character;
+                } else
+                {
+                    Character = mRegionManager.Regions[Constants.ContentRegion].Context as Character;
+                }
+                
                 _setDataForTutorialStep(CurrentStepIndex);
 
                 Workflow.Fire(WizardTriggers.ReadyForUserAction);

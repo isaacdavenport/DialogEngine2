@@ -51,7 +51,15 @@ namespace DialogGenerator.Model
                 StepDescription = "Choose the avatar image of your character",
                 StepControl = "AvatarControl"
             });
-            
+
+            mSteps.Add(new CreateCharacterWizardStep
+            {
+                StepIndex = 6,
+                StepName = "Run Dialog Wizard",
+                StepDescription = "Run one or more dialog model wizards in order to add the phrases to the character.",
+                StepControl = "WizardControl"
+            });
+
 
         }
 
