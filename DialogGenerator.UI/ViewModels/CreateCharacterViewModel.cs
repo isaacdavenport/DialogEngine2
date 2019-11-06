@@ -186,24 +186,22 @@ namespace DialogGenerator.UI.ViewModels
 
         public ICommand ChooseImageCommand { get; set; }
 
-        public CreateCharacterWizardStep nextStep()
+        public void nextStep()
         {
            if(CurrentStepIndex + 1 < mWizard.Steps.Count)
             {
                 CurrentStepIndex++;                
             }
 
-            return mWizard.Steps[CurrentStepIndex];
         }
 
-        public CreateCharacterWizardStep previousStep()
+        public void previousStep()
         {
             if(CurrentStepIndex > 0)
             {
                 CurrentStepIndex--;
             }
-
-            return mWizard.Steps[CurrentStepIndex];
+            
         }
             
         private string _getCharacterInitials()

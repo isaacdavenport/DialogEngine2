@@ -27,26 +27,39 @@ namespace DialogGenerator.UI.Views
         {
             //this.DataContext = new CreateCharacterViewModel();
             InitializeComponent();
+            (this.DataContext as CreateCharacterViewModel).PropertyChanged += CreateCharacterView_PropertyChanged;
+        }
+
+        private void CreateCharacterView_PropertyChanged(object sender, System.ComponentModel.PropertyChangedEventArgs e)
+        {
+            CreateCharacterViewModel _viewModel = sender as CreateCharacterViewModel;
+            if(sender != null)
+            {
+                if(e.PropertyName.Equals("CurrentStep"))
+                {
+                    this.ContentControl.Template = Resources[_viewModel.CurrentStep.StepControl] as ControlTemplate;
+                }
+            }
         }
 
         private void ButtonPrev_Click(object sender, RoutedEventArgs e)
         {
             CreateCharacterViewModel model = this.DataContext as CreateCharacterViewModel;
-            if (model != null)
-            {
-                CreateCharacterWizardStep _step = model.previousStep();
-                this.ContentControl.Template = Resources[_step.StepControl] as ControlTemplate;
-            }
+            model?.previousStep();
+            //if (model != null)
+            //{
+            //    model.previousStep();                
+            //}
         }
 
         private void ButtonNext_Click(object sender, RoutedEventArgs e)
         {
             CreateCharacterViewModel model = this.DataContext as CreateCharacterViewModel;
-            if (model != null)
-            {
-                CreateCharacterWizardStep _step = model.nextStep();
-                this.ContentControl.Template = Resources[_step.StepControl] as ControlTemplate;
-            }
+            model?.nextStep();
+            //if (model != null)
+            //{
+            //    model.nextStep();                
+            //}
         }
     }
 }
