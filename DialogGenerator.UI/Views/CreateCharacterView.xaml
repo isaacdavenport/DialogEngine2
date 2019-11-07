@@ -22,6 +22,7 @@
                     <converters:CloneValuesConverter x:Key="CloneValuesConverter" />
                     <converters:ImageToFullPathValueConverter x:Key="ImageToFullPathValueConverter" />
                     <converters:ImageContentValueConverter x:Key="ImageContentValueConverter" />
+                    <converters:IdentifierConverter x:Key="IdentifierConverter"/>
 
                     <ControlTemplate x:Key="NameControl">
                         <Grid Background="White">
@@ -47,8 +48,8 @@
                             <Label Grid.Column="1" Height="30" Margin="0, 8, 20, 0" HorizontalAlignment="Right">Prefix:</Label>
                             <StackPanel Orientation="Horizontal" HorizontalAlignment="Left" Grid.Column="2">
                                 <TextBox x:Name="Initials" Height="30" Text="{Binding CharacterInitials}" IsEnabled="False"/>
-                                <TextBlock Height="30" Text="_" IsEnabled="False"/>
-                                <TextBox x:Name="Prefix" Grid.Column="3" Height="30" Text="{Binding CharacterIdentifier}" IsEnabled="False"/>
+                                <!--<TextBlock Height="30" Text="_" IsEnabled="False"/>-->
+                                <TextBox x:Name="Prefix" Grid.Column="3" Height="30" Text="{Binding CharacterIdentifier, Converter={StaticResource IdentifierConverter}}" IsEnabled="False"/>
                             </StackPanel>
                         </Grid>
                     </ControlTemplate>
@@ -185,6 +186,7 @@
                 <ColumnDefinition Width="4*"/>
             </Grid.ColumnDefinitions>
             <Border BorderBrush="Gray" BorderThickness="1" Grid.Column="0">
+
                 <Grid Background="#FF51CB8C">
                     <Grid.RowDefinitions>
                         <RowDefinition Height="Auto"/>
@@ -215,8 +217,12 @@
                     <RowDefinition Height="Auto"/>
                     <RowDefinition Height="*"/>
                 </Grid.RowDefinitions>
-                <Border BorderBrush="Gray" BorderThickness="1" Grid.Row="0">
-                    <Grid Background="#eeeeee">
+                <Border BorderBrush="Gray" BorderThickness="1" Grid.Row="0" Margin="10">
+                    <Border.Effect>
+                        <DropShadowEffect Color="#FF51CB8C"/>
+
+                    </Border.Effect>
+                    <Grid Background="Ivory">
                         <Grid.RowDefinitions>
                             <RowDefinition Height="Auto" />
                             <RowDefinition Height="Auto" />
@@ -235,8 +241,8 @@
                     <ColumnDefinition Width="*"/>
                     <ColumnDefinition Width="*"/>
                 </Grid.ColumnDefinitions>
-                <Button Grid.Column="0" HorizontalAlignment="Left" Content="Edit Existing" Width="120" Margin="10,0,0,0" >
-                    <Button.InputBindings>
+                <Button Grid.Column="0" HorizontalAlignment="Left" Content="Edit Existing" Width="120" Margin="10,0,0,0" Command="{Binding CreateCommand}">
+                    <!--<Button.InputBindings>
                         <MouseBinding MouseAction="LeftClick" Command="NavigationCommands.GoToPage">
                             <MouseBinding.CommandParameter>
                                 <MultiBinding Converter="{StaticResource CloneValuesConverter}">
@@ -245,10 +251,10 @@
                                 </MultiBinding>
                             </MouseBinding.CommandParameter>
                         </MouseBinding>
-                    </Button.InputBindings>
+                    </Button.InputBindings>-->
                 </Button>
                 <Button Grid.Column="0" HorizontalAlignment="Right" Content="Previous" Margin="0,0,10,0" Width="120" Click="ButtonPrev_Click"/>
-                <Button Grid.Column="1" HorizontalAlignment="Left" Content="Next" Margin="10, 0, 0, 0" Width="120" Click="ButtonNext_Click"/>
+                <Button Grid.Column="1" HorizontalAlignment="Left" Content="{Binding NextButtonText}" Margin="10, 0, 0, 0" Width="120" Click="ButtonNext_Click"/>
                 <Button Grid.Column="1" HorizontalAlignment="Right" Content="Cancel" Width="120" Margin="0,0,10,0" Command="{Binding HomeCommand}">
                     <!--<Button.InputBindings>
                         <MouseBinding MouseAction="LeftClick" Command="NavigationCommands.GoToPage">

@@ -27,7 +27,6 @@ namespace DialogGenerator.UI.ViewModels
         private string mCharacterGender = "Female";        
         private int mCharacterAge = 10;
         private List<int> mAgesCollection = new List<int>();
-        private List<string> mSteps = new List<string>();
         private CreateCharacterWizard mWizard;
         private CreateCharacterWizardStep mCurrentStep = null;
         private int mCurrentStepIndex = 0;
@@ -109,7 +108,7 @@ namespace DialogGenerator.UI.ViewModels
         {
             get
             {
-                return CharacterInitials + (!String.IsNullOrEmpty(CharacterIdentifier) ? "-" + CharacterIdentifier : "");
+                return CharacterInitials + (!String.IsNullOrEmpty(CharacterIdentifier) ? "_" + CharacterIdentifier : "");
             }
         }
 
@@ -216,6 +215,19 @@ namespace DialogGenerator.UI.ViewModels
             }
         }
 
+        public string NextButtonText
+        {
+            get
+            {
+                if(CurrentStepIndex == mWizard.Steps.Count - 1)
+                {
+                    return "Finish";
+                }
+
+                return "Next";
+            }
+        }
+
         public ICommand ChooseImageCommand { get; set; }
         public ICommand HomeCommand { get; set; }
         public ICommand CreateCommand { get; set; }
@@ -225,7 +237,12 @@ namespace DialogGenerator.UI.ViewModels
            if(CurrentStepIndex + 1 < mWizard.Steps.Count)
             {
                 CurrentStepIndex++;                
+            } else 
+            {
+                _processFinish();
             }
+
+            RaisePropertyChanged("NextButtonText");
 
         }
 
@@ -235,7 +252,15 @@ namespace DialogGenerator.UI.ViewModels
             {
                 CurrentStepIndex--;
             }
-            
+
+            RaisePropertyChanged("NextButtonText");
+        }
+
+        private async void _processFinish()
+        {
+            Character _character = Session.Get(Constants.NEW_CHARACTER) as Character;
+            await mCharacterDataProvider.AddAsync(_character);
+            _onCreateCommand_execute();
         }
 
 
@@ -244,10 +269,15 @@ namespace DialogGenerator.UI.ViewModels
             if(CurrentStep.StepName.Equals("Run Dialog Wizard"))
             {
                 Character _character = Session.Get(Constants.NEW_CHARACTER) as Character;
+                if(_character == null)
+                {
+                    _character = new Character();
+                }
+
                 _character.CharacterName = CharacterName;
                 _character.CharacterPrefix = CharacterPrefix;
                 _character.CharacterAge = CharacterAge;
-                _character.CharacterGender = CharacterGender;
+                _character.CharacterGender = CharacterGender.Substring(0,1);
                 _character.CharacterImage = CharacterImage;
                 Session.Set(Constants.NEW_CHARACTER, _character);
             }
@@ -312,7 +342,7 @@ namespace DialogGenerator.UI.ViewModels
             var query = mRegionManager.Regions[Constants.ContentRegion].Views.Select(v => v.ToString());
 
 
-            mRegionManager.Regions[Constants.ContentRegion].RequestNavigate(typeof(DialogView).Name);
+            mRegionManager.Regions[Constants.ContentRegion].NavigationService.RequestNavigate("CreateView");
         }
 
         private void _onHomeCommand_execute()
