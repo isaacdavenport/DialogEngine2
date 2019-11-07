@@ -61,13 +61,7 @@ namespace DialogGenerator.UI.ViewModels
 
             mCharactersCollectionViewSource.Filter += _mCharacterViewSource_Filter;
 
-            _bindCommands();
-
-            if (Session.Contains(Constants.CHARACTER_EDIT_MODE) && (bool)Session.Get(Constants.CHARACTER_EDIT_MODE))
-            {
-                Session.Set(Constants.CHARACTER_EDIT_MODE, false);
-                Session.Set(Constants.NEW_CHARACTER, null);
-            }
+            _bindCommands();            
         }
 
 

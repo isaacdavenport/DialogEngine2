@@ -24,7 +24,7 @@ namespace DialogGenerator.UI.ViewModels
         private string mCharacterInitials = String.Empty;
         private string mCharacterIdentifier = String.Empty;
         private string mCharacterImage = String.Empty;
-        private string mCharacterGender = "Female";        
+        private string mCharacterGender = "Female";
         private int mCharacterAge = 10;
         private List<int> mAgesCollection = new List<int>();
         private CreateCharacterWizard mWizard;
@@ -35,7 +35,7 @@ namespace DialogGenerator.UI.ViewModels
         private ICharacterDataProvider mCharacterDataProvider;
         private IRegionManager mRegionManager;
 
-        public CreateCharacterViewModel(ILogger _logger, 
+        public CreateCharacterViewModel(ILogger _logger,
             IEventAggregator _eventAggregator,
             ICharacterDataProvider _characterDataProvider,
             IRegionManager _regionManager)
@@ -48,7 +48,7 @@ namespace DialogGenerator.UI.ViewModels
             mWizard = new CreateCharacterWizard();
             mCurrentStep = mWizard.Steps[mCurrentStepIndex];
 
-            for(int i = 5; i < 100; i++)
+            for (int i = 5; i < 100; i++)
             {
                 mAgesCollection.Add(i);
             }
@@ -68,13 +68,13 @@ namespace DialogGenerator.UI.ViewModels
             set
             {
                 mCharacterName = value;
-                mCharacterInitials = _getCharacterInitials();                
+                mCharacterInitials = _getCharacterInitials();
                 RaisePropertyChanged("CharacterName");
                 RaisePropertyChanged("CharacterInitials");
                 CharacterInitials = _getCharacterInitials();
                 CharacterIdentifier = _getCharacterIdentifier();
             }
-        }        
+        }
 
         public string CharacterInitials
         {
@@ -98,7 +98,7 @@ namespace DialogGenerator.UI.ViewModels
             }
 
             set
-            {                                
+            {
                 mCharacterIdentifier = value;
                 RaisePropertyChanged("CharacterIdentifier");
             }
@@ -197,6 +197,7 @@ namespace DialogGenerator.UI.ViewModels
                 mCurrentStepIndex = value;
                 RaisePropertyChanged("CurrentStepIndex");
                 CurrentStep = mWizard.Steps[mCurrentStepIndex];
+                RaisePropertyChanged("NextButtonText");
             }
         }
 
@@ -219,7 +220,7 @@ namespace DialogGenerator.UI.ViewModels
         {
             get
             {
-                if(CurrentStepIndex == mWizard.Steps.Count - 1)
+                if (CurrentStepIndex == mWizard.Steps.Count - 1)
                 {
                     return "Finish";
                 }
@@ -231,6 +232,7 @@ namespace DialogGenerator.UI.ViewModels
         public ICommand ChooseImageCommand { get; set; }
         public ICommand HomeCommand { get; set; }
         public ICommand CreateCommand { get; set; }
+        public ICommand CancelCommand {get;set;}
 
         public void nextStep()
         {
@@ -242,7 +244,6 @@ namespace DialogGenerator.UI.ViewModels
                 _processFinish();
             }
 
-            RaisePropertyChanged("NextButtonText");
 
         }
 
@@ -252,17 +253,33 @@ namespace DialogGenerator.UI.ViewModels
             {
                 CurrentStepIndex--;
             }
-
-            RaisePropertyChanged("NextButtonText");
+            
         }
 
         private async void _processFinish()
         {
             Character _character = Session.Get(Constants.NEW_CHARACTER) as Character;
             await mCharacterDataProvider.AddAsync(_character);
+            _initEntries();
             _onCreateCommand_execute();
         }
 
+        private void _initEntries()
+        {
+            CharacterName = String.Empty;
+            CharacterInitials = String.Empty;
+            CharacterIdentifier = String.Empty;
+            CharacterAge = 10;
+            CharacterGender = "Male";
+            CharacterImage = "Avatar.png";
+            CurrentStepIndex = 0;
+
+            if(Session.Contains(Constants.CHARACTER_EDIT_MODE) && (bool) Session.Get(Constants.CHARACTER_EDIT_MODE))
+            {
+                Session.Set(Constants.CHARACTER_EDIT_MODE, false);
+                Session.Set(Constants.NEW_CHARACTER, null);
+            }
+        }
 
         private void handleStepChange()
         {
@@ -315,6 +332,7 @@ namespace DialogGenerator.UI.ViewModels
             ChooseImageCommand = new DelegateCommand(_onChooseImage_execute);
             HomeCommand = new DelegateCommand(_onHomeCommand_execute);
             CreateCommand = new DelegateCommand(_onCreateCommand_execute);
+            CancelCommand = new DelegateCommand(_onCancelCommand_execute);
         }
 
         
@@ -333,20 +351,19 @@ namespace DialogGenerator.UI.ViewModels
 
         private void _onCreateCommand_execute()
         {
-            if(Session.Contains(Constants.CHARACTER_EDIT_MODE) && (bool) Session.Get(Constants.CHARACTER_EDIT_MODE))
-            {
-                Session.Set(Constants.CHARACTER_EDIT_MODE, false);
-                Session.Set(Constants.NEW_CHARACTER, null);
-            }
-
-            var query = mRegionManager.Regions[Constants.ContentRegion].Views.Select(v => v.ToString());
-
-
+            _initEntries();
             mRegionManager.Regions[Constants.ContentRegion].NavigationService.RequestNavigate("CreateView");
         }
 
         private void _onHomeCommand_execute()
-        {            
+        {
+            _initEntries();
+            mRegionManager.Regions[Constants.ContentRegion].NavigationService.RequestNavigate("HomeView");
+        }
+
+        private void _onCancelCommand_execute()
+        {
+            _initEntries();
             mRegionManager.Regions[Constants.ContentRegion].NavigationService.RequestNavigate("HomeView");
         }
 
