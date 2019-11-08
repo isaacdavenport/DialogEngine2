@@ -273,12 +273,8 @@ namespace DialogGenerator.UI.ViewModels
             CharacterGender = "Male";
             CharacterImage = "Avatar.png";
             CurrentStepIndex = 0;
-
-            if(Session.Contains(Constants.CHARACTER_EDIT_MODE) && (bool) Session.Get(Constants.CHARACTER_EDIT_MODE))
-            {
-                Session.Set(Constants.CHARACTER_EDIT_MODE, false);
-                Session.Set(Constants.NEW_CHARACTER, null);
-            }
+            
+            _closeCreateSession();
         }
 
         private void handleStepChange()
@@ -288,7 +284,11 @@ namespace DialogGenerator.UI.ViewModels
                 Character _character = Session.Get(Constants.NEW_CHARACTER) as Character;
                 if(_character == null)
                 {
+                    // If the character value was null in the session object, 
+                    // it means that the CHARACTER_EDIT_MODE was also not on.
+                    // So we have to turn it on too. 
                     _character = new Character();
+                    Session.Set(Constants.CHARACTER_EDIT_MODE, true);
                 }
 
                 _character.CharacterName = CharacterName;
