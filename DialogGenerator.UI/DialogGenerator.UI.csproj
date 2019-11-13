@@ -235,6 +235,7 @@
     <Compile Include="Views\WizardView.xaml.cs">
       <DependentUpon>WizardView.xaml</DependentUpon>
     </Compile>
+    <Compile Include="Workflow\CreateCharacterWorkflow.cs" />
     <Compile Include="Workflow\MP3RecorderStateMachine.cs" />
     <Compile Include="Workflow\VideoPlayerStateMachine.cs" />
     <Compile Include="Workflow\WizardWorkflow.cs" />

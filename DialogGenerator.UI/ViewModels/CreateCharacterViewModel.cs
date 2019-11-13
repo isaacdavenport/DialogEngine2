@@ -2,6 +2,7 @@
 using DialogGenerator.Model;
 using DialogGenerator.UI.Data;
 using DialogGenerator.UI.Views;
+using DialogGenerator.UI.Workflow.CreateCharacterWorkflow;
 using Prism.Commands;
 using Prism.Events;
 using Prism.Mvvm;
@@ -9,6 +10,7 @@ using Prism.Regions;
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
+using System.ComponentModel;
 using System.IO;
 using System.Linq;
 using System.Text;
@@ -26,6 +28,8 @@ namespace DialogGenerator.UI.ViewModels
         private string mCharacterImage = String.Empty;
         private string mCharacterGender = "Female";
         private int mCharacterAge = 10;
+        private int mWizardPassthroughIndex = 0;
+        private List<string> mDialogWizards = new List<string>();
         private List<int> mAgesCollection = new List<int>();
         private CreateCharacterWizard mWizard;
         private CreateCharacterWizardStep mCurrentStep = null;
@@ -34,6 +38,9 @@ namespace DialogGenerator.UI.ViewModels
         private IEventAggregator mEventAgregator;
         private ICharacterDataProvider mCharacterDataProvider;
         private IRegionManager mRegionManager;
+        private string mCurrentDialogWizard = String.Empty;
+        private string mNextButtonText = "Next";
+        private bool mIsFinished = false;
 
         public CreateCharacterViewModel(ILogger _logger,
             IEventAggregator _eventAggregator,
@@ -53,11 +60,47 @@ namespace DialogGenerator.UI.ViewModels
                 mAgesCollection.Add(i);
             }
 
+            Workflow = new CreateCharacterWorkflow(action: () => { });
+            Workflow.PropertyChanged += _workflow_PropertyChanged;
+            _configureWorkflow();
 
-            _openCreateSession();
+            Character = new Character();
+
+            _initDialogWizards();
+
+            //_openCreateSession();
             _bindCommands();
         }
+        
+        public int WizardPassthroughIndex
+        {
+            get
+            {
+                return mWizardPassthroughIndex;
+            }
 
+            set
+            {
+                mWizardPassthroughIndex = value;
+                RaisePropertyChanged();
+            }
+        }
+
+        public CreateCharacterWorkflow Workflow { get; set; }
+        public Character Character {get;set;}
+        public string CurrentDialogWizard
+        {
+            get
+            {
+                return mCurrentDialogWizard;
+            }
+
+            set
+            {
+                mCurrentDialogWizard = value;
+                RaisePropertyChanged();
+            }
+        }
         public string CharacterName
         {
             get
@@ -196,8 +239,10 @@ namespace DialogGenerator.UI.ViewModels
             {
                 mCurrentStepIndex = value;
                 RaisePropertyChanged("CurrentStepIndex");
-                CurrentStep = mWizard.Steps[mCurrentStepIndex];
-                RaisePropertyChanged("NextButtonText");
+                if(mWizard.Steps.Count > mCurrentStepIndex)
+                {
+                    CurrentStep = mWizard.Steps[mCurrentStepIndex];                    
+                }                
             }
         }
 
@@ -211,8 +256,8 @@ namespace DialogGenerator.UI.ViewModels
             set
             {
                 mCurrentStep = value;
-                handleStepChange();
-                RaisePropertyChanged("CurrentStep");
+                //handleStepChange();
+                RaisePropertyChanged();
             }
         }
 
@@ -220,12 +265,13 @@ namespace DialogGenerator.UI.ViewModels
         {
             get
             {
-                if (CurrentStepIndex == mWizard.Steps.Count - 1)
-                {
-                    return "Finish";
-                }
+                return mNextButtonText;
+            }
 
-                return "Next";
+            set
+            {
+                mNextButtonText = value;
+                RaisePropertyChanged();
             }
         }
 
@@ -236,13 +282,23 @@ namespace DialogGenerator.UI.ViewModels
 
         public void nextStep()
         {
-           if(CurrentStepIndex + 1 < mWizard.Steps.Count)
+            if(mIsFinished)
             {
-                CurrentStepIndex++;                
-            } else 
-            {
+                mIsFinished = false;
                 _processFinish();
+            } else
+            {
+                CurrentStepIndex++;
+                Workflow.Fire((Triggers)CurrentStepIndex);
             }
+            
+           //if(CurrentStepIndex + 1 < mWizard.Steps.Count)
+           // {
+           //     CurrentStepIndex++;                
+           // } else 
+           // {
+           //     _processFinish();
+           // }
 
 
         }
@@ -252,6 +308,7 @@ namespace DialogGenerator.UI.ViewModels
             if(CurrentStepIndex > 0)
             {
                 CurrentStepIndex--;
+                Workflow.Fire((Triggers) CurrentStepIndex);
             }
             
         }
@@ -335,7 +392,185 @@ namespace DialogGenerator.UI.ViewModels
             CancelCommand = new DelegateCommand(_onCancelCommand_execute);
         }
 
-        
+        private void _configureWorkflow()
+        {
+            Workflow.Configure(States.EnteredSetName)
+                 .OnEntry(() => _stepEntered("Name"))
+                 .OnExit(() => _stepExited("Name"))
+                 .Permit(Triggers.SetInitials, States.EnteredSetInitials)
+                 .Permit(Triggers.SetAge, States.EnteredSetAge)
+                 .Permit(Triggers.SetGender, States.EnteredSetGender)
+                 .Permit(Triggers.SetAvatar, States.EnteredSetAvatar)
+                 .Permit(Triggers.StartWizard, States.InWizard)
+                 .Permit(Triggers.Finish, States.Finished);
+
+            Workflow.Configure(States.EnteredSetInitials)
+                 .OnEntry(() => _stepEntered("Initials"))
+                 .OnExit(() => _stepExited("Initials"))
+                 .Permit(Triggers.SetName, States.EnteredSetName)
+                 .Permit(Triggers.SetAge, States.EnteredSetAge)
+                 .Permit(Triggers.SetGender, States.EnteredSetGender)
+                 .Permit(Triggers.SetAvatar, States.EnteredSetAvatar)
+                 .Permit(Triggers.StartWizard, States.InWizard)
+                 .Permit(Triggers.Finish, States.Finished);
+
+            Workflow.Configure(States.EnteredSetAge)
+                 .OnEntry(() => _stepEntered("Age"))
+                 .OnExit(() => _stepExited("Age"))
+                 .Permit(Triggers.SetName, States.EnteredSetName)
+                 .Permit(Triggers.SetInitials, States.EnteredSetInitials)
+                 .Permit(Triggers.SetGender, States.EnteredSetGender)
+                 .Permit(Triggers.SetAvatar, States.EnteredSetAvatar)
+                 .Permit(Triggers.StartWizard, States.InWizard)
+                 .Permit(Triggers.Finish, States.Finished);
+
+            Workflow.Configure(States.EnteredSetGender)
+                 .OnEntry(() => _stepEntered("Gender"))
+                 .OnExit(() => _stepExited("Gender"))
+                 .Permit(Triggers.SetName, States.EnteredSetName)
+                 .Permit(Triggers.SetInitials, States.EnteredSetInitials)
+                 .Permit(Triggers.SetAge, States.EnteredSetAge)
+                 .Permit(Triggers.SetAvatar, States.EnteredSetAvatar)
+                 .Permit(Triggers.StartWizard, States.InWizard)
+                 .Permit(Triggers.Finish, States.Finished);
+
+            Workflow.Configure(States.EnteredSetAvatar)
+                 .OnEntry(() => _stepEntered("Avatar"))
+                 .OnExit(() => _stepExited("Avatar"))
+                 .Permit(Triggers.SetName, States.EnteredSetName)
+                 .Permit(Triggers.SetInitials, States.EnteredSetInitials)
+                 .Permit(Triggers.SetAge, States.EnteredSetAge)
+                 .Permit(Triggers.SetGender, States.EnteredSetGender)
+                 .Permit(Triggers.CheckCounter, States.InCounter)
+                 .Permit(Triggers.Finish, States.Finished);
+
+            Workflow.Configure(States.InCounter)
+                  .OnEntry(() => _stepEntered("CheckCounter"))
+                  .Permit(Triggers.StartWizard, States.InWizard)
+                  .Permit(Triggers.Finish, States.Finished);
+                    
+
+            Workflow.Configure(States.InWizard)
+                .OnEntry(() => _stepEntered("Wizard"))
+                .Permit(Triggers.GoPlay, States.Playing)
+                .Permit(Triggers.CheckCounter, States.InCounter)
+                .Permit(Triggers.Finish, States.Finished);
+
+            Workflow.Configure(States.Playing)
+                .OnEntry(() => _stepEntered("Play"))
+                .Permit(Triggers.CheckCounter, States.InCounter)
+                .Permit(Triggers.Finish, States.Finished);
+
+            Workflow.Configure(States.Finished)
+                .OnEntry(() => _stepEntered("Finished"));
+            
+    
+        }
+
+        private void _stepExited(string stepName)
+        {
+            switch (stepName)
+            {
+                case "Name":
+                    Character.CharacterName = CharacterName;
+                    break;
+                case "Initials":
+                    Character.CharacterPrefix = CharacterPrefix;
+                    break;
+                case "Age":
+                    Character.CharacterAge = CharacterAge;
+                    break;
+                case "Gender":                    
+                    Character.CharacterGender = CharacterGender.Substring(0, 1);
+                    break;
+                case "Avatar":
+                    Character.CharacterImage = CharacterImage;
+                    break;
+                case "Wizard":
+                    
+
+                    break;
+                default:
+                    break;
+            }
+        }
+
+        private void _stepEntered(string stepName)
+        {
+            switch(stepName)
+            {
+                case "Name":
+                    CurrentStepIndex = 0;                    
+                    CharacterName = Character.CharacterName;
+                    break;
+                case "Initials":
+                    CurrentStepIndex = 1;
+                    break;
+                case "Age":
+                    CurrentStepIndex = 2;
+                    CharacterAge = Character.CharacterAge;
+                    break;
+                case "Gender":
+                    CurrentStepIndex = 3;
+                    CharacterGender = Character.CharacterGender.Equals("M") ? "Male" : "Female";
+                    break;
+                case "Avatar":
+                    CurrentStepIndex = 4;
+                    CharacterImage = Character.CharacterImage;
+                    break;
+                case "CheckCounter":
+                    if(mWizardPassthroughIndex < mDialogWizards.Count)
+                    {
+                        CurrentDialogWizard = mDialogWizards[mWizardPassthroughIndex++];
+                        Workflow.Fire(Triggers.StartWizard);
+                    } else
+                    {
+                        Workflow.Fire(Triggers.Finish);
+                    }
+                    
+                    break;
+                case "Wizard":
+                    // Prepare steps for starting of the dialog model wizard in 
+                    // character creation mode.
+                    if(!_checkCharacterCreateMode())
+                    {
+                        Session.Set(Constants.CHARACTER_EDIT_MODE, true);
+                        Session.Set(Constants.NEW_CHARACTER, Character);
+                        Session.Set(Constants.CREATE_CHARACTER_VIEW_MODEL, this);
+                    }
+
+                    // Start the wizard.
+                    mRegionManager.Regions[Constants.ContentRegion].NavigationService.RequestNavigate("WizardView");
+                    break;
+                case "Play":
+                    mRegionManager.Regions[Constants.ContentRegion].NavigationService.RequestNavigate("DialogView");
+                    break;
+                case "Finished":
+                    CurrentStepIndex = 4;
+                    NextButtonText = "Finish";
+                    mIsFinished = true;
+                    break;
+                default:
+                    break;
+            }
+        }
+
+        private bool _checkCharacterCreateMode()
+        {
+            if(Session.Contains(Constants.CHARACTER_EDIT_MODE) && (bool) Session.Get(Constants.CHARACTER_EDIT_MODE) == true)
+            {
+                return true;
+            }
+
+            return false;
+        }
+
+        private void _initDialogWizards()
+        {
+            mDialogWizards.Add("BasicWizard");
+            mDialogWizards.Add("IntermediateWizard");
+            mDialogWizards.Add("ActionStoryWizard");
+        }
 
         private void _openCreateSession()
         {
@@ -347,6 +582,7 @@ namespace DialogGenerator.UI.ViewModels
         {
             Session.Set(Constants.NEW_CHARACTER, null);
             Session.Set(Constants.CHARACTER_EDIT_MODE, false);
+            Session.Set(Constants.CREATE_CHARACTER_VIEW_MODEL, null);
         }
 
         private void _onCreateCommand_execute()
@@ -365,6 +601,11 @@ namespace DialogGenerator.UI.ViewModels
         {
             _initEntries();
             mRegionManager.Regions[Constants.ContentRegion].NavigationService.RequestNavigate("HomeView");
+        }
+
+        private void _workflow_PropertyChanged(object sender, PropertyChangedEventArgs e)
+        {
+
         }
 
         private async void _onChooseImage_execute()

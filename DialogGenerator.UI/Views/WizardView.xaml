@@ -97,7 +97,7 @@
                     <Grid x:Name="WizardMainGrid" Grid.Column="1" Margin="20"  Background="Transparent">
                         <Grid.ColumnDefinitions>
                             <ColumnDefinition Width="*" />
-                            <ColumnDefinition Width="100"/>
+                            <ColumnDefinition Width="Auto"/>
                             <ColumnDefinition Width="*"/>
                         </Grid.ColumnDefinitions>
                         
@@ -169,7 +169,8 @@
                         
                         <StackPanel Grid.Row="2" Grid.Column="1" Orientation="Horizontal"
                                     VerticalAlignment="Bottom" HorizontalAlignment="Center" >
-                            <TextBlock Text="{Binding CurrentStepIndex,Converter={StaticResource IncrementValueConverter}}"
+                        <TextBlock Text="{Binding CurrentWizard.WizardName}" FontSize="16" FontWeight="Bold" Foreground="{DynamicResource PrimaryHueMidBrush}" Margin="0,0,10,0"/>
+                        <TextBlock Text="{Binding CurrentStepIndex,Converter={StaticResource IncrementValueConverter}}"
                                        FontSize="16" FontWeight="Bold" Foreground="{DynamicResource PrimaryHueMidBrush}" />
                             <TextBlock Text="of" FontSize="16" Margin="7,0,7,0" Foreground="#FF595959" />
                             <TextBlock Text="{Binding CurrentWizard.TutorialSteps.Count}" FontSize="16" FontWeight="Bold"

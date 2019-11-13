@@ -26,5 +26,7 @@
         public const string FILENAME_CHECK_REGEX = @"^[-a-zA-Z0-9_' ]+$";
         public const string CHARACTER_EDIT_MODE = "CharacterEditMode";
         public const string NEW_CHARACTER = "NewCharacter";
+        public const string CREATE_CHARACTER_VIEW_MODEL = "CreateCharacterViewModel";
+        
     }
 }
