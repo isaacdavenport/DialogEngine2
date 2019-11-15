@@ -12,7 +12,7 @@
             xmlns:converters="clr-namespace:DialogGenerator.UI.Converters"
              xmlns:local="clr-namespace:DialogGenerator.UI.Views"
              mc:Ignorable="d" 
-             d:DesignHeight="450" d:DesignWidth="800">
+             d:DesignHeight="450" d:DesignWidth="800" Loaded="viewLoaded">
     <ContentControl.Resources>
         
         <ResourceDictionary>

@@ -3,6 +3,7 @@ using DialogGenerator.DialogEngine;
 using DialogGenerator.Events;
 using DialogGenerator.Events.EventArgs;
 using DialogGenerator.UI.Views.Dialogs;
+using DialogGenerator.UI.Workflow.CreateCharacterWorkflow;
 using DialogGenerator.Utilities;
 using Prism.Commands;
 using Prism.Events;
@@ -28,6 +29,7 @@ namespace DialogGenerator.UI.ViewModels
         private bool mIsDialogStarted;
         private bool mIsStopBtnEnabled;
         private Visibility mIsDebugViewVisible = Visibility.Collapsed;
+        private bool mCanGoBackToWizard = false;
 
         #endregion
 
@@ -60,6 +62,7 @@ namespace DialogGenerator.UI.ViewModels
         public DelegateCommand<object> ChangeDebugVisibilityCommand { get; set; }
         public DelegateCommand ViewLoadedCommand { get; set; }
         public DelegateCommand ViewUnloadedCommand { get; set; }
+        public DelegateCommand GoBackToWizardCommand { get; set; }
 
         #endregion
 
@@ -75,12 +78,46 @@ namespace DialogGenerator.UI.ViewModels
             ChangeDebugVisibilityCommand = new DelegateCommand<object>(_changeDebugVisibilityCommand_Execute);
             ViewLoadedCommand = new DelegateCommand(_viewLoaded_Execute);
             ViewUnloadedCommand = new DelegateCommand(_viewUnloaded_Execute);
+            GoBackToWizardCommand = new DelegateCommand(_goBackToWizard_Execute, _goBackToWizard_CanExecute);           
+        }
+        
+        public bool CanGoBackToWizard
+        {
+            get
+            {
+                return mCanGoBackToWizard;
+            }      
+            
+            set
+            {
+                mCanGoBackToWizard = value;
+                RaisePropertyChanged();
+            }
+        }
+
+        private bool _goBackToWizard_CanExecute()
+        {
+            if(Session.Contains(Constants.CHARACTER_EDIT_MODE) && Session.Get<bool>(Constants.CHARACTER_EDIT_MODE))
+            {
+                return true;
+            }
+            
+            return false;
+        }
+
+        private void _goBackToWizard_Execute()
+        {
+            CreateCharacterViewModel ccViewModel = Session.Get<CreateCharacterViewModel>(Constants.CREATE_CHARACTER_VIEW_MODEL);
+            if(ccViewModel != null)
+            {
+                ccViewModel.Workflow.Fire(Triggers.CheckCounter);
+            }
         }
 
         private void _viewUnloaded_Execute()
         {
             try
-            {
+            {                
                 mDialogEngine.StopDialogEngine();
             }
             catch (Exception ex)
@@ -93,7 +130,8 @@ namespace DialogGenerator.UI.ViewModels
         {
             try
             {
-                await mDialogEngine.StartDialogEngine();
+                CanGoBackToWizard = GoBackToWizardCommand.CanExecute();
+                await mDialogEngine.StartDialogEngine();                
             }
             catch (Exception ex)
             {

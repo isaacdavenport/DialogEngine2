@@ -1,4 +1,5 @@
 ﻿using DialogGenerator.Core;
+using DialogGenerator.Events;
 using DialogGenerator.Model;
 using DialogGenerator.UI.Data;
 using DialogGenerator.UI.Views;
@@ -285,22 +286,13 @@ namespace DialogGenerator.UI.ViewModels
             if(mIsFinished)
             {
                 mIsFinished = false;
+                NextButtonText = "Next";
                 _processFinish();
             } else
             {
                 CurrentStepIndex++;
-                Workflow.Fire((Triggers)CurrentStepIndex);
+                Workflow.Fire((Triggers) CurrentStepIndex);
             }
-            
-           //if(CurrentStepIndex + 1 < mWizard.Steps.Count)
-           // {
-           //     CurrentStepIndex++;                
-           // } else 
-           // {
-           //     _processFinish();
-           // }
-
-
         }
 
         public void previousStep()
@@ -314,10 +306,13 @@ namespace DialogGenerator.UI.ViewModels
         }
 
         private async void _processFinish()
-        {
-            Character _character = Session.Get(Constants.NEW_CHARACTER) as Character;
-            await mCharacterDataProvider.AddAsync(_character);
-            _initEntries();
+        {            
+            int _idx = mCharacterDataProvider.IndexOf(Character);
+            if(_idx == -1)
+            {
+                await mCharacterDataProvider.AddAsync(Character);
+            }
+
             _onCreateCommand_execute();
         }
 
@@ -330,6 +325,8 @@ namespace DialogGenerator.UI.ViewModels
             CharacterGender = "Male";
             CharacterImage = "Avatar.png";
             CurrentStepIndex = 0;
+            NextButtonText = "Next";
+            WizardPassthroughIndex = 0;
             
             _closeCreateSession();
         }
@@ -397,6 +394,7 @@ namespace DialogGenerator.UI.ViewModels
             Workflow.Configure(States.EnteredSetName)
                  .OnEntry(() => _stepEntered("Name"))
                  .OnExit(() => _stepExited("Name"))
+                 .PermitReentry(Triggers.SetName)
                  .Permit(Triggers.SetInitials, States.EnteredSetInitials)
                  .Permit(Triggers.SetAge, States.EnteredSetAge)
                  .Permit(Triggers.SetGender, States.EnteredSetGender)
@@ -462,9 +460,9 @@ namespace DialogGenerator.UI.ViewModels
                 .Permit(Triggers.Finish, States.Finished);
 
             Workflow.Configure(States.Finished)
-                .OnEntry(() => _stepEntered("Finished"));
+                .OnEntry(() => _stepEntered("Finished"))
+                .Permit(Triggers.SetAvatar, States.EnteredSetAvatar);
             
-    
         }
 
         private void _stepExited(string stepName)
@@ -495,7 +493,7 @@ namespace DialogGenerator.UI.ViewModels
             }
         }
 
-        private void _stepEntered(string stepName)
+        private async void _stepEntered(string stepName)
         {
             switch(stepName)
             {
@@ -543,10 +541,39 @@ namespace DialogGenerator.UI.ViewModels
                     mRegionManager.Regions[Constants.ContentRegion].NavigationService.RequestNavigate("WizardView");
                     break;
                 case "Play":
+                    // Prepare character to be shown on 'play'.
+                    int _idx = mCharacterDataProvider.IndexOf(Character);
+                    if (_idx == -1)
+                    {
+                        // First remove all that have state on
+                        foreach(var _charMember in mCharacterDataProvider.GetAll())
+                        {
+                            if(_charMember.State == Model.Enum.CharacterState.On)
+                            {
+                                _charMember.State = Model.Enum.CharacterState.Available;
+                            }
+                        }
+
+                        Character.State = Model.Enum.CharacterState.On;
+                        await mCharacterDataProvider.AddAsync(Character);
+                        _idx = mCharacterDataProvider.IndexOf(Character); 
+                    }
+
+                    int _forcedCharacterCount = Session.Get<int>(Constants.FORCED_CH_COUNT);
+                    if (_forcedCharacterCount == 0)
+                    {
+                        _forcedCharacterCount++;
+                        Session.Set(Constants.FORCED_CH_COUNT, _forcedCharacterCount);
+                    }
+
+                    Session.Set(Constants.FORCED_CH_1, _idx);
+
+                    // Call the play window.
                     mRegionManager.Regions[Constants.ContentRegion].NavigationService.RequestNavigate("DialogView");
                     break;
                 case "Finished":
-                    CurrentStepIndex = 4;
+                    mRegionManager.Regions[Constants.ContentRegion].NavigationService.RequestNavigate("CreateCharacterView");
+                    Workflow.Fire(Triggers.SetAvatar);
                     NextButtonText = "Finish";
                     mIsFinished = true;
                     break;
@@ -567,9 +594,11 @@ namespace DialogGenerator.UI.ViewModels
 
         private void _initDialogWizards()
         {
-            mDialogWizards.Add("BasicWizard");
-            mDialogWizards.Add("IntermediateWizard");
+            mDialogWizards.Add("BasicWizard");            
+            mDialogWizards.Add("ScaryStoryWizard");
             mDialogWizards.Add("ActionStoryWizard");
+            mDialogWizards.Add("IntermediateWizard");
+            mDialogWizards.Add("Advanced1Wizard");
         }
 
         private void _openCreateSession()
@@ -588,6 +617,8 @@ namespace DialogGenerator.UI.ViewModels
         private void _onCreateCommand_execute()
         {
             _initEntries();
+            Character = new Character();
+            Workflow.Fire(Triggers.SetName);
             mRegionManager.Regions[Constants.ContentRegion].NavigationService.RequestNavigate("CreateView");
         }
 

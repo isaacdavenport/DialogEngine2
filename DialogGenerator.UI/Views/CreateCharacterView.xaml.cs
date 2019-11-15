@@ -38,5 +38,10 @@ namespace DialogGenerator.UI.Views
             CreateCharacterViewModel model = this.DataContext as CreateCharacterViewModel;
             model?.nextStep();
         }
+
+        private void viewLoaded(object sender, RoutedEventArgs e)
+        {
+
+        }
     }
 }
