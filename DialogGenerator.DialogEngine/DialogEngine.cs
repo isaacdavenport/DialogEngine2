@@ -92,8 +92,15 @@ namespace DialogGenerator.DialogEngine
             mEventAggregator.GetEvent<ChangedCharacterStateEvent>().Subscribe(_onChangedCharacterState);
             mEventAggregator.GetEvent<ChangedDialogModelStateEvent>().Subscribe(_onChangedDialogModelState);
             mEventAggregator.GetEvent<CharacterUpdatedEvent>().Subscribe(_onCharacterUpdated);
+            mEventAggregator.GetEvent<RestartDialogEngineEvent>().Subscribe(_onRestartRequired);
             mWorkflow.PropertyChanged += _mWorkflow_PropertyChanged;
             Session.SessionPropertyChanged += _sessionPropertyChanged;
+        }
+
+        private async void _onRestartRequired()
+        {
+            StopDialogEngine();
+            await StartDialogEngine();
         }
 
         /// <summary>

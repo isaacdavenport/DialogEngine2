@@ -63,6 +63,7 @@ namespace DialogGenerator.UI.ViewModels
         public DelegateCommand ViewLoadedCommand { get; set; }
         public DelegateCommand ViewUnloadedCommand { get; set; }
         public DelegateCommand GoBackToWizardCommand { get; set; }
+        public DelegateCommand CreateCharacterCommand { get; set; }
 
         #endregion
 
@@ -78,9 +79,9 @@ namespace DialogGenerator.UI.ViewModels
             ChangeDebugVisibilityCommand = new DelegateCommand<object>(_changeDebugVisibilityCommand_Execute);
             ViewLoadedCommand = new DelegateCommand(_viewLoaded_Execute);
             ViewUnloadedCommand = new DelegateCommand(_viewUnloaded_Execute);
-            GoBackToWizardCommand = new DelegateCommand(_goBackToWizard_Execute, _goBackToWizard_CanExecute);           
-        }
-        
+            GoBackToWizardCommand = new DelegateCommand(_goBackToWizard_Execute, _goBackToWizard_CanExecute);            
+        }        
+
         public bool CanGoBackToWizard
         {
             get

@@ -45,10 +45,10 @@ namespace DialogGenerator.UI
                 .Resolve(typeof(DialogModelsNavigationViewModel));
 
             //mRegionManager.RegisterViewWithRegion(Constants.MenuRegion, typeof(MenuView));
+            mRegionManager.RegisterViewWithRegion(Constants.ContentRegion, typeof(DialogView));
             mRegionManager.RegisterViewWithRegion(Constants.ContentRegion, typeof(HomeView));
             mRegionManager.RegisterViewWithRegion(Constants.ContentRegion, typeof(CreateView));
-            mRegionManager.RegisterViewWithRegion(Constants.ContentRegion, typeof(WizardView));
-            mRegionManager.RegisterViewWithRegion(Constants.ContentRegion, typeof(DialogView));
+            mRegionManager.RegisterViewWithRegion(Constants.ContentRegion, typeof(WizardView));            
 
             //mRegionManager.RegisterViewWithRegion(Constants.NavigationRegion, typeof(CharactersNavigationView));
 

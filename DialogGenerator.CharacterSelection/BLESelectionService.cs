@@ -35,6 +35,9 @@ namespace DialogGenerator.CharacterSelection
         private readonly DispatcherTimer mcHeatMapUpdateTimer = new DispatcherTimer();
         private Random mRandom = new Random();
         private States mCurrentState;
+        private int mFailedBLEMessageAttempts = 0;
+        private TimeSpan mIddleTime;
+        private DateTime mLastAccessTime;
 
         private int BigRssi = 0;
         private int CurrentCharacter1;
@@ -126,6 +129,8 @@ namespace DialogGenerator.CharacterSelection
         private  Triggers _initialize()
         {
             mCurrentDataProvider = mBLEDataProviderFactory.Create(BLEDataProviderType.WinBLEWatcher);
+            mIddleTime = new TimeSpan(0, 0, 0);
+            mLastAccessTime = DateTime.Now;
 
             return Triggers.ProcessMessage;
         }
@@ -148,9 +153,26 @@ namespace DialogGenerator.CharacterSelection
 
                 if (message == null)
                 {
+                    DateTime nowTime = DateTime.Now;
+                    mIddleTime += nowTime - mLastAccessTime;
+                    mLastAccessTime = nowTime;
+                    mFailedBLEMessageAttempts++;
+                    
+                    if (mIddleTime.Milliseconds > 500)                    
+                    {
+                        ApplicationData.Instance.UseBLERadios = false;
+                        mEventAggregator.GetEvent<RestartDialogEngineEvent>().Publish();
+                        Console.Out.WriteLine("Restart of Dialog Engine required!!!");
+                    }
+
                     return Triggers.ProcessMessage;
+                } else
+                {
+                    mLastAccessTime = DateTime.Now;
+                    mIddleTime = new TimeSpan(0, 0, 0);
                 }
 
+                Console.Out.WriteLine("Failed messages " + mFailedBLEMessageAttempts);
                 BLE_Message mNewRow = new BLE_Message();  // added number holds sequence number
 
                 var mRowNum = ParseMessageHelper.ParseBle(message, mNewRow);
@@ -478,6 +500,7 @@ namespace DialogGenerator.CharacterSelection
         public async Task StartCharacterSelection()
         {
             mCancellationTokenSource = new CancellationTokenSource();
+            mFailedBLEMessageAttempts = 0;
 
             await Task.Run(async() =>
             {
