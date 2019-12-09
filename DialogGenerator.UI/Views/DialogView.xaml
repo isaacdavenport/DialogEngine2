@@ -30,6 +30,7 @@
             <converters:CloneValuesConverter x:Key="CloneValuesConverter" />
             <converters:ImageContentSmallSizeValueConverter x:Key="ImageContentSmallSizeValueConverter" />
             <converters:BoolToVisibilityConverter x:Key="BoolToVisibilityConverter" />
+            <converters:ImageContentValueConverter x:Key="ImageContentValueConverter" />
         </ResourceDictionary>
     </UserControl.Resources>
 
@@ -42,19 +43,96 @@
         </i:EventTrigger>
     </i:Interaction.Triggers>
 
-    <Grid>
+    <Grid Background="White">
         <Grid.RowDefinitions>
+            <RowDefinition Height="300"/>
             <RowDefinition Height="*"/>
             <RowDefinition Height="Auto" />
             <RowDefinition Height="Auto"/>
             <RowDefinition Height="Auto" />
-        </Grid.RowDefinitions> 
+        </Grid.RowDefinitions>
+
+        <Grid Grid.Row="0">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="*" />
+                <ColumnDefinition Width="Auto" />
+                <ColumnDefinition Width="200" />
+                <ColumnDefinition Width="Auto" />
+                <ColumnDefinition Width="*" />
+            </Grid.ColumnDefinitions>
+
+            
+            <Grid Grid.Column="0">
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="*" />
+                        <RowDefinition Height="Auto" />
+                        <RowDefinition Height="100"/>
+                        <RowDefinition Height="*" />
+                    </Grid.RowDefinitions>
+                <TextBlock Grid.Row="1" Text="{Binding FirstSelectedCharacter.CharacterName}" HorizontalAlignment="Center" Margin="0,0,0,20" FontWeight="Bold"/>
+                <materialDesign:ColorZone Grid.Row="2" Mode="PrimaryLight" VerticalAlignment="Stretch" HorizontalAlignment="Center" 
+                                                              Content="{Binding FirstSelectedCharacter.CharacterImage, Converter={StaticResource ImageContentValueConverter}}" />
+            </Grid>
+
+            <Button Grid.Column ="1" x:Name="btnFirstSelect" 
+                        HorizontalAlignment="Center" VerticalAlignment="Center" 
+                        Width="200" Margin="100, 0, 100, 0" Height="Auto" Command="{Binding SelectFirstCharacterCommand}" >
+                <StackPanel>
+                    <materialDesign:PackIcon Kind="ArrowBottomLeft" Height="20" Width="20" Foreground="White" HorizontalAlignment="Center" VerticalAlignment="Center" />
+                    <TextBlock>First Character</TextBlock>
+                </StackPanel>
+            </Button>
+            <Grid Grid.Column="2">
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="20" />
+                    <RowDefinition Height="Auto" />
+                    <RowDefinition Height="*" />
+                    <RowDefinition Height="20" />
+                </Grid.RowDefinitions>
+                <TextBlock Grid.Row="1" HorizontalAlignment="Center" FontWeight="Bold" Text="Character List" Margin="0, 0, 0, 20"/>
+                <Grid Grid.Row="2">
+                    <Border Margin="10" BorderBrush="Black" BorderThickness="1" Background="White">
+                        <Border.Effect>
+                            <DropShadowEffect/>
+                        </Border.Effect>
+                    </Border>
+                    <Border Margin="10" BorderBrush="Black" BorderThickness="1">
+                        
+                            <ListBox x:Name="lstCharacters" ItemsSource="{Binding Characters}" SelectedItem="{Binding ListSelectedCharacter}" Width="Auto" Height="Auto"/>
+                        
+                    </Border>
+                </Grid>
+                
+                
+            </Grid>
+            
+            <Button Grid.Column ="3" x:Name="btnSecondSelect" 
+                        HorizontalAlignment="Center" VerticalAlignment="Center" 
+                        Width="200" Margin="100, 0, 100, 0" Height="Auto" Command="{Binding SelectSecondCharacterCommand}">
+                <StackPanel>
+                    <materialDesign:PackIcon Kind="ArrowBottomRight" Height="20" Width="20" Foreground="White" HorizontalAlignment="Center" VerticalAlignment="Center" />
+                    <TextBlock>Second Character</TextBlock>
+                </StackPanel>
+            </Button>
+            <Grid Grid.Column="4">
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="*" />
+                    <RowDefinition Height="Auto" />
+                    <RowDefinition Height="100"/>
+                    <RowDefinition Height="*" />
+                </Grid.RowDefinitions>
+                <TextBlock Grid.Row="1" Text="{Binding SecondSelectedCharacter.CharacterName}" HorizontalAlignment="Center" Margin="0,0,0,20" FontWeight="Bold"/>
+                <materialDesign:ColorZone Grid.Row="2" Mode="PrimaryLight" VerticalAlignment="Stretch" 
+                                                              Content="{Binding SecondSelectedCharacter.CharacterImage, Converter={StaticResource ImageContentValueConverter}}" />
+            </Grid>
+
+        </Grid>
 
         <ItemsControl   x:Name="TextOutput"
                         ScrollViewer.VerticalScrollBarVisibility="Auto" 
                         HorizontalContentAlignment="Stretch"  
                         SnapsToDevicePixels="True"
-                        Grid.Row="0"
+                        Grid.Row="1"
                         Margin="0"
                         Padding="0,20,0,20"
                         Background="White"
@@ -123,7 +201,7 @@
 
         </ItemsControl>
 
-        <GridSplitter Grid.Row="1" HorizontalAlignment="Stretch" Visibility="{Binding IsDebugViewVisible}" Height="10"  VerticalAlignment="Center" >
+        <GridSplitter Grid.Row="2" HorizontalAlignment="Stretch" Visibility="{Binding IsDebugViewVisible}" Height="10"  VerticalAlignment="Center" >
             <GridSplitter.Template>
                 <ControlTemplate TargetType="{x:Type GridSplitter}">
                     <Grid>
@@ -133,12 +211,12 @@
             </GridSplitter.Template>
         </GridSplitter>
 
-        <Border Grid.Row="2" BorderBrush="LightGray" HorizontalAlignment="Stretch" 
+        <Border Grid.Row="3" BorderBrush="LightGray" HorizontalAlignment="Stretch" 
                 Visibility="{Binding IsDebugViewVisible}" VerticalAlignment="Stretch" BorderThickness="0,1,0,0" >
             <views:DebugView HorizontalAlignment="Stretch" VerticalAlignment="Stretch" />
         </Border>
 
-        <Border  Grid.Row="3" Background="White"   BorderBrush="LightGray" BorderThickness="0,1,0,0">
+        <Border  Grid.Row="4" Background="White"   BorderBrush="LightGray" BorderThickness="0,1,0,0">
             <Grid>
 
                 <StackPanel Orientation="Horizontal" VerticalAlignment="Center" Margin="0,0,5,0" HorizontalAlignment="Left">

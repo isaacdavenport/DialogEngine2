@@ -101,6 +101,9 @@ namespace DialogGenerator.DialogEngine
         {
             StopDialogEngine();
             await StartDialogEngine();
+
+
+                        
         }
 
         /// <summary>
@@ -152,11 +155,11 @@ namespace DialogGenerator.DialogEngine
 
         private void _onSelectedCharactersPairChanged(SelectedCharactersPairEventArgs obj)
         {
-            if (!ApplicationData.Instance.UseBLERadios && mRandomSelectionDataCached != null
-               && Session.Get<int>(Constants.COMPLETED_DLG_MODELS) < ApplicationData.Instance.NumberOfDialogModelsCompleted)
-            {
-                return;
-            }
+            //if (!ApplicationData.Instance.UseBLERadios && mRandomSelectionDataCached != null
+            //   && Session.Get<int>(Constants.COMPLETED_DLG_MODELS) < ApplicationData.Instance.NumberOfDialogModelsCompleted)
+            //{
+            //    return;
+            //}
 
             mRandomSelectionDataCached = obj;
             Session.Set(Constants.COMPLETED_DLG_MODELS, 0);
@@ -447,7 +450,7 @@ namespace DialogGenerator.DialogEngine
             Task _characterSelectionTask;
             mCharacterSelection = ApplicationData.Instance.UseBLERadios
                   ? mCharacterSelectionFactory.Create(SelectionMode.SerialSelectionMode)
-                  : mCharacterSelectionFactory.Create(SelectionMode.RandomSelectionModel);
+                  : mCharacterSelectionFactory.Create( /* SelectionMode.RandomSelectionModel */  SelectionMode.ArenaModel);
             mCancellationTokenSource = new CancellationTokenSource();
 
             if (mCurrentState != States.PreparingDialogParameters)

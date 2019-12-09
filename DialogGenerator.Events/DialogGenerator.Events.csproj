@@ -55,6 +55,7 @@
     <Compile Include="ActiveCharactersEvent.cs" />
     <Compile Include="ChangedCharacterStateEvent.cs" />
     <Compile Include="ChangedDialogModelStateEvent.cs" />
+    <Compile Include="CharacterCollectionLoadedEvent.cs" />
     <Compile Include="CharacterSelectionActionChangedEvent.cs" />
     <Compile Include="CharacterStructureChangedEvent.cs" />
     <Compile Include="CharacterUpdatedEvent.cs" />

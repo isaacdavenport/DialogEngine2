@@ -1,7 +1,9 @@
 ﻿using DialogGenerator.Core;
+using DialogGenerator.DataAccess;
 using DialogGenerator.DialogEngine;
 using DialogGenerator.Events;
 using DialogGenerator.Events.EventArgs;
+using DialogGenerator.Model;
 using DialogGenerator.UI.Views.Dialogs;
 using DialogGenerator.UI.Workflow.CreateCharacterWorkflow;
 using DialogGenerator.Utilities;
@@ -30,6 +32,12 @@ namespace DialogGenerator.UI.ViewModels
         private bool mIsStopBtnEnabled;
         private Visibility mIsDebugViewVisible = Visibility.Collapsed;
         private bool mCanGoBackToWizard = false;
+        private ICharacterRepository mCharacterRepository;
+        private Character mFirstSelectedCharacter;
+        private Character mSecondSelectedCharacter;
+        private Character mListSelectedCharacter;
+        private ObservableCollection<Character> mCharacters;
+
 
         #endregion
 
@@ -37,17 +45,116 @@ namespace DialogGenerator.UI.ViewModels
 
         public DialogViewModel(ILogger logger,IEventAggregator _eventAggregator
             ,IDialogEngine _dialogEngine
-            ,IMessageDialogService _messageDialogService)
+            ,IMessageDialogService _messageDialogService
+            ,ICharacterRepository _characterRepository)
         {
             mLogger = logger;
             mEventAggregator = _eventAggregator;
             mMessageDialogService = _messageDialogService;
             mDialogEngine = _dialogEngine;
+            mCharacterRepository = _characterRepository;
 
             mEventAggregator.GetEvent<NewDialogLineEvent>().Subscribe(_onNewDialogLine);
             mEventAggregator.GetEvent<ActiveCharactersEvent>().Subscribe(_onNewActiveCharacters);
+            mEventAggregator.GetEvent<RestartDialogEngineEvent>().Subscribe(_onRestartDialogEngineRecquired);
+            mEventAggregator.GetEvent<CharacterCollectionLoadedEvent>().Subscribe(_onCharacterCollectionLoaded);
 
             _bindCommands();
+        }
+
+        private void _onCharacterCollectionLoaded()
+        {
+            Characters = mCharacterRepository.GetAll();
+        }
+
+        private void _onRestartDialogEngineRecquired()
+        {
+            if(!ApplicationData.Instance.UseBLERadios)
+            {                
+                int startIndex = 1;
+                if(FirstSelectedCharacter == null)
+                {
+                    FirstSelectedCharacter = mCharacterRepository.GetAll()[startIndex++];
+                }
+
+                if(SecondSelectedCharacter == null)
+                {
+                    SecondSelectedCharacter = mCharacterRepository.GetAll()[startIndex];
+                }
+                
+            }
+        }
+
+        #endregion
+
+        #region - properties
+        public ObservableCollection<Character> Characters
+        {
+            get
+            {
+                if(mCharacters == null)
+                {
+                    mCharacters = new ObservableCollection<Character>();
+                }
+
+                return mCharacters;
+            }
+
+            set
+            {
+                mCharacters = value;
+                RaisePropertyChanged();
+            }
+        }
+
+        public Character FirstSelectedCharacter
+        {
+            get
+            {
+                return mFirstSelectedCharacter;
+            }
+
+            set
+            {
+                mFirstSelectedCharacter = value;
+                int idx = mCharacterRepository.IndexOf(mFirstSelectedCharacter);
+                Session.Set(Constants.NEXT_CH_1, idx);
+
+                RaisePropertyChanged();
+            }
+        }
+
+        public Character SecondSelectedCharacter
+        {
+            get
+            {
+                return mSecondSelectedCharacter;
+            }
+
+            set
+            {
+                mSecondSelectedCharacter = value;
+                int idx = mCharacterRepository.IndexOf(mSecondSelectedCharacter);
+                Session.Set(Constants.NEXT_CH_2, idx);
+
+                RaisePropertyChanged();
+            }
+        }
+
+        public Character ListSelectedCharacter
+        {
+            get
+            {
+                return mListSelectedCharacter;
+            }
+
+            set
+            {
+                mListSelectedCharacter = value;
+                SelectFirstCharacterCommand.RaiseCanExecuteChanged();
+                SelectSecondCharacterCommand.RaiseCanExecuteChanged();
+                RaisePropertyChanged();
+            }
         }
 
         #endregion
@@ -65,6 +172,9 @@ namespace DialogGenerator.UI.ViewModels
         public DelegateCommand GoBackToWizardCommand { get; set; }
         public DelegateCommand CreateCharacterCommand { get; set; }
 
+        public DelegateCommand SelectFirstCharacterCommand { get; set; }
+        public DelegateCommand SelectSecondCharacterCommand { get; set; }
+
         #endregion
 
         #region - private functions -
@@ -79,8 +189,38 @@ namespace DialogGenerator.UI.ViewModels
             ChangeDebugVisibilityCommand = new DelegateCommand<object>(_changeDebugVisibilityCommand_Execute);
             ViewLoadedCommand = new DelegateCommand(_viewLoaded_Execute);
             ViewUnloadedCommand = new DelegateCommand(_viewUnloaded_Execute);
-            GoBackToWizardCommand = new DelegateCommand(_goBackToWizard_Execute, _goBackToWizard_CanExecute);            
-        }        
+            GoBackToWizardCommand = new DelegateCommand(_goBackToWizard_Execute, _goBackToWizard_CanExecute);
+            SelectFirstCharacterCommand = new DelegateCommand(_SelectFirstCharacter_Execute, _selectFirstCharacter_CanExecute);
+            SelectSecondCharacterCommand = new DelegateCommand(_SelectSecondCharacter_Execute, _selectSecondCharacter_CanExecute);
+        }
+
+        private bool _selectSecondCharacter_CanExecute()
+        {
+            if (mListSelectedCharacter == null)
+                return false;
+            if (mListSelectedCharacter == FirstSelectedCharacter || mListSelectedCharacter == SecondSelectedCharacter)
+                return false;
+            return true;
+        }
+
+        private void _SelectSecondCharacter_Execute()
+        {
+            SecondSelectedCharacter = ListSelectedCharacter;
+        }
+
+        private bool _selectFirstCharacter_CanExecute()
+        {
+            if (ListSelectedCharacter == null)
+                return false;
+            if (ListSelectedCharacter == FirstSelectedCharacter || ListSelectedCharacter == SecondSelectedCharacter)
+                return false;
+            return true;
+        }
+
+        private void _SelectFirstCharacter_Execute()
+        {
+            FirstSelectedCharacter = ListSelectedCharacter;
+        }
 
         public bool CanGoBackToWizard
         {

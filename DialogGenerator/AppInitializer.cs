@@ -8,6 +8,8 @@ using System.Collections.Generic;
 using DialogGenerator.Utilities;
 using DialogGenerator.Model.Enum;
 using System.Diagnostics;
+using Prism.Events;
+using DialogGenerator.Events;
 
 namespace DialogGenerator
 {
@@ -22,20 +24,23 @@ namespace DialogGenerator
         private IDialogEngine mDialogEngine;
         private AppInitializerWorkflow mWorkflow;
         private States mCurrentState;
+        private IEventAggregator mEventAggregator;
         public event EventHandler Completed;
+
 
         #endregion
 
         #region - constructor -
 
         public AppInitializer(ILogger logger,IUserLogger _userLogger, IDialogDataRepository _dialogRepository,
-            IDialogEngine _dialogEngine,ICharacterRepository _characterRepository)
+            IDialogEngine _dialogEngine,ICharacterRepository _characterRepository, IEventAggregator _eventAggregator)
         {
             mLogger = logger;
             mUserLogger = _userLogger;
             mDialogDataRepository = _dialogRepository;
             mCharacterRepository = _characterRepository;
             mDialogEngine = _dialogEngine;
+            mEventAggregator = _eventAggregator;
 
             mWorkflow = new AppInitializerWorkflow(() => { });
             mWorkflow.PropertyChanged += _mWorkflow_PropertyChanged;
@@ -92,6 +97,7 @@ namespace DialogGenerator
             Session.Set(Constants.CHARACTERS, _JSONObjectTypesList.Characters);
             Session.Set(Constants.DIALOG_MODELS, _JSONObjectTypesList.DialogModels);
             Session.Set(Constants.WIZARDS, _JSONObjectTypesList.Wizards);
+            mEventAggregator.GetEvent<CharacterCollectionLoadedEvent>().Publish();
 
             mLogger.Info("Finished importing characters: " + _JSONObjectTypesList.Characters.Count + " DialogModelGroups: " + 
                 _JSONObjectTypesList.DialogModels.Count + " Wizards: " + _JSONObjectTypesList.Wizards.Count);
