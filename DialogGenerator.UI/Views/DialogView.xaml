@@ -67,11 +67,16 @@
                         <RowDefinition Height="*" />
                         <RowDefinition Height="Auto" />
                         <RowDefinition Height="100"/>
+                        <RowDefinition Height="Auto" />
                         <RowDefinition Height="*" />
                     </Grid.RowDefinitions>
                 <TextBlock Grid.Row="1" Text="{Binding FirstSelectedCharacter.CharacterName}" HorizontalAlignment="Center" Margin="0,0,0,20" FontWeight="Bold"/>
                 <materialDesign:ColorZone Grid.Row="2" Mode="PrimaryLight" VerticalAlignment="Stretch" HorizontalAlignment="Center" 
                                                               Content="{Binding FirstSelectedCharacter.CharacterImage, Converter={StaticResource ImageContentValueConverter}}" />
+                <StackPanel Grid.Row="3" Orientation="Vertical" Width="300" Margin="0,20,0,0">
+                    <TextBlock Text="{Binding FirstCharacterDialogLine}" HorizontalAlignment="Center" TextWrapping="Wrap"/>
+                </StackPanel>
+                
             </Grid>
 
             <Button Grid.Column ="1" x:Name="btnFirstSelect" 
@@ -119,11 +124,15 @@
                     <RowDefinition Height="*" />
                     <RowDefinition Height="Auto" />
                     <RowDefinition Height="100"/>
+                    <RowDefinition Height="Auto" />
                     <RowDefinition Height="*" />
                 </Grid.RowDefinitions>
                 <TextBlock Grid.Row="1" Text="{Binding SecondSelectedCharacter.CharacterName}" HorizontalAlignment="Center" Margin="0,0,0,20" FontWeight="Bold"/>
                 <materialDesign:ColorZone Grid.Row="2" Mode="PrimaryLight" VerticalAlignment="Stretch" 
                                                               Content="{Binding SecondSelectedCharacter.CharacterImage, Converter={StaticResource ImageContentValueConverter}}" />
+                <StackPanel Grid.Row="3" Orientation="Vertical" Width="300" Margin="0,20,0,0">
+                    <TextBlock Text="{Binding SecondCharacterDialogLine}" HorizontalAlignment="Center" TextWrapping="Wrap"/>
+                </StackPanel>
             </Grid>
 
         </Grid>

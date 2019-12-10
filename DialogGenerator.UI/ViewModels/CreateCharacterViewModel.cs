@@ -1,5 +1,6 @@
 ﻿using DialogGenerator.Core;
 using DialogGenerator.Events;
+using DialogGenerator.Events.EventArgs;
 using DialogGenerator.Model;
 using DialogGenerator.UI.Data;
 using DialogGenerator.UI.Views;
@@ -559,14 +560,27 @@ namespace DialogGenerator.UI.ViewModels
                         _idx = mCharacterDataProvider.IndexOf(Character); 
                     }
 
-                    int _forcedCharacterCount = Session.Get<int>(Constants.FORCED_CH_COUNT);
-                    if (_forcedCharacterCount == 0)
-                    {
-                        _forcedCharacterCount++;
-                        Session.Set(Constants.FORCED_CH_COUNT, _forcedCharacterCount);
-                    }
 
-                    Session.Set(Constants.FORCED_CH_1, _idx);
+                    Session.Set(Constants.NEXT_CH_1, _idx);
+                    int _idx2 = Session.Get<int>(Constants.NEXT_CH_2);                    
+                    mEventAgregator.GetEvent<StopPlayingCurrentDialogLineEvent>().Publish();
+                    mEventAgregator.GetEvent<SelectedCharactersPairChangedEvent>().
+                    Publish(new SelectedCharactersPairEventArgs
+                    {
+                        Character1Index = _idx,
+                        Character2Index = _idx2
+                    });
+
+                    
+
+                    //int _forcedCharacterCount = Session.Get<int>(Constants.FORCED_CH_COUNT);
+                    //if (_forcedCharacterCount == 0)
+                    //{
+                    //    _forcedCharacterCount++;
+                    //    Session.Set(Constants.FORCED_CH_COUNT, _forcedCharacterCount);
+                    //}
+
+                    //Session.Set(Constants.FORCED_CH_1, _idx);
 
                     // Call the play window.
                     mRegionManager.Regions[Constants.ContentRegion].NavigationService.RequestNavigate("DialogView");

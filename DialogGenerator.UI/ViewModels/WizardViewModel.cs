@@ -1,4 +1,6 @@
 ﻿using DialogGenerator.Core;
+using DialogGenerator.Events;
+using DialogGenerator.Events.EventArgs;
 using DialogGenerator.Model;
 using DialogGenerator.UI.Data;
 using DialogGenerator.UI.Views;
@@ -41,6 +43,7 @@ namespace DialogGenerator.UI.ViewModels
         private IMessageDialogService mMessageDialogService;
         private ICharacterDataProvider mCharacterDataProvider;
         private IRegionManager mRegionManager;
+        private IEventAggregator mEventAggregator;
         private int mCurrentStepIndex;
         private string mDialogStr;
         private WizardFormDialog mWizardFormDialog;
@@ -71,6 +74,7 @@ namespace DialogGenerator.UI.ViewModels
             mWizardFormDialog = _wizardFormDialog;
             mCharacterDataProvider = _characterDataProvider;
             mRegionManager = _regionManager;
+            mEventAggregator = _eventAggregator;
 
             Workflow = new WizardWorkflow(action: () => { });
             MediaPlayerControlViewModel = new MediaPlayerControlViewModel(Workflow);
@@ -461,14 +465,22 @@ namespace DialogGenerator.UI.ViewModels
                 {
                     // Get parent view oGo to play view
                     CreateCharacterViewModel viewModel = Session.Get(Constants.CREATE_CHARACTER_VIEW_MODEL) as CreateCharacterViewModel;
-                    if (mIsFinished)
-                        viewModel.Workflow.Fire(Triggers.GoPlay);
-                    else
-                    {
-                        _contentRegion.NavigationService.Journal.GoBack();
-                        viewModel.Workflow.Fire(Triggers.CheckCounter);
-                    }
-                        
+
+                    // S.Ristic (12/10/2019) - Commented that so that the user doesn't skip play mode if the 
+                    // >>
+                    // wizard has not finished yet.
+                    //if (mIsFinished)
+                    //    viewModel.Workflow.Fire(Triggers.GoPlay);
+                    //else
+                    //{
+                    //    _contentRegion.NavigationService.Journal.GoBack();
+                    //    viewModel.Workflow.Fire(Triggers.CheckCounter);
+                    //}
+                    // <<
+                    // End of commented part                    
+
+                    viewModel.Workflow.Fire(Triggers.GoPlay);
+
 
                 } else
                 {                    

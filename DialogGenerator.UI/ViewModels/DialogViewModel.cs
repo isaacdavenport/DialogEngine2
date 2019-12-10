@@ -37,6 +37,8 @@ namespace DialogGenerator.UI.ViewModels
         private Character mSecondSelectedCharacter;
         private Character mListSelectedCharacter;
         private ObservableCollection<Character> mCharacters;
+        private string mFirstCharacterDialogLine;
+        private string mSecondCharacterDialogLine;
 
 
         #endregion
@@ -58,8 +60,15 @@ namespace DialogGenerator.UI.ViewModels
             mEventAggregator.GetEvent<ActiveCharactersEvent>().Subscribe(_onNewActiveCharacters);
             mEventAggregator.GetEvent<RestartDialogEngineEvent>().Subscribe(_onRestartDialogEngineRecquired);
             mEventAggregator.GetEvent<CharacterCollectionLoadedEvent>().Subscribe(_onCharacterCollectionLoaded);
+            mEventAggregator.GetEvent<SelectedCharactersPairChangedEvent>().Subscribe(_onSelectedCharactersPairChangedEvent);
 
             _bindCommands();
+        }
+
+        private void _onSelectedCharactersPairChangedEvent(SelectedCharactersPairEventArgs obj)
+        {
+            FirstSelectedCharacter = mCharacterRepository.GetAll()[obj.Character1Index];
+            SecondSelectedCharacter = mCharacterRepository.GetAll()[obj.Character2Index];
         }
 
         private void _onCharacterCollectionLoaded()
@@ -124,6 +133,20 @@ namespace DialogGenerator.UI.ViewModels
             }
         }
 
+        public string FirstCharacterDialogLine
+        {
+            get
+            {
+                return mFirstCharacterDialogLine;
+            }
+
+            set
+            {
+                mFirstCharacterDialogLine = value;
+                RaisePropertyChanged();
+            }
+        }
+
         public Character SecondSelectedCharacter
         {
             get
@@ -137,6 +160,20 @@ namespace DialogGenerator.UI.ViewModels
                 int idx = mCharacterRepository.IndexOf(mSecondSelectedCharacter);
                 Session.Set(Constants.NEXT_CH_2, idx);
 
+                RaisePropertyChanged();
+            }
+        }
+
+        public string SecondCharacterDialogLine
+        {
+            get
+            {
+                return mSecondCharacterDialogLine;
+            }
+
+            set
+            {
+                mSecondCharacterDialogLine = value;
                 RaisePropertyChanged();
             }
         }
@@ -366,6 +403,23 @@ namespace DialogGenerator.UI.ViewModels
                     DialogLinesCollection.Add(item);
                 });
             }
+
+            _dispatchLineToCharacter(item);
+        }
+
+        private void _dispatchLineToCharacter(object item)
+        {
+            NewDialogLineEventArgs args = (NewDialogLineEventArgs)item;
+            if(args.Character.CharacterPrefix.Equals(FirstSelectedCharacter.CharacterPrefix))
+            {
+                FirstCharacterDialogLine = args.DialogLine;
+            } 
+
+            if(args.Character.CharacterPrefix.Equals(SecondSelectedCharacter.CharacterPrefix))
+            {
+                SecondCharacterDialogLine = args.DialogLine;
+            }
+
         }
 
         #endregion

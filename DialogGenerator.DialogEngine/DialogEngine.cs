@@ -100,10 +100,8 @@ namespace DialogGenerator.DialogEngine
         private async void _onRestartRequired()
         {
             StopDialogEngine();
-            await StartDialogEngine();
-
-
-                        
+            Thread.Sleep(1000);
+            await StartDialogEngine();                        
         }
 
         /// <summary>
@@ -336,6 +334,8 @@ namespace DialogGenerator.DialogEngine
         {
             try
             {
+                System.Console.WriteLine("Dialog {0} started", mIndexOfCurrentDialogModel);
+
                 var _speakingCharacter = mContext.Character1Num;
                 var _selectedPhrase = mContext.CharactersList[_speakingCharacter].Phrases[0]; //initialize to unused placeholder phrase
 
@@ -431,7 +431,19 @@ namespace DialogGenerator.DialogEngine
                 mLogger.Error("_startDialog " + ex.Message);
             }
 
+            System.Console.WriteLine("Dialog {0} stopped regularly", mIndexOfCurrentDialogModel);
+
             return Triggers.PrepareDialogParameters;
+        }
+
+        private bool _checkIsCreateCharacterSession()
+        {
+            if (Session.Contains(Constants.CHARACTER_EDIT_MODE) && (bool)Session.Get(Constants.CHARACTER_EDIT_MODE))
+            {
+                return true;
+            }
+
+            return false;
         }
 
         #endregion
@@ -446,11 +458,20 @@ namespace DialogGenerator.DialogEngine
 
         public async Task StartDialogEngine()
         {
+            System.Console.WriteLine("Dialog engine started");
+
             mIsDialogCancelled = false;
             Task _characterSelectionTask;
-            mCharacterSelection = ApplicationData.Instance.UseBLERadios
-                  ? mCharacterSelectionFactory.Create(SelectionMode.SerialSelectionMode)
-                  : mCharacterSelectionFactory.Create( /* SelectionMode.RandomSelectionModel */  SelectionMode.ArenaModel);
+            if(_checkIsCreateCharacterSession())
+            {
+                mCharacterSelection = mCharacterSelectionFactory.Create(SelectionMode.ArenaModel);
+            } else
+            {
+                mCharacterSelection = ApplicationData.Instance.UseBLERadios
+                    ? mCharacterSelectionFactory.Create(SelectionMode.SerialSelectionMode)
+                    : mCharacterSelectionFactory.Create( /* SelectionMode.RandomSelectionModel */  SelectionMode.ArenaModel);
+            }
+            
             mCancellationTokenSource = new CancellationTokenSource();
 
             if (mCurrentState != States.PreparingDialogParameters)
@@ -489,6 +510,10 @@ namespace DialogGenerator.DialogEngine
                                 Triggers _nextTrigger = _startDialog(mStateMachineTaskTokenSource.Token);
                                 if (mWorkflow.CanFire(_nextTrigger))
                                     mWorkflow.Fire(_nextTrigger);
+                                else
+                                {
+                                    System.Console.WriteLine("Triger {0} cannot be started!", _nextTrigger);
+                                }
                                 break;
                             }
                         case States.DialogFinished:
@@ -528,6 +553,8 @@ namespace DialogGenerator.DialogEngine
 
             if (mCurrentState != States.DialogFinished)
                 mWorkflow.Fire(Triggers.FinishDialog);
+
+            System.Console.WriteLine("Dialog Engine Stopped");
         }
 
         #endregion
