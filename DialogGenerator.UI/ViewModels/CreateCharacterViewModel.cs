@@ -571,8 +571,7 @@ namespace DialogGenerator.UI.ViewModels
                         Character2Index = _idx2
                     });
 
-                    
-
+                    // Version with the random selection model. Temporarily commented. S.Ristic 12/11/2019
                     //int _forcedCharacterCount = Session.Get<int>(Constants.FORCED_CH_COUNT);
                     //if (_forcedCharacterCount == 0)
                     //{
