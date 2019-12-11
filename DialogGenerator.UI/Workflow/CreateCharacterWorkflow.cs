@@ -1,9 +1,5 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.ComponentModel;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using System.Windows.Input;
 
 namespace DialogGenerator.UI.Workflow.CreateCharacterWorkflow
@@ -15,6 +11,7 @@ namespace DialogGenerator.UI.Workflow.CreateCharacterWorkflow
         EnteredSetAge,
         EnteredSetGender,
         EnteredSetAvatar,
+        EnteredSetAuthor,
         InCounter,
         InWizard,
         Playing,
@@ -28,6 +25,7 @@ namespace DialogGenerator.UI.Workflow.CreateCharacterWorkflow
         SetAge,
         SetGender,
         SetAvatar,
+        SetAuthor,
         CheckCounter,
         StartWizard,
         GoPlay,

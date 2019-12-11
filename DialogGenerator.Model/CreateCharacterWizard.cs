@@ -56,6 +56,14 @@ namespace DialogGenerator.Model
                 StepDescription = "Choose the avatar image of your character",
                 StepControl = "AvatarControl"
             });
+
+            mSteps.Add(new CreateCharacterWizardStep
+            {
+                StepIndex = 6,
+                Key = "Author",
+                StepName = "Set Author Remark",
+                StepControl = "AuthorControl"
+            }) ;
         }
 
         public List<CreateCharacterWizardStep> Steps

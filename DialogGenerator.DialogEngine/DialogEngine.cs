@@ -83,7 +83,8 @@ namespace DialogGenerator.DialogEngine
                 .Permit(Triggers.FinishDialog, States.DialogFinished);
 
             mWorkflow.Configure(States.DialogFinished)
-                .Permit(Triggers.PrepareDialogParameters, States.PreparingDialogParameters);
+                .Permit(Triggers.PrepareDialogParameters, States.PreparingDialogParameters)
+                .PermitReentry(Triggers.FinishDialog);
         }
 
         private void _subscribeForEvents()

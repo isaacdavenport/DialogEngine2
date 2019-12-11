@@ -10,6 +10,7 @@ using DialogGenerator.Utilities;
 using Prism.Commands;
 using Prism.Events;
 using Prism.Mvvm;
+using Prism.Regions;
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
@@ -28,6 +29,7 @@ namespace DialogGenerator.UI.ViewModels
         private IEventAggregator mEventAggregator;
         private IMessageDialogService mMessageDialogService;
         private IDialogEngine mDialogEngine;
+        private IRegionManager mRegionManager;
         private bool mIsDialogStarted;
         private bool mIsStopBtnEnabled;
         private Visibility mIsDebugViewVisible = Visibility.Collapsed;
@@ -48,13 +50,15 @@ namespace DialogGenerator.UI.ViewModels
         public DialogViewModel(ILogger logger,IEventAggregator _eventAggregator
             ,IDialogEngine _dialogEngine
             ,IMessageDialogService _messageDialogService
-            ,ICharacterRepository _characterRepository)
+            ,ICharacterRepository _characterRepository
+            ,IRegionManager _regionManager)
         {
             mLogger = logger;
             mEventAggregator = _eventAggregator;
             mMessageDialogService = _messageDialogService;
             mDialogEngine = _dialogEngine;
             mCharacterRepository = _characterRepository;
+            mRegionManager = _regionManager;
 
             mEventAggregator.GetEvent<NewDialogLineEvent>().Subscribe(_onNewDialogLine);
             mEventAggregator.GetEvent<ActiveCharactersEvent>().Subscribe(_onNewActiveCharacters);
@@ -211,6 +215,7 @@ namespace DialogGenerator.UI.ViewModels
 
         public DelegateCommand SelectFirstCharacterCommand { get; set; }
         public DelegateCommand SelectSecondCharacterCommand { get; set; }
+        public DelegateCommand ExpertModeCommand { get; set; }
 
         #endregion
 
@@ -229,6 +234,21 @@ namespace DialogGenerator.UI.ViewModels
             GoBackToWizardCommand = new DelegateCommand(_goBackToWizard_Execute, _goBackToWizard_CanExecute);
             SelectFirstCharacterCommand = new DelegateCommand(_SelectFirstCharacter_Execute, _selectFirstCharacter_CanExecute);
             SelectSecondCharacterCommand = new DelegateCommand(_SelectSecondCharacter_Execute, _selectSecondCharacter_CanExecute);
+            ExpertModeCommand = new DelegateCommand(_expertModeExecute);
+        }
+
+        private void _expertModeExecute()
+        {
+            CreateCharacterViewModel createCharacterViewModel = Session.Get(Constants.CREATE_CHARACTER_VIEW_MODEL) as CreateCharacterViewModel;
+            if(createCharacterViewModel != null)
+            {
+                //createCharacterViewModel.ResetCommand.Execute(null);
+                createCharacterViewModel.Workflow.Fire(Triggers.Finish);
+            } else
+            {
+                mRegionManager.Regions[Constants.ContentRegion].NavigationService.RequestNavigate("CreateCharacterView");
+            }
+            
         }
 
         private bool _selectSecondCharacter_CanExecute()

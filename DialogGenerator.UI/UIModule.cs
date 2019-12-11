@@ -54,7 +54,8 @@ namespace DialogGenerator.UI
 
             mContainer.RegisterType<object, CreateCharacterView>(typeof(CreateCharacterView).FullName);
             mContainer.RegisterType<CreateCharacterViewModel>(new ContainerControlledLifetimeManager());
-            
+            mRegionManager.RegisterViewWithRegion(Constants.ContentRegion, typeof(CreateCharacterView));
+
         }
     }
 }
