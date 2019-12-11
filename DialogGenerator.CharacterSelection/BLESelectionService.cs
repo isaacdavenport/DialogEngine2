@@ -68,7 +68,41 @@ namespace DialogGenerator.CharacterSelection
 
             _configureWorkflow();
         }
+        private bool _moreThanOneRadioIsTransmitting()
+        {
+            //  This method allows us to autoselect whether we should use incoming radio BLE
+            //    or avatar arena based character selection.  Can be overidden in settings to
+            //    force to Avatar Arena.  This method needs to be called on a timer.
 
+            bool _atLeastTwoTransmitting = false;
+            try
+            {
+                int i = 0, j = 0, k = 0;
+
+                var _currentTime = DateTime.Now;
+
+                for (i = 0; i < ApplicationData.Instance.NumberOfRadios; i++)
+                {
+                    if (_currentTime - CharactersLastHeatMapUpdateTime[i] < MaxLastSeenInterval)
+                    {
+                        j++;
+                    }
+                }
+                if (j > 1)
+                {
+                    _atLeastTwoTransmitting = true;
+                }
+                else
+                {
+                    _atLeastTwoTransmitting = false;
+                }
+            }
+            catch (Exception ex)
+            {
+                mLogger.Error("_moreThanOneRadioIsTransmitting " + ex.Message);
+            }
+            return _atLeastTwoTransmitting;
+        }
         private void _mWorkflow_PropertyChanged(object sender, System.ComponentModel.PropertyChangedEventArgs e)
         {
             if (e.PropertyName.Equals("State"))
