@@ -25,28 +25,19 @@ namespace DialogGenerator.CharacterSelection
         }
         public async Task StartCharacterSelection()
         {
-            System.Console.WriteLine("Character selection started ...");
             mCancellationTokenSource = new CancellationTokenSource();
             await Task.Run(async () => 
             {
-                System.Console.WriteLine("Entered task ...");
                 Thread.CurrentThread.Name = "CharacterBoxesScanningThread";
                 Session.Set(Constants.FORCED_CH_COUNT, 2);
-                Session.Set(Constants.NEXT_CH_1, 1);
-                Session.Set(Constants.NEXT_CH_2, 2);
+
                 while (!mCancellationTokenSource.Token.IsCancellationRequested)
-                {
-                    System.Console.WriteLine("looping ...");
-                    System.Console.WriteLine("Character count = {0}", Session.Get<int>(Constants.FORCED_CH_COUNT));
-                    
+                {                    
                     // Both characters are selected.
                     if (Session.Get<int>(Constants.FORCED_CH_COUNT) == 2)
                     {
                         int _char1Index = Session.Get<int>(Constants.NEXT_CH_1);
                         int _char2Index = Session.Get<int>(Constants.NEXT_CH_2);
-
-                        System.Console.WriteLine("{0}, {1}", mFirstCharacterIndex, mSecondCharacterIndex);
-                        System.Console.WriteLine("{0}, {1}", _char1Index, _char2Index);
 
                         bool _bChanged = false;                        
 
