@@ -595,6 +595,18 @@ namespace DialogGenerator.UI.ViewModels
         {
             if(_checkIsCreateCharacterSession())
             {
+                var result = await mMessageDialogService.ShowOKCancelDialogAsync("Character successfully updated!", "Info",
+                "Next", "Cancel");
+
+                if(result == MessageDialogResult.Cancel)
+                {
+                    CreateCharacterViewModel cvwModel = Session.Get<CreateCharacterViewModel>(Constants.CREATE_CHARACTER_VIEW_MODEL);
+                    if(cvwModel != null)
+                    {
+                        cvwModel.Workflow.Fire(Triggers.Finish);
+                    }
+                }
+
                 Workflow.Fire(WizardTriggers.LeaveWizard);
                 mIsFinished = true;
             } else

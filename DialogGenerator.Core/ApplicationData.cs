@@ -120,7 +120,7 @@ namespace DialogGenerator.Core
         [Editable(true)]
         [Description(" Use BLE radios or random selection of characters.")]
         [DisplayName("Use BLE radios:")]
-        public bool UseBLERadios { get; set; } = false;
+        public bool UseBLERadios { get; set; } = true;
 
         [Description("Determine how long current dialog can play, if new characters selected. Value is in seconds.")]
         [DisplayName("Max time to play .mp3 file:")]
@@ -141,6 +141,11 @@ namespace DialogGenerator.Core
         [DisplayName("Number of dialog models:")]
         [RegularExpression(@"^[1-9]+$", ErrorMessage = @"Field requires number.")]
         public int NumberOfDialogModelsCompleted { get; set; } = 5;
+
+        [Editable(true)]
+        [DisplayName("Debug Mode On:")]
+        public bool DebugModeOn { get; set; } = false;
+        
 
         [XmlIgnore]
         public string RootDirectory
