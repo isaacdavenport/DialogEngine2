@@ -65,8 +65,14 @@ namespace DialogGenerator.UI.ViewModels
             mEventAggregator.GetEvent<RestartDialogEngineEvent>().Subscribe(_onRestartDialogEngineRecquired);
             mEventAggregator.GetEvent<CharacterCollectionLoadedEvent>().Subscribe(_onCharacterCollectionLoaded);
             mEventAggregator.GetEvent<SelectedCharactersPairChangedEvent>().Subscribe(_onSelectedCharactersPairChangedEvent);
+            mEventAggregator.GetEvent<GuidedCharacterCreationModeChangedEvent>().Subscribe(_onGuidedCharacterCreationModeChanged);
 
             _bindCommands();
+        }
+
+        private void _onGuidedCharacterCreationModeChanged(bool obj)
+        {
+            CanGoBackToWizard = obj;
         }
 
         private void _onSelectedCharactersPairChangedEvent(SelectedCharactersPairEventArgs obj)
@@ -237,13 +243,27 @@ namespace DialogGenerator.UI.ViewModels
             ExpertModeCommand = new DelegateCommand(_expertModeExecute);
         }
 
-        private void _expertModeExecute()
+        private async void _expertModeExecute()
         {
             CreateCharacterViewModel createCharacterViewModel = Session.Get(Constants.CREATE_CHARACTER_VIEW_MODEL) as CreateCharacterViewModel;
             if(createCharacterViewModel != null)
             {
-                //createCharacterViewModel.ResetCommand.Execute(null);
-                createCharacterViewModel.Workflow.Fire(Triggers.Finish);
+                string _nextWizardName = createCharacterViewModel.NextWizardName;
+                if(!_nextWizardName.Equals("Finished"))
+                {
+                    if( await mMessageDialogService.ShowOKCancelDialogAsync(String.Format("You are ready to add more lines using {0} wizard.", _nextWizardName), "Info") == MessageDialogResult.OK)
+                    {
+                        createCharacterViewModel.Workflow.Fire(Triggers.CheckCounter);
+                    } else
+                    {
+                        createCharacterViewModel.Workflow.Fire(Triggers.Finish);
+                    }                    
+                } else
+                {
+                    await mMessageDialogService.ShowMessage("INFO", "You have successfully completed the guided character creation!");
+                    createCharacterViewModel.Workflow.Fire(Triggers.Finish);
+                }
+                
             } else
             {
                 mRegionManager.Regions[Constants.ContentRegion].NavigationService.RequestNavigate("CreateCharacterView");
@@ -277,20 +297,6 @@ namespace DialogGenerator.UI.ViewModels
         private void _SelectFirstCharacter_Execute()
         {
             FirstSelectedCharacter = ListSelectedCharacter;
-        }
-
-        public bool CanGoBackToWizard
-        {
-            get
-            {
-                return mCanGoBackToWizard;
-            }      
-            
-            set
-            {
-                mCanGoBackToWizard = value;
-                RaisePropertyChanged();
-            }
         }
 
         private bool _goBackToWizard_CanExecute()
@@ -366,6 +372,13 @@ namespace DialogGenerator.UI.ViewModels
         private async void _onOpenSettingsDialog_Execute()
         {
             await mMessageDialogService.ShowDedicatedDialogAsync<int?>(new SettingsDialog());
+            if(ApplicationData.Instance.DebugModeOn)
+            {
+                IsDebugViewVisible = Visibility.Visible;
+            } else
+            {
+                IsDebugViewVisible = Visibility.Collapsed;
+            }
         }
 
         private async void _configureDialogCommand_Execute()
@@ -445,6 +458,28 @@ namespace DialogGenerator.UI.ViewModels
         #endregion
 
         #region - properties -
+        public bool CanGoBackToWizard
+        {
+            get
+            {
+                return mCanGoBackToWizard;
+            }
+
+            set
+            {
+                mCanGoBackToWizard = value;
+                RaisePropertyChanged();
+                RaisePropertyChanged("CreateButtonName");
+            }
+        }
+
+        public string CreateButtonName
+        {
+            get
+            {
+                return CanGoBackToWizard ? "Next" : "Create";
+            }
+        }
 
         public ObservableCollection<object> DialogLinesCollection { get; set; } = new ObservableCollection<object>();
 

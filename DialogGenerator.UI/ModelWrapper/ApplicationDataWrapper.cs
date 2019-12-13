@@ -113,5 +113,15 @@ namespace DialogGenerator.UI.Wrapper
                 validateProperty(nameof(NumberOfDialogModelsCompleted));
             }
         }
+
+        public bool DebugModeOn
+        {
+            get { return getValue<bool>(); }
+            set
+            {
+                setValue(value);
+                validateProperty(nameof(DebugModeOn));
+            }
+        }
     }
 }

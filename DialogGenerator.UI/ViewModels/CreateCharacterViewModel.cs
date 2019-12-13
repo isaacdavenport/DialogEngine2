@@ -5,6 +5,7 @@ using DialogGenerator.Model;
 using DialogGenerator.UI.Data;
 using DialogGenerator.UI.Views;
 using DialogGenerator.UI.Workflow.CreateCharacterWorkflow;
+using DialogGenerator.Utilities;
 using Prism.Commands;
 using Prism.Events;
 using Prism.Mvvm;
@@ -41,6 +42,7 @@ namespace DialogGenerator.UI.ViewModels
         private IEventAggregator mEventAgregator;
         private ICharacterDataProvider mCharacterDataProvider;
         private IRegionManager mRegionManager;
+        private IMessageDialogService mMessageDialogService;
         private string mCurrentDialogWizard = String.Empty;
         private string mNextButtonText = "Next";
         private bool mIsFinished = false;
@@ -48,12 +50,14 @@ namespace DialogGenerator.UI.ViewModels
         public CreateCharacterViewModel(ILogger _logger,
             IEventAggregator _eventAggregator,
             ICharacterDataProvider _characterDataProvider,
-            IRegionManager _regionManager)
+            IRegionManager _regionManager,
+            IMessageDialogService _messageDialogService)
         {
             mLogger = _logger;
             mEventAgregator = _eventAggregator;
             mCharacterDataProvider = _characterDataProvider;
             mRegionManager = _regionManager;
+            mMessageDialogService = _messageDialogService;
 
             mWizard = new CreateCharacterWizard();
             mCurrentStep = mWizard.Steps[mCurrentStepIndex];
@@ -292,6 +296,20 @@ namespace DialogGenerator.UI.ViewModels
             }
         }
 
+        public string NextWizardName
+        {
+            get
+            {
+                string _nextWizardName = "Finished";
+                if(mWizardPassthroughIndex < mDialogWizards.Count)
+                {
+                    _nextWizardName = mDialogWizards[mWizardPassthroughIndex];
+                }
+
+                return _nextWizardName;
+            }
+        }
+
         public ICommand ChooseImageCommand { get; set; }
         public ICommand HomeCommand { get; set; }
         public ICommand CreateCommand { get; set; }
@@ -301,16 +319,8 @@ namespace DialogGenerator.UI.ViewModels
 
         public void nextStep()
         {
-            if(mIsFinished)
-            {
-                mIsFinished = false;
-                NextButtonText = "Next";
-                _processFinish();
-            } else
-            {
-                CurrentStepIndex++;
-                Workflow.Fire((Triggers) CurrentStepIndex);
-            }
+            CurrentStepIndex++;
+            Workflow.Fire((Triggers) CurrentStepIndex);   
         }
 
         public void previousStep()
@@ -319,8 +329,7 @@ namespace DialogGenerator.UI.ViewModels
             {
                 CurrentStepIndex--;
                 Workflow.Fire((Triggers) CurrentStepIndex);
-            }
-            
+            }            
         }
 
         private async void _processFinish()
@@ -331,13 +340,10 @@ namespace DialogGenerator.UI.ViewModels
                 await mCharacterDataProvider.AddAsync(Character);
             }
 
-            if(!mIsFinished)
-            {
-                _onResetCommand_execute();
-            }  else
-            {
-                _onPlayCommand_execute();
-            }            
+            _initEntries();
+            Character = new Character();
+            Workflow.Fire(Triggers.SetName);
+                        
         }
 
         private void _initEntries()
@@ -367,7 +373,7 @@ namespace DialogGenerator.UI.ViewModels
                     // it means that the CHARACTER_EDIT_MODE was also not on.
                     // So we have to turn it on too. 
                     _character = new Character();
-                    Session.Set(Constants.CHARACTER_EDIT_MODE, true);
+                    Session.Set(Constants.CHARACTER_EDIT_MODE, true);                    
                 }
 
                 _character.CharacterName = CharacterName;
@@ -415,9 +421,7 @@ namespace DialogGenerator.UI.ViewModels
             ResetCommand = new DelegateCommand(_onResetCommand_execute);
             PlayCommand = new DelegateCommand(_onPlayCommand_execute);
         }
-
         
-
         private void _configureWorkflow()
         {
             Workflow.Configure(States.EnteredSetName)
@@ -532,6 +536,7 @@ namespace DialogGenerator.UI.ViewModels
                     break;
                 case "Author":
                     Character.Author = CharacterAuthor;
+                    NextButtonText = "Next";
                     break;
                 case "Wizard":
                     
@@ -568,6 +573,7 @@ namespace DialogGenerator.UI.ViewModels
                 case "Author":
                     CurrentStepIndex = 5;
                     CharacterAuthor = Character.Author;
+                    NextButtonText = "Save";
                     break;
                 case "CheckCounter":
                     if(mWizardPassthroughIndex < mDialogWizards.Count)
@@ -586,9 +592,7 @@ namespace DialogGenerator.UI.ViewModels
                     // character creation mode.
                     if(!_checkCharacterCreateMode())
                     {
-                        Session.Set(Constants.CHARACTER_EDIT_MODE, true);
-                        Session.Set(Constants.NEW_CHARACTER, Character);
-                        Session.Set(Constants.CREATE_CHARACTER_VIEW_MODEL, this);
+                        _openCreateSession(Character);                        
                     }
 
                     // Start the wizard.
@@ -624,15 +628,12 @@ namespace DialogGenerator.UI.ViewModels
                         Character2Index = _idx2
                     });
 
-                    // Version with the random selection model. Temporarily commented. S.Ristic 12/11/2019
-                    //int _forcedCharacterCount = Session.Get<int>(Constants.FORCED_CH_COUNT);
-                    //if (_forcedCharacterCount == 0)
-                    //{
-                    //    _forcedCharacterCount++;
-                    //    Session.Set(Constants.FORCED_CH_COUNT, _forcedCharacterCount);
-                    //}
-
-                    //Session.Set(Constants.FORCED_CH_1, _idx);
+                    // Check if we have reached the end?
+                    if(mWizardPassthroughIndex == mDialogWizards.Count)
+                    {
+                        await mMessageDialogService.ShowMessage("INFO", "You have successfully completed the guided character creation process!");
+                        Workflow.Fire(Triggers.Finish);
+                    }
 
                     // Call the play window.
                     mRegionManager.Regions[Constants.ContentRegion].NavigationService.RequestNavigate("DialogView");
@@ -664,10 +665,19 @@ namespace DialogGenerator.UI.ViewModels
             mDialogWizards.Add("Advanced1Wizard");
         }
 
-        private void _openCreateSession()
+        private void _openCreateSession(Character _c = null)
         {
-            Session.Set(Constants.NEW_CHARACTER, new Character());
+            if(_c == null)
+            {
+                Session.Set(Constants.NEW_CHARACTER, new Character());
+            } else
+            {
+                Session.Set(Constants.NEW_CHARACTER, _c);
+            }
+            
             Session.Set(Constants.CHARACTER_EDIT_MODE, true);
+            Session.Set(Constants.CREATE_CHARACTER_VIEW_MODEL, this);
+            mEventAgregator.GetEvent<GuidedCharacterCreationModeChangedEvent>().Publish(true);
         }
 
         private void _closeCreateSession()
@@ -675,6 +685,7 @@ namespace DialogGenerator.UI.ViewModels
             Session.Set(Constants.NEW_CHARACTER, null);
             Session.Set(Constants.CHARACTER_EDIT_MODE, false);
             Session.Set(Constants.CREATE_CHARACTER_VIEW_MODEL, null);
+            mEventAgregator.GetEvent<GuidedCharacterCreationModeChangedEvent>().Publish(false);
         }
 
         private void _onCreateCommand_execute()
