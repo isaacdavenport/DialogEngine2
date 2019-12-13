@@ -536,6 +536,7 @@ namespace DialogGenerator.UI.ViewModels
                     break;
                 case "Author":
                     Character.Author = CharacterAuthor;
+                    NextButtonText = "Next";
                     break;
                 case "Wizard":
                     
@@ -572,6 +573,7 @@ namespace DialogGenerator.UI.ViewModels
                 case "Author":
                     CurrentStepIndex = 5;
                     CharacterAuthor = Character.Author;
+                    NextButtonText = "Save";
                     break;
                 case "CheckCounter":
                     if(mWizardPassthroughIndex < mDialogWizards.Count)
