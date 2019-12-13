@@ -17,9 +17,7 @@ namespace DialogGenerator.CharacterSelection
         private int mFirstCharacterIndex = -1;
         private int mSecondCharacterIndex = -1;
 
-        public ArenaCharacterSelection(ILogger logger, IEventAggregator _eventAggregator
-            , ICharacterRepository _characterRepository
-            , IMessageDialogService _messageDialogService)
+        public ArenaCharacterSelection(IEventAggregator _eventAggregator)
         {
             mEventAggregator = _eventAggregator;
         }

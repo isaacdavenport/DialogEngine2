@@ -89,7 +89,7 @@ namespace DialogGenerator.DialogEngine
 
         private void _subscribeForEvents()
         {
-            mEventAggregator.GetEvent<SelectedCharactersPairChangedEvent>().Subscribe(_onSelectedCharactersPairChanged);
+            mEventAggregator.GetEvent<SelectedCharactersPairChangedEvent>().Subscribe(_onSelectedCharactersPairChanged);            
             mEventAggregator.GetEvent<ChangedCharacterStateEvent>().Subscribe(_onChangedCharacterState);
             mEventAggregator.GetEvent<ChangedDialogModelStateEvent>().Subscribe(_onChangedDialogModelState);
             mEventAggregator.GetEvent<CharacterUpdatedEvent>().Subscribe(_onCharacterUpdated);
@@ -134,9 +134,20 @@ namespace DialogGenerator.DialogEngine
             switch (e.PropertyName)
             {
                 case Constants.SELECTED_DLG_MODEL:
-                    {
+                    {                        
                         mEventAggregator.GetEvent<StopPlayingCurrentDialogLineEvent>().Publish();
-                        mEventAggregator.GetEvent<SelectedCharactersPairChangedEvent>().Unsubscribe(_onSelectedCharactersPairChanged);
+
+                        // S.Ristic - 12/13/2019 
+                        // I have inserted this condition because if this happens while system
+                        // is starting up the dialog engine is unsubcribed from this event before the
+                        // character selection initialization and therefore the conversation doesn't start
+                        // until one of the characters is changed.
+                        int _completedDialogModels = Session.Get<int>(Constants.COMPLETED_DLG_MODELS);
+                        if(_completedDialogModels != 0)
+                        {
+                            mEventAggregator.GetEvent<SelectedCharactersPairChangedEvent>().Unsubscribe(_onSelectedCharactersPairChanged);
+                        }
+                        
                         mRandomSelectionDataCached = null;
                         mStateMachineTaskTokenSource.Cancel();
                         break;
