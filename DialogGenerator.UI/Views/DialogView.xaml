@@ -230,11 +230,11 @@
 
                 <StackPanel Orientation="Horizontal" VerticalAlignment="Center" Margin="0,0,5,0" HorizontalAlignment="Left">
 
-                    <materialDesign:Card Width="150" HorizontalAlignment="Left" VerticalAlignment="Center"  Height="150" Margin="10" Background="#017a84" >
+                    <materialDesign:Card Width="150" HorizontalAlignment="Left" VerticalAlignment="Center"  Height="150" Margin="10" Background="Orange" >
                         <Grid Style="{StaticResource CardGrid}">
                             <StackPanel HorizontalAlignment="Center" VerticalAlignment="Center">
                                 <materialDesign:PackIcon Kind="Creation" HorizontalAlignment="Center" Height="50" Width="50" Foreground="White" />
-                                <TextBlock Text="Create" Foreground="White" FontSize="20" HorizontalAlignment="Center" VerticalAlignment="Center" />
+                                <TextBlock Text="{Binding CreateButtonName}" Foreground="White" FontSize="20" HorizontalAlignment="Center" VerticalAlignment="Center" />
                             </StackPanel>
                             <Grid.InputBindings>
                                 <MouseBinding MouseAction="LeftClick" Command="{Binding ExpertModeCommand}" />
@@ -242,7 +242,7 @@
                         </Grid>
                     </materialDesign:Card>
 
-                    <materialDesign:Card Width="150" HorizontalAlignment="Left" Height="150" Margin="10" Background="#51cb8c" >
+                    <materialDesign:Card Width="150" HorizontalAlignment="Left" Height="150" Margin="10" Background="#51cb8c" Visibility="Collapsed">
                         <Grid Style="{StaticResource CardGrid}">
                             <StackPanel HorizontalAlignment="Center" VerticalAlignment="Center">
                                 <materialDesign:PackIcon Kind="AccountCheck" HorizontalAlignment="Center" Height="50" Width="50" Foreground="White" />
@@ -261,7 +261,7 @@
                         </Grid>
                     </materialDesign:Card>
 
-                  <materialDesign:Card Width="150" HorizontalAlignment="Left" Visibility="{Binding IsDebugViewVisible}"
+                  <materialDesign:Card Width="150" HorizontalAlignment="Left" Visibility="Collapsed"
                        Height="150" Margin="10" Background="#51cb8c" >
                     <Grid Style="{StaticResource CardGrid}">
                       <StackPanel HorizontalAlignment="Center" VerticalAlignment="Center">
@@ -293,7 +293,7 @@
                     </Grid>
                   </materialDesign:Card>
 
-                  <materialDesign:Card Width="150" Height="150" Margin="10" Background="#51cb8c" HorizontalAlignment="Left" Visibility="{Binding IsDebugViewVisible}" >
+                  <materialDesign:Card Width="150" Height="150" Margin="10" Background="#51cb8c" HorizontalAlignment="Left"  >
                     <Grid Style="{StaticResource CardGrid}">
                       <StackPanel HorizontalAlignment="Center" VerticalAlignment="Center">
                         <materialDesign:PackIcon Kind="Settings" HorizontalAlignment="Center" Height="50" Width="50" Foreground="White" />
@@ -306,7 +306,7 @@
                   </materialDesign:Card>
 
                   <materialDesign:Card Width="150" HorizontalAlignment="Left"  Height="150" Margin="10" Background="#51cb8c"
-                      Visibility="{Binding IsDebugViewVisible, Converter={StaticResource InvertVisibilityValueConverter}}" >
+                      Visibility="Collapsed" >
 
                     <Grid Style="{StaticResource CardGrid}">
                       <StackPanel HorizontalAlignment="Center" VerticalAlignment="Center">
@@ -319,21 +319,7 @@
                       </Grid.InputBindings>
                     </Grid>
                   </materialDesign:Card>
-
-                    <materialDesign:Card Width="150" HorizontalAlignment="Left"  Height="150" Margin="10" Background="#51cb8c"
-                      Visibility="{Binding CanGoBackToWizard, Converter={StaticResource BoolToVisibilityConverter}}" >
-
-                        <Grid Style="{StaticResource CardGrid}">
-                            <StackPanel HorizontalAlignment="Center" VerticalAlignment="Center">
-                                <materialDesign:PackIcon Kind="Creation" HorizontalAlignment="Center" Height="50" Width="50" Foreground="White" />
-                                <TextBlock Text="Back to Wizard" Foreground="White" FontSize="20" HorizontalAlignment="Center" VerticalAlignment="Center" />
-                            </StackPanel>
-                            <Grid.InputBindings>
-                                <MouseBinding MouseAction="LeftClick"
-                                      Command="{Binding GoBackToWizardCommand}" />
-                            </Grid.InputBindings>
-                        </Grid>
-                    </materialDesign:Card>
+                    
                 </StackPanel>
             </Grid>
         </Border>

@@ -137,6 +137,7 @@
                                             <RowDefinition Height="auto" />
                                             <RowDefinition Height="auto" />
                                             <RowDefinition Height="auto" />
+                                            <RowDefinition Height="auto" />
                                         </Grid.RowDefinitions>
                                         <StackPanel Grid.Row="0" Grid.Column="1">
                                             <Label Content="Character name:" HorizontalAlignment="Left" Margin="-5,0,0,0"/>
@@ -222,7 +223,29 @@
                                             HorizontalAlignment="Left" Margin="0" />
                                         </StackPanel>
 
-                                        <StackPanel HorizontalAlignment="Center" Margin="0,20,0,0" Orientation="Horizontal" Grid.Row="6" Grid.ColumnSpan="2">
+                                        <StackPanel Grid.Row="5" Grid.Column="1" Margin="0,20,0,0">
+                                            <Label Content="Author:" HorizontalAlignment="Left" Margin="-5,0,0,0"/>
+                                            <Grid>
+                                                <Border Margin="10" BorderBrush="#FF51CB8C" BorderThickness="1" Background="White">
+                                                    <Border.Effect>
+                                                        <DropShadowEffect/>
+                                                    </Border.Effect>
+                                                </Border>
+                                                <Border Margin="10" BorderBrush="#FF51CB8C" BorderThickness="1">
+                                                    <TextBox x:Name="Author"  
+                                                 Height="100" 
+                                                 Width="Auto"
+                                                 Text="{Binding Character.Author,Mode=TwoWay,UpdateSourceTrigger=PropertyChanged}"
+                                                 TextWrapping="Wrap"
+                                                 AcceptsReturn="True" 
+                                                 VerticalScrollBarVisibility="Auto"
+                                                 VerticalContentAlignment="Top" materialDesign:HintAssist.Hint="Enter author's remark..." Padding="2"/>
+                                                </Border>
+                                            </Grid>
+                                            
+                                        </StackPanel>
+
+                                        <StackPanel HorizontalAlignment="Center" Margin="0,20,0,0" Orientation="Horizontal" Grid.Row="7" Grid.ColumnSpan="2">
                                             <Button Style="{StaticResource MaterialDesignFlatButton}" Content="Delete" Command="{Binding DeleteCommand}" />
                                             <Button Content="Save" Command="{Binding SaveCommand}" Background="#51cb8c" 
                                                 BorderBrush="#51cb8c" Style="{DynamicResource MaterialDesignRaisedButton}"  Margin="10,0,0,0" />

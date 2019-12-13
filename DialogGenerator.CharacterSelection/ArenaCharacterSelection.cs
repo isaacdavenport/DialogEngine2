@@ -30,15 +30,16 @@ namespace DialogGenerator.CharacterSelection
             {
                 Thread.CurrentThread.Name = "CharacterBoxesScanningThread";
                 Session.Set(Constants.FORCED_CH_COUNT, 2);
-                while(!mCancellationTokenSource.Token.IsCancellationRequested)
-                {
+
+                while (!mCancellationTokenSource.Token.IsCancellationRequested)
+                {                    
                     // Both characters are selected.
-                    if(Session.Get<int>(Constants.FORCED_CH_COUNT) == 2)
+                    if (Session.Get<int>(Constants.FORCED_CH_COUNT) == 2)
                     {
                         int _char1Index = Session.Get<int>(Constants.NEXT_CH_1);
                         int _char2Index = Session.Get<int>(Constants.NEXT_CH_2);
 
-                        bool _bChanged = false;
+                        bool _bChanged = false;                        
 
                         if (_char1Index != mFirstCharacterIndex)
                         {
@@ -52,23 +53,25 @@ namespace DialogGenerator.CharacterSelection
                             _bChanged = true;
                         }
 
-
                         if (_bChanged)
                         {
-                            mEventAggregator.GetEvent<StopPlayingCurrentDialogLineEvent>().Publish();
+                            System.Console.WriteLine("Will send event");                            
 
                             mEventAggregator.GetEvent<SelectedCharactersPairChangedEvent>().
                             Publish(new SelectedCharactersPairEventArgs
                             {
                                 Character1Index = mFirstCharacterIndex,
                                 Character2Index = mSecondCharacterIndex
-                            });                            
-                           
+                            });
+
+                            mEventAggregator.GetEvent<StopPlayingCurrentDialogLineEvent>().Publish();
+
                         }                        
                     }
 
                     Thread.Sleep(1000);
                 }
+
             });
         }
 

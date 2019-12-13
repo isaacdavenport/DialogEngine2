@@ -61,6 +61,7 @@
     <Compile Include="CharacterUpdatedEvent.cs" />
     <Compile Include="EventArgs\NewDialogLineEventArgs.cs" />
     <Compile Include="EventArgs\SelectedCharactersPairEventArgs.cs" />
+    <Compile Include="GuidedCharacterCreationModeChangedEvent.cs" />
     <Compile Include="HeatMapUpdateEvent.cs" />
     <Compile Include="InitializeDialogModelEvent.cs" />
     <Compile Include="MediaPlayerStoppedEvent.cs" />
