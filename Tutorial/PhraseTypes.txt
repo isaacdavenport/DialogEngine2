@@ -1,74 +1,76 @@
-      Exclamation,
-        Greeting,
-        Threat,
-        Retreat,
-        YesNoQuestion,
-        Yes,
-        No,
-        RequestCatchup,
-        GiveAffirmation,
-        RequestAffirmation,
-        GiveDisbelief,
-        GiveRecentHistory,
-        GiveSurprisingStatement,
-        Ramble,
-        ShutUp,
-        RequestJoke,
-        GiveJoke,
-        Insult,
-        RequestActivity,
-        GiveActivity,
-        RequestAdvice,
-        GiveAdvice, 
-        RequestMotivation,
-        GiveMotivation,
-        RequestLocation,
-        GiveLocation,
-		RequestWho,
-		GiveWho,
-		Accuse,
-		Deny,
-		Admit,
-		GiveCredit,
-		YoureWelcome,
-		ThankYou,
-		GiveSilence,
-        GoOnNeutral,   
-        GoOnUnderstanding,
-        GoOnSad,
-        GoOnSurprise, 
-        GoOnAngry,  
-        GoOnJoyful,   
-        GoOnDisgust,  
-        GoOnFear,
-        GoOnDisapproval,
-		GiveAgreement,
-SuggestPlan  
-Complain
-Laugh 
-NotFunny 
-HurtFeelings 
-Sorry 
-WhatsWrong 
-MakeUp 
+List of PhraseTypes DialogGenerator\bin\Debug\Tutorial
+
 AcceptPlan
-RejectPlan
-DontKnow
-RequestLike
-GiveLike
-RequestObject
-GiveObject
-GoodNews
-RequestQuestion
-Maybe
-HowAreYou
-ImSad
-ImScared
-ImAngry
-ImHappy
-Exasperation
-DontCare
+Accuse
+Admit
 BodilyNoise
 Brag
-RequestSecret
+Complain
+Deny
+DontCare
+DontKnow
+Exasperation
+Exclamation
+GiveActivity
+GiveAdvice
+GiveAffirmation
+GiveAgreement
+GiveCredit
+GiveDisbelief
+GiveJoke
+GiveLike
+GiveLocation
+GiveMotivation
+GiveObject
+GiveRecentHistory
 GiveSecret
+GiveSilence
+GiveSurprisingStatement
+GiveWho
+GoOnAngry
+GoOnDisapproval
+GoOnDisgust
+GoOnFear
+GoOnJoyful
+GoOnNeutral
+GoOnSad
+GoOnSurprise
+GoOnUnderstanding
+GoodNews
+Greeting
+HowAreYou
+HurtFeelings
+ImAngry
+ImHappy
+ImSad
+ImScared
+Insult
+Laugh
+MakeUp
+Maybe
+No
+NotFunny
+Ramble
+RejectPlan
+RequestActivity
+RequestAdvice
+RequestAffirmation
+RequestCatchup
+RequestJoke
+RequestLike
+RequestLocation
+RequestMotivation
+RequestObject
+RequestQuestion
+RequestSecret
+RequestWho
+Retreat
+ShutUp
+Sorry
+SuggestPlan
+ThankYou
+Threat
+WhatsWrong
+Yes
+YesNoQuestion
+YoureWelcome
