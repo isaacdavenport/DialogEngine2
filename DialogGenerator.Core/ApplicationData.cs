@@ -107,15 +107,29 @@ namespace DialogGenerator.Core
         public string URLToUpdateFile { get; set; } = "http://drive.google.com/uc?export=download&id=1nkflu9P-y1gQMajnxv58BRU7TqrgBh9U";
         public int CheckForUpdateInterval { get; set; } = 30; // minutes
 
-        [Editable(true)]
-        [Description("Check which tags will not be used in dialog.")]
-        [DisplayName("Check tag usage:")]
+
+        // S. Ristic 12/15/2019
+        // DLGEN-420 This should not be shown in the settings dialog and should always be false.
+
+        //[Editable(true)]
+        //[Description("Check which tags will not be used in dialog.")]
+        //[DisplayName("Check tag usage:")]
+        //public bool TagUsageCheck { get; set; } = false;
         public bool TagUsageCheck { get; set; } = false;
 
-        [Editable(true)]
-        [Description("Is dialog text visible during dialog.")]
-        [DisplayName("Text dialog enabled:")]
+        // S. Ristic 12/15/2019
+        // DLGEN-420 This should not be shown in the settings dialog and should always be true.
+
+        //[Editable(true)]
+        //[Description("Is dialog text visible during dialog.")]
+        //[DisplayName("Text dialog enabled:")]
+        //public bool TextDialogsOn { get; set; } = true;
         public bool TextDialogsOn { get; set; } = true;
+
+        [Editable(true)]
+        [Description("Override radio signal checking")]
+        [DisplayName("Ignore radio signals:")]
+        public bool IgnoreRadioSignals { get; set; } = false;
 
         [Editable(true)]
         [Description(" Use BLE radios or random selection of characters.")]

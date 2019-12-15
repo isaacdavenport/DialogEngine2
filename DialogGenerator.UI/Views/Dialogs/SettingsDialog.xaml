@@ -61,29 +61,29 @@
                 <RowDefinition Height="auto" />
             </Grid.RowDefinitions>
 
-            <Label Content="Check tag usage:" Margin="10" HorizontalAlignment="Right" />
-            <ToggleButton Grid.Column="2" Margin="10" Foreground="#F5FFFA"
-                          IsChecked="{Binding Settings.TagUsageCheck,UpdateSourceTrigger=PropertyChanged,Mode=TwoWay}" HorizontalAlignment="Left" />
-
-            <Label Content="Text dialog enabled:" Margin="10" HorizontalAlignment="Right"  Grid.Row="1" />
-            <ToggleButton Grid.Row="1" Grid.Column="2" Margin="10" Foreground="#F5FFFA"
-                          IsChecked="{Binding Settings.TextDialogsOn, UpdateSourceTrigger=PropertyChanged,Mode=TwoWay}" HorizontalAlignment="Left" />
-
-            <Label Content="Max time for playing of .mp3 file(seconds):" Margin="10" Grid.Row="2" HorizontalAlignment="Right" />
-            <TextBox Grid.Row="2" MinWidth="75" Text="{Binding Settings.MaxTimeToPlayFile, UpdateSourceTrigger=LostFocus,Mode=TwoWay}" 
+            <Label Content="Max time for playing of .mp3 file(seconds):" Margin="10" Grid.Row="1" HorizontalAlignment="Right" />
+            <TextBox Grid.Row="1" MinWidth="75" Text="{Binding Settings.MaxTimeToPlayFile, UpdateSourceTrigger=LostFocus,Mode=TwoWay}" 
                      HorizontalAlignment="Left" Margin="10" Grid.Column="2" materialDesign:ValidationAssist.UsePopup="True" />
 
-            <Label Content="Current parental rating:" Grid.Column="0" HorizontalAlignment="Right" Margin="10" Grid.Row="4" />
-            <TextBox Grid.Row="4" MinWidth="75" Text="{Binding Settings.CurrentParentalRating,UpdateSourceTrigger=PropertyChanged,Mode=TwoWay}" 
+            <Label Content="Current parental rating:" Grid.Column="0" HorizontalAlignment="Right" Margin="10" Grid.Row="2" />
+            <TextBox Grid.Row="2" MinWidth="75" Text="{Binding Settings.CurrentParentalRating,UpdateSourceTrigger=PropertyChanged,Mode=TwoWay}" 
                      HorizontalAlignment="Left" Margin="10" Grid.Column="2" materialDesign:ValidationAssist.UsePopup="True" />
 
-            <Label Content="Delay between phrases(seconds):" Grid.Column="0" HorizontalAlignment="Right" Margin="10" Grid.Row="5" />
-            <TextBox Grid.Row="5" MinWidth="75" Text="{Binding Settings.DelayBetweenPhrases,UpdateSourceTrigger=LostFocus,Mode=TwoWay}" 
+            <Label Content="Delay between phrases(seconds):" Grid.Column="0" HorizontalAlignment="Right" Margin="10" Grid.Row="3" />
+            <TextBox Grid.Row="3" MinWidth="75" Text="{Binding Settings.DelayBetweenPhrases,UpdateSourceTrigger=LostFocus,Mode=TwoWay}" 
                      HorizontalAlignment="Left" Margin="10" Grid.Column="2" materialDesign:ValidationAssist.UsePopup="True" />
 
-            <Label Content="Dlg models completed(random mode):" Grid.Column="0" HorizontalAlignment="Right" Margin="10" Grid.Row="6" />
-            <TextBox Grid.Row="6" MinWidth="75" Text="{Binding Settings.NumberOfDialogModelsCompleted,UpdateSourceTrigger=PropertyChanged,Mode=TwoWay}" 
+            <Label Content="Dlg models completed(random mode):" Grid.Column="0" HorizontalAlignment="Right" Margin="10" Grid.Row="4" />
+            <TextBox Grid.Row="4" MinWidth="75" Text="{Binding Settings.NumberOfDialogModelsCompleted,UpdateSourceTrigger=PropertyChanged,Mode=TwoWay}" 
                      HorizontalAlignment="Left" Margin="10" Grid.Column="2" materialDesign:ValidationAssist.UsePopup="True" />
+            
+            <Label Content="Ignore Radio Signals:" Margin="10" HorizontalAlignment="Right" Grid.Row="5"/>
+            <ToggleButton Grid.Column="2" Grid.Row="5" Margin="10" Foreground="#F5FFFA"
+                          IsChecked="{Binding Settings.IgnoreRadioSignals,UpdateSourceTrigger=PropertyChanged,Mode=TwoWay}" HorizontalAlignment="Left" />
+
+            <Label Content="Debug Mode:" Margin="10" HorizontalAlignment="Right" Grid.Row="6"/>
+            <ToggleButton Grid.Column="2" Grid.Row="6" Margin="10" Foreground="#F5FFFA"
+                          IsChecked="{Binding Settings.DebugModeOn,UpdateSourceTrigger=PropertyChanged,Mode=TwoWay}" HorizontalAlignment="Left" />
 
             <Label Content="Website:" Grid.Column="0" HorizontalAlignment="Right" Margin="10" Grid.Row="7" />
             <Button Content="{Binding Website}" 
@@ -97,15 +97,13 @@
             <Label Content="Version:" Grid.Column="0" HorizontalAlignment="Right" Margin="10" Grid.Row="8" />
             <Label Content="{Binding Version}" Grid.Column="2" HorizontalAlignment="Left" Margin="0,10,0,0" Grid.Row="8" />
 
-            <Label Content="Debug Mode:" Margin="10" HorizontalAlignment="Right" Grid.Row="9"/>
-            <ToggleButton Grid.Column="2" Grid.Row="9" Margin="10" Foreground="#F5FFFA"
-                          IsChecked="{Binding Settings.DebugModeOn,UpdateSourceTrigger=PropertyChanged,Mode=TwoWay}" HorizontalAlignment="Left" />
+            
 
             <Button Content="Close"
                     x:Name="CloseBtn"
                     Style="{StaticResource MaterialDesignRaisedButton}"
                     Grid.ColumnSpan="3"
-                    Grid.Row="10"
+                    Grid.Row="9"
                     IsEnabled="{Binding Settings.HasErrors,Converter={StaticResource InvertValueConverter}}"
                     Command="{Binding CloseCommand}"
                     Margin="0,20,0,0"

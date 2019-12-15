@@ -64,6 +64,16 @@ namespace DialogGenerator.UI.Wrapper
             }
         }
 
+        public bool IgnoreRadioSignals
+        {
+            get { return getValue<bool>(); }
+            set
+            {
+                setValue(value);
+                validateProperty(nameof(IgnoreRadioSignals));
+            }
+        }
+
         public bool UseBLERadios
         {
             get { return getValue<bool>(); }

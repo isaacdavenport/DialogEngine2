@@ -117,46 +117,16 @@
                     <ControlTemplate x:Key="AuthorControl">
                         <Grid Background="White">
                             <Grid.ColumnDefinitions>
-                                <ColumnDefinition Width="*"/>
+                                <ColumnDefinition Width="2*"/>
                                 <ColumnDefinition Width="Auto"/>
                                 <ColumnDefinition Width="*"/>
- 
+                                <ColumnDefinition Width="2*"/>
                             </Grid.ColumnDefinitions>
-                            <Grid Grid.Column="1">
-                                <Grid.RowDefinitions>
-                                    <RowDefinition Height="*"/>
-                                    <RowDefinition Height="Auto"/>
-                                    <RowDefinition Height="*"/>
-                                </Grid.RowDefinitions>
-                                <StackPanel Grid.Row="1" Orientation="Vertical">
-                                    <Label Height="30" Margin="0, 8, 20, 0" >Author:</Label>
-
-                                    <Grid>
-                                        <Border Margin="10" BorderBrush="#FF51CB8C" BorderThickness="1" Background="White">
-                                            <Border.Effect>
-                                                <DropShadowEffect/>
-                                            </Border.Effect>
-                                        </Border>
-                                        <Border Margin="10" BorderBrush="#FF51CB8C" BorderThickness="1">
-                                            <TextBox x:Name="Author"  
-                                                 Height="100" 
-                                                 Width="300"
-                                                 Text="{Binding CharacterAuthor}"
-                                                 TextWrapping="Wrap"
-                                                 AcceptsReturn="True" 
-                                                 VerticalScrollBarVisibility="Auto"
-                                                 VerticalContentAlignment="Top" materialDesign:HintAssist.Hint="Enter author's remark..." Padding="2"/>
-                                        </Border>
-                                    </Grid>
-
-                                    
-                                </StackPanel>
-                            </Grid>
-                            
-                            
-                            
+                            <Label Grid.Column="1" Height="30" Margin="0, 8, 20, 0" HorizontalAlignment="Right">Author:</Label>
+                            <TextBox x:Name="Author" Grid.Column="2" Height="30" Text="{Binding CharacterAuthor}" materialDesign:HintAssist.Hint="Enter Author's Nickname ..."/>
                         </Grid>
                     </ControlTemplate>
+                    
                     <ControlTemplate x:Key="WizardControl">
                         <Grid Background="White">
                             <Grid.ColumnDefinitions>

@@ -274,7 +274,7 @@
                     </Grid>
                   </materialDesign:Card>
 
-                  <materialDesign:Card Width="150" HorizontalAlignment="Left" Height="150" Margin="10" Background="#51cb8c" Visibility="{Binding IsDebugViewVisible}" >
+                  <materialDesign:Card Width="150" HorizontalAlignment="Left" Height="150" Margin="10" Background="#51cb8c" Visibility="Collapsed" >
                     <Grid Style="{StaticResource CardGrid}">
                       <StackPanel HorizontalAlignment="Center" VerticalAlignment="Center">
                         <materialDesign:PackIcon Kind="Forum" HorizontalAlignment="Center" Height="50" Width="50" Foreground="White" />

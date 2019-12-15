@@ -479,7 +479,8 @@ namespace DialogGenerator.UI.ViewModels
                     // <<
                     // End of commented part                    
 
-                    viewModel.Workflow.Fire(Triggers.GoPlay);
+                    viewModel.Workflow.Fire(Triggers.Finish);
+                    mRegionManager.Regions[Constants.ContentRegion].NavigationService.RequestNavigate("DialogView");
 
 
                 } else

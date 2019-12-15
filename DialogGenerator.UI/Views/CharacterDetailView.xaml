@@ -225,24 +225,13 @@
 
                                         <StackPanel Grid.Row="5" Grid.Column="1" Margin="0,20,0,0">
                                             <Label Content="Author:" HorizontalAlignment="Left" Margin="-5,0,0,0"/>
-                                            <Grid>
-                                                <Border Margin="10" BorderBrush="#FF51CB8C" BorderThickness="1" Background="White">
-                                                    <Border.Effect>
-                                                        <DropShadowEffect/>
-                                                    </Border.Effect>
-                                                </Border>
-                                                <Border Margin="10" BorderBrush="#FF51CB8C" BorderThickness="1">
-                                                    <TextBox x:Name="Author"  
-                                                 Height="100" 
-                                                 Width="Auto"
-                                                 Text="{Binding Character.Author,Mode=TwoWay,UpdateSourceTrigger=PropertyChanged}"
-                                                 TextWrapping="Wrap"
-                                                 AcceptsReturn="True" 
-                                                 VerticalScrollBarVisibility="Auto"
-                                                 VerticalContentAlignment="Top" materialDesign:HintAssist.Hint="Enter author's remark..." Padding="2"/>
-                                                </Border>
-                                            </Grid>
-                                            
+                                            <TextBox MinWidth="300"
+                                                 Margin="0"
+                                                 HorizontalAlignment="Left"
+                                                 Style="{StaticResource MaterialDesignTextBox}"
+                                                 materialDesign:HintAssist.Hint="Enter Author's Nickname..."
+                                                 materialDesign:ValidationAssist.UsePopup="True"
+                                                 Text="{Binding Character.Author,Mode=TwoWay,UpdateSourceTrigger=PropertyChanged}"/>
                                         </StackPanel>
 
                                         <StackPanel HorizontalAlignment="Center" Margin="0,20,0,0" Orientation="Horizontal" Grid.Row="7" Grid.ColumnSpan="2">
