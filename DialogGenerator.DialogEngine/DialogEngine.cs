@@ -352,7 +352,8 @@ namespace DialogGenerator.DialogEngine
                 var _selectedPhrase = mContext.CharactersList[_speakingCharacter].Phrases[0]; //initialize to unused placeholder phrase
 
                 string _debugMessage = "_startDialog " + mContext.CharactersList[mContext.Character1Num].CharacterPrefix + " and " +
-                    mContext.CharactersList[mContext.Character2Num].CharacterPrefix + " " + string.Join("; --,",mContext.DialogModelsList[mIndexOfCurrentDialogModel].PhraseTypeSequence.ToArray());
+                    mContext.CharactersList[mContext.Character2Num].CharacterPrefix + " " + string.Join("; --,",
+                    mContext.DialogModelsList[mIndexOfCurrentDialogModel].PhraseTypeSequence.ToArray());
 
                 mLogger.Debug(_debugMessage,ApplicationData.Instance.DialogLoggerKey);
                 mUserLogger.Info(_debugMessage);
@@ -440,7 +441,7 @@ namespace DialogGenerator.DialogEngine
             }
             catch (Exception ex)
             {
-                mLogger.Error("_startDialog " + ex.Message);
+                mLogger.Error("_startDialog ended in exception " + ex.Message);
             }
 
             System.Console.WriteLine("Dialog {0} stopped regularly", mIndexOfCurrentDialogModel);

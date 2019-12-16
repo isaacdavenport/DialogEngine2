@@ -71,7 +71,7 @@ namespace DialogGenerator.Model
             {
                 StepIndex = counter++,
                 Key = "Author",
-                StepName = "Set Author Remark",
+                StepName = "Set Author Nickname",
                 StepControl = "AuthorControl"
             }) ;
             
