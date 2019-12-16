@@ -74,16 +74,6 @@ namespace DialogGenerator.UI.Wrapper
             }
         }
 
-        public bool UseBLERadios
-        {
-            get { return getValue<bool>(); }
-            set
-            {
-                setValue(value);
-                validateProperty(nameof(UseBLERadios));
-            }
-        }
-
         public double MaxTimeToPlayFile
         {
             get { return getValue<double>(); }

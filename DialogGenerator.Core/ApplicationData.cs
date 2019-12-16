@@ -131,11 +131,6 @@ namespace DialogGenerator.Core
         [DisplayName("Ignore radio signals:")]
         public bool IgnoreRadioSignals { get; set; } = false;
 
-        [Editable(true)]
-        [Description(" Use BLE radios or random selection of characters.")]
-        [DisplayName("Use BLE radios:")]
-        public bool UseBLERadios { get; set; } = true;
-
         [Description("Determine how long current dialog can play, if new characters selected. Value is in seconds.")]
         [DisplayName("Max time to play .mp3 file:")]
         [RegularExpression(@"^[0-9]([.,][0-9]{1,3})?$", ErrorMessage = @"Field requires decimal number.")]

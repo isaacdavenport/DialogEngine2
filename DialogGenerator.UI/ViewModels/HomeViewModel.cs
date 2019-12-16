@@ -63,7 +63,7 @@ namespace DialogGenerator.UI.ViewModels
         {
             if (_isStarted)
             {
-                if (ApplicationData.Instance.UseBLERadios)
+                if (!Session.Get<bool>(Constants.BLE_MODE_ON))
                     SelectionMode = "Selection by toys";
                 else
                     SelectionMode = "Random selection";

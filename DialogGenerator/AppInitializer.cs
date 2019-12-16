@@ -185,6 +185,7 @@ namespace DialogGenerator
             Session.Set(Constants.DIALOG_SPEED, 1000); // ms
             Session.Set(Constants.SELECTED_DLG_MODEL, -1);
             Session.Set(Constants.COMPLETED_DLG_MODELS, 0);
+            Session.Set(Constants.BLE_MODE_ON, true);
 
             Completed?.Invoke(this, new EventArgs());
         }

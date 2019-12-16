@@ -88,7 +88,7 @@ namespace DialogGenerator.UI.ViewModels
 
         private void _onRestartDialogEngineRecquired()
         {
-            if(!ApplicationData.Instance.UseBLERadios)
+            if(!Session.Get<bool>(Constants.BLE_MODE_ON))
             {                
                 int startIndex = 1;
                 if(FirstSelectedCharacter == null)

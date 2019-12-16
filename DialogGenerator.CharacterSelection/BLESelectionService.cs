@@ -193,8 +193,8 @@ namespace DialogGenerator.CharacterSelection
                     mFailedBLEMessageAttempts++;
                     
                     if (mIddleTime.Milliseconds > 500)                    
-                    {
-                        ApplicationData.Instance.UseBLERadios = false;
+                    {                        
+                        Session.Set(Constants.BLE_MODE_ON, false);
                         mEventAggregator.GetEvent<RestartDialogEngineEvent>().Publish();
                         Console.Out.WriteLine("Restart of Dialog Engine required!!!");
                     }

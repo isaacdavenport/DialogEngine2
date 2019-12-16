@@ -479,10 +479,16 @@ namespace DialogGenerator.UI.ViewModels
                     // <<
                     // End of commented part                    
 
-                    viewModel.Workflow.Fire(Triggers.Finish);
-                    mRegionManager.Regions[Constants.ContentRegion].NavigationService.RequestNavigate("DialogView");
-
-
+                    if(mIsFinished)
+                    {
+                        viewModel.Workflow.Fire(Triggers.GoPlay);
+                        
+                    } else
+                    {
+                        viewModel.Workflow.Fire(Triggers.Finish);
+                        mRegionManager.Regions[Constants.ContentRegion].NavigationService.RequestNavigate("DialogView");
+                    }
+                    
                 } else
                 {                    
                     _contentRegion.NavigationService.Journal.GoBack();                    
@@ -608,8 +614,8 @@ namespace DialogGenerator.UI.ViewModels
                     }
                 }
 
-                Workflow.Fire(WizardTriggers.LeaveWizard);
                 mIsFinished = true;
+                Workflow.Fire(WizardTriggers.LeaveWizard);                
             } else
             {
                 var result = await mMessageDialogService.ShowOKCancelDialogAsync("Character successfully updated!", "Info",

@@ -165,7 +165,7 @@ namespace DialogGenerator.DialogEngine
 
         private void _onSelectedCharactersPairChanged(SelectedCharactersPairEventArgs obj)
         {
-            //if (!ApplicationData.Instance.UseBLERadios && mRandomSelectionDataCached != null
+            //if (!Session.Get<bool>(Constants.BLE_MODE_ON) && mRandomSelectionDataCached != null
             //   && Session.Get<int>(Constants.COMPLETED_DLG_MODELS) < ApplicationData.Instance.NumberOfDialogModelsCompleted)
             //{
             //    return;
@@ -174,7 +174,7 @@ namespace DialogGenerator.DialogEngine
             mRandomSelectionDataCached = obj;
             Session.Set(Constants.COMPLETED_DLG_MODELS, 0);
 
-            if (ApplicationData.Instance.UseBLERadios && mCurrentState != States.PreparingDialogParameters)
+            if (Session.Get<bool>(Constants.BLE_MODE_ON) && mCurrentState != States.PreparingDialogParameters)
             {
                 mStateMachineTaskTokenSource.Cancel();
                 mWorkflow.Fire(Triggers.PrepareDialogParameters);
@@ -407,7 +407,7 @@ namespace DialogGenerator.DialogEngine
 
                         _playAudio(_pathAndFileName); // vb: code stops here so commented out for debugging purpose
 
-                        if (!_dialogTrackerAndBLESelectedCharactersSame() && ApplicationData.Instance.UseBLERadios)
+                        if (!_dialogTrackerAndBLESelectedCharactersSame() && Session.Get<bool>(Constants.BLE_MODE_ON))
                         {
                             mContext.SameCharactersAsLast = false;
                             return Triggers.PrepareDialogParameters; // the characters have moved  TODO break into charactersSame() and use also with prior
@@ -484,7 +484,7 @@ namespace DialogGenerator.DialogEngine
                 // to request in DLGEN-420.
                 if(!ApplicationData.Instance.IgnoreRadioSignals)
                 {
-                    mCharacterSelection = ApplicationData.Instance.UseBLERadios
+                    mCharacterSelection = Session.Get<bool>(Constants.BLE_MODE_ON)
                     ? mCharacterSelectionFactory.Create(SelectionMode.SerialSelectionMode)
                     : mCharacterSelectionFactory.Create( SelectionMode.ArenaModel);
                 } else
