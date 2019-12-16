@@ -126,6 +126,29 @@
                             <TextBox x:Name="Author" Grid.Column="2" Height="30" Text="{Binding CharacterAuthor}" materialDesign:HintAssist.Hint="Enter Author's Nickname ..."/>
                         </Grid>
                     </ControlTemplate>
+                    <ControlTemplate x:Key="AssignToyToCharacterControl">
+                        <Grid Background="White">
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="2*"/>
+                                <ColumnDefinition Width="Auto"/>
+                                <ColumnDefinition Width="*"/>
+                                <ColumnDefinition Width="2*"/>
+                            </Grid.ColumnDefinitions>
+                            <Label Grid.Column="1" Height="30" Margin="0, 8, 20, 0" HorizontalAlignment="Right">Assigned Radio:</Label>
+                            <ComboBox 
+                                Grid.Column="2" 
+                                x:Name="SelectedRadio" 
+                                ItemsSource="{Binding RadiosCollection}" 
+                                SelectedValue="{Binding SelectedRadio}"
+                                Style="{StaticResource MaterialDesignComboBox}">
+                                <ComboBox.ItemsPanel>
+                                    <ItemsPanelTemplate>
+                                        <VirtualizingStackPanel />
+                                    </ItemsPanelTemplate>
+                                </ComboBox.ItemsPanel>
+                            </ComboBox>
+                        </Grid>
+                    </ControlTemplate>
                     
                     <ControlTemplate x:Key="WizardControl">
                         <Grid Background="White">

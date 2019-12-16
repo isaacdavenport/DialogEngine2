@@ -1,4 +1,5 @@
-﻿using System;
+﻿using DialogGenerator.Core;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -12,9 +13,10 @@ namespace DialogGenerator.Model
 
         public CreateCharacterWizard()
         {
+            int counter = 1;
             mSteps.Add(new CreateCharacterWizardStep
             {
-                StepIndex = 1,
+                StepIndex = counter++,
                 Key = "Name",
                 StepName = "Set Character Name",
                 StepDescription = "Sets the name the character will have.",
@@ -23,7 +25,7 @@ namespace DialogGenerator.Model
 
             mSteps.Add(new CreateCharacterWizardStep
             {
-                StepIndex = 2,
+                StepIndex = counter++,
                 Key = "Initials",
                 StepName = "Set Character Initials",
                 StepDescription = "Sets the character initials.",
@@ -32,7 +34,7 @@ namespace DialogGenerator.Model
 
             mSteps.Add(new CreateCharacterWizardStep
             {
-                StepIndex = 3,
+                StepIndex = counter++,
                 Key = "Age",
                 StepName = "Set Character Age",
                 StepDescription = "Sets the age of your character.",
@@ -41,7 +43,7 @@ namespace DialogGenerator.Model
 
             mSteps.Add(new CreateCharacterWizardStep
             {
-                StepIndex = 4,
+                StepIndex = counter++,
                 Key = "Gender",
                 StepName = "Set Character Gender",
                 StepDescription = "Set the gender of the character.",
@@ -50,7 +52,7 @@ namespace DialogGenerator.Model
 
             mSteps.Add(new CreateCharacterWizardStep
             {
-                StepIndex = 5,
+                StepIndex = counter++,
                 Key = "Avatar",
                 StepName = "Set Character Avatar",
                 StepDescription = "Choose the avatar image of your character",
@@ -59,11 +61,20 @@ namespace DialogGenerator.Model
 
             mSteps.Add(new CreateCharacterWizardStep
             {
-                StepIndex = 6,
+                StepIndex = counter++,
+                Key = "AssignToy",
+                StepName = "Assign Toy To Character",
+                StepControl = "AssignToyToCharacterControl"
+            });
+            
+            mSteps.Add(new CreateCharacterWizardStep
+            {
+                StepIndex = counter++,
                 Key = "Author",
                 StepName = "Set Author Remark",
                 StepControl = "AuthorControl"
             }) ;
+            
         }
 
         public List<CreateCharacterWizardStep> Steps

@@ -46,6 +46,8 @@ namespace DialogGenerator.UI.ViewModels
         private string mCurrentDialogWizard = String.Empty;
         private string mNextButtonText = "Next";
         private bool mIsFinished = false;
+        private List<ToyEntry> mRadiosCollection = new List<ToyEntry>();
+        private ToyEntry mSelectedRadio;
 
         public CreateCharacterViewModel(ILogger _logger,
             IEventAggregator _eventAggregator,
@@ -67,6 +69,23 @@ namespace DialogGenerator.UI.ViewModels
                 mAgesCollection.Add(i);
             }
 
+            mRadiosCollection.Add(new ToyEntry
+            {
+                Key = -1,
+                Value = "Unassigned"
+            });
+
+            for (int i = 0; i < 6; i++)
+            {
+                mRadiosCollection.Add(new ToyEntry
+                {
+                    Key = i,
+                    Value = i.ToString()
+                });
+            }
+
+            mSelectedRadio = mRadiosCollection.FirstOrDefault(p => p.Key == -1);
+
             Workflow = new CreateCharacterWorkflow(action: () => { });
             Workflow.PropertyChanged += _workflow_PropertyChanged;
             _configureWorkflow();
@@ -79,6 +98,55 @@ namespace DialogGenerator.UI.ViewModels
             _bindCommands();
         }
         
+        public List<ToyEntry> RadiosCollection
+        {
+            get
+            {
+                return mRadiosCollection;
+            }
+        }
+
+        public ToyEntry SelectedRadio
+        {
+            get
+            {
+                return mSelectedRadio;
+            }
+
+            set
+            {
+                mSelectedRadio = value;
+                _selectToyToCharacter();
+                RaisePropertyChanged();
+            }
+        }
+
+        private async void _selectToyToCharacter()
+        {
+            if (mSelectedRadio.Key == -1)
+                return;
+
+            var _oldChars = mCharacterDataProvider.GetAll().Where(c => c.RadioNum == mSelectedRadio.Key);
+            if(_oldChars.Count() > 0)
+            {
+                var _oldChar = _oldChars.First();
+                _oldChar = mCharacterDataProvider.GetAll().Where(c => c.RadioNum == mSelectedRadio.Key).First();
+                if (_oldChar != null)
+                {
+                    // izbaci message box
+                    MessageDialogResult result = await mMessageDialogService.ShowOKCancelDialogAsync(String.Format("The toy with index {0} is assigned to character {1}. Are You sure that you want to re-asign it?", mSelectedRadio.Key, _oldChar.CharacterName), "Check");
+                    if (result == MessageDialogResult.OK)
+                    {
+                        // settuj na Unassigned ako je Yes
+                        _oldChar.RadioNum = -1;
+                        await mCharacterDataProvider.SaveAsync(_oldChar);
+                    }
+                }
+            }
+            
+            Character.RadioNum = mSelectedRadio.Key;
+        }
+
         public int WizardPassthroughIndex
         {
             get
@@ -358,31 +426,9 @@ namespace DialogGenerator.UI.ViewModels
             NextButtonText = "Next";
             WizardPassthroughIndex = 0;
             mIsFinished = false;
+            SelectedRadio = RadiosCollection[0];
             
             _closeCreateSession();
-        }
-
-        private void handleStepChange()
-        {
-            if(CurrentStep.StepName.Equals("Run Dialog Wizard"))
-            {
-                Character _character = Session.Get(Constants.NEW_CHARACTER) as Character;
-                if(_character == null)
-                {
-                    // If the character value was null in the session object, 
-                    // it means that the CHARACTER_EDIT_MODE was also not on.
-                    // So we have to turn it on too. 
-                    _character = new Character();
-                    Session.Set(Constants.CHARACTER_EDIT_MODE, true);                    
-                }
-
-                _character.CharacterName = CharacterName;
-                _character.CharacterPrefix = CharacterPrefix;
-                _character.CharacterAge = CharacterAge;
-                _character.CharacterGender = CharacterGender.Substring(0,1);
-                _character.CharacterImage = CharacterImage;
-                Session.Set(Constants.NEW_CHARACTER, _character);
-            }
         }
 
         private string _getCharacterInitials()
@@ -432,6 +478,7 @@ namespace DialogGenerator.UI.ViewModels
                  .Permit(Triggers.SetAge, States.EnteredSetAge)
                  .Permit(Triggers.SetGender, States.EnteredSetGender)
                  .Permit(Triggers.SetAvatar, States.EnteredSetAvatar)
+                 .Permit(Triggers.SetAssignToy, States.EnteredSetAssignToy)
                  .Permit(Triggers.SetAuthor, States.EnteredSetAuthor)
                  .Permit(Triggers.StartWizard, States.InWizard)
                  .Permit(Triggers.Finish, States.Finished);
@@ -443,6 +490,7 @@ namespace DialogGenerator.UI.ViewModels
                  .Permit(Triggers.SetAge, States.EnteredSetAge)
                  .Permit(Triggers.SetGender, States.EnteredSetGender)
                  .Permit(Triggers.SetAvatar, States.EnteredSetAvatar)
+                 .Permit(Triggers.SetAssignToy, States.EnteredSetAssignToy)
                  .Permit(Triggers.SetAuthor, States.EnteredSetAuthor)
                  .Permit(Triggers.StartWizard, States.InWizard)
                  .Permit(Triggers.Finish, States.Finished);
@@ -454,6 +502,7 @@ namespace DialogGenerator.UI.ViewModels
                  .Permit(Triggers.SetInitials, States.EnteredSetInitials)
                  .Permit(Triggers.SetGender, States.EnteredSetGender)
                  .Permit(Triggers.SetAvatar, States.EnteredSetAvatar)
+                 .Permit(Triggers.SetAssignToy, States.EnteredSetAssignToy)
                  .Permit(Triggers.SetAuthor, States.EnteredSetAuthor)
                  .Permit(Triggers.StartWizard, States.InWizard)
                  .Permit(Triggers.Finish, States.Finished);
@@ -465,8 +514,21 @@ namespace DialogGenerator.UI.ViewModels
                  .Permit(Triggers.SetInitials, States.EnteredSetInitials)
                  .Permit(Triggers.SetAge, States.EnteredSetAge)
                  .Permit(Triggers.SetAvatar, States.EnteredSetAvatar)
+                 .Permit(Triggers.SetAssignToy, States.EnteredSetAssignToy)
                  .Permit(Triggers.SetAuthor, States.EnteredSetAuthor)
                  .Permit(Triggers.StartWizard, States.InWizard)
+                 .Permit(Triggers.Finish, States.Finished);
+
+            Workflow.Configure(States.EnteredSetAssignToy)
+                 .OnEntry(() => _stepEntered("AssignToy"))
+                 .OnExit(() => _stepExited("AssignToy"))
+                 .Permit(Triggers.SetName, States.EnteredSetName)
+                 .Permit(Triggers.SetInitials, States.EnteredSetInitials)
+                 .Permit(Triggers.SetAge, States.EnteredSetAge)
+                 .Permit(Triggers.SetGender, States.EnteredSetGender)
+                 .Permit(Triggers.SetAvatar, States.EnteredSetAvatar)
+                 .Permit(Triggers.SetAuthor, States.EnteredSetAuthor)
+                 .Permit(Triggers.CheckCounter, States.InCounter)
                  .Permit(Triggers.Finish, States.Finished);
 
             Workflow.Configure(States.EnteredSetAvatar)
@@ -476,6 +538,7 @@ namespace DialogGenerator.UI.ViewModels
                  .Permit(Triggers.SetInitials, States.EnteredSetInitials)
                  .Permit(Triggers.SetAge, States.EnteredSetAge)
                  .Permit(Triggers.SetGender, States.EnteredSetGender)
+                 .Permit(Triggers.SetAssignToy, States.EnteredSetAssignToy)
                  .Permit(Triggers.SetAuthor, States.EnteredSetAuthor)
                  .Permit(Triggers.CheckCounter, States.InCounter)
                  .Permit(Triggers.Finish, States.Finished);
@@ -487,6 +550,7 @@ namespace DialogGenerator.UI.ViewModels
                  .Permit(Triggers.SetInitials, States.EnteredSetInitials)
                  .Permit(Triggers.SetAge, States.EnteredSetAge)
                  .Permit(Triggers.SetGender, States.EnteredSetGender)
+                 .Permit(Triggers.SetAssignToy, States.EnteredSetAssignToy)
                  .Permit(Triggers.SetAvatar, States.EnteredSetAvatar)
                  .Permit(Triggers.CheckCounter, States.InCounter)
                  .Permit(Triggers.Finish, States.Finished);
@@ -538,6 +602,13 @@ namespace DialogGenerator.UI.ViewModels
                     Character.Author = CharacterAuthor;
                     NextButtonText = "Next";
                     break;
+                case "AssignToy":
+                    if(Session.Get<bool>(Constants.BLE_MODE_ON))
+                    {
+                        Character.RadioNum = SelectedRadio.Key;
+                    }
+
+                    break;
                 case "Wizard":
                     
 
@@ -570,8 +641,21 @@ namespace DialogGenerator.UI.ViewModels
                     CurrentStepIndex = 4;
                     CharacterImage = Character.CharacterImage;
                     break;
-                case "Author":
+                case "AssignToy":
                     CurrentStepIndex = 5;
+                    if(Session.Get<bool>(Constants.BLE_MODE_ON) == false)
+                    {
+                        Workflow.Fire(Triggers.SetAuthor);
+                    } else
+                    {
+                        string _radioText = Character.RadioNum == -1 ? "Unasigned" : Character.RadioNum.ToString();
+                        var _selectedRadio = RadiosCollection.First(r => r.Key == Character.RadioNum);
+                        SelectedRadio = _selectedRadio;
+                    }
+                    
+                    break;
+                case "Author":
+                    CurrentStepIndex = 6;
                     CharacterAuthor = Character.Author;
                     NextButtonText = "Save";
                     break;
@@ -768,6 +852,18 @@ namespace DialogGenerator.UI.ViewModels
             {
                 mLogger.Error("_chooseImage_Execute " + ex.Message);
             }
+        }
+    }
+
+    public class ToyEntry
+    {
+        public int Key { get; set; }
+        public string Value { get; set; }
+
+        override
+        public string ToString()
+        {
+            return Value;
         }
     }
 }

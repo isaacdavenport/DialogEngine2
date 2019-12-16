@@ -474,11 +474,7 @@ namespace DialogGenerator.DialogEngine
 
             mIsDialogCancelled = false;
             Task _characterSelectionTask;
-            if(_checkIsCreateCharacterSession())
-            {
-                mCharacterSelection = mCharacterSelectionFactory.Create(SelectionMode.ArenaModel);
-            } else
-            {
+
                 // S.Ristic 12/15/2019
                 // This additional check is consequence of adding of the new setting according
                 // to request in DLGEN-420.
@@ -492,7 +488,7 @@ namespace DialogGenerator.DialogEngine
                     mCharacterSelection = mCharacterSelectionFactory.Create(SelectionMode.ArenaModel);
                 }
                 
-            }
+
             
             mCancellationTokenSource = new CancellationTokenSource();
 
