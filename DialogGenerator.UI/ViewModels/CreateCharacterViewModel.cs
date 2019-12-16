@@ -46,6 +46,12 @@ namespace DialogGenerator.UI.ViewModels
         private string mCurrentDialogWizard = String.Empty;
         private string mNextButtonText = "Next";
         private bool mIsFinished = false;
+
+        internal void SetCurrentStep(int index)
+        {
+            Workflow.Fire((Triggers)index);
+        }
+
         private List<ToyEntry> mRadiosCollection = new List<ToyEntry>();
         private ToyEntry mSelectedRadio;
 
@@ -387,16 +393,16 @@ namespace DialogGenerator.UI.ViewModels
 
         public void nextStep()
         {
-            CurrentStepIndex++;
-            Workflow.Fire((Triggers) CurrentStepIndex);   
+            int _currentStepIndex = CurrentStepIndex;
+            Workflow.Fire((Triggers) (++_currentStepIndex));   
         }
 
         public void previousStep()
         {
             if(CurrentStepIndex > 0)
             {
-                CurrentStepIndex--;
-                Workflow.Fire((Triggers) CurrentStepIndex);
+                int _currentStepIndex = CurrentStepIndex;
+                Workflow.Fire((Triggers) (--_currentStepIndex));
             }            
         }
 
@@ -642,10 +648,18 @@ namespace DialogGenerator.UI.ViewModels
                     CharacterImage = Character.CharacterImage;
                     break;
                 case "AssignToy":
+                    int _oldIndex = CurrentStepIndex;
                     CurrentStepIndex = 5;
                     if(Session.Get<bool>(Constants.BLE_MODE_ON) == false)
                     {
-                        Workflow.Fire(Triggers.SetAuthor);
+                        if(_oldIndex < CurrentStepIndex)
+                        {
+                            Workflow.Fire(Triggers.SetAuthor);
+                        } else
+                        {
+                            Workflow.Fire(Triggers.SetAvatar);
+                        }
+                        
                     } else
                     {
                         string _radioText = Character.RadioNum == -1 ? "Unasigned" : Character.RadioNum.ToString();

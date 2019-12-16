@@ -1,4 +1,5 @@
 ﻿using DialogGenerator.UI.ViewModels;
+using System;
 using System.Windows;
 using System.Windows.Controls;
 
@@ -43,5 +44,6 @@ namespace DialogGenerator.UI.Views
         {
 
         }
+
     }
 }

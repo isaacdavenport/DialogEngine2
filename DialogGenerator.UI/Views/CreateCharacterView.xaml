@@ -241,7 +241,8 @@
                      Grid.Row="2" 
                      Margin="20"
                      ItemsSource="{Binding Steps}" 
-                     SelectedIndex="{Binding CurrentStepIndex}" 
+                     SelectedIndex="{Binding CurrentStepIndex, Mode=OneWay}"
+                     IsEnabled="False"
                      Foreground="White" 
                      ItemContainerStyle="{StaticResource ContainerStyle}"/>
                 </Grid>
