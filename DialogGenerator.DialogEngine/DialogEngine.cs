@@ -488,8 +488,6 @@ namespace DialogGenerator.DialogEngine
                 {
                     mCharacterSelection = mCharacterSelectionFactory.Create(SelectionMode.ArenaModel);
                 }
-                
-
             
             mCancellationTokenSource = new CancellationTokenSource();
 
@@ -501,8 +499,7 @@ namespace DialogGenerator.DialogEngine
                 Thread.CurrentThread.Name = "DialogGeneratorThread";
 
                 _characterSelectionTask= mCharacterSelection.StartCharacterSelection();
-                mCharactersManager.Initialize();  //TODO Isaac added so that updated characters get phraseweights calculated
-
+                mCharactersManager.Initialize();  //TODO Isaac added so that character updates recalculate phraseweights
                 do
                 {
                     if(mStateMachineTaskTokenSource != null && mIsDialogCancelled
@@ -537,7 +534,8 @@ namespace DialogGenerator.DialogEngine
                             }
                         case States.DialogFinished:
                             {
-                                // we need to track is "Stop dialog" btn pressed, because we can arrive in this state if event with new characters fire
+                                // we need to track is "Stop dialog" btn pressed, because we can arrive in this 
+                                // state if event with new characters fire
                                 if (mIsDialogCancelled)
                                 {
                                     mCancellationTokenSource.Cancel();

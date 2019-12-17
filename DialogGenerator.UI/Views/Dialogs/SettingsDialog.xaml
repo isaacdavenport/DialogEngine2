@@ -61,7 +61,7 @@
                 <RowDefinition Height="auto" />
             </Grid.RowDefinitions>
 
-            <Label Content="Max time for playing of .mp3 file(seconds):" Margin="10" Grid.Row="1" HorizontalAlignment="Right" />
+            <Label Content="Complete anyway after stop(seconds):" Margin="10" Grid.Row="1" HorizontalAlignment="Right" />
             <TextBox Grid.Row="1" MinWidth="75" Text="{Binding Settings.MaxTimeToPlayFile, UpdateSourceTrigger=LostFocus,Mode=TwoWay}" 
                      HorizontalAlignment="Left" Margin="10" Grid.Column="2" materialDesign:ValidationAssist.UsePopup="True" />
 

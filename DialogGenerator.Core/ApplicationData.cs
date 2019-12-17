@@ -92,9 +92,6 @@ namespace DialogGenerator.Core
         }
 
         public bool MonitorMessageParseFails { get; set; } = false;
-        public bool CheckStuckTransmissions { get; set; } = false;
-        public bool MonitorReceiveBufferSize { get; set; } = false;
-        public bool ShowDupePhrases { get; set; } = false;
         public string JSONEditorExeFileName { get; set; } = "JSONedit.exe"; 
         public string WebsiteUrl { get; set; } = "www.toys2life.org";
         public string TutorialFileName { get; set; } = "tutorial.pdf";
@@ -107,23 +104,6 @@ namespace DialogGenerator.Core
         public string URLToUpdateFile { get; set; } = "http://drive.google.com/uc?export=download&id=1nkflu9P-y1gQMajnxv58BRU7TqrgBh9U";
         public int CheckForUpdateInterval { get; set; } = 30; // minutes
 
-
-        // S. Ristic 12/15/2019
-        // DLGEN-420 This should not be shown in the settings dialog and should always be false.
-
-        //[Editable(true)]
-        //[Description("Check which tags will not be used in dialog.")]
-        //[DisplayName("Check tag usage:")]
-        //public bool TagUsageCheck { get; set; } = false;
-        public bool TagUsageCheck { get; set; } = false;
-
-        // S. Ristic 12/15/2019
-        // DLGEN-420 This should not be shown in the settings dialog and should always be true.
-
-        //[Editable(true)]
-        //[Description("Is dialog text visible during dialog.")]
-        //[DisplayName("Text dialog enabled:")]
-        //public bool TextDialogsOn { get; set; } = true;
         public bool TextDialogsOn { get; set; } = true;
 
         [Editable(true)]
@@ -131,8 +111,8 @@ namespace DialogGenerator.Core
         [DisplayName("Ignore radio signals:")]
         public bool IgnoreRadioSignals { get; set; } = false;
 
-        [Description("Determine how long current dialog can play, if new characters selected. Value is in seconds.")]
-        [DisplayName("Max time to play .mp3 file:")]
+        [Description("Determine how long current dialog can play to finish a line after new characters selected. Value is in seconds.")]
+        [DisplayName("Max time past stop to play:")]
         [RegularExpression(@"^[0-9]([.,][0-9]{1,3})?$", ErrorMessage = @"Field requires decimal number.")]
         public double MaxTimeToPlayFile { get; set; } = 1.5;
 
@@ -146,11 +126,7 @@ namespace DialogGenerator.Core
         [DisplayName("Delay between phrases:")]
         [RegularExpression(@"^[0-9]([.,][0-9]{1,3})?$", ErrorMessage = @"Field requires decimal number.")]
         public double DelayBetweenPhrases { get; set; } = 1.0;
-
-        [DisplayName("Number of dialog models:")]
-        [RegularExpression(@"^[1-9]+$", ErrorMessage = @"Field requires number.")]
-        public int NumberOfDialogModelsCompleted { get; set; } = 5;
-
+        
         [Editable(true)]
         [DisplayName("Debug Mode On:")]
         public bool DebugModeOn { get; set; } = false;
