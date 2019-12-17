@@ -165,12 +165,6 @@ namespace DialogGenerator.DialogEngine
 
         private void _onSelectedCharactersPairChanged(SelectedCharactersPairEventArgs obj)
         {
-            //if (!Session.Get<bool>(Constants.BLE_MODE_ON) && mRandomSelectionDataCached != null
-            //   && Session.Get<int>(Constants.COMPLETED_DLG_MODELS) < ApplicationData.Instance.NumberOfDialogModelsCompleted)
-            //{
-            //    return;
-            //}
-
             mRandomSelectionDataCached = obj;
             Session.Set(Constants.COMPLETED_DLG_MODELS, 0);
 

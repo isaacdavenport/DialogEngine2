@@ -104,15 +104,6 @@ namespace DialogGenerator.UI.Wrapper
             }
         }
 
-        public int NumberOfDialogModelsCompleted
-        {
-            get { return getValue<int>(); }
-            set
-            {
-                setValue(value);
-                validateProperty(nameof(NumberOfDialogModelsCompleted));
-            }
-        }
 
         public bool DebugModeOn
         {
