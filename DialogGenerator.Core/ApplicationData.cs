@@ -99,7 +99,7 @@ namespace DialogGenerator.Core
         public string DialogLoggerKey { get; set; } = "LogDialog";
         public string DefaultLoggerKey { get; set; } = "DefaultLog";
         public string DefaultImage { get; set; } = "avatar.png";
-        public string JSONFilesVersion { get; set; } = "1.2";
+        public string JSONFilesVersion { get; set; } = "1.3";  //updated after adding author field
         public int NumberOfRadios { get; set; } = 6;
         public string URLToUpdateFile { get; set; } = "http://drive.google.com/uc?export=download&id=1nkflu9P-y1gQMajnxv58BRU7TqrgBh9U";
         public int CheckForUpdateInterval { get; set; } = 30; // minutes
