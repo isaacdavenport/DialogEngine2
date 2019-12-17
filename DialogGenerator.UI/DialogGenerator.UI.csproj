@@ -111,6 +111,7 @@
     </Compile>
     <Compile Include="Converters\ActiveDialogModelBtnVisibilityValueConverter.cs" />
     <Compile Include="Converters\AssignedCharacter2NameValueConverter.cs" />
+    <Compile Include="Converters\BoolToRowHeightConverter.cs" />
     <Compile Include="Converters\BoolToVisibilityConverter.cs" />
     <Compile Include="Converters\CharaccterStateToNameValueConverter.cs" />
     <Compile Include="Converters\CharacterDataTemplateSelectorValueConverter.cs" />

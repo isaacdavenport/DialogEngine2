@@ -41,6 +41,7 @@ namespace DialogGenerator.UI.ViewModels
         private ObservableCollection<Character> mCharacters;
         private string mFirstCharacterDialogLine;
         private string mSecondCharacterDialogLine;
+        private bool mRadioModeOn = false;
 
 
         #endregion
@@ -66,8 +67,14 @@ namespace DialogGenerator.UI.ViewModels
             mEventAggregator.GetEvent<CharacterCollectionLoadedEvent>().Subscribe(_onCharacterCollectionLoaded);
             mEventAggregator.GetEvent<SelectedCharactersPairChangedEvent>().Subscribe(_onSelectedCharactersPairChangedEvent);
             mEventAggregator.GetEvent<GuidedCharacterCreationModeChangedEvent>().Subscribe(_onGuidedCharacterCreationModeChanged);
+            mEventAggregator.GetEvent<CharacterSelectionModelChangedEvent>().Subscribe(_onCharacterSelectionModelChanged);
 
             _bindCommands();
+        }
+
+        private void _onCharacterSelectionModelChanged()
+        {
+            RadioModeOn = Session.Get<bool>(Constants.BLE_MODE_ON);
         }
 
         private void _onGuidedCharacterCreationModeChanged(bool obj)
@@ -200,6 +207,20 @@ namespace DialogGenerator.UI.ViewModels
                 mListSelectedCharacter = value;
                 SelectFirstCharacterCommand.RaiseCanExecuteChanged();
                 SelectSecondCharacterCommand.RaiseCanExecuteChanged();
+                RaisePropertyChanged();
+            }
+        }
+
+        public bool RadioModeOn
+        {
+            get
+            {
+                return mRadioModeOn;
+            }
+
+            set
+            {
+                mRadioModeOn = value;
                 RaisePropertyChanged();
             }
         }
