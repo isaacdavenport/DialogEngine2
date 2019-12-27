@@ -58,6 +58,7 @@ namespace DialogGenerator.CharacterSelection
             
             await Task.Run(async () => 
             {
+                bool _restartRequired = false;
                 Task _BLEDataReaderTask = mCurrentDataProvider.StartReadingData();
                 Thread.CurrentThread.Name = "CharacterBoxesScanningThread";
                 Session.Set(Constants.FORCED_CH_COUNT, 2);
@@ -89,6 +90,8 @@ namespace DialogGenerator.CharacterSelection
                         {
                             System.Console.WriteLine("Will send event");
 
+                            mEventAggregator.GetEvent<StopPlayingCurrentDialogLineEvent>().Publish();
+
                             mEventAggregator.GetEvent<SelectedCharactersPairChangedEvent>().
                             Publish(new SelectedCharactersPairEventArgs
                             {
@@ -96,8 +99,7 @@ namespace DialogGenerator.CharacterSelection
                                 Character2Index = mSecondCharacterIndex
                             });
 
-                            mEventAggregator.GetEvent<StopPlayingCurrentDialogLineEvent>().Publish();
-
+                            
                         }
                     }
 
@@ -109,29 +111,41 @@ namespace DialogGenerator.CharacterSelection
                     BLE_Message message = mCurrentDataProvider.GetMessage();
                     if (message != null)
                     {
-                        while(_difference.Milliseconds < 500)
-                        {
-                            message = mCurrentDataProvider.GetMessage();
-                            _nowTime = DateTime.Now;
-                            _difference += _nowTime - _lastAccessTime;
-                            _lastAccessTime = _nowTime;
-                        }
+                        //while(_difference.Milliseconds < 500)
+                        //{
+                        //    message = mCurrentDataProvider.GetMessage();
+                        //    _nowTime = DateTime.Now;
+                        //    _difference += _nowTime - _lastAccessTime;
+                        //    _lastAccessTime = _nowTime;
+                        //}
 
-                        Thread.Sleep(1000);
+                        //Thread.Sleep(1000);
 
-                        if(_difference.Milliseconds >= 500) {
-                            Session.Set(Constants.BLE_MODE_ON, true);
-                            mEventAggregator.GetEvent<RestartDialogEngineEvent>().Publish();
-                        }                        
+                        //if(_difference.Milliseconds >= 500) {
+
+                        //    _restartRequired = true;
+                        //    mCancellationTokenSource.Cancel();
+                        //}                        
+
+                        _restartRequired = true;
+                        mCancellationTokenSource.Cancel();
+                        
                     }
-                    
-                    
-
+                                        
                     Thread.Sleep(1000);
                 } while (!mCancellationTokenSource.Token.IsCancellationRequested);
 
-                await _BLEDataReaderTask;
+                
 
+                if(_restartRequired)
+                {
+                    mCurrentDataProvider.StopReadingData();
+                    Session.Set(Constants.BLE_MODE_ON, true);
+                    Session.Set(Constants.NEEDS_RESTART, true);
+                    
+                }
+
+                await _BLEDataReaderTask;
             });
         }
 

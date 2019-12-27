@@ -63,7 +63,6 @@ namespace DialogGenerator.UI.ViewModels
 
             mEventAggregator.GetEvent<NewDialogLineEvent>().Subscribe(_onNewDialogLine);
             mEventAggregator.GetEvent<ActiveCharactersEvent>().Subscribe(_onNewActiveCharacters);
-            mEventAggregator.GetEvent<RestartDialogEngineEvent>().Subscribe(_onRestartDialogEngineRecquired);
             mEventAggregator.GetEvent<CharacterCollectionLoadedEvent>().Subscribe(_onCharacterCollectionLoaded);
             mEventAggregator.GetEvent<SelectedCharactersPairChangedEvent>().Subscribe(_onSelectedCharactersPairChangedEvent);
             mEventAggregator.GetEvent<GuidedCharacterCreationModeChangedEvent>().Subscribe(_onGuidedCharacterCreationModeChanged);
@@ -75,6 +74,21 @@ namespace DialogGenerator.UI.ViewModels
         private void _onCharacterSelectionModelChanged()
         {
             RadioModeOn = Session.Get<bool>(Constants.BLE_MODE_ON);
+
+            if (!RadioModeOn)
+            {
+                int startIndex = 1;
+                if (FirstSelectedCharacter == null)
+                {
+                    FirstSelectedCharacter = mCharacterRepository.GetAll()[startIndex++];
+                }
+
+                if (SecondSelectedCharacter == null)
+                {
+                    SecondSelectedCharacter = mCharacterRepository.GetAll()[startIndex];
+                }
+
+            }
         }
 
         private void _onGuidedCharacterCreationModeChanged(bool obj)
@@ -435,7 +449,7 @@ namespace DialogGenerator.UI.ViewModels
 
         private void _onNewActiveCharacters(string info)
         {
-            _processDialogItem(info);
+            //_processDialogItem(info);
         }
 
         private void _processDialogItem(object item)
