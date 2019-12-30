@@ -29,7 +29,6 @@ namespace DialogGenerator.CharacterSelection
             mContainer.RegisterInstance<IBLEDataProviderFactory>(_dataProviderfactoryInstance);
 
             mContainer.RegisterType<ICharacterSelection, BLESelectionService>(SelectionMode.SerialSelectionMode.ToString());
-            mContainer.RegisterType<ICharacterSelection, RandomSelectionService>(SelectionMode.RandomSelectionModel.ToString());
             mContainer.RegisterType<ICharacterSelection, ArenaCharacterSelection>(SelectionMode.ArenaModel.ToString());
 
             Func<SelectionMode, ICharacterSelection> _selectionFactory = (_selectionType) =>
