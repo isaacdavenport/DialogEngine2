@@ -208,6 +208,7 @@ namespace DialogGenerator.CharacterSelection
                 {
                     mLastAccessTime = DateTime.Now;
                     mIddleTime = new TimeSpan(0, 0, 0);
+                    mFailedBLEMessageAttempts = 0;
                 }
 
                 Console.Out.WriteLine("Failed messages " + mFailedBLEMessageAttempts);

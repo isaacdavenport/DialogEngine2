@@ -111,25 +111,8 @@ namespace DialogGenerator.CharacterSelection
                     BLE_Message message = mCurrentDataProvider.GetMessage();
                     if (message != null)
                     {
-                        //while(_difference.Milliseconds < 500)
-                        //{
-                        //    message = mCurrentDataProvider.GetMessage();
-                        //    _nowTime = DateTime.Now;
-                        //    _difference += _nowTime - _lastAccessTime;
-                        //    _lastAccessTime = _nowTime;
-                        //}
-
-                        //Thread.Sleep(1000);
-
-                        //if(_difference.Milliseconds >= 500) {
-
-                        //    _restartRequired = true;
-                        //    mCancellationTokenSource.Cancel();
-                        //}                        
-
                         _restartRequired = true;
                         mCancellationTokenSource.Cancel();
-                        
                     }
                                         
                     Thread.Sleep(1000);
