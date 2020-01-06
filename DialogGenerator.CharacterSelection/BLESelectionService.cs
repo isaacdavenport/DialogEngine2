@@ -38,6 +38,7 @@ namespace DialogGenerator.CharacterSelection
         private int mFailedBLEMessageAttempts = 0;
         private TimeSpan mIddleTime;
         private DateTime mLastAccessTime;
+        private bool mRestartRequested = false;
 
         private int BigRssi = 0;
         private int CurrentCharacter1;
@@ -194,9 +195,12 @@ namespace DialogGenerator.CharacterSelection
                     
                     if (mIddleTime.Milliseconds > 500)                    
                     {                        
-                        Session.Set(Constants.BLE_MODE_ON, false);
-                        mEventAggregator.GetEvent<RestartDialogEngineEvent>().Publish();
-                        Console.Out.WriteLine("Restart of Dialog Engine required!!!");
+                        //Session.Set(Constants.BLE_MODE_ON, false);
+                        //mEventAggregator.GetEvent<RestartDialogEngineEvent>().Publish();
+                        //Console.Out.WriteLine("Restart of Dialog Engine required!!!");
+
+                        mRestartRequested = true;
+                        mCancellationTokenSource.Cancel();                        
                     }
 
                     return Triggers.ProcessMessage;
@@ -204,6 +208,7 @@ namespace DialogGenerator.CharacterSelection
                 {
                     mLastAccessTime = DateTime.Now;
                     mIddleTime = new TimeSpan(0, 0, 0);
+                    mFailedBLEMessageAttempts = 0;
                 }
 
                 Console.Out.WriteLine("Failed messages " + mFailedBLEMessageAttempts);
@@ -500,11 +505,11 @@ namespace DialogGenerator.CharacterSelection
                     CurrentCharacter1 = NextCharacter1;
                     CurrentCharacter2 = NextCharacter2;
 
-                    mEventAggregator.GetEvent<SelectedCharactersPairChangedEvent>().
-                        Publish(new SelectedCharactersPairEventArgs { Character1Index = CurrentCharacter1, Character2Index = CurrentCharacter2 });
-
                     mEventAggregator.GetEvent<StopPlayingCurrentDialogLineEvent>().Publish();
 
+                    mEventAggregator.GetEvent<SelectedCharactersPairChangedEvent>().
+                        Publish(new SelectedCharactersPairEventArgs { Character1Index = CurrentCharacter1, Character2Index = CurrentCharacter2 });
+                   
                     mEventAggregator.GetEvent<HeatMapUpdateEvent>().Publish(new HeatMapData
                     {
                         HeatMap = HeatMap,
@@ -574,6 +579,16 @@ namespace DialogGenerator.CharacterSelection
                     mWorkflow.Fire(next);
                 }
                 while (!mCancellationTokenSource.IsCancellationRequested);
+
+                
+                if(mRestartRequested)
+                {
+                    mCurrentDataProvider.StopReadingData();
+                    Session.Set(Constants.BLE_MODE_ON, false);
+                    Session.Set(Constants.NEEDS_RESTART, true);
+                    Console.Out.WriteLine("Restart of Dialog Engine required!!!");
+                               
+                } 
 
                 await _BLEDataReaderTask;
 

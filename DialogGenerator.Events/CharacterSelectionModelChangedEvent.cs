@@ -7,7 +7,7 @@ using System.Threading.Tasks;
 
 namespace DialogGenerator.Events
 {
-    public class RestartDialogEngineEvent : PubSubEvent
+    public class CharacterSelectionModelChangedEvent : PubSubEvent
     {
     }
 }

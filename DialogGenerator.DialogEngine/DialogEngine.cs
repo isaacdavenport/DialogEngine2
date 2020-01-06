@@ -71,7 +71,9 @@ namespace DialogGenerator.DialogEngine
         private void _configureWorkflow()
         {
             mWorkflow.Configure(States.Start)
-                .Permit(Triggers.PrepareDialogParameters, States.PreparingDialogParameters);
+                .Permit(Triggers.PrepareDialogParameters, States.PreparingDialogParameters)
+                .PermitReentry(Triggers.StartDialog);
+                
 
             mWorkflow.Configure(States.PreparingDialogParameters)
                 .PermitReentry(Triggers.PrepareDialogParameters)
@@ -93,16 +95,9 @@ namespace DialogGenerator.DialogEngine
             mEventAggregator.GetEvent<ChangedCharacterStateEvent>().Subscribe(_onChangedCharacterState);
             mEventAggregator.GetEvent<ChangedDialogModelStateEvent>().Subscribe(_onChangedDialogModelState);
             mEventAggregator.GetEvent<CharacterUpdatedEvent>().Subscribe(_onCharacterUpdated);
-            mEventAggregator.GetEvent<RestartDialogEngineEvent>().Subscribe(_onRestartRequired);
+
             mWorkflow.PropertyChanged += _mWorkflow_PropertyChanged;
             Session.SessionPropertyChanged += _sessionPropertyChanged;
-        }
-
-        private async void _onRestartRequired()
-        {
-            StopDialogEngine();
-            Thread.Sleep(1000);
-            await StartDialogEngine();                        
         }
 
         /// <summary>
@@ -470,18 +465,23 @@ namespace DialogGenerator.DialogEngine
             mIsDialogCancelled = false;
             Task _characterSelectionTask;
 
-                // S.Ristic 12/15/2019
-                // This additional check is consequence of adding of the new setting according
-                // to request in DLGEN-420.
-                if(!ApplicationData.Instance.IgnoreRadioSignals)
-                {
-                    mCharacterSelection = Session.Get<bool>(Constants.BLE_MODE_ON)
-                    ? mCharacterSelectionFactory.Create(SelectionMode.SerialSelectionMode)
-                    : mCharacterSelectionFactory.Create( SelectionMode.ArenaModel);
-                } else
-                {
-                    mCharacterSelection = mCharacterSelectionFactory.Create(SelectionMode.ArenaModel);
-                }
+
+            // S.Ristic 12/15/2019
+            // This additional check is consequence of adding of the new setting according
+            // to request in DLGEN-420.
+            if(!ApplicationData.Instance.IgnoreRadioSignals)
+            {
+                mCharacterSelection = Session.Get<bool>(Constants.BLE_MODE_ON)
+                ? mCharacterSelectionFactory.Create(SelectionMode.SerialSelectionMode)
+                : mCharacterSelectionFactory.Create( SelectionMode.ArenaModel);
+            } else
+            {
+                Session.Set(Constants.BLE_MODE_ON, false);
+                mCharacterSelection = mCharacterSelectionFactory.Create(SelectionMode.ArenaModel);
+                
+            }
+
+            mEventAggregator.GetEvent<CharacterSelectionModelChangedEvent>().Publish();
             
             mCancellationTokenSource = new CancellationTokenSource();
 
@@ -491,11 +491,36 @@ namespace DialogGenerator.DialogEngine
             await Task.Run(async() =>
             {
                 Thread.CurrentThread.Name = "DialogGeneratorThread";
+                Console.WriteLine(Thread.CurrentThread.Name + " started!");
+                mLogger.Debug(Thread.CurrentThread.Name + " started!");
 
                 _characterSelectionTask= mCharacterSelection.StartCharacterSelection();
                 mCharactersManager.Initialize();  //TODO Isaac added so that character updates recalculate phraseweights
                 do
                 {
+                    if(Session.Contains(Constants.NEEDS_RESTART) && Session.Get<bool>(Constants.NEEDS_RESTART))
+                    {
+                        await _characterSelectionTask;
+
+                        bool _radioModeOn = Session.Get<bool>(Constants.BLE_MODE_ON);
+                        if (!ApplicationData.Instance.IgnoreRadioSignals)
+                        {
+                            mCharacterSelection = Session.Get<bool>(Constants.BLE_MODE_ON)
+                            ? mCharacterSelectionFactory.Create(SelectionMode.SerialSelectionMode)
+                            : mCharacterSelectionFactory.Create(SelectionMode.ArenaModel);
+                        }
+                        else
+                        {
+                            Session.Set(Constants.BLE_MODE_ON, false);
+                            mCharacterSelection = mCharacterSelectionFactory.Create(SelectionMode.ArenaModel);
+
+                        }
+
+                        mEventAggregator.GetEvent<CharacterSelectionModelChangedEvent>().Publish();
+                        _characterSelectionTask = mCharacterSelection.StartCharacterSelection();
+                        Session.Set(Constants.NEEDS_RESTART, false);
+                    }
+
                     if(mStateMachineTaskTokenSource != null && mIsDialogCancelled
                        && mWorkflow.CanFire(Triggers.FinishDialog))
                     {
@@ -518,6 +543,9 @@ namespace DialogGenerator.DialogEngine
                         case States.DialogStarted:
                             {
                                 Triggers _nextTrigger = _startDialog(mStateMachineTaskTokenSource.Token);
+                                string _debugMessage = "Start dialog returned " + _nextTrigger.ToString();
+                                mLogger.Debug(_debugMessage, ApplicationData.Instance.DialogLoggerKey);
+
                                 if (mWorkflow.CanFire(_nextTrigger))
                                     mWorkflow.Fire(_nextTrigger);
                                 else
@@ -548,6 +576,10 @@ namespace DialogGenerator.DialogEngine
                 while (!mCancellationTokenSource.Token.IsCancellationRequested);
 
                 await _characterSelectionTask;
+
+                Console.WriteLine(Thread.CurrentThread.Name + " stopped!");
+                mLogger.Debug(Thread.CurrentThread.Name + " stopped!");
+
             });
         }
 

@@ -13,6 +13,7 @@
              xmlns:i="clr-namespace:System.Windows.Interactivity;assembly=System.Windows.Interactivity"             
              xmlns:s="clr-namespace:System;assembly=mscorlib"
              xmlns:views="clr-namespace:DialogGenerator.UI.Views"
+             xmlns:sys="clr-namespace:System;assembly=mscorlib"
              TextElement.FontWeight="Regular"
              TextElement.FontSize="13"
              TextOptions.TextFormattingMode="Ideal" 
@@ -31,6 +32,8 @@
             <converters:ImageContentSmallSizeValueConverter x:Key="ImageContentSmallSizeValueConverter" />
             <converters:BoolToVisibilityConverter x:Key="BoolToVisibilityConverter" />
             <converters:ImageContentValueConverter x:Key="ImageContentValueConverter" />
+            <converters:BoolToRowHeightConverter x:Key="BoolToRowHeightConverter"/>
+            <sys:Int32 x:Key="rowHeight">300</sys:Int32>
         </ResourceDictionary>
     </UserControl.Resources>
 
@@ -45,14 +48,14 @@
 
     <Grid Background="White">
         <Grid.RowDefinitions>
-            <RowDefinition Height="300"/>
+            <RowDefinition Height="Auto"/>
             <RowDefinition Height="*"/>
             <RowDefinition Height="Auto" />
             <RowDefinition Height="Auto"/>
             <RowDefinition Height="Auto" />
         </Grid.RowDefinitions>
 
-        <Grid Grid.Row="0">
+        <Grid Grid.Row="0" Visibility="{Binding RadioModeOn, Converter={StaticResource BoolToVisibilityConverter}}" Height="300">
             <Grid.ColumnDefinitions>
                 <ColumnDefinition Width="*" />
                 <ColumnDefinition Width="Auto" />

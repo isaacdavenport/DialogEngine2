@@ -104,7 +104,6 @@ namespace DialogGenerator.UI.Wrapper
             }
         }
 
-
         public bool DebugModeOn
         {
             get { return getValue<bool>(); }

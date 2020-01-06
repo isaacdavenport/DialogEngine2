@@ -1,4 +1,5 @@
 ﻿using DialogGenerator.Core;
+using DialogGenerator.DataAccess.Helper;
 using DialogGenerator.Events;
 using DialogGenerator.Events.EventArgs;
 using DialogGenerator.Model;
@@ -756,11 +757,70 @@ namespace DialogGenerator.UI.ViewModels
 
         private void _initDialogWizards()
         {
-            mDialogWizards.Add("BasicWizard");            
-            mDialogWizards.Add("ScaryStoryWizard");
-            mDialogWizards.Add("ActionStoryWizard");
-            mDialogWizards.Add("IntermediateWizard");
-            mDialogWizards.Add("Advanced1Wizard");
+            mDialogWizards.Clear();
+            if(!_loadWizardCollection())
+            {
+                WizardCollection _wizardCollection = new WizardCollection
+                {
+                    Version = "1.1",
+                    Wizards = new List<string>()
+                };
+
+                _wizardCollection.Version = "1.1";
+
+                mDialogWizards.Add("BasicWizard");
+                _wizardCollection.Wizards.Add("BasicWizard");
+                mDialogWizards.Add("IntermediateWizard");
+                _wizardCollection.Wizards.Add("IntermediateWizard");
+                mDialogWizards.Add("ScaryStoryWizard");
+                _wizardCollection.Wizards.Add("ScaryStoryWizard");
+                mDialogWizards.Add("ActionStoryWizard");
+                _wizardCollection.Wizards.Add("ActionStoryWizard");               
+                mDialogWizards.Add("Advanced1Wizard");
+                _wizardCollection.Wizards.Add("Advanced1Wizard");
+                mDialogWizards.Add("Advanced2Wizard");
+                _wizardCollection.Wizards.Add("Advanced2Wizard");
+
+                Serializer.Serialize(_wizardCollection, ApplicationData.Instance.DataDirectory + "\\WizardCollection.json");
+            }             
+        }
+
+        private class WizardCollection
+        {
+            string mVersionNumber;
+            List<string> mWizards = new List<string>();
+
+            public string Version { get; set; }
+            public List<string> Wizards { get; set; }
+        }
+
+        private bool _loadWizardCollection()
+        {
+            string _filePath = ApplicationData.Instance.DataDirectory + "\\WizardCollection.json";
+            try
+            {
+                using (var reader = new StreamReader(_filePath)) //creates new streamerader for fs stream. Could also construct with filename...
+                {
+                    string _jsonString = reader.ReadToEnd();
+
+                    //json string to Object.
+                    var _wizardCollection = Serializer.Deserialize<WizardCollection>(_jsonString);
+                    if (_wizardCollection.Wizards != null && _wizardCollection.Wizards.Count() > 0)
+                    {
+                        foreach (string _wizard in _wizardCollection.Wizards)
+                        {
+                            mDialogWizards.Add(_wizard);
+                        }
+
+                        return true;
+                    }
+                }
+            } catch (IOException ioe)
+            {
+                return false;
+            }
+            
+            return false;
         }
 
         private void _openCreateSession(Character _c = null)
