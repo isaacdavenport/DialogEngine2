@@ -160,7 +160,6 @@ namespace DialogGenerator.DialogEngine
 
         private void _onSelectedCharactersPairChanged(SelectedCharactersPairEventArgs obj)
         {
-
             mRandomSelectionDataCached = obj;
             Session.Set(Constants.COMPLETED_DLG_MODELS, 0);
 
@@ -466,6 +465,7 @@ namespace DialogGenerator.DialogEngine
             mIsDialogCancelled = false;
             Task _characterSelectionTask;
 
+
             // S.Ristic 12/15/2019
             // This additional check is consequence of adding of the new setting according
             // to request in DLGEN-420.
@@ -495,8 +495,7 @@ namespace DialogGenerator.DialogEngine
                 mLogger.Debug(Thread.CurrentThread.Name + " started!");
 
                 _characterSelectionTask= mCharacterSelection.StartCharacterSelection();
-                mCharactersManager.Initialize();  //TODO Isaac added so that updated characters get phraseweights calculated
-
+                mCharactersManager.Initialize();  //TODO Isaac added so that character updates recalculate phraseweights
                 do
                 {
                     if(Session.Contains(Constants.NEEDS_RESTART) && Session.Get<bool>(Constants.NEEDS_RESTART))
@@ -557,7 +556,8 @@ namespace DialogGenerator.DialogEngine
                             }
                         case States.DialogFinished:
                             {
-                                // we need to track is "Stop dialog" btn pressed, because we can arrive in this state if event with new characters fire
+                                // we need to track is "Stop dialog" btn pressed, because we can arrive in this 
+                                // state if event with new characters fire
                                 if (mIsDialogCancelled)
                                 {
                                     mCancellationTokenSource.Cancel();
