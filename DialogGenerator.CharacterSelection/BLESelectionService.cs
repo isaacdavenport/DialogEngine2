@@ -37,7 +37,7 @@ namespace DialogGenerator.CharacterSelection
         private States mCurrentState;
         private int mFailedBLEMessageAttempts = 0;
         private TimeSpan mIddleTime;
-        private DateTime mLastAccessTime;
+        private DateTime mLastAccessTime = DateTime.Now;
         private bool mRestartRequested = false;
 
         private int BigRssi = 0;
@@ -183,36 +183,36 @@ namespace DialogGenerator.CharacterSelection
                 mTempCh1 = 0;
                 mTempch2 = 0;
                 BLE_Message message = new BLE_Message();
+                DateTime nowTime = DateTime.Now;
 
                 message = mCurrentDataProvider.GetMessage();
 
                 if (message == null)
                 {
-                    DateTime nowTime = DateTime.Now;
                     mIddleTime += nowTime - mLastAccessTime;
-                    mLastAccessTime = nowTime;
                     mFailedBLEMessageAttempts++;
                     
-                    if (mIddleTime.Milliseconds > 500)                    
-                    {                        
+                    if (mIddleTime.TotalMilliseconds > 800)                    
+                    {
                         //Session.Set(Constants.BLE_MODE_ON, false);
                         //mEventAggregator.GetEvent<RestartDialogEngineEvent>().Publish();
                         //Console.Out.WriteLine("Restart of Dialog Engine required!!!");
 
+                        mIddleTime = new TimeSpan(0, 0, 0);
                         mRestartRequested = true;
                         mCancellationTokenSource.Cancel();                        
                     }
-
+                    Console.Out.WriteLine("Failed messages " + mFailedBLEMessageAttempts);
+                    mLastAccessTime = nowTime;
                     return Triggers.ProcessMessage;
                 } else
                 {
-                    mLastAccessTime = DateTime.Now;
                     mIddleTime = new TimeSpan(0, 0, 0);
                     mFailedBLEMessageAttempts = 0;
                 }
 
-                Console.Out.WriteLine("Failed messages " + mFailedBLEMessageAttempts);
                 BLE_Message mNewRow = new BLE_Message();  // added number holds sequence number
+                mLastAccessTime = nowTime;
 
                 var mRowNum = ParseMessageHelper.ParseBle(message, mNewRow);
 
