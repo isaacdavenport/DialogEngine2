@@ -200,6 +200,7 @@ namespace DialogGenerator.CharacterSelection
 
                         mIddleTime = new TimeSpan(0, 0, 0);
                         mRestartRequested = true;
+                        mLogger.Info("BLE Messages have not arrived in 800ms, switching to avatar arena");
                         mCancellationTokenSource.Cancel();                        
                     }
                     Console.Out.WriteLine("Failed messages " + mFailedBLEMessageAttempts);
@@ -409,9 +410,10 @@ namespace DialogGenerator.CharacterSelection
                          (NextCharacter2 != CurrentCharacter1 || NextCharacter1 != CurrentCharacter2))
                     {
                         _nextCharactersAssigned = true;
+                        mLogger.Info("New characters assigned by BLE Character 1 is " + NextCharacter1 +
+                            " Character 2 is " + NextCharacter2);
                     }
                 }
-
                 return _nextCharactersAssigned;
             }
             catch (Exception ex)
