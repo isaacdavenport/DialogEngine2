@@ -36,9 +36,10 @@ namespace DialogGenerator.CharacterSelection
         private Random mRandom = new Random();
         private States mCurrentState;
         private int mFailedBLEMessageAttempts = 0;
-        private TimeSpan mIddleTime;
-        private DateTime mLastAccessTime;
+        private long mIddleTime = 0;
+        private long mLastAccessTime = 0;
         private bool mRestartRequested = false;
+        private bool mFirstFailMessage = true;
 
         private int BigRssi = 0;
         private int CurrentCharacter1;
@@ -164,8 +165,8 @@ namespace DialogGenerator.CharacterSelection
         private  Triggers _initialize()
         {
             mCurrentDataProvider = mBLEDataProviderFactory.Create(BLEDataProviderType.WinBLEWatcher);
-            mIddleTime = new TimeSpan(0, 0, 0);
-            mLastAccessTime = DateTime.Now;
+            //mIddleTime = new TimeSpan(0, 0, 0);
+            //mLastAccessTime = DateTime.Now;
 
             return Triggers.ProcessMessage;
         }
@@ -174,6 +175,11 @@ namespace DialogGenerator.CharacterSelection
         {
             mcHeatMapUpdateTimer.Stop();
             mWorkflow.Fire(Triggers.Wait);
+        }
+
+        private long _toMilliseconds(DateTime date)
+        {
+            return (long)(date - new DateTime(2000, 1, 1)).TotalMilliseconds;
         }
 
         private Triggers _processMessage()
@@ -188,12 +194,19 @@ namespace DialogGenerator.CharacterSelection
 
                 if (message == null)
                 {
-                    DateTime nowTime = DateTime.Now;
-                    mIddleTime += nowTime - mLastAccessTime;
-                    mLastAccessTime = nowTime;
+                    DateTime _nowTime = DateTime.Now;
+
+                    if (mFirstFailMessage)
+                    {
+                        mFirstFailMessage = false;
+                        mLastAccessTime = _toMilliseconds(_nowTime) ;
+                    }
+
+                    mIddleTime += _toMilliseconds(_nowTime) - mLastAccessTime;
+                    mLastAccessTime = _toMilliseconds(_nowTime);
                     mFailedBLEMessageAttempts++;
                     
-                    if (mIddleTime.Milliseconds > 500)                    
+                    if (mIddleTime > 1500)                    
                     {                        
                         //Session.Set(Constants.BLE_MODE_ON, false);
                         //mEventAggregator.GetEvent<RestartDialogEngineEvent>().Publish();
@@ -203,15 +216,18 @@ namespace DialogGenerator.CharacterSelection
                         mCancellationTokenSource.Cancel();                        
                     }
 
+                    //Console.Out.WriteLine("Failed messages " + mFailedBLEMessageAttempts);
+                    Console.Out.WriteLine("Iddle time: {0}", mIddleTime);
+
                     return Triggers.ProcessMessage;
                 } else
                 {
-                    mLastAccessTime = DateTime.Now;
-                    mIddleTime = new TimeSpan(0, 0, 0);
+                    mLastAccessTime = _toMilliseconds(DateTime.Now);
+                    mIddleTime = 0L;
                     mFailedBLEMessageAttempts = 0;
                 }
 
-                Console.Out.WriteLine("Failed messages " + mFailedBLEMessageAttempts);
+                
                 BLE_Message mNewRow = new BLE_Message();  // added number holds sequence number
 
                 var mRowNum = ParseMessageHelper.ParseBle(message, mNewRow);
@@ -577,6 +593,9 @@ namespace DialogGenerator.CharacterSelection
                     }
 
                     mWorkflow.Fire(next);
+
+                    Thread.Sleep(100);
+                    
                 }
                 while (!mCancellationTokenSource.IsCancellationRequested);
 

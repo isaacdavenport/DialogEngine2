@@ -62,7 +62,7 @@ namespace DialogGenerator.CharacterSelection
                 Task _BLEDataReaderTask = mCurrentDataProvider.StartReadingData();
                 Thread.CurrentThread.Name = "CharacterBoxesScanningThread";
                 Session.Set(Constants.FORCED_CH_COUNT, 2);
-                mcHeatMapUpdateTimer.Start();
+                //mcHeatMapUpdateTimer.Start();
 
                 do
                 {
@@ -122,6 +122,7 @@ namespace DialogGenerator.CharacterSelection
 
                 if(_restartRequired)
                 {
+                    //mcHeatMapUpdateTimer.Stop();
                     mCurrentDataProvider.StopReadingData();
                     Session.Set(Constants.BLE_MODE_ON, true);
                     Session.Set(Constants.NEEDS_RESTART, true);
@@ -134,7 +135,7 @@ namespace DialogGenerator.CharacterSelection
 
         public void StopCharacterSelection()
         {                        
-            mcHeatMapUpdateTimer.Stop();
+            //mcHeatMapUpdateTimer.Stop();
             mCurrentDataProvider.StopReadingData();
             mCancellationTokenSource.Cancel();
         }
