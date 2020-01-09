@@ -110,6 +110,7 @@ namespace DialogGenerator.CharacterSelection
                     if (message != null)
                     {
                         _restartRequired = true;
+                        mLogger.Info("BLE messages arriving, switch to BLE Mode.");
                         mCancellationTokenSource.Cancel();
                     }
                                         

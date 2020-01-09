@@ -493,8 +493,10 @@ namespace DialogGenerator.DialogEngine
                 Thread.CurrentThread.Name = "DialogGeneratorThread";
                 Console.WriteLine(Thread.CurrentThread.Name + " started!");
                 mLogger.Debug(Thread.CurrentThread.Name + " started!");
+                mLogger.Info("Starting Dialog Engine", ApplicationData.Instance.BLEVectorsLoggerKey);
 
-                _characterSelectionTask= mCharacterSelection.StartCharacterSelection();
+
+                _characterSelectionTask = mCharacterSelection.StartCharacterSelection();
                 mCharactersManager.Initialize();  //TODO Isaac added so that character updates recalculate phraseweights
                 do
                 {
