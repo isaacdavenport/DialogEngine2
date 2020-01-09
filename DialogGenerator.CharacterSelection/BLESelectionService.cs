@@ -594,7 +594,7 @@ namespace DialogGenerator.CharacterSelection
 
                     mWorkflow.Fire(next);
 
-                    Thread.Sleep(100);
+                    Thread.Sleep(3);
                     
                 }
                 while (!mCancellationTokenSource.IsCancellationRequested);
