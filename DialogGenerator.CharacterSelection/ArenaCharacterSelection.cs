@@ -1,11 +1,9 @@
 ﻿using DialogGenerator.CharacterSelection.Data;
 using DialogGenerator.CharacterSelection.Model;
 using DialogGenerator.Core;
-using DialogGenerator.DataAccess;
 using DialogGenerator.Events;
 using DialogGenerator.Events.EventArgs;
 using DialogGenerator.Model;
-using DialogGenerator.Utilities;
 using Prism.Events;
 using System;
 using System.Threading;

@@ -55,7 +55,7 @@ namespace DialogGenerator.CharacterSelection.Helper
 
                 _debugString += ReceivedMessages[ReceivedMessages.Count - 1].Motion.ToString("D3") + " ";
                 _debugString += ReceivedMessages[ReceivedMessages.Count - 1].SequenceNum.ToString("D3");
-                Logger.Info(_debugString, ApplicationData.Instance.DecimalSerialDirectBLELoggerKey);
+                Logger.Info(_debugString, ApplicationData.Instance.BLEVectorsLoggerKey);
 
                 if (ReceivedMessages.Count > 30000)
                 {

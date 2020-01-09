@@ -472,7 +472,7 @@ namespace DialogGenerator.DialogEngine
             if(!ApplicationData.Instance.IgnoreRadioSignals)
             {
                 mCharacterSelection = Session.Get<bool>(Constants.BLE_MODE_ON)
-                ? mCharacterSelectionFactory.Create(SelectionMode.SerialSelectionMode)
+                ? mCharacterSelectionFactory.Create(SelectionMode.BLESelectionMode)
                 : mCharacterSelectionFactory.Create( SelectionMode.ArenaModel);
             } else
             {
@@ -506,7 +506,7 @@ namespace DialogGenerator.DialogEngine
                         if (!ApplicationData.Instance.IgnoreRadioSignals)
                         {
                             mCharacterSelection = Session.Get<bool>(Constants.BLE_MODE_ON)
-                            ? mCharacterSelectionFactory.Create(SelectionMode.SerialSelectionMode)
+                            ? mCharacterSelectionFactory.Create(SelectionMode.BLESelectionMode)
                             : mCharacterSelectionFactory.Create(SelectionMode.ArenaModel);
                         }
                         else

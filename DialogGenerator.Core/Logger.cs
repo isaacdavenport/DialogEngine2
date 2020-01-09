@@ -9,7 +9,7 @@ namespace DialogGenerator.Core
     public class Logger : ILogger
     {
         private readonly ILog mcDefaultLog = LogManager.GetLogger(ApplicationData.Instance.DefaultLoggerKey);
-        private readonly ILog mcDecimalSerialLogDirectBLE = LogManager.GetLogger(ApplicationData.Instance.DecimalSerialDirectBLELoggerKey);
+        private readonly ILog mcBLEVectorsLog = LogManager.GetLogger(ApplicationData.Instance.BLEVectorsLoggerKey);
 
         public Logger()
         {
@@ -28,9 +28,9 @@ namespace DialogGenerator.Core
                 return mcDefaultLog;
                 //return mcLogDialog;  IKE got rid of second log file
             }
-            else if (string.Equals(type, ApplicationData.Instance.DecimalSerialDirectBLELoggerKey, StringComparison.OrdinalIgnoreCase))
+            else if (string.Equals(type, ApplicationData.Instance.BLEVectorsLoggerKey, StringComparison.OrdinalIgnoreCase))
             {
-                return mcDecimalSerialLogDirectBLE;
+                return mcBLEVectorsLog;
             }
 
             return null;
