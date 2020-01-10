@@ -2,8 +2,7 @@
 {
     public enum SelectionMode
     {
-        SerialSelectionMode,
-        RandomSelectionModel,
+        BLESelectionMode,
         ArenaModel
     }
 }

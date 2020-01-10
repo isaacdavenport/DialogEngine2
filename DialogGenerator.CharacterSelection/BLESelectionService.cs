@@ -189,11 +189,13 @@ namespace DialogGenerator.CharacterSelection
                 mTempCh1 = 0;
                 mTempch2 = 0;
                 BLE_Message message = new BLE_Message();
+                DateTime nowTime = DateTime.Now;
 
                 message = mCurrentDataProvider.GetMessage();
 
                 if (message == null)
                 {
+
                     DateTime _nowTime = DateTime.Now;
 
                     if (mFirstFailMessage)
@@ -212,13 +214,14 @@ namespace DialogGenerator.CharacterSelection
                         //mEventAggregator.GetEvent<RestartDialogEngineEvent>().Publish();
                         //Console.Out.WriteLine("Restart of Dialog Engine required!!!");
 
+                        mIddleTime = new TimeSpan(0, 0, 0);
                         mRestartRequested = true;
+                        mLogger.Info("BLE Messages have not arrived in 800ms, switching to avatar arena");
                         mCancellationTokenSource.Cancel();                        
                     }
 
                     //Console.Out.WriteLine("Failed messages " + mFailedBLEMessageAttempts);
                     Console.Out.WriteLine("Iddle time: {0}", mIddleTime);
-
                     return Triggers.ProcessMessage;
                 } else
                 {
@@ -226,9 +229,9 @@ namespace DialogGenerator.CharacterSelection
                     mIddleTime = 0L;
                     mFailedBLEMessageAttempts = 0;
                 }
-
                 
                 BLE_Message mNewRow = new BLE_Message();  // added number holds sequence number
+                mLastAccessTime = nowTime;
 
                 var mRowNum = ParseMessageHelper.ParseBle(message, mNewRow);
 
@@ -425,9 +428,10 @@ namespace DialogGenerator.CharacterSelection
                          (NextCharacter2 != CurrentCharacter1 || NextCharacter1 != CurrentCharacter2))
                     {
                         _nextCharactersAssigned = true;
+                        mLogger.Info("New characters assigned by BLE Character 1 is " + NextCharacter1 +
+                            " Character 2 is " + NextCharacter2);
                     }
                 }
-
                 return _nextCharactersAssigned;
             }
             catch (Exception ex)

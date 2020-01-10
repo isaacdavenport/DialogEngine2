@@ -1,11 +1,9 @@
 ﻿using DialogGenerator.CharacterSelection.Data;
 using DialogGenerator.CharacterSelection.Model;
 using DialogGenerator.Core;
-using DialogGenerator.DataAccess;
 using DialogGenerator.Events;
 using DialogGenerator.Events.EventArgs;
 using DialogGenerator.Model;
-using DialogGenerator.Utilities;
 using Prism.Events;
 using System;
 using System.Threading;
@@ -112,6 +110,7 @@ namespace DialogGenerator.CharacterSelection
                     if (message != null)
                     {
                         _restartRequired = true;
+                        mLogger.Info("BLE messages arriving, switch to BLE Mode.");
                         mCancellationTokenSource.Cancel();
                     }
                                         

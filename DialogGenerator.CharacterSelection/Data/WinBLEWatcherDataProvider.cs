@@ -1,13 +1,9 @@
 ﻿using DialogGenerator.Core;
 using System;
-using System.Threading;
 using Windows.Devices.Bluetooth.Advertisement;
 using Windows.Storage.Streams;
-using System.Collections.Generic;
 using System.Runtime.InteropServices;
-using System.Runtime.Remoting.Messaging;
 using System.Threading.Tasks;
-using System.Windows.Navigation;
 
 namespace DialogGenerator.CharacterSelection.Data
 {
@@ -116,12 +112,14 @@ namespace DialogGenerator.CharacterSelection.Data
 
         public async Task StartReadingData()
         {
+            mLogger.Info("StartReadingData BLE");
             mWatcher.Start();
             await BetterScanner.StartScanner(0, 29, 29);
         }
 
         public void StopReadingData()
         {
+            mLogger.Info("StopReadingData BLE");
             mWatcher.Stop();
             BetterScanner.Cancel();
         }

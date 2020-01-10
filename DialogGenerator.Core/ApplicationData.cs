@@ -94,8 +94,8 @@ namespace DialogGenerator.Core
         public bool MonitorMessageParseFails { get; set; } = false;
         public string JSONEditorExeFileName { get; set; } = "JSONedit.exe"; 
         public string WebsiteUrl { get; set; } = "www.toys2life.org";
-        public string TutorialFileName { get; set; } = "tutorial.pdf";
-        public string DecimalSerialDirectBLELoggerKey { get; set; } = "DecimalSerialLogDirectBLE";
+        public string TutorialFileName { get; set; } = "tutorial.pdf"; 
+        public string BLEVectorsLoggerKey { get; set; } = "BLEVectorsLog";
         public string DialogLoggerKey { get; set; } = "LogDialog";
         public string DefaultLoggerKey { get; set; } = "DefaultLog";
         public string DefaultImage { get; set; } = "avatar.png";
