@@ -161,6 +161,7 @@
     <Compile Include="Data\WizardDataProvider.cs" />
     <Compile Include="Helpers\FileHelper.cs" />
     <Compile Include="UIModule.cs" />
+    <Compile Include="ViewModels\ArenaViewModel.cs" />
     <Compile Include="ViewModels\AssignCharactersToToysBindingProxy.cs" />
     <Compile Include="ViewModels\AssignCharactersToToysViewModel.cs" />
     <Compile Include="ViewModels\CharacterDetailViewModel.cs" />
