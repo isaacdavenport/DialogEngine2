@@ -214,7 +214,7 @@ namespace DialogGenerator.CharacterSelection
                         //mEventAggregator.GetEvent<RestartDialogEngineEvent>().Publish();
                         //Console.Out.WriteLine("Restart of Dialog Engine required!!!");
 
-                        mIddleTime = new TimeSpan(0, 0, 0);
+                        mIddleTime = 0l;
                         mRestartRequested = true;
                         mLogger.Info("BLE Messages have not arrived in 800ms, switching to avatar arena");
                         mCancellationTokenSource.Cancel();                        
@@ -231,7 +231,7 @@ namespace DialogGenerator.CharacterSelection
                 }
                 
                 BLE_Message mNewRow = new BLE_Message();  // added number holds sequence number
-                mLastAccessTime = nowTime;
+                mLastAccessTime = _toMilliseconds(DateTime.Now);
 
                 var mRowNum = ParseMessageHelper.ParseBle(message, mNewRow);
 
