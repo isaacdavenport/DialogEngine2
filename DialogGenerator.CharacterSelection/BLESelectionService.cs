@@ -165,9 +165,6 @@ namespace DialogGenerator.CharacterSelection
         private  Triggers _initialize()
         {
             mCurrentDataProvider = mBLEDataProviderFactory.Create(BLEDataProviderType.WinBLEWatcher);
-            //mIddleTime = new TimeSpan(0, 0, 0);
-            //mLastAccessTime = DateTime.Now;
-
             return Triggers.ProcessMessage;
         }
 

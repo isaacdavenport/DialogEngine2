@@ -1,4 +1,7 @@
-﻿using DialogGenerator.Core;
+﻿using DialogGenerator.CharacterSelection;
+using DialogGenerator.CharacterSelection.Data;
+using DialogGenerator.CharacterSelection.Model;
+using DialogGenerator.Core;
 using DialogGenerator.DataAccess.Helper;
 using DialogGenerator.Events;
 using DialogGenerator.Events.EventArgs;
@@ -49,6 +52,10 @@ namespace DialogGenerator.UI.ViewModels
         private string mNextButtonText = "Next";
         private bool mIsFinished = false;
 
+        private IBLEDataProviderFactory mBLEDataProviderFactory;
+        private IBLEDataProvider mCurrentDataProvider;
+        private CancellationTokenSource mCancellationTokenSource;
+
         internal void SetCurrentStep(int index)
         {
             Workflow.Fire((Triggers)index);
@@ -61,13 +68,15 @@ namespace DialogGenerator.UI.ViewModels
             IEventAggregator _eventAggregator,
             ICharacterDataProvider _characterDataProvider,
             IRegionManager _regionManager,
-            IMessageDialogService _messageDialogService)
+            IMessageDialogService _messageDialogService,
+            IBLEDataProviderFactory _BLEDataProviderFactory)
         {
             mLogger = _logger;
             mEventAgregator = _eventAggregator;
             mCharacterDataProvider = _characterDataProvider;
             mRegionManager = _regionManager;
             mMessageDialogService = _messageDialogService;
+            mBLEDataProviderFactory = _BLEDataProviderFactory;
 
             mWizard = new CreateCharacterWizard();
             mCurrentStep = mWizard.Steps[mCurrentStepIndex];
@@ -123,13 +132,14 @@ namespace DialogGenerator.UI.ViewModels
 
             set
             {
+                int _oldVal = mSelectedRadio.Key;
                 mSelectedRadio = value;
-                _selectToyToCharacter();
+                _selectToyToCharacter(_oldVal);
                 RaisePropertyChanged();
             }
         }
 
-        private async void _selectToyToCharacter()
+        private async void _selectToyToCharacter(int oldVal = -1)
         {
             if (mSelectedRadio.Key == -1)
                 return;
@@ -148,6 +158,10 @@ namespace DialogGenerator.UI.ViewModels
                         // settuj na Unassigned ako je Yes
                         _oldChar.RadioNum = -1;
                         await mCharacterDataProvider.SaveAsync(_oldChar);
+                    } else
+                    {
+                        mSelectedRadio = mRadiosCollection.First(p => p.Key == oldVal);
+                        RaisePropertyChanged("SelectedRadio");
                     }
                 }
             }
@@ -614,6 +628,7 @@ namespace DialogGenerator.UI.ViewModels
                     if(Session.Get<bool>(Constants.BLE_MODE_ON))
                     {
                         Character.RadioNum = SelectedRadio.Key;
+                        _stopScanForRadios();
                     }
 
                     break;
@@ -624,7 +639,7 @@ namespace DialogGenerator.UI.ViewModels
                 default:
                     break;
             }
-        }
+        }        
 
         private async void _stepEntered(string stepName)
         {
@@ -667,6 +682,8 @@ namespace DialogGenerator.UI.ViewModels
                         string _radioText = Character.RadioNum == -1 ? "Unasigned" : Character.RadioNum.ToString();
                         var _selectedRadio = RadiosCollection.First(r => r.Key == Character.RadioNum);
                         SelectedRadio = _selectedRadio;
+
+                        _startScanForRadios();
                     }
                     
                     break;
@@ -746,6 +763,64 @@ namespace DialogGenerator.UI.ViewModels
             }
         }
 
+        private async void _startScanForRadios()
+        {
+            mCancellationTokenSource = new CancellationTokenSource();
+            mCurrentDataProvider = mBLEDataProviderFactory.Create(BLEDataProviderType.WinBLEWatcher);
+            await Task.Run(async () =>
+            {
+                Thread.CurrentThread.Name = "StartCharacterMovingDetection";                
+                Task _BLEDataReaderTask = mCurrentDataProvider.StartReadingData();
+                int _oldIndex = -1;
+                do
+                {
+                    // Read messages
+                    BLE_Message message = mCurrentDataProvider.GetMessage();
+                    if(message != null)
+                    {
+                        int _radioIndex = -1;
+                        string outData = String.Empty;
+                        for (int i = 0; i < ApplicationData.Instance.NumberOfRadios; i++)
+                        {
+                            if (message.msgArray[i] == 0xFF)
+                            {
+                                _radioIndex = i;
+                            }
+                            
+                        }
+
+                        // If motion vector is greater than zero, show message
+                        int _motion = message.msgArray[ApplicationData.Instance.NumberOfRadios];
+                        if(_motion > 10 && _radioIndex > -1)
+                        {
+                            if(_radioIndex != _oldIndex)
+                            {
+                                ToyEntry _tEntry = mRadiosCollection.FirstOrDefault(p => p.Key == _radioIndex);
+                                if(_tEntry != null)
+                                {
+                                    SelectedRadio = _tEntry;
+                                }
+
+                                _oldIndex = _radioIndex;
+                            }
+                        }
+                        
+                    }
+
+                    Thread.Sleep(1);
+                } while (!mCancellationTokenSource.IsCancellationRequested);
+
+                await _BLEDataReaderTask;
+
+            });
+        }
+
+        private void _stopScanForRadios()
+        {
+            mCurrentDataProvider.StopReadingData();
+            mCancellationTokenSource.Cancel();
+        }
+        
         private bool _checkCharacterCreateMode()
         {
             if(Session.Contains(Constants.CHARACTER_EDIT_MODE) && (bool) Session.Get(Constants.CHARACTER_EDIT_MODE) == true)

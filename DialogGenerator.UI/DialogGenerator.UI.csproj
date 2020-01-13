@@ -382,6 +382,10 @@
     </None>
   </ItemGroup>
   <ItemGroup>
+    <ProjectReference Include="..\DialogGenerator.CharacterSelection\DialogGenerator.CharacterSelection.csproj">
+      <Project>{2302A9F6-72B8-4AAE-BB7E-02AFDE420D57}</Project>
+      <Name>DialogGenerator.CharacterSelection</Name>
+    </ProjectReference>
     <ProjectReference Include="..\DialogGenerator.Core\DialogGenerator.Core.csproj">
       <Project>{de5ab434-bc15-4a64-b275-3e7379d6fcfd}</Project>
       <Name>DialogGenerator.Core</Name>
