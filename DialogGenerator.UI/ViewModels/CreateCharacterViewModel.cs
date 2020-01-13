@@ -7,6 +7,7 @@ using DialogGenerator.UI.Data;
 using DialogGenerator.UI.Views;
 using DialogGenerator.UI.Workflow.CreateCharacterWorkflow;
 using DialogGenerator.Utilities;
+using Newtonsoft.Json;
 using Prism.Commands;
 using Prism.Events;
 using Prism.Mvvm;
@@ -762,8 +763,7 @@ namespace DialogGenerator.UI.ViewModels
             {
                 WizardCollection _wizardCollection = new WizardCollection
                 {
-                    Version = "1.1",
-                    Wizards = new List<string>()
+                    Version = "1.1",                    
                 };
 
                 _wizardCollection.Version = "1.1";
@@ -781,22 +781,30 @@ namespace DialogGenerator.UI.ViewModels
                 mDialogWizards.Add("Advanced2Wizard");
                 _wizardCollection.Wizards.Add("Advanced2Wizard");
 
-                Serializer.Serialize(_wizardCollection, ApplicationData.Instance.DataDirectory + "\\WizardCollection.json");
+                Serializer.Serialize(_wizardCollection, ApplicationData.Instance.DataDirectory + "\\WizardCollection.cfg");
             }             
         }
 
         private class WizardCollection
         {
             string mVersionNumber;
-            List<string> mWizards = new List<string>();
-
+            ObservableCollection<string> mWizards = new ObservableCollection<string>();
+            
+            [JsonProperty("Version")]
             public string Version { get; set; }
-            public List<string> Wizards { get; set; }
+            [JsonProperty("Wizards")]
+            public ObservableCollection<string> Wizards
+            {
+                get
+                {
+                    return mWizards;
+                }
+            }
         }
 
         private bool _loadWizardCollection()
         {
-            string _filePath = ApplicationData.Instance.DataDirectory + "\\WizardCollection.json";
+            string _filePath = ApplicationData.Instance.DataDirectory + "\\WizardCollection.cfg";
             try
             {
                 using (var reader = new StreamReader(_filePath)) //creates new streamerader for fs stream. Could also construct with filename...
@@ -814,6 +822,7 @@ namespace DialogGenerator.UI.ViewModels
 
                         return true;
                     }
+                                        
                 }
             } catch (IOException ioe)
             {
