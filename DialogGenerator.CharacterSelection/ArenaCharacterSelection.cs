@@ -100,7 +100,6 @@ namespace DialogGenerator.CharacterSelection
                             
                         }
                     }
-
                     
                     DateTime _nowTime = DateTime.Now;
                     DateTime _lastAccessTime = _nowTime;
@@ -116,16 +115,13 @@ namespace DialogGenerator.CharacterSelection
                                         
                     Thread.Sleep(1000);
                 } while (!mCancellationTokenSource.Token.IsCancellationRequested);
-
-                
-
+               
                 if(_restartRequired)
                 {
                     //mcHeatMapUpdateTimer.Stop();
                     mCurrentDataProvider.StopReadingData();
                     Session.Set(Constants.BLE_MODE_ON, true);
-                    Session.Set(Constants.NEEDS_RESTART, true);
-                    
+                    Session.Set(Constants.NEEDS_RESTART, true);                    
                 }
 
                 await _BLEDataReaderTask;

@@ -7,7 +7,6 @@ using DialogGenerator.Events;
 using DialogGenerator.Events.EventArgs;
 using DialogGenerator.Model;
 using DialogGenerator.UI.Data;
-using DialogGenerator.UI.Views;
 using DialogGenerator.UI.Workflow.CreateCharacterWorkflow;
 using DialogGenerator.Utilities;
 using Newtonsoft.Json;
@@ -21,7 +20,6 @@ using System.Collections.ObjectModel;
 using System.ComponentModel;
 using System.IO;
 using System.Linq;
-using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
 using System.Windows.Input;
@@ -55,6 +53,7 @@ namespace DialogGenerator.UI.ViewModels
         private IBLEDataProviderFactory mBLEDataProviderFactory;
         private IBLEDataProvider mCurrentDataProvider;
         private CancellationTokenSource mCancellationTokenSource;
+        private string mSelectRadioTitle = Properties.Resources.ShakeRadio;
 
         internal void SetCurrentStep(int index)
         {
@@ -135,6 +134,28 @@ namespace DialogGenerator.UI.ViewModels
                 int _oldVal = mSelectedRadio.Key;
                 mSelectedRadio = value;
                 _selectToyToCharacter(_oldVal);
+                if(mSelectedRadio.Key == -1)
+                {
+                    SelectRadioTitle = Properties.Resources.ShakeRadio;
+                } else
+                {
+                    SelectRadioTitle = Properties.Resources.RadioAttached;
+                }
+
+                RaisePropertyChanged();
+            }
+        }
+
+        public string SelectRadioTitle
+        {
+            get
+            {
+                return mSelectRadioTitle;
+            }
+
+            set
+            {
+                mSelectRadioTitle = value;
                 RaisePropertyChanged();
             }
         }
@@ -162,6 +183,7 @@ namespace DialogGenerator.UI.ViewModels
                     {
                         mSelectedRadio = mRadiosCollection.First(p => p.Key == oldVal);
                         RaisePropertyChanged("SelectedRadio");
+                        SelectRadioTitle = Properties.Resources.ShakeRadio;
                     }
                 }
             }
@@ -845,12 +867,18 @@ namespace DialogGenerator.UI.ViewModels
 
                 mDialogWizards.Add("BasicWizard");
                 _wizardCollection.Wizards.Add("BasicWizard");
+                mDialogWizards.Add("ResponsesToOtherStories");
+                _wizardCollection.Wizards.Add("ResponsesToOtherStories");
+                mDialogWizards.Add("SimpleStoryWizardA");
+                _wizardCollection.Wizards.Add("SimpleStoryWizardA");
                 mDialogWizards.Add("IntermediateWizard");
                 _wizardCollection.Wizards.Add("IntermediateWizard");
                 mDialogWizards.Add("ScaryStoryWizard");
                 _wizardCollection.Wizards.Add("ScaryStoryWizard");
                 mDialogWizards.Add("ActionStoryWizard");
-                _wizardCollection.Wizards.Add("ActionStoryWizard");               
+                _wizardCollection.Wizards.Add("ActionStoryWizard");
+                mDialogWizards.Add("SimpleStoryWizardB");
+                _wizardCollection.Wizards.Add("SimpleStoryWizardB");                                          
                 mDialogWizards.Add("Advanced1Wizard");
                 _wizardCollection.Wizards.Add("Advanced1Wizard");
                 mDialogWizards.Add("Advanced2Wizard");

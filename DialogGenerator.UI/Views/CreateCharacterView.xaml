@@ -128,14 +128,20 @@
                     </ControlTemplate>
                     <ControlTemplate x:Key="AssignToyToCharacterControl">
                         <Grid Background="White">
+                            <Grid.RowDefinitions>
+                                <RowDefinition Height="Auto" />
+                                <RowDefinition Height="*" />
+                            </Grid.RowDefinitions>
                             <Grid.ColumnDefinitions>
                                 <ColumnDefinition Width="2*"/>
                                 <ColumnDefinition Width="Auto"/>
                                 <ColumnDefinition Width="*"/>
                                 <ColumnDefinition Width="2*"/>
                             </Grid.ColumnDefinitions>
-                            <Label Grid.Column="1" Height="30" Margin="0, 8, 20, 0" HorizontalAlignment="Right">Assigned Radio:</Label>
+                            <TextBlock Grid.ColumnSpan="4" Grid.Row="0" Text="{Binding SelectRadioTitle}" VerticalAlignment="Center" HorizontalAlignment="Center" FontSize="20"/>
+                            <Label Grid.Row="1" Grid.Column="1" Height="30" Margin="0, 8, 20, 0" HorizontalAlignment="Right">Assigned Radio:</Label>
                             <ComboBox 
+                                Grid.Row="1"
                                 Grid.Column="2" 
                                 x:Name="SelectedRadio" 
                                 ItemsSource="{Binding RadiosCollection}" 
