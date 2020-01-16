@@ -448,15 +448,28 @@ namespace DialogGenerator.CharacterSelection
                 int i = 0, j = 0, k = 0;
 
                 var _currentTime = DateTime.Now;
-                mTempCh1 = NextCharacter1;
-                mTempch2 = NextCharacter2;
 
-                if (mTempCh1 > ApplicationData.Instance.NumberOfRadios - 1 || mTempch2 > ApplicationData.Instance.NumberOfRadios - 1 ||
-                    mTempCh1 < 0 || mTempch2 < 0 || mTempCh1 == mTempch2)
+                Character _ch1 = mCharacterRepository.GetAll()[NextCharacter1];
+                Character _ch2 = mCharacterRepository.GetAll()[NextCharacter2];
+                if(_ch1 != null && _ch1.RadioNum != -1 && _ch2 != null && _ch2.RadioNum != -1)
+                {
+                    mTempCh1 = _ch1.RadioNum;
+                    mTempch2 = _ch2.RadioNum;
+                } else
                 {
                     mTempCh1 = 0;
                     mTempch2 = 1;
                 }
+
+                //mTempCh1 = NextCharacter1;
+                //mTempch2 = NextCharacter2;
+
+                //if (mTempCh1 > ApplicationData.Instance.NumberOfRadios - 1 || mTempch2 > ApplicationData.Instance.NumberOfRadios - 1 ||
+                //    mTempCh1 < 0 || mTempch2 < 0 || mTempCh1 == mTempch2)
+                //{
+                //    mTempCh1 = 0;
+                //    mTempch2 = 1;
+                //}
 
                 //only pick up new characters if bigRssi greater not =
                 BigRssi = HeatMap[mTempCh1, mTempch2] + HeatMap[mTempch2, mTempCh1];
