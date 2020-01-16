@@ -40,10 +40,5 @@ namespace DialogGenerator.UI.Views
             model?.nextStep();
         }
 
-        private void viewLoaded(object sender, RoutedEventArgs e)
-        {
-
-        }
-
     }
 }

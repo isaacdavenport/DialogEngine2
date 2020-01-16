@@ -10,11 +10,11 @@
             xmlns:inf="clr-namespace:DialogGenerator.Core;assembly=DialogGenerator.Core"
             xmlns:view="clr-namespace:DialogGenerator.UI.Views"
             xmlns:converters="clr-namespace:DialogGenerator.UI.Converters"
-             xmlns:local="clr-namespace:DialogGenerator.UI.Views"
+             xmlns:i="clr-namespace:System.Windows.Interactivity;assembly=System.Windows.Interactivity"    
              mc:Ignorable="d" 
-             d:DesignHeight="450" d:DesignWidth="800" Loaded="viewLoaded">
+             d:DesignHeight="450" d:DesignWidth="800">
+    
     <ContentControl.Resources>
-        
         <ResourceDictionary>
             <ResourceDictionary.MergedDictionaries>
                 <ResourceDictionary>
@@ -217,6 +217,16 @@
         </ResourceDictionary>
 
     </ContentControl.Resources>
+
+    <i:Interaction.Triggers>
+        <i:EventTrigger EventName="Loaded">
+            <i:InvokeCommandAction Command="{Binding ViewLoadedCommand}" />
+        </i:EventTrigger>
+        <i:EventTrigger EventName="Unloaded">
+            <i:InvokeCommandAction Command="{Binding ViewUnloadedCommand}" />
+        </i:EventTrigger>
+    </i:Interaction.Triggers>
+    
     <Grid Background="White">
         <Grid.RowDefinitions>
             <RowDefinition Height="*"/>

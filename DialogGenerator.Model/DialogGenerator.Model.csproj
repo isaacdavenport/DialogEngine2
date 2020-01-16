@@ -59,7 +59,6 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="ArenaAvatar.cs" />
     <Compile Include="Attributes\RadioNumRangeAttribute.cs" />
     <Compile Include="Attributes\ValidCharacterPrefixAttribute.cs" />
     <Compile Include="Character.cs" />

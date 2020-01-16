@@ -164,6 +164,7 @@
     <Compile Include="Data\WizardDataProvider.cs" />
     <Compile Include="Helpers\FileHelper.cs" />
     <Compile Include="UIModule.cs" />
+    <Compile Include="ViewModels\ArenaAvatarViewModel.cs" />
     <Compile Include="ViewModels\ArenaViewModel.cs" />
     <Compile Include="ViewModels\AssignCharactersToToysBindingProxy.cs" />
     <Compile Include="ViewModels\AssignCharactersToToysViewModel.cs" />
@@ -184,6 +185,9 @@
     <Compile Include="ViewModels\WizardViewModel.cs" />
     <Compile Include="Views\AssignCharactersToToysView.xaml.cs">
       <DependentUpon>AssignCharactersToToysView.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="Views\ArenaView.xaml.cs">
+      <DependentUpon>ArenaView.xaml</DependentUpon>
     </Compile>
     <Compile Include="Views\CharacterDataTemplateSelector.cs" />
     <Compile Include="Views\CharacterDetailView.xaml.cs">
@@ -280,6 +284,10 @@
       <Generator>MSBuild:Compile</Generator>
     </Page>
     <Page Include="Views\AssignCharactersToToysView.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="Views\ArenaView.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>

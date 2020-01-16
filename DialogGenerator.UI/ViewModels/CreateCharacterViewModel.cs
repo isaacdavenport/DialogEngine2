@@ -44,6 +44,7 @@ namespace DialogGenerator.UI.ViewModels
         private ILogger mLogger;
         private IEventAggregator mEventAgregator;
         private ICharacterDataProvider mCharacterDataProvider;
+        private IWizardDataProvider mWizardDataProvider;
         private IRegionManager mRegionManager;
         private IMessageDialogService mMessageDialogService;
         private string mCurrentDialogWizard = String.Empty;
@@ -68,7 +69,8 @@ namespace DialogGenerator.UI.ViewModels
             ICharacterDataProvider _characterDataProvider,
             IRegionManager _regionManager,
             IMessageDialogService _messageDialogService,
-            IBLEDataProviderFactory _BLEDataProviderFactory)
+            IBLEDataProviderFactory _BLEDataProviderFactory,
+            IWizardDataProvider _WizardDataProvider)
         {
             mLogger = _logger;
             mEventAgregator = _eventAggregator;
@@ -76,6 +78,7 @@ namespace DialogGenerator.UI.ViewModels
             mRegionManager = _regionManager;
             mMessageDialogService = _messageDialogService;
             mBLEDataProviderFactory = _BLEDataProviderFactory;
+            mWizardDataProvider = _WizardDataProvider;
 
             mWizard = new CreateCharacterWizard();
             mCurrentStep = mWizard.Steps[mCurrentStepIndex];
@@ -428,6 +431,8 @@ namespace DialogGenerator.UI.ViewModels
         public ICommand CancelCommand {get;set;}
         public ICommand ResetCommand { get; set; }
         public ICommand PlayCommand { get; set; }
+        public ICommand ViewLoadedCommand { get; set; }
+        public ICommand ViewUnloadedCommand { get; set; }
 
         public void nextStep()
         {
@@ -510,6 +515,17 @@ namespace DialogGenerator.UI.ViewModels
             CancelCommand = new DelegateCommand(_onCancelCommand_execute);
             ResetCommand = new DelegateCommand(_onResetCommand_execute);
             PlayCommand = new DelegateCommand(_onPlayCommand_execute);
+            ViewLoadedCommand = new DelegateCommand(_viewLoaded_execute);
+            ViewUnloadedCommand = new DelegateCommand(_viewUnloaded_execute);
+        }
+
+        private async void _viewLoaded_execute()
+        {
+            await _checkWizardConfiguration();
+        }
+        private void _viewUnloaded_execute()
+        {
+            
         }
         
         private void _configureWorkflow()
@@ -885,7 +901,30 @@ namespace DialogGenerator.UI.ViewModels
                 _wizardCollection.Wizards.Add("Advanced2Wizard");
 
                 Serializer.Serialize(_wizardCollection, ApplicationData.Instance.DataDirectory + "\\WizardCollection.cfg");
-            }             
+            }            
+            
+        }
+
+        private async Task _checkWizardConfiguration()
+        {
+            List<string> _wrongEntries = new List<string>();
+            foreach (string _wName in mDialogWizards)
+            {
+                Wizard _w = mWizardDataProvider.GetByName(_wName);
+                if (_w == null)
+                {
+                    await mMessageDialogService.ShowMessage("WARNING", String.Format("The wizard {0} doesn't exist in the collection of loaded wizards! It will be removed from configuration.", _wName));
+                    _wrongEntries.Add(_wName);
+                }
+            }
+
+            if (_wrongEntries.Count > 0)
+            {
+                foreach (string _entry in _wrongEntries)
+                {
+                    mDialogWizards.Remove(_entry);
+                }
+            }
         }
 
         private class WizardCollection

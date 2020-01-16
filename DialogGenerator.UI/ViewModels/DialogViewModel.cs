@@ -42,6 +42,7 @@ namespace DialogGenerator.UI.ViewModels
         private string mFirstCharacterDialogLine;
         private string mSecondCharacterDialogLine;
         private bool mRadioModeOn = false;
+        private ArenaViewModel mArenaViewModel;
 
 
         #endregion
@@ -52,7 +53,8 @@ namespace DialogGenerator.UI.ViewModels
             ,IDialogEngine _dialogEngine
             ,IMessageDialogService _messageDialogService
             ,ICharacterRepository _characterRepository
-            ,IRegionManager _regionManager)
+            ,IRegionManager _regionManager
+            ,ArenaViewModel _ArenaViewModel)
         {
             mLogger = logger;
             mEventAggregator = _eventAggregator;
@@ -60,6 +62,7 @@ namespace DialogGenerator.UI.ViewModels
             mDialogEngine = _dialogEngine;
             mCharacterRepository = _characterRepository;
             mRegionManager = _regionManager;
+            mArenaViewModel = _ArenaViewModel;
 
             mEventAggregator.GetEvent<NewDialogLineEvent>().Subscribe(_onNewDialogLine);
             mEventAggregator.GetEvent<ActiveCharactersEvent>().Subscribe(_onNewActiveCharacters);
@@ -236,6 +239,14 @@ namespace DialogGenerator.UI.ViewModels
             {
                 mRadioModeOn = value;
                 RaisePropertyChanged();
+            }
+        }
+
+        public ArenaViewModel ArenaViewModel
+        {
+            get
+            {
+                return mArenaViewModel;
             }
         }
 

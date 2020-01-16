@@ -55,6 +55,8 @@
             <RowDefinition Height="Auto" />
         </Grid.RowDefinitions>
 
+        <!--<view:ArenaView x:Name="ArenaView" Grid.Row="0" Visibility="{Binding RadioModeOn, Converter={StaticResource BoolToVisibilityConverter}}" />-->
+
         <Grid Grid.Row="0" Visibility="{Binding RadioModeOn, Converter={StaticResource BoolToVisibilityConverter}}" Height="300">
             <Grid.ColumnDefinitions>
                 <ColumnDefinition Width="*" />

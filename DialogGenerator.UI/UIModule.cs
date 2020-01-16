@@ -49,11 +49,9 @@ namespace DialogGenerator.UI
             mRegionManager.RegisterViewWithRegion(Constants.ContentRegion, typeof(HomeView));
             mRegionManager.RegisterViewWithRegion(Constants.ContentRegion, typeof(CreateView));
             mRegionManager.RegisterViewWithRegion(Constants.ContentRegion, typeof(WizardView));            
-
-            //mRegionManager.RegisterViewWithRegion(Constants.NavigationRegion, typeof(CharactersNavigationView));
-
-            mContainer.RegisterType<object, CreateCharacterView>(typeof(CreateCharacterView).FullName);
+                                   
             mContainer.RegisterType<CreateCharacterViewModel>(new ContainerControlledLifetimeManager());
+            mContainer.RegisterType<ArenaViewModel>(new ContainerControlledLifetimeManager());
             mRegionManager.RegisterViewWithRegion(Constants.ContentRegion, typeof(CreateCharacterView));
 
         }
