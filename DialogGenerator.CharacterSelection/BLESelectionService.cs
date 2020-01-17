@@ -284,6 +284,13 @@ namespace DialogGenerator.CharacterSelection
                     {  // in the needsToBeStableWindow
                         if (ParseMessageHelper.ReceivedMessages[i].Motion > 40)  // we had motion between 300-1500ms ago
                         {
+                            ReceivedMessage msg = ParseMessageHelper.ReceivedMessages[i];
+                            string dbgOut = msg.CharacterPrefix + " ";
+                            dbgOut += msg.Motion.ToString("D3");
+                            dbgOut += " - ";
+                            dbgOut += msg.ReceivedTime.ToString("HH:mm:ss");
+                            mLogger.Info(dbgOut);
+
                             return true;
                         }
                     }
@@ -369,6 +376,25 @@ namespace DialogGenerator.CharacterSelection
                     }
                 }
 
+                if(!_rssiStable)
+                {
+                    string dbgOut1 = "Char1 Buff ";
+                    for(int i = 0; i < StrongRssiBufDepth; i++)
+                    {
+                        dbgOut1 += mStrongRssiCharacterPairBuf[0, i].ToString("D3");
+                        dbgOut1 += " ";
+                    }
+                    string dbgOut2 = "Char2 Buff ";
+                    for (int i = 0; i < StrongRssiBufDepth; i++)
+                    {
+                        dbgOut2 += mStrongRssiCharacterPairBuf[1, i].ToString("D3");
+                        dbgOut2 += " ";
+                    }
+
+                    mLogger.Info(dbgOut1);
+                    mLogger.Info(dbgOut2);
+                }
+
                 return _rssiStable;
             }
             catch (Exception ex)
@@ -402,6 +428,8 @@ namespace DialogGenerator.CharacterSelection
         {
             try
             {
+                mLogger.Info(String.Format("Trying to assign characters ch1_radio = {0}, ch2_radio = {1}", _tempCh1, _tempCh2));
+
                 int _nextCharacter1MappedIndex1, _nextCharacter1MappedIndex2;
                 bool _nextCharactersAssigned = false;
 
@@ -427,7 +455,17 @@ namespace DialogGenerator.CharacterSelection
                         _nextCharactersAssigned = true;
                         mLogger.Info("New characters assigned by BLE Character 1 is " + NextCharacter1 +
                             " Character 2 is " + NextCharacter2);
+                    } else
+                    {
+                        mLogger.Info(String.Format("Characters not assigned! Current1 = {0}, Next1 = {1}, Current2 = {2}, Next2 = {3}"
+                            , CurrentCharacter1
+                            , NextCharacter1
+                            , CurrentCharacter2
+                            , NextCharacter2));
                     }
+                } else
+                {
+                    mLogger.Info(String.Format("Characters not assigned. ch1 = {0}, ch2 = {1}", _nextCharacter1MappedIndex1, _nextCharacter1MappedIndex2));
                 }
                 return _nextCharactersAssigned;
             }
@@ -509,6 +547,7 @@ namespace DialogGenerator.CharacterSelection
 
                 if (_rssiStable && _inMovementWindow)
                 {
+                    mLogger.Info("Select Next Characters Called");
                     return Triggers.SelectNextCharacters;
                 }
                 else
@@ -529,6 +568,8 @@ namespace DialogGenerator.CharacterSelection
             {
                 if (_assignNextCharacters(mTempCh1, mTempch2))
                 {
+                    mLogger.Info("Characters assigned");
+
                     Session.Set(Constants.NEXT_CH_1, NextCharacter1);
                     Session.Set(Constants.NEXT_CH_2, NextCharacter2);
 
