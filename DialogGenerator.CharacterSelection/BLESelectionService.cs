@@ -20,7 +20,7 @@ namespace DialogGenerator.CharacterSelection
     {
         #region - fields -
 
-        public const int StrongRssiBufDepth = 26;  // TODO we should use a timer as well as relying on a number of incoming packets to switch characters
+        public const int StrongRssiBufDepth = /* 26 */ 5;  // TODO we should use a timer as well as relying on a number of incoming packets to switch characters
 
         private ILogger mLogger;
         private IEventAggregator mEventAggregator;
@@ -40,6 +40,7 @@ namespace DialogGenerator.CharacterSelection
         private long mLastAccessTime = 0;
         private bool mRestartRequested = false;
         private bool mFirstFailMessage = true;
+        private bool mFreshStart = true;
 
         private int BigRssi = 0;
         private int CurrentCharacter1;
@@ -50,6 +51,8 @@ namespace DialogGenerator.CharacterSelection
         public static int[] MotionVector = new int[ApplicationData.Instance.NumberOfRadios];
         public static DateTime[] CharactersLastHeatMapUpdateTime = new DateTime[ApplicationData.Instance.NumberOfRadios];
         public readonly TimeSpan MaxLastSeenInterval = new TimeSpan(0, 0, 0, 4, 100);
+
+        
 
         #endregion
 
@@ -545,8 +548,13 @@ namespace DialogGenerator.CharacterSelection
                 _rssiStable = _calculateRssiStableAfterChange(mTempCh1, mTempch2);
                 var _inMovementWindow = _calculateIfInMotionWindow();
 
-                if (_rssiStable && _inMovementWindow)
+                if (_rssiStable && (_inMovementWindow || mFreshStart))
                 {
+                    if(mFreshStart)
+                    {
+                        mFreshStart = false;
+                    }
+
                     mLogger.Info("Select Next Characters Called");
                     return Triggers.SelectNextCharacters;
                 }
