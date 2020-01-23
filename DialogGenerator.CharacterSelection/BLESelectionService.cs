@@ -32,7 +32,7 @@ namespace DialogGenerator.CharacterSelection
         private int[,] mStrongRssiCharacterPairBuf = new int[2, StrongRssiBufDepth];
         private CancellationTokenSource mCancellationTokenSource;
         private BLESelectionWorkflow mWorkflow;
-        private readonly DispatcherTimer mcHeatMapUpdateTimer = new DispatcherTimer();
+        private Timer mcHeatMapUpdateTimer;
         private Random mRandom = new Random();
         private States mCurrentState;
         private int mFailedBLEMessageAttempts = 0;
@@ -51,9 +51,7 @@ namespace DialogGenerator.CharacterSelection
         public static int[] MotionVector = new int[ApplicationData.Instance.NumberOfRadios];
         public static DateTime[] CharactersLastHeatMapUpdateTime = new DateTime[ApplicationData.Instance.NumberOfRadios];
         public readonly TimeSpan MaxLastSeenInterval = new TimeSpan(0, 0, 0, 4, 100);
-
         
-
         #endregion
 
         #region - constructor -
@@ -68,11 +66,10 @@ namespace DialogGenerator.CharacterSelection
 
             mWorkflow = new BLESelectionWorkflow(() => { });
             mWorkflow.PropertyChanged += _mWorkflow_PropertyChanged;
-            mcHeatMapUpdateTimer.Interval = TimeSpan.FromMilliseconds(300);
-            mcHeatMapUpdateTimer.Tick += _heatMapUpdateTimer_Tick;
 
             _configureWorkflow();
         }
+        
         private bool _moreThanOneRadioIsTransmitting()
         {
             //  This method allows us to autoselect whether we should use incoming radio BLE
@@ -132,6 +129,18 @@ namespace DialogGenerator.CharacterSelection
             });
         }
 
+        private void _updateTimer(object state)
+        {
+            mEventAggregator.GetEvent<HeatMapUpdateEvent>().Publish(new HeatMapData
+            {
+                HeatMap = HeatMap,
+                MotionVector = MotionVector,
+                LastHeatMapUpdateTime = CharactersLastHeatMapUpdateTime,
+                Character1Index = NextCharacter1,
+                Character2Index = NextCharacter2
+            });
+        }
+
         #endregion
 
         #region - private functions -
@@ -164,7 +173,6 @@ namespace DialogGenerator.CharacterSelection
                 .Permit(Triggers.Wait, States.Waiting);
         }
 
-
         private  Triggers _initialize()
         {
             mCurrentDataProvider = mBLEDataProviderFactory.Create(BLEDataProviderType.WinBLEWatcher);
@@ -172,8 +180,8 @@ namespace DialogGenerator.CharacterSelection
         }
 
         private void _finishSelection()
-        {
-            mcHeatMapUpdateTimer.Stop();
+        {           
+            mcHeatMapUpdateTimer.Dispose();
             mWorkflow.Fire(Triggers.Wait);
         }
 
@@ -492,15 +500,20 @@ namespace DialogGenerator.CharacterSelection
 
                 Character _ch1 = mCharacterRepository.GetAll()[NextCharacter1];
                 Character _ch2 = mCharacterRepository.GetAll()[NextCharacter2];
-                if(_ch1 != null && _ch1.RadioNum != -1 && _ch2 != null && _ch2.RadioNum != -1)
+
+                if (_ch1 != null && _ch1.RadioNum != -1 && _ch2 != null && _ch2.RadioNum != -1 && _ch1.RadioNum != _ch2.RadioNum)
                 {
                     mTempCh1 = _ch1.RadioNum;
                     mTempch2 = _ch2.RadioNum;
-                } else
+                }
+                else
                 {
                     mTempCh1 = 0;
                     mTempch2 = 1;
                 }
+                
+                // S.Ristic - This is commented because it is not clear what this condition does. mTempCh1 relates to radio index, and 
+                // NextCharacter1 relates to the character index in the character repository. These are the two different data types.
 
                 //mTempCh1 = NextCharacter1;
                 //mTempch2 = NextCharacter2;
@@ -548,7 +561,7 @@ namespace DialogGenerator.CharacterSelection
                 _rssiStable = _calculateRssiStableAfterChange(mTempCh1, mTempch2);
                 var _inMovementWindow = _calculateIfInMotionWindow();
 
-                if (_rssiStable && (_inMovementWindow || mFreshStart))
+                if ( _rssiStable && (_inMovementWindow || mFreshStart))
                 {
                     if(mFreshStart)
                     {
@@ -625,7 +638,7 @@ namespace DialogGenerator.CharacterSelection
                 Thread.CurrentThread.Name = "StartCharacterSelection";
 
                 mWorkflow.Fire(Triggers.Initialize);
-                mcHeatMapUpdateTimer.Start();
+                mcHeatMapUpdateTimer = new Timer(_updateTimer, null, 0, 300);
                 Triggers next = _initialize();
                 Task _BLEDataReaderTask = mCurrentDataProvider.StartReadingData();
 
@@ -665,6 +678,7 @@ namespace DialogGenerator.CharacterSelection
                 
                 if(mRestartRequested)
                 {
+                    mcHeatMapUpdateTimer.Dispose();
                     mCurrentDataProvider.StopReadingData();
                     Session.Set(Constants.BLE_MODE_ON, false);
                     Session.Set(Constants.NEEDS_RESTART, true);
@@ -680,7 +694,7 @@ namespace DialogGenerator.CharacterSelection
 
         public void StopCharacterSelection()
         {
-            mcHeatMapUpdateTimer.Stop();
+            mcHeatMapUpdateTimer.Dispose();
             mCurrentDataProvider.StopReadingData();
             mCancellationTokenSource.Cancel();
         }
