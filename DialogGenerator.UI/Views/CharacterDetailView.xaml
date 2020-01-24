@@ -218,7 +218,7 @@
                                         </StackPanel>
 
                                         <StackPanel Grid.Row="4" Grid.Column="1">
-                                            <Label Content="Assigned toy:" HorizontalAlignment="Left" Margin="-5,15,0,0" />
+                                            <Label Content="Assigned toy (shake a radio to change it):" HorizontalAlignment="Left" Margin="-5,15,0,0" />
                                             <TextBlock Text="{Binding Character.RadioNum, Converter={StaticResource CharacterRadioNumberToTextValueConverter}}" 
                                             HorizontalAlignment="Left" Margin="0" />
                                         </StackPanel>

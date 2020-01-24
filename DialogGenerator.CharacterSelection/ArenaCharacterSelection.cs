@@ -20,11 +20,6 @@ namespace DialogGenerator.CharacterSelection
         private int mSecondCharacterIndex = -1;
         private IBLEDataProviderFactory mBLEDataProviderFactory;
         private IBLEDataProvider mCurrentDataProvider;
-        public static int[,] HeatMap = new int[ApplicationData.Instance.NumberOfRadios, ApplicationData.Instance.NumberOfRadios];
-        public static int[] MotionVector = new int[ApplicationData.Instance.NumberOfRadios];
-        public static DateTime[] CharactersLastHeatMapUpdateTime = new DateTime[ApplicationData.Instance.NumberOfRadios];
-        public readonly TimeSpan MaxLastSeenInterval = new TimeSpan(0, 0, 0, 4, 100);
-        private readonly DispatcherTimer mcHeatMapUpdateTimer = new DispatcherTimer();
         private ILogger mLogger;
 
         public ArenaCharacterSelection( IEventAggregator _eventAggregator, 
@@ -34,21 +29,9 @@ namespace DialogGenerator.CharacterSelection
             mBLEDataProviderFactory = _dataProviderFactory;
             mCurrentDataProvider = mBLEDataProviderFactory.Create(BLEDataProviderType.WinBLEWatcher);
             mLogger = _logger;
-            mcHeatMapUpdateTimer.Interval = TimeSpan.FromMilliseconds(300);
-            mcHeatMapUpdateTimer.Tick += _heatMapUpdateTimer_Tick;
         }
 
-        private void _heatMapUpdateTimer_Tick(object sender, EventArgs e)
-        {
-            mEventAggregator.GetEvent<HeatMapUpdateEvent>().Publish(new HeatMapData
-            {
-                HeatMap = HeatMap,
-                MotionVector = MotionVector,
-                LastHeatMapUpdateTime = CharactersLastHeatMapUpdateTime,
-                Character1Index = mFirstCharacterIndex,
-                Character2Index = mSecondCharacterIndex
-            });
-        }
+
 
         public async Task StartCharacterSelection()
         {
@@ -60,7 +43,6 @@ namespace DialogGenerator.CharacterSelection
                 Task _BLEDataReaderTask = mCurrentDataProvider.StartReadingData();
                 Thread.CurrentThread.Name = "CharacterBoxesScanningThread";
                 Session.Set(Constants.FORCED_CH_COUNT, 2);
-                //mcHeatMapUpdateTimer.Start();
 
                 do
                 {
@@ -113,12 +95,11 @@ namespace DialogGenerator.CharacterSelection
                         mCancellationTokenSource.Cancel();
                     }
                                         
-                    Thread.Sleep(1000);
+                    Thread.Sleep(1);
                 } while (!mCancellationTokenSource.Token.IsCancellationRequested);
                
                 if(_restartRequired)
                 {
-                    //mcHeatMapUpdateTimer.Stop();
                     mCurrentDataProvider.StopReadingData();
                     Session.Set(Constants.BLE_MODE_ON, true);
                     Session.Set(Constants.NEEDS_RESTART, true);                    
@@ -130,45 +111,9 @@ namespace DialogGenerator.CharacterSelection
 
         public void StopCharacterSelection()
         {                        
-            //mcHeatMapUpdateTimer.Stop();
             mCurrentDataProvider.StopReadingData();
             mCancellationTokenSource.Cancel();
         }
 
-        private bool _moreThanOneRadioIsTransmitting()
-        {
-            //  This method allows us to autoselect whether we should use incoming radio BLE
-            //    or avatar arena based character selection.  Can be overidden in settings to
-            //    force to Avatar Arena.  This method needs to be called on a timer.
-
-            bool _atLeastTwoTransmitting = false;
-            try
-            {
-                int i = 0, j = 0, k = 0;
-
-                var _currentTime = DateTime.Now;
-
-                for (i = 0; i < ApplicationData.Instance.NumberOfRadios; i++)
-                {
-                    if (_currentTime - CharactersLastHeatMapUpdateTime[i] < MaxLastSeenInterval)
-                    {
-                        j++;
-                    }
-                }
-                if (j > 1)
-                {
-                    _atLeastTwoTransmitting = true;
-                }
-                else
-                {
-                    _atLeastTwoTransmitting = false;
-                }
-            }
-            catch (Exception ex)
-            {
-                mLogger.Error("_moreThanOneRadioIsTransmitting " + ex.Message);
-            }
-            return _atLeastTwoTransmitting;
-        }
     }
 }

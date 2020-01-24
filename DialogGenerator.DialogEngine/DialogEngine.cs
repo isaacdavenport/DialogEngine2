@@ -356,6 +356,10 @@ namespace DialogGenerator.DialogEngine
                 foreach (var _currentPhraseType in mContext.DialogModelsList[mIndexOfCurrentDialogModel].PhraseTypeSequence)
                 {
                     token.ThrowIfCancellationRequested();
+                    if(Session.Get<bool>(Constants.NEEDS_RESTART))
+                    {
+                        throw (new OperationCanceledException());
+                    }
 
                     if (mContext.CharactersList[_speakingCharacter].PhraseTotals.PhraseWeights.ContainsKey(_currentPhraseType))
                     {
@@ -366,6 +370,10 @@ namespace DialogGenerator.DialogEngine
                         }
 
                         token.ThrowIfCancellationRequested();
+                        if (Session.Get<bool>(Constants.NEEDS_RESTART))
+                        {
+                            throw (new OperationCanceledException());
+                        }
 
                         _selectedPhrase = mDialogModelsManager.PickAWeightedPhrase(_speakingCharacter, _currentPhraseType);
 
@@ -377,6 +385,10 @@ namespace DialogGenerator.DialogEngine
                         }
 
                         token.ThrowIfCancellationRequested();
+                        if (Session.Get<bool>(Constants.NEEDS_RESTART))
+                        {
+                            throw (new OperationCanceledException());
+                        }
 
                         if (ApplicationData.Instance.TextDialogsOn)
                         {
@@ -388,6 +400,10 @@ namespace DialogGenerator.DialogEngine
                         }
 
                         token.ThrowIfCancellationRequested();
+                        if (Session.Get<bool>(Constants.NEEDS_RESTART))
+                        {
+                            throw (new OperationCanceledException());
+                        }
 
                         _addPhraseToHistory(_selectedPhrase, _speakingCharacter);
 

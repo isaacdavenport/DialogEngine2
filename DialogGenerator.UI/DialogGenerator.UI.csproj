@@ -168,6 +168,7 @@
     <Compile Include="ViewModels\ArenaViewModel.cs" />
     <Compile Include="ViewModels\AssignCharactersToToysBindingProxy.cs" />
     <Compile Include="ViewModels\AssignCharactersToToysViewModel.cs" />
+    <Compile Include="ViewModels\AssignedRadiosViewModel.cs" />
     <Compile Include="ViewModels\CharacterDetailViewModel.cs" />
     <Compile Include="ViewModels\ComputerSelectsViewModel.cs" />
     <Compile Include="ViewModels\CreateCharacterViewModel.cs" />
