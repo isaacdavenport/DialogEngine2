@@ -72,6 +72,11 @@ namespace DialogGenerator.UI.ViewModels
             mEventAggregator.GetEvent<CharacterSelectionModelChangedEvent>().Subscribe(_onCharacterSelectionModelChanged);
 
             _bindCommands();
+
+            if(ApplicationData.Instance.DebugModeOn)
+            {
+                IsDebugViewVisible = Visibility.Visible;
+            }
         }
 
         private void _onCharacterSelectionModelChanged()
