@@ -43,6 +43,7 @@ namespace DialogGenerator.UI.ViewModels
         private string mSecondCharacterDialogLine;
         private bool mRadioModeOn = false;
         private ArenaViewModel mArenaViewModel;
+        private AssignedRadiosViewModel mAssignedRadiosViewModel;
 
 
         #endregion
@@ -54,7 +55,8 @@ namespace DialogGenerator.UI.ViewModels
             ,IMessageDialogService _messageDialogService
             ,ICharacterRepository _characterRepository
             ,IRegionManager _regionManager
-            ,ArenaViewModel _ArenaViewModel)
+            ,ArenaViewModel _ArenaViewModel
+            ,AssignedRadiosViewModel _AssignedRadiosViewModel)
         {
             mLogger = logger;
             mEventAggregator = _eventAggregator;
@@ -63,6 +65,7 @@ namespace DialogGenerator.UI.ViewModels
             mCharacterRepository = _characterRepository;
             mRegionManager = _regionManager;
             mArenaViewModel = _ArenaViewModel;
+            mAssignedRadiosViewModel = _AssignedRadiosViewModel;
 
             mEventAggregator.GetEvent<NewDialogLineEvent>().Subscribe(_onNewDialogLine);
             mEventAggregator.GetEvent<ActiveCharactersEvent>().Subscribe(_onNewActiveCharacters);
@@ -255,6 +258,14 @@ namespace DialogGenerator.UI.ViewModels
             }
         }
 
+        public AssignedRadiosViewModel AssignedRadiosViewModel
+        {
+            get
+            {
+                return mAssignedRadiosViewModel;
+            }
+        }
+
         #endregion
 
         #region - commands -
@@ -273,6 +284,7 @@ namespace DialogGenerator.UI.ViewModels
         public DelegateCommand SelectFirstCharacterCommand { get; set; }
         public DelegateCommand SelectSecondCharacterCommand { get; set; }
         public DelegateCommand ExpertModeCommand { get; set; }
+        public DelegateCommand ToggleAssignedRadiosCommand { get; set; }
 
         #endregion
 
@@ -292,6 +304,19 @@ namespace DialogGenerator.UI.ViewModels
             SelectFirstCharacterCommand = new DelegateCommand(_SelectFirstCharacter_Execute, _selectFirstCharacter_CanExecute);
             SelectSecondCharacterCommand = new DelegateCommand(_SelectSecondCharacter_Execute, _selectSecondCharacter_CanExecute);
             ExpertModeCommand = new DelegateCommand(_expertModeExecute);
+            ToggleAssignedRadiosCommand = new DelegateCommand(_toggleAssignedRadios_Execute);
+        }
+
+        private void _toggleAssignedRadios_Execute()
+        {
+            if(AssignedRadiosViewModel.Visible == Visibility.Collapsed)
+            {
+                AssignedRadiosViewModel.Visible = Visibility.Visible;
+            } else
+            {
+                AssignedRadiosViewModel.Visible = Visibility.Collapsed;
+            }
+            
         }
 
         private async void _expertModeExecute()
@@ -386,7 +411,8 @@ namespace DialogGenerator.UI.ViewModels
             try
             {
                 CanGoBackToWizard = GoBackToWizardCommand.CanExecute();
-                await mDialogEngine.StartDialogEngine();                
+                await mDialogEngine.StartDialogEngine();
+                
             }
             catch (Exception ex)
             {

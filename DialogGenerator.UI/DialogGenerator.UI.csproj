@@ -124,6 +124,7 @@
     <Compile Include="Converters\CloneValuesConverter.cs" />
     <Compile Include="Converters\DivideBy2ValueConverter.cs" />
     <Compile Include="Converters\IdentifierConverter.cs" />
+    <Compile Include="Converters\NotBoolToVisibilityConverter.cs" />
     <Compile Include="Converters\ToyNumberToAssignedCharacterImageValueConverter.cs" />
     <Compile Include="Converters\ToyNumberToAssignedCharacterValueConverter.cs" />
     <Compile Include="Converters\ToyNumberToAssignedChForegroundValueConverter.cs" />
@@ -189,6 +190,9 @@
     </Compile>
     <Compile Include="Views\ArenaView.xaml.cs">
       <DependentUpon>ArenaView.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="Views\AssignedRadiosView.xaml.cs">
+      <DependentUpon>AssignedRadiosView.xaml</DependentUpon>
     </Compile>
     <Compile Include="Views\CharacterDataTemplateSelector.cs" />
     <Compile Include="Views\CharacterDetailView.xaml.cs">
@@ -289,6 +293,10 @@
       <Generator>MSBuild:Compile</Generator>
     </Page>
     <Page Include="Views\ArenaView.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="Views\AssignedRadiosView.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
