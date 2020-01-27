@@ -15,7 +15,21 @@
         <converters:ImageContentValueConverter x:Key="ImageContentValueConverter" />
         <DataTemplate x:Key="MyCombo">
             <StackPanel Orientation="Vertical">
+                <StackPanel Orientation="Horizontal">
+                    <TextBlock Text="Radio "/>
+                    <TextBlock Text="{Binding RadioNum}"/>
+                </StackPanel>
                 <Image Source="{Binding CharacterImage, Converter={StaticResource ImageToFullPathValueConverter}}" Height="50"/>
+                <TextBlock Text="{Binding CharacterName}" HorizontalAlignment="Center"/>
+            </StackPanel>
+        </DataTemplate>
+        <DataTemplate x:Key="CharacterPanel">
+            <StackPanel Orientation="Vertical" Margin="20, 0, 20, 0">
+                <StackPanel Orientation="Horizontal" HorizontalAlignment="Center">
+                    <TextBlock Text="Radio "/>
+                    <TextBlock Text="{Binding RadioNum}"/>
+                </StackPanel>
+                <Image Source="{Binding CharacterImage, Converter={StaticResource ImageToFullPathValueConverter}}" Height="50" Margin="0,5,0,0"/>
                 <TextBlock Text="{Binding CharacterName}" HorizontalAlignment="Center"/>
             </StackPanel>
         </DataTemplate>
@@ -31,56 +45,23 @@
             <RowDefinition Height="*"/>
         </Grid.RowDefinitions>
         <TextBlock x:Name="Title" Text="Characters With Radios" HorizontalAlignment="Center" FontWeight="Bold"/>
-        <Grid Grid.Row="1" Height="100">
+        <Grid Grid.Row="1">
             <Grid.ColumnDefinitions>
-                <ColumnDefinition Width="100"/>
-                <ColumnDefinition Width="Auto"/>
-                <ColumnDefinition Width="Auto"/>
-                <ColumnDefinition Width="Auto"/>
-                <ColumnDefinition Width="Auto"/>
+                <ColumnDefinition Width="*"/>
                 <ColumnDefinition Width="Auto"/>
                 <ColumnDefinition Width="*"/>
             </Grid.ColumnDefinitions>
-            <StackPanel Grid.Column="1" Orientation="Vertical" Margin="10,0,10,0">
-                <TextBlock Width="100" HorizontalAlignment="Center">Character 1</TextBlock>
-                <ComboBox 
-                    Width="100"                     
-                    SelectedItem="{Binding RadioCharacter1}"
-                    ItemsSource="{Binding Characters}" ItemTemplate="{StaticResource MyCombo}">
-                </ComboBox>
-            </StackPanel>
-            <StackPanel Grid.Column="2" Orientation="Vertical" Margin="10,0,10,0">
-                <TextBlock Width="100" HorizontalAlignment="Center">Character 2</TextBlock>
-                <ComboBox 
-                    Width="100"                     
-                    SelectedItem="{Binding RadioCharacter2}"
-                    ItemsSource="{Binding Characters}" ItemTemplate="{StaticResource MyCombo}">
-                </ComboBox>
-            </StackPanel>
-            <StackPanel Grid.Column="3" Orientation="Vertical" Margin="10,0,10,0">
-                <TextBlock Width="100" HorizontalAlignment="Center">Character 3</TextBlock>
-                <ComboBox 
-                    Width="100"                     
-                    SelectedItem="{Binding RadioCharacter3}"
-                    ItemsSource="{Binding Characters}" ItemTemplate="{StaticResource MyCombo}">
-                </ComboBox>
-            </StackPanel>
-            <StackPanel Grid.Column="4" Orientation="Vertical" Margin="10,0,10,0">
-                <TextBlock Width="100" HorizontalAlignment="Center">Character 4</TextBlock>
-                <ComboBox 
-                    Width="100"                     
-                    SelectedItem="{Binding RadioCharacter4}"
-                    ItemsSource="{Binding Characters}" ItemTemplate="{StaticResource MyCombo}">
-                </ComboBox>
-            </StackPanel>
-            <StackPanel Grid.Column="5" Orientation="Vertical" Margin="10,0,10,0">
-                <TextBlock Width="100" HorizontalAlignment="Center">Character 5</TextBlock>
-                <ComboBox 
-                    Width="100"                     
-                    SelectedItem="{Binding RadioCharacter5}"
-                    ItemsSource="{Binding Characters}" ItemTemplate="{StaticResource MyCombo}">
-                </ComboBox>
-            </StackPanel>
+            <ItemsControl 
+                x:Name="RadioCharacters" 
+                Grid.Column="1"
+                ItemsSource="{Binding RadioCharacters}" 
+                ItemTemplate="{StaticResource CharacterPanel}" Margin="0,20,0,20">
+                <ItemsControl.ItemsPanel>
+                    <ItemsPanelTemplate>
+                        <WrapPanel />
+                    </ItemsPanelTemplate>
+                </ItemsControl.ItemsPanel>
+            </ItemsControl>
         </Grid>
     </Grid>
 </UserControl>

@@ -309,13 +309,13 @@ namespace DialogGenerator.UI.ViewModels
 
         private void _toggleAssignedRadios_Execute()
         {
-            if(AssignedRadiosViewModel.Visible == Visibility.Collapsed)
-            {
-                AssignedRadiosViewModel.Visible = Visibility.Visible;
-            } else
-            {
-                AssignedRadiosViewModel.Visible = Visibility.Collapsed;
-            }
+            //if(AssignedRadiosViewModel.Visible == Visibility.Collapsed)
+            //{
+            //    AssignedRadiosViewModel.Visible = Visibility.Visible;
+            //} else
+            //{
+            //    AssignedRadiosViewModel.Visible = Visibility.Collapsed;
+            //}
             
         }
 
