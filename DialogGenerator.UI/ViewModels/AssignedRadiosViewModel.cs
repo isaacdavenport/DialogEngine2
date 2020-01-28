@@ -13,6 +13,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using System.Windows;
+using System.Windows.Threading;
 
 namespace DialogGenerator.UI.ViewModels
 {
@@ -31,11 +32,11 @@ namespace DialogGenerator.UI.ViewModels
             Visible = Visibility.Collapsed;
 
             mEventAggregator.GetEvent<SelectedCharactersPairChangedEvent>().Subscribe(_characterPairChanged);
+            mEventAggregator.GetEvent<RadioAssignedEvent>().Subscribe(_radioAsigned);
 
             _bindCommands();
         }
 
-        
 
         #region Properties         
 
@@ -70,18 +71,47 @@ namespace DialogGenerator.UI.ViewModels
             ViewLoadedCommand = new DelegateCommand(_viewLoaded_Execute);
         }
 
+        private void _radioAsigned(int _RadioIndex)
+        {
+
+            // Remember the old selection.
+            List<int> activeIndices = new List<int>();
+            foreach(ArenaAvatarViewModel _am in RadioCharacters)
+            {
+                if(_am.Active)
+                {
+                    activeIndices.Add(_am.Character.RadioNum);
+                }
+            }
+
+            // Re-initialize the list.
+            _viewLoaded_Execute();
+
+            // Bring back the selection.
+            foreach(ArenaAvatarViewModel _am in RadioCharacters)
+            {
+                if(activeIndices.Contains(_am.Character.RadioNum))
+                {
+                    _am.Active = true;
+                }
+            }
+        }
+
         private void _characterPairChanged(SelectedCharactersPairEventArgs obj)
         {
             int _radioIndex1 = mCharacterRepository.GetAll()[obj.Character1Index].RadioNum;
             int _radioIndex2 = mCharacterRepository.GetAll()[obj.Character2Index].RadioNum;
 
-            foreach(ArenaAvatarViewModel _ch in RadioCharacters)
+            if(Session.Get<bool>(Constants.BLE_MODE_ON) && RadioCharacters.Count > 0)
             {
-                _ch.Active = false;
-            }
+                foreach (ArenaAvatarViewModel _ch in RadioCharacters)
+                {
+                    _ch.Active = false;
+                }
 
-            RadioCharacters[_radioIndex1-1].Active = true;
-            RadioCharacters[_radioIndex2-1].Active = true;
+                RadioCharacters[_radioIndex1 - 1].Active = true;
+                RadioCharacters[_radioIndex2 - 1].Active = true;
+            }
         }
 
         private class CharacterComparer : IComparer<Character>
@@ -98,6 +128,7 @@ namespace DialogGenerator.UI.ViewModels
 
         private void _viewLoaded_Execute()
         {
+            RadioCharacters.Clear();
             List<Character> _charactersWithRadios = mCharacterRepository.GetAll().Where(c => c.RadioNum != -1).ToList();
             _charactersWithRadios.Sort(new CharacterComparer());
             foreach (Character _ch in _charactersWithRadios)

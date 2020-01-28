@@ -310,7 +310,7 @@ namespace DialogGenerator.UI.ViewModels
 
         private void _toggleAssignedRadios_Execute()
         {
-            mMessageDialogService.ShowDedicatedDialogAsync<int?>(new AssignCharacterToRadioView());            
+            mMessageDialogService.ShowDedicatedDialogAsync<int?>(new AssignCharacterToRadioView(), "ContentDialogHost");            
         }
 
         private async void _expertModeExecute()

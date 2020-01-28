@@ -25,7 +25,7 @@
         <i:EventTrigger EventName="Loaded">
             <i:InvokeCommandAction Command="{Binding ViewLoadedCommand}" />
         </i:EventTrigger>
-        <i:EventTrigger>
+        <i:EventTrigger EventName="Unloaded">
             <i:InvokeCommandAction Command="{Binding ViewUnloadedCommand}"/>
         </i:EventTrigger>
     </i:Interaction.Triggers>

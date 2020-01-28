@@ -3,6 +3,7 @@ using DialogGenerator.CharacterSelection.Data;
 using DialogGenerator.CharacterSelection.Model;
 using DialogGenerator.Core;
 using DialogGenerator.DataAccess;
+using DialogGenerator.Events;
 using DialogGenerator.Model;
 using DialogGenerator.UI.Data;
 using DialogGenerator.Utilities;
@@ -16,6 +17,7 @@ using System.Linq;
 using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
+using System.Windows.Threading;
 
 namespace DialogGenerator.UI.ViewModels
 {
@@ -30,6 +32,7 @@ namespace DialogGenerator.UI.ViewModels
         private CancellationTokenSource mCancellationTokenSource;
         private ICharacterDataProvider mCharacterDataProvider;
         private IMessageDialogService mMessageDialogService;
+        private int mAssignedRadio = -1;
 
         public AssignCharacterToRadioViewModel(ILogger _Logger
             , IEventAggregator _EventAggregator
@@ -86,7 +89,8 @@ namespace DialogGenerator.UI.ViewModels
 
         private async void _viewLoaded_Execute()
         {
-            List<Character> _characters = mCharacterRepository.GetAll().ToList();
+            Characters.Clear();
+            List<Character> _characters = mCharacterRepository.GetAll().Where(c => c.RadioNum == -1).ToList();
             foreach (Character _ch in _characters)
             {
                 Characters.Add(_ch);
@@ -100,9 +104,16 @@ namespace DialogGenerator.UI.ViewModels
             await _startRadioScanning();
         }
 
+
         private void _viewUnloaded_Execute()
         {
             _stopRadioScanning();
+            if(mAssignedRadio != -1)
+            {
+                mEventAggregator.GetEvent<RadioAssignedEvent>().Publish(mAssignedRadio);
+                mAssignedRadio = -1;
+            }
+            
         }
 
         private async Task _startRadioScanning()
@@ -111,7 +122,7 @@ namespace DialogGenerator.UI.ViewModels
             mCurrentDataProvider = mBLEDataProviderFactory.Create(BLEDataProviderType.WinBLEWatcher);
             await Task.Run(async () =>
             {
-                Thread.CurrentThread.Name = "StartCharacterMovingDetection";
+                Thread.CurrentThread.Name = "CharacterMovingDetection";
                 Task _BLEDataReaderTask = mCurrentDataProvider.StartReadingData();
                 int _oldIndex = -1;
                 do
@@ -137,7 +148,6 @@ namespace DialogGenerator.UI.ViewModels
                         {
                             if (_radioIndex != _oldIndex)
                             {
-
                                 await _selectToyToCharacter(_radioIndex);
                                 _oldIndex = _radioIndex;
                             }
@@ -168,15 +178,16 @@ namespace DialogGenerator.UI.ViewModels
                 _oldChar = mCharacterDataProvider.GetAll().Where(c => c.RadioNum == newVal).First();
                 if (_oldChar != null)
                 {
-                    // izbaci message box
+                    // Show message box.
                     MessageDialogResult result = await mMessageDialogService.ShowOKCancelDialogAsync(String.Format("The toy with index {0} is assigned to character {1}. Are You sure that you want to re-asign it?", newVal, _oldChar.CharacterName), "Check");
                     if (result == MessageDialogResult.OK)
                     {
-                        // settuj na Unassigned ako je Yes
+                        // Set to Unassigned if Yes
                         _oldChar.RadioNum = -1;
                         await mCharacterDataProvider.SaveAsync(_oldChar);
                         SelectedCharacter.RadioNum = newVal;
                         await mCharacterDataProvider.SaveAsync(SelectedCharacter);
+                        mAssignedRadio = newVal;
                     }
                 }
             }
