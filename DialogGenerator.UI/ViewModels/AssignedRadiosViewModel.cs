@@ -1,6 +1,7 @@
 ﻿using DialogGenerator.Core;
 using DialogGenerator.DataAccess;
 using DialogGenerator.Events;
+using DialogGenerator.Events.EventArgs;
 using DialogGenerator.Model;
 using Prism.Commands;
 using Prism.Events;
@@ -29,9 +30,13 @@ namespace DialogGenerator.UI.ViewModels
             mCharacterRepository = _CharacterRepository;
             Visible = Visibility.Collapsed;
 
+            mEventAggregator.GetEvent<SelectedCharactersPairChangedEvent>().Subscribe(_characterPairChanged);
+
             _bindCommands();
         }
+
         
+
         #region Properties         
 
         public Visibility Visible
@@ -48,7 +53,7 @@ namespace DialogGenerator.UI.ViewModels
             }
         }
 
-        public ObservableCollection<Character> RadioCharacters { get; } = new ObservableCollection<Character>();
+        public ObservableCollection<ArenaAvatarViewModel> RadioCharacters { get; } = new ObservableCollection<ArenaAvatarViewModel>();
 
         #endregion
 
@@ -63,6 +68,20 @@ namespace DialogGenerator.UI.ViewModels
         private void _bindCommands()
         {
             ViewLoadedCommand = new DelegateCommand(_viewLoaded_Execute);
+        }
+
+        private void _characterPairChanged(SelectedCharactersPairEventArgs obj)
+        {
+            int _radioIndex1 = mCharacterRepository.GetAll()[obj.Character1Index].RadioNum;
+            int _radioIndex2 = mCharacterRepository.GetAll()[obj.Character2Index].RadioNum;
+
+            foreach(ArenaAvatarViewModel _ch in RadioCharacters)
+            {
+                _ch.Active = false;
+            }
+
+            RadioCharacters[_radioIndex1-1].Active = true;
+            RadioCharacters[_radioIndex2-1].Active = true;
         }
 
         private class CharacterComparer : IComparer<Character>
@@ -83,8 +102,16 @@ namespace DialogGenerator.UI.ViewModels
             _charactersWithRadios.Sort(new CharacterComparer());
             foreach (Character _ch in _charactersWithRadios)
             {
-                RadioCharacters.Add(_ch);
-            }                                        
+                RadioCharacters.Add(new ArenaAvatarViewModel
+                {
+                    Character = _ch,
+                    Active = false,
+                    InPlayground = false,
+                    Left = 0, 
+                    Top = 0
+                });                
+            }
+            
         }
 
         #endregion
