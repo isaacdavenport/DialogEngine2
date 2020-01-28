@@ -4,6 +4,7 @@ using DialogGenerator.DialogEngine;
 using DialogGenerator.Events;
 using DialogGenerator.Events.EventArgs;
 using DialogGenerator.Model;
+using DialogGenerator.UI.Views;
 using DialogGenerator.UI.Views.Dialogs;
 using DialogGenerator.UI.Workflow.CreateCharacterWorkflow;
 using DialogGenerator.Utilities;
@@ -309,14 +310,7 @@ namespace DialogGenerator.UI.ViewModels
 
         private void _toggleAssignedRadios_Execute()
         {
-            //if(AssignedRadiosViewModel.Visible == Visibility.Collapsed)
-            //{
-            //    AssignedRadiosViewModel.Visible = Visibility.Visible;
-            //} else
-            //{
-            //    AssignedRadiosViewModel.Visible = Visibility.Collapsed;
-            //}
-            
+            mMessageDialogService.ShowDedicatedDialogAsync<int?>(new AssignCharacterToRadioView());            
         }
 
         private async void _expertModeExecute()

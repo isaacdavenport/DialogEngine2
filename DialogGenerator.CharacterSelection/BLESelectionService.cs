@@ -511,19 +511,19 @@ namespace DialogGenerator.CharacterSelection
                     mTempCh1 = 0;
                     mTempch2 = 1;
                 }
-                
+
                 // S.Ristic - This is commented because it is not clear what this condition does. mTempCh1 relates to radio index, and 
                 // NextCharacter1 relates to the character index in the character repository. These are the two different data types.
 
                 //mTempCh1 = NextCharacter1;
                 //mTempch2 = NextCharacter2;
 
-                //if (mTempCh1 > ApplicationData.Instance.NumberOfRadios - 1 || mTempch2 > ApplicationData.Instance.NumberOfRadios - 1 ||
-                //    mTempCh1 < 0 || mTempch2 < 0 || mTempCh1 == mTempch2)
-                //{
-                //    mTempCh1 = 0;
-                //    mTempch2 = 1;
-                //}
+                if (mTempCh1 > ApplicationData.Instance.NumberOfRadios - 1 || mTempch2 > ApplicationData.Instance.NumberOfRadios - 1 ||
+                    mTempCh1 < 0 || mTempch2 < 0 || mTempCh1 == mTempch2)
+                {
+                    mTempCh1 = 0;
+                    mTempch2 = 1;
+                }
 
                 //only pick up new characters if bigRssi greater not =
                 BigRssi = HeatMap[mTempCh1, mTempch2] + HeatMap[mTempch2, mTempCh1];

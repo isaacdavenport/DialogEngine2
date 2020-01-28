@@ -20,14 +20,6 @@ namespace DialogGenerator.UI.ViewModels
         private ILogger mLogger;
         private IEventAggregator mEventAggregator;
         private ICharacterRepository mCharacterRepository;
-        private ObservableCollection<Character> mCharacters = new ObservableCollection<Character>();
-        private Character mRadioCharacter0;
-        private Character mRadioCharacter1;
-        private Character mRadioCharacter2;
-        private Character mRadioCharacter3;
-        private Character mRadioCharacter4;
-        private Character mRadioCharacter5;
-        private ObservableCollection<Character> mRadioCharacters = new ObservableCollection<Character>();
         private Visibility mVisible;
         
         public AssignedRadiosViewModel(ILogger _Logger, IEventAggregator _EventAggregator, ICharacterRepository _CharacterRepository)
@@ -39,18 +31,8 @@ namespace DialogGenerator.UI.ViewModels
 
             _bindCommands();
         }
-
         
-
-        #region Properties
-
-        public ObservableCollection<Character> Characters
-        {
-            get
-            {
-                return mCharacters;
-            }
-        }                
+        #region Properties         
 
         public Visibility Visible
         {
@@ -66,13 +48,7 @@ namespace DialogGenerator.UI.ViewModels
             }
         }
 
-        public ObservableCollection<Character> RadioCharacters
-        {
-            get
-            {
-                return mRadioCharacters;
-            }
-        }
+        public ObservableCollection<Character> RadioCharacters { get; } = new ObservableCollection<Character>();
 
         #endregion
 
@@ -107,7 +83,7 @@ namespace DialogGenerator.UI.ViewModels
             _charactersWithRadios.Sort(new CharacterComparer());
             foreach (Character _ch in _charactersWithRadios)
             {
-                mRadioCharacters.Add(_ch);
+                RadioCharacters.Add(_ch);
             }                                        
         }
 

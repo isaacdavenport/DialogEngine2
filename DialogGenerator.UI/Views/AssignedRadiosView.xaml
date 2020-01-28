@@ -15,10 +15,6 @@
         <converters:ImageContentValueConverter x:Key="ImageContentValueConverter" />
         <DataTemplate x:Key="MyCombo">
             <StackPanel Orientation="Vertical">
-                <StackPanel Orientation="Horizontal">
-                    <TextBlock Text="Radio "/>
-                    <TextBlock Text="{Binding RadioNum}"/>
-                </StackPanel>
                 <Image Source="{Binding CharacterImage, Converter={StaticResource ImageToFullPathValueConverter}}" Height="50"/>
                 <TextBlock Text="{Binding CharacterName}" HorizontalAlignment="Center"/>
             </StackPanel>
