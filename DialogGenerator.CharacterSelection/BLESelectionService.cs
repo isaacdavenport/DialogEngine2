@@ -51,6 +51,10 @@ namespace DialogGenerator.CharacterSelection
         public static int[] MotionVector = new int[ApplicationData.Instance.NumberOfRadios];
         public static DateTime[] CharactersLastHeatMapUpdateTime = new DateTime[ApplicationData.Instance.NumberOfRadios];
         public readonly TimeSpan MaxLastSeenInterval = new TimeSpan(0, 0, 0, 4, 100);
+
+        public int mStableRadioIndex1 = -1;
+        public int mStableRadioIndex2 = -1;
+        public long mLastStableTime = 0;
         
         #endregion
 
@@ -358,6 +362,25 @@ namespace DialogGenerator.CharacterSelection
             }
         }
 
+        private bool _calculateRssiStableAfterChange1(int _Ch1, int _Ch2, long _Milliseconds = 500)
+        {           
+            if((_Ch1 != mStableRadioIndex1 || _Ch2 != mStableRadioIndex2) && (_Ch1 != mStableRadioIndex2 || _Ch2 != mStableRadioIndex1))
+            {
+                mLastStableTime = _toMilliseconds(DateTime.Now);
+                mStableRadioIndex1 = _Ch1;
+                mStableRadioIndex2 = _Ch2;
+                return false;
+            }
+
+            long _currentTime = _toMilliseconds(DateTime.Now);
+            if(_currentTime - mLastStableTime >= _Milliseconds)
+            {
+                return true;
+            }
+
+            return false;
+        }
+
         private bool _calculateRssiStableAfterChange(int _ch1, int _ch2)
         {
             try
@@ -461,7 +484,7 @@ namespace DialogGenerator.CharacterSelection
                     NextCharacter2 = _nextCharacter1MappedIndex2;
 
                     if ((NextCharacter1 != CurrentCharacter1 || NextCharacter2 != CurrentCharacter2) &&
-                         (NextCharacter2 != CurrentCharacter1 || NextCharacter1 != CurrentCharacter2))
+                         (NextCharacter2 != CurrentCharacter1 || NextCharacter1 != CurrentCharacter2) || mFreshStart)
                     {
                         _nextCharactersAssigned = true;
                         mLogger.Info("New characters assigned by BLE Character 1 is " + NextCharacter1 +
@@ -552,20 +575,23 @@ namespace DialogGenerator.CharacterSelection
                             // look at both characters view of each other
                             BigRssi = HeatMap[i, j] + HeatMap[j, i];
                             mTempCh1 = i;
-                            mTempch2 = j;
+                            mTempch2 = j;                            
                         }
                     }
                 }
 
                 // TODO, _calculateRssiStableAfterChange and _calculateIfInMotionWindow should be their own states
-                _rssiStable = _calculateRssiStableAfterChange(mTempCh1, mTempch2);
+                _rssiStable = _calculateRssiStableAfterChange1(mTempCh1, mTempch2);
                 var _inMovementWindow = _calculateIfInMotionWindow();
 
                 if ( _rssiStable && (_inMovementWindow || mFreshStart))
                 {
                     if(mFreshStart)
                     {
-                        mFreshStart = false;
+                        if(_calculateRssiStableAfterChange1(mTempCh1, mTempch2, 1000))
+                        {
+                            mFreshStart = false;
+                        }                        
                     }
 
                     mLogger.Info("Select Next Characters Called");
