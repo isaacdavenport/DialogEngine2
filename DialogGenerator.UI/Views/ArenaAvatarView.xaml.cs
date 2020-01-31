@@ -1,4 +1,5 @@
-﻿using System;
+﻿using DialogGenerator.UI.ViewModels;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -55,6 +56,9 @@ namespace DialogGenerator.UI.Views
                 _top += deltaY;
                 this.SetValue(Canvas.LeftProperty, _left);
                 this.SetValue(Canvas.TopProperty, _top);
+                ((ArenaAvatarViewModel)DataContext).Left = (int)_left;
+                ((ArenaAvatarViewModel)DataContext).Top = (int)_top;
+
             }
         }
     }

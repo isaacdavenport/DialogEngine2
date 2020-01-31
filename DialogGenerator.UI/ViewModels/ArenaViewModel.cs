@@ -83,6 +83,44 @@ namespace DialogGenerator.UI.ViewModels
                 }
             }
 
+            if(_closestPair != null)
+            {
+                foreach(ArenaAvatarViewModel _am in PlaygroundAvatars)
+                {
+                    if(_closestPair.Contains(_am))
+                    {
+                        _am.Active = true;
+                    } else
+                    {
+                        _am.Active = false;
+                    }
+                }
+
+                int _characterIndex1 = -1;
+                int _characterIndex2 = -1;
+
+                List<Character> _characters = mCharacterRepository.GetAll().ToList();
+                for(int i = 0; i < _characters.Count; i++)
+                {
+                    Character _c = _characters[i];
+                    if(_c.CharacterName.Equals(_closestPair.FirstAvatar.Character.CharacterName))
+                    {
+                        _characterIndex1 = i;
+                    }
+
+                    if (_c.CharacterName.Equals(_closestPair.SecondAvatar.Character.CharacterName))
+                    {
+                        _characterIndex2 = i;
+                    }
+                }
+
+                if(_characterIndex1 != -1 && _characterIndex2 != -1)
+                {                    
+                    Session.Set(Constants.NEXT_CH_1, _characterIndex1);
+                    Session.Set(Constants.NEXT_CH_2, _characterIndex2);
+                }
+            }
+
             return _closestPair;
         }
 
@@ -144,6 +182,19 @@ namespace DialogGenerator.UI.ViewModels
             }
         }
 
+        public bool Contains(ArenaAvatarViewModel _Am)
+        {
+            if(FirstAvatar.Equals(_Am))
+            {
+                return true;
+            }
 
+            if(SecondAvatar.Equals(_Am))
+            {
+                return true;
+            }
+
+            return false;
+        }
     }
 }

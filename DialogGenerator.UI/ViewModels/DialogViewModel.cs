@@ -90,15 +90,15 @@ namespace DialogGenerator.UI.ViewModels
             if (!RadioModeOn)
             {
                 int startIndex = 1;
-                if (FirstSelectedCharacter == null)
-                {
-                    FirstSelectedCharacter = mCharacterRepository.GetAll()[startIndex++];
-                }
+                //if (FirstSelectedCharacter == null)
+                //{
+                //    FirstSelectedCharacter = mCharacterRepository.GetAll()[startIndex++];
+                //}
 
-                if (SecondSelectedCharacter == null)
-                {
-                    SecondSelectedCharacter = mCharacterRepository.GetAll()[startIndex];
-                }
+                //if (SecondSelectedCharacter == null)
+                //{
+                //    SecondSelectedCharacter = mCharacterRepository.GetAll()[startIndex];
+                //}
 
             }
         }

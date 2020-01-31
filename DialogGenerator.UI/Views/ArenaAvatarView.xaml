@@ -18,7 +18,7 @@
         <converters:BoolToColorConverter x:Key="BoolToColorConverter" />
     </UserControl.Resources>
     <Grid>
-        <Border Background="LightGray" BorderBrush="{Binding Active, Converter={StaticResource BoolToColorConverter}, ConverterParameter=Orange}" CornerRadius="10" BorderThickness="2" Padding="5">
+        <Border Background="LightGray" BorderBrush="{Binding Active, Converter={StaticResource BoolToColorConverter}, ConverterParameter=LightGreen}" CornerRadius="10" BorderThickness="2" Padding="5">
             <Grid>
                 <Grid.RowDefinitions>
                     <RowDefinition Height="50"/>

@@ -180,8 +180,8 @@ namespace DialogGenerator
             }
 
             Session.Set(Constants.FORCED_CH_COUNT, _forcedCharacters.Count);
-            Session.Set(Constants.NEXT_CH_1, 1);
-            Session.Set(Constants.NEXT_CH_2, 2);
+            Session.Set(Constants.NEXT_CH_1, -1);
+            Session.Set(Constants.NEXT_CH_2, -1);
             Session.Set(Constants.DIALOG_SPEED, 1000); // ms
             Session.Set(Constants.SELECTED_DLG_MODEL, -1);
             Session.Set(Constants.COMPLETED_DLG_MODELS, 0);
