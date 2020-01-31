@@ -109,8 +109,31 @@ namespace DialogGenerator.UI.ViewModels
                     _ch.Active = false;
                 }
 
-                RadioCharacters[_radioIndex1 - 1].Active = true;
-                RadioCharacters[_radioIndex2 - 1].Active = true;
+                if(_radioIndex1 != -1)
+                {
+                    if(RadioCharacters.Where(rc => rc.Character.RadioNum == _radioIndex1).ToList().Count > 0)
+                    {
+                        ArenaAvatarViewModel _am = RadioCharacters.Where(rc => rc.Character.RadioNum == _radioIndex1).First();
+                        if (_am != null)
+                        {
+                            _am.Active = true;
+                        }
+                    }
+                                                            
+                }
+                    
+                if(_radioIndex2 != -1)
+                {
+                    if (RadioCharacters.Where(rc => rc.Character.RadioNum == _radioIndex2).ToList().Count > 0)
+                    {
+                        ArenaAvatarViewModel _am = RadioCharacters.Where(rc => rc.Character.RadioNum == _radioIndex2).First();
+                        if (_am != null)
+                        {
+                            _am.Active = true;
+                        }
+                    }                    
+                }
+                    
             }
         }
 

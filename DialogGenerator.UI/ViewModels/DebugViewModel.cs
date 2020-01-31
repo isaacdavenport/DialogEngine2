@@ -81,10 +81,22 @@ namespace DialogGenerator.UI.ViewModels
         private void _onHeatMapUpdate(HeatMapData data)
         {
             var characters = mCharacterDataProvider.GetAll();
+            int _characterCount = mCharacterDataProvider.GetAll().Count;
 
             HeatMap = data;
-            Character1Prefix = characters[data.Character1Index].CharacterPrefix;
-            Character2Prefix = characters[data.Character2Index].CharacterPrefix;
+
+            // Sinisa - 1/31/2020 (Possible fix of DLGEN-434)
+            // TODO - Discussion with Isaac.
+            if(data.Character1Index < _characterCount)
+            {
+                Character1Prefix = characters[data.Character1Index].CharacterPrefix;
+            }
+
+            if(data.Character2Index < _characterCount)
+            {
+                Character2Prefix = characters[data.Character2Index].CharacterPrefix;
+            }            
+            
         }
 
         #endregion
