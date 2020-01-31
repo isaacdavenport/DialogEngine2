@@ -17,7 +17,7 @@ namespace DialogGenerator.UI.Converters
             if (_active)
                 return color;
 
-            return "Transparent";
+            return "DarkGray";
         }
 
         public object ConvertBack(object value, Type targetType, object parameter, CultureInfo culture)

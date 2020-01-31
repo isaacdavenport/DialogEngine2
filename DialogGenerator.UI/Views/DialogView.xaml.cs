@@ -18,7 +18,7 @@ namespace DialogGenerator.UI.Views
             ((INotifyCollectionChanged)TextOutput.Items).CollectionChanged += _textOutput_CollectionChanged;
 
             DialogViewModel model = this.DataContext as DialogViewModel;
-            //this.ArenaView.DataContext = model.ArenaViewModel;
+            this.ArenaView.DataContext = model.ArenaViewModel;
             this.AssignedRadiosControl.DataContext = model.AssignedRadiosViewModel;
         }
 

@@ -187,6 +187,9 @@
     <Compile Include="ViewModels\HomeViewModel.cs" />
     <Compile Include="ViewModels\VoiceRecorderControlViewModel.cs" />
     <Compile Include="ViewModels\WizardViewModel.cs" />
+    <Compile Include="Views\ArenaAvatarView.xaml.cs">
+      <DependentUpon>ArenaAvatarView.xaml</DependentUpon>
+    </Compile>
     <Compile Include="Views\AssignCharacterToRadioView.xaml.cs">
       <DependentUpon>AssignCharacterToRadioView.xaml</DependentUpon>
     </Compile>
@@ -290,6 +293,10 @@
       <Generator>MSBuild:Compile</Generator>
     </Page>
     <Page Include="Themes\VoiceRecorderStyle.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="Views\ArenaAvatarView.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>

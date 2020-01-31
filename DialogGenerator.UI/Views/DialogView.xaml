@@ -56,9 +56,11 @@
             <RowDefinition Height="Auto" />
         </Grid.RowDefinitions>
 
-        <!--<view:ArenaView x:Name="ArenaView" Grid.Row="0" Visibility="{Binding RadioModeOn, Converter={StaticResource BoolToVisibilityConverter}}" />-->
+        <Border BorderBrush="DarkGray" BorderThickness="2">
+            <view:ArenaView x:Name="ArenaView" Grid.Row="0" Visibility="{Binding RadioModeOn, Converter={StaticResource NotBoolToVisibilityConverter}}" />
+        </Border>
 
-        <Grid Grid.Row="0" Visibility="{Binding RadioModeOn, Converter={StaticResource NotBoolToVisibilityConverter}}" Height="300">
+        <Grid Grid.Row="0" Visibility="Collapsed" Height="300">
             <Grid.ColumnDefinitions>
                 <ColumnDefinition Width="*" />
                 <ColumnDefinition Width="Auto" />

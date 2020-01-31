@@ -8,50 +8,50 @@
              xmlns:converters="clr-namespace:DialogGenerator.UI.Converters"
              xmlns:local="clr-namespace:DialogGenerator.UI.Views"
              mc:Ignorable="d" 
-             d:DesignHeight="850" d:DesignWidth="800">
+             MinHeight="300"
+             d:DesignHeight="850" d:DesignWidth="800" Loaded="UserControl_Loaded">
     <UserControl.Resources>
         <converters:ImageToFullPathValueConverter x:Key="ImageToFullPathValueConverter" />
         <converters:ImageContentValueConverter x:Key="ImageContentValueConverter" />
+        <DataTemplate x:Key="AvatarPanel">
+            <materialDesign:Card Width="60" Margin="5" Background="AliceBlue" BorderBrush="Green" BorderThickness="2">
+                <Grid>
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="50"/>
+                        <RowDefinition Height="20"/>
+                    </Grid.RowDefinitions>
+                    <Image Width="50" Grid.Row="0" Source="{Binding Character.CharacterImage, Converter={StaticResource ImageToFullPathValueConverter}}"/>
+                    <TextBlock Grid.Row="1" Text="{Binding Character.CharacterName}" HorizontalAlignment="Center" TextWrapping="Wrap"/>
+                </Grid>
+            </materialDesign:Card>
+        </DataTemplate>
     </UserControl.Resources>
-    
+
     <Grid>
         <Grid.ColumnDefinitions>
-            <ColumnDefinition Width="2*"/>
+            <ColumnDefinition Width="*"/>
             <ColumnDefinition Width="Auto"/>
             <ColumnDefinition Width="Auto"/>
         </Grid.ColumnDefinitions>
-        <Canvas Grid.Column="0" Background="#efefef"/>
+        <Canvas x:Name="Playground" 
+                Grid.Column="0" 
+                Background="#efefef" 
+                AllowDrop="True" 
+                Drop="Playground_Drop" 
+                DragEnter="Playground_DragEnter" 
+                MouseLeftButtonUp="Playground_MouseLeftButtonUp"/>
         <Separator Grid.Column="1" Width="2"/>
-        <ItemsControl x:Name="AvatarToolbox" Grid.Column="2" Background="LightGray" Width="220" ItemsSource="{Binding ToolboxAvatars}">
+        <ItemsControl x:Name="AvatarGallery" Grid.Column="2" Background="LightGray" Width="220" ItemsSource="{Binding AvatarGalleryItems}" ItemTemplate="{StaticResource AvatarPanel}">
             <ItemsControl.ItemsPanel>
                 <ItemsPanelTemplate>
                     <WrapPanel />
                 </ItemsPanelTemplate>
             </ItemsControl.ItemsPanel>
-            <ItemsControl.ItemTemplate>
-                <DataTemplate>
-                    <materialDesign:Card Width="60" Margin="5" Background="AliceBlue">
-                        <Grid>
-                            <Grid.RowDefinitions>
-                                <RowDefinition Height="50"/>
-                                <RowDefinition Height="20"/>
-                            </Grid.RowDefinitions>
-                            <!--<materialDesign:ColorZone Grid.Row="0" Mode="PrimaryLight"
-                                                          Content="{Binding Character.CharacterImage,Converter={StaticResource ImageContentValueConverter}}" HorizontalAlignment="Stretch" VerticalAlignment="Stretch">
-                            </materialDesign:ColorZone>
-                            <TextBlock Grid.Row="1" Text="{Binding Character.CharacterName}"/>-->
-
-
-                            <!--<materialDesign:ColorZone Padding="5" Grid.Row="0" Mode="PrimaryLight"
-                                                            Content="{Binding Character.CharacterImage,Converter={StaticResource ImageContentValueConverter}}" HorizontalAlignment="Center" VerticalAlignment="Stretch">
-                            </materialDesign:ColorZone>-->
-                            <Image Width="50" Grid.Row="0" Source="{Binding Character.CharacterImage, Converter={StaticResource ImageToFullPathValueConverter}}"/>
-                            <TextBlock Grid.Row="1" Text="{Binding Character.CharacterName}" HorizontalAlignment="Center" TextWrapping="Wrap"/>
-                                                                                    
-                        </Grid>
-                    </materialDesign:Card>
-                </DataTemplate>
-            </ItemsControl.ItemTemplate>
+            <ItemsControl.Resources>
+                <Style TargetType="materialDesign:Card">
+                    <EventSetter Event="MouseMove" Handler="Card_MouseMove" />
+                </Style>
+            </ItemsControl.Resources>
         </ItemsControl>
     </Grid>
 </UserControl>
