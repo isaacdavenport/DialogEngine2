@@ -667,8 +667,8 @@ namespace DialogGenerator.UI.ViewModels
                     {
                         Character.RadioNum = SelectedRadio.Key;
                         _stopScanForRadios();
-                    }
-
+                    }                    
+                    
                     break;
                 case "Wizard":
                     
@@ -732,7 +732,7 @@ namespace DialogGenerator.UI.ViewModels
                     break;
                 case "CheckCounter":
                     if(mWizardPassthroughIndex < mDialogWizards.Count)
-                    {
+                    {                                                
                         CurrentDialogWizard = mDialogWizards[mWizardPassthroughIndex++];
                         Workflow.Fire(Triggers.StartWizard);
                     } else
@@ -769,7 +769,12 @@ namespace DialogGenerator.UI.ViewModels
 
                         Character.State = Model.Enum.CharacterState.On;
                         await mCharacterDataProvider.AddAsync(Character);
-                        _idx = mCharacterDataProvider.IndexOf(Character); 
+                        _idx = mCharacterDataProvider.IndexOf(Character);
+
+                        if (Character.RadioNum != -1)
+                        {                            
+                            mEventAgregator.GetEvent<RadioAssignedEvent>().Publish(Character.RadioNum);
+                        }
                     }
 
 
