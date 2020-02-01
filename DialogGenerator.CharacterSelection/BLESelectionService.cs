@@ -282,7 +282,7 @@ namespace DialogGenerator.CharacterSelection
 
         }
 
-        private bool _calculateRssiStableAfterChange(int _Ch1, int _Ch2, long _Milliseconds = 80)
+        private bool _calculateRssiStableAfterChange(int _Ch1, int _Ch2, long _Milliseconds = 80, double _HitPercent = 0.70)
         {           
             if((_Ch1 != mStableRadioIndex1 || _Ch2 != mStableRadioIndex2) && 
                 (_Ch1 != mStableRadioIndex2 || _Ch2 != mStableRadioIndex1))
