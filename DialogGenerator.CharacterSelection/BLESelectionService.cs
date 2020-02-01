@@ -12,7 +12,6 @@ using System;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
-using System.Windows.Threading;
 
 namespace DialogGenerator.CharacterSelection
 {
@@ -74,41 +73,6 @@ namespace DialogGenerator.CharacterSelection
             _configureWorkflow();
         }
         
-        private bool _moreThanOneRadioIsTransmitting()
-        {
-            //  This method allows us to autoselect whether we should use incoming radio BLE
-            //    or avatar arena based character selection.  Can be overidden in settings to
-            //    force to Avatar Arena.  This method needs to be called on a timer.
-
-            bool _atLeastTwoTransmitting = false;
-            try
-            {
-                int i = 0, j = 0, k = 0;
-
-                var _currentTime = DateTime.Now;
-
-                for (i = 0; i < ApplicationData.Instance.NumberOfRadios; i++)
-                {
-                    if (_currentTime - CharactersLastHeatMapUpdateTime[i] < MaxLastSeenInterval)
-                    {
-                        j++;
-                    }
-                }
-                if (j > 1)
-                {
-                    _atLeastTwoTransmitting = true;
-                }
-                else
-                {
-                    _atLeastTwoTransmitting = false;
-                }
-            }
-            catch (Exception ex)
-            {
-                mLogger.Error("_moreThanOneRadioIsTransmitting " + ex.Message);
-            }
-            return _atLeastTwoTransmitting;
-        }
         private void _mWorkflow_PropertyChanged(object sender, System.ComponentModel.PropertyChangedEventArgs e)
         {
             if (e.PropertyName.Equals("State"))
@@ -222,13 +186,9 @@ namespace DialogGenerator.CharacterSelection
                     
                     if (mIddleTime > 1500)                    
                     {                        
-                        //Session.Set(Constants.BLE_MODE_ON, false);
-                        //mEventAggregator.GetEvent<RestartDialogEngineEvent>().Publish();
-                        //Console.Out.WriteLine("Restart of Dialog Engine required!!!");
-
                         mIddleTime = 0l;
                         mRestartRequested = true;
-                        mLogger.Info("BLE Messages have not arrived in 800ms, switching to avatar arena");
+                        mLogger.Info("BLE Messages have not arrived in some time, switching to avatar arena");
                         mCancellationTokenSource.Cancel();                        
                     }
 
@@ -321,50 +281,11 @@ namespace DialogGenerator.CharacterSelection
             }
 
         }
-        private bool _calculateRssiStableAfterChangeNew(int _ch1, int _ch2)  // TODO we want this to be time based not number of BLE vector based
-        {
-            try
-            {
-                bool _rssiStable = true;
-                DateTime _currentTime = DateTime.Now;
-                int i = ParseMessageHelper.ReceivedMessages.Count - 1;
-                while (i >= 0)
-                {
-                    // scoot data in buffer back by one to make room for next
-                    mStrongRssiCharacterPairBuf[0, i] = mStrongRssiCharacterPairBuf[0, i + 1];
-                    mStrongRssiCharacterPairBuf[1, i] = mStrongRssiCharacterPairBuf[1, i + 1];
-                    i--;
-                    if (_currentTime - ParseMessageHelper.ReceivedMessages[i].ReceivedTime < TimeSpan.FromMilliseconds(300))
-                        break;
-                }
 
-                mStrongRssiCharacterPairBuf[0, StrongRssiBufDepth - 1] = _ch1;
-                mStrongRssiCharacterPairBuf[1, StrongRssiBufDepth - 1] = _ch2;
-
-                for (int j = 0; j < StrongRssiBufDepth - 2; j++)
-                {
-                    if ((mStrongRssiCharacterPairBuf[0, j] != mStrongRssiCharacterPairBuf[0, j + 1]
-                        || mStrongRssiCharacterPairBuf[1, j] != mStrongRssiCharacterPairBuf[1, j + 1])
-                        &&
-                          (mStrongRssiCharacterPairBuf[0, j] != mStrongRssiCharacterPairBuf[1, j + 1]
-                        || mStrongRssiCharacterPairBuf[1, j] != mStrongRssiCharacterPairBuf[0, j + 1]))
-                    {
-                        _rssiStable = false;
-                        break;
-                    }
-                }
-
-                return _rssiStable;
-            }
-            catch (Exception ex)
-            {
-                throw ex;
-            }
-        }
-
-        private bool _calculateRssiStableAfterChange1(int _Ch1, int _Ch2, long _Milliseconds = 500)
+        private bool _calculateRssiStableAfterChange(int _Ch1, int _Ch2, long _Milliseconds = 80)
         {           
-            if((_Ch1 != mStableRadioIndex1 || _Ch2 != mStableRadioIndex2) && (_Ch1 != mStableRadioIndex2 || _Ch2 != mStableRadioIndex1))
+            if((_Ch1 != mStableRadioIndex1 || _Ch2 != mStableRadioIndex2) && 
+                (_Ch1 != mStableRadioIndex2 || _Ch2 != mStableRadioIndex1))
             {
                 mLastStableTime = _toMilliseconds(DateTime.Now);
                 mStableRadioIndex1 = _Ch1;
@@ -379,62 +300,6 @@ namespace DialogGenerator.CharacterSelection
             }
 
             return false;
-        }
-
-        private bool _calculateRssiStableAfterChange(int _ch1, int _ch2)
-        {
-            try
-            {
-                bool _rssiStable = true;
-
-                for (int i = 0; i < StrongRssiBufDepth - 1; i++)
-                {
-                    // scoot data in buffer back by one to make room for next
-                    mStrongRssiCharacterPairBuf[0, i] = mStrongRssiCharacterPairBuf[0, i + 1];
-                    mStrongRssiCharacterPairBuf[1, i] = mStrongRssiCharacterPairBuf[1, i + 1];
-                }
-
-                mStrongRssiCharacterPairBuf[0, StrongRssiBufDepth - 1] = _ch1;
-                mStrongRssiCharacterPairBuf[1, StrongRssiBufDepth - 1] = _ch2;
-
-                for (int i = 0; i < StrongRssiBufDepth - 2; i++)
-                {
-                    if ((mStrongRssiCharacterPairBuf[0, i] != mStrongRssiCharacterPairBuf[0, i + 1]
-                        || mStrongRssiCharacterPairBuf[1, i] != mStrongRssiCharacterPairBuf[1, i + 1])
-                        &&
-                          (mStrongRssiCharacterPairBuf[0, i] != mStrongRssiCharacterPairBuf[1, i + 1]
-                        || mStrongRssiCharacterPairBuf[1, i] != mStrongRssiCharacterPairBuf[0, i + 1]))
-                    {
-                        _rssiStable = false;
-                        break;
-                    }
-                }
-
-                if(!_rssiStable)
-                {
-                    string dbgOut1 = "Char1 Buff ";
-                    for(int i = 0; i < StrongRssiBufDepth; i++)
-                    {
-                        dbgOut1 += mStrongRssiCharacterPairBuf[0, i].ToString("D3");
-                        dbgOut1 += " ";
-                    }
-                    string dbgOut2 = "Char2 Buff ";
-                    for (int i = 0; i < StrongRssiBufDepth; i++)
-                    {
-                        dbgOut2 += mStrongRssiCharacterPairBuf[1, i].ToString("D3");
-                        dbgOut2 += " ";
-                    }
-
-                    mLogger.Info(dbgOut1);
-                    mLogger.Info(dbgOut2);
-                }
-
-                return _rssiStable;
-            }
-            catch (Exception ex)
-            {
-                throw ex;
-            }
         }
 
         private int _getCharacterMappedIndex(int _radioNum)
@@ -535,12 +400,6 @@ namespace DialogGenerator.CharacterSelection
                     mTempch2 = 1;
                 }
 
-                // S.Ristic - This is commented because it is not clear what this condition does. mTempCh1 relates to radio index, and 
-                // NextCharacter1 relates to the character index in the character repository. These are the two different data types.
-
-                //mTempCh1 = NextCharacter1;
-                //mTempch2 = NextCharacter2;
-
                 if (mTempCh1 > ApplicationData.Instance.NumberOfRadios - 1 || mTempch2 > ApplicationData.Instance.NumberOfRadios - 1 ||
                     mTempCh1 < 0 || mTempch2 < 0 || mTempCh1 == mTempch2)
                 {
@@ -548,7 +407,7 @@ namespace DialogGenerator.CharacterSelection
                     mTempch2 = 1;
                 }
 
-                //only pick up new characters if bigRssi greater not =
+                //only pick up new characters if bigRssi greater not ==
                 BigRssi = HeatMap[mTempCh1, mTempch2] + HeatMap[mTempch2, mTempCh1];
 
                 for (i = 0; i < ApplicationData.Instance.NumberOfRadios; i++)
@@ -581,14 +440,14 @@ namespace DialogGenerator.CharacterSelection
                 }
 
                 // TODO, _calculateRssiStableAfterChange and _calculateIfInMotionWindow should be their own states
-                _rssiStable = _calculateRssiStableAfterChange1(mTempCh1, mTempch2);
+                _rssiStable = _calculateRssiStableAfterChange(mTempCh1, mTempch2);
                 var _inMovementWindow = _calculateIfInMotionWindow();
 
                 if ( _rssiStable && (_inMovementWindow || mFreshStart))
                 {
                     if(mFreshStart)
                     {
-                        if(_calculateRssiStableAfterChange1(mTempCh1, mTempch2, 1000))
+                        if(_calculateRssiStableAfterChange(mTempCh1, mTempch2, 1000))
                         {
                             mFreshStart = false;
                         }                        
