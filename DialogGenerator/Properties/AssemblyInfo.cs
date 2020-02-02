@@ -38,6 +38,6 @@ using System.Windows;
                                               // app, or any theme specific resource dictionaries)
 )]
 
-//This is the version number picked up for display in debug/settings screen
-[assembly: AssemblyVersion("2.55.*")]
+//This is the version number picked up for  display in debug/settings screen
+[assembly: AssemblyVersion("2.55.*")] 
 
