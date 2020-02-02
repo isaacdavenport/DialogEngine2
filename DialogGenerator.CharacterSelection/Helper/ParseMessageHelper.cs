@@ -73,7 +73,7 @@ namespace DialogGenerator.CharacterSelection.Helper
         #region - Public functions -
 
 
-        public static void ProcessTheMessage(int _rowNum, BLE_Message _newRow)
+        public static void UpdateHeatMapWithMessage(int _rowNum, BLE_Message _newRow)
         {
             try
             {

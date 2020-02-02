@@ -19,29 +19,25 @@ namespace DialogGenerator.CharacterSelection
     {
         #region - fields -
 
-        public const int StrongRssiBufDepth = /* 26 */ 5;  // TODO we should use a timer as well as relying on a number of incoming packets to switch characters
-
         private ILogger mLogger;
         private IEventAggregator mEventAggregator;
         private ICharacterRepository mCharacterRepository;
         private IBLEDataProviderFactory mBLEDataProviderFactory;
         private IBLEDataProvider mCurrentDataProvider;
-        private int mTempCh1;
-        private int mTempch2;
-        private int[,] mStrongRssiCharacterPairBuf = new int[2, StrongRssiBufDepth];
+        private int mPossibleSpeakingCh1RadioNum;
+        private int mPossibleSpeakingCh2RadioNum;
         private CancellationTokenSource mCancellationTokenSource;
         private BLESelectionWorkflow mWorkflow;
         private Timer mcHeatMapUpdateTimer;
         private Random mRandom = new Random();
         private States mCurrentState;
         private int mFailedBLEMessageAttempts = 0;
-        private long mIddleTime = 0;
+        private long mIdleTime = 0;
         private long mLastAccessTime = 0;
         private bool mRestartRequested = false;
         private bool mFirstFailMessage = true;
         private bool mFreshStart = true;
 
-        private int BigRssi = 0;
         private int CurrentCharacter1;
         private int CurrentCharacter2 = 1;
         private static int NextCharacter1 = 1;
@@ -84,18 +80,6 @@ namespace DialogGenerator.CharacterSelection
         #endregion
 
         #region - event handlers -
-
-        private void _heatMapUpdateTimer_Tick(object sender, EventArgs e)
-        {
-            mEventAggregator.GetEvent<HeatMapUpdateEvent>().Publish(new HeatMapData
-            {
-                HeatMap = HeatMap,
-                MotionVector = MotionVector,
-                LastHeatMapUpdateTime = CharactersLastHeatMapUpdateTime,
-                Character1Index = NextCharacter1,
-                Character2Index = NextCharacter2
-            });
-        }
 
         private void _updateTimer(object state)
         {
@@ -162,8 +146,8 @@ namespace DialogGenerator.CharacterSelection
         {
             try
             {
-                mTempCh1 = 0;
-                mTempch2 = 0;
+                mPossibleSpeakingCh1RadioNum = 0;
+                mPossibleSpeakingCh2RadioNum = 0;
                 BLE_Message message = new BLE_Message();
                 DateTime nowTime = DateTime.Now;
 
@@ -179,30 +163,27 @@ namespace DialogGenerator.CharacterSelection
                         mLastAccessTime = _toMilliseconds(_nowTime) ;
                     }
 
-                    mIddleTime += _toMilliseconds(_nowTime) - mLastAccessTime;
+                    mIdleTime += _toMilliseconds(_nowTime) - mLastAccessTime;
                     mLastAccessTime = _toMilliseconds(_nowTime);
                     mFailedBLEMessageAttempts++;
                     
-                    if (mIddleTime > 1500)                    
+                    if (mIdleTime > 1500)                    
                     {                        
-                        mIddleTime = 0l;
+                        mIdleTime = 0L;
                         mRestartRequested = true;
                         mLogger.Info("BLE Messages have not arrived in some time, switching to avatar arena");
                         mCancellationTokenSource.Cancel();                        
                     }
 
-                    Console.Out.WriteLine("Iddle time: {0}", mIddleTime);
+                    Console.Out.WriteLine("Iddle time: {0}", mIdleTime);
                     return Triggers.ProcessMessage;
-                } else
-                {
-                    mLastAccessTime = _toMilliseconds(DateTime.Now);
-                    mIddleTime = 0L;
-                    mFailedBLEMessageAttempts = 0;
-                }
-                
-                BLE_Message mNewRow = new BLE_Message();  // added number holds sequence number
-                mLastAccessTime = _toMilliseconds(DateTime.Now);
+                } 
 
+                mLastAccessTime = _toMilliseconds(DateTime.Now);
+                mIdleTime = 0L;
+                mFailedBLEMessageAttempts = 0;
+                BLE_Message mNewRow = new BLE_Message();  // added number holds sequence number
+                
                 var mRowNum = ParseMessageHelper.ParseBle(message, mNewRow);
 
                 if (mRowNum < 0 || mRowNum >= ApplicationData.Instance.NumberOfRadios)
@@ -211,7 +192,7 @@ namespace DialogGenerator.CharacterSelection
                 }
                 else
                 {
-                    ParseMessageHelper.ProcessTheMessage(mRowNum, mNewRow);
+                    ParseMessageHelper.UpdateHeatMapWithMessage(mRowNum, mNewRow);
                     return Triggers.CalculateClosestPair;
                 }
             }
@@ -223,7 +204,7 @@ namespace DialogGenerator.CharacterSelection
         }
  
         /// <summary>
-        /// This method calculates whether all characters have been "still" for a set number (300) of milliseconds since 
+        /// This method calculates whether all radios have been "still" for a set number (300) of milliseconds since 
         /// motion was last detected.  The talking characters should not change unless the toys moved.  The talking
         /// characters should not change unless the toys have been as still as they can be when held in the hand for
         /// a set number of milliseconds in the case the user is holding one or more of the toys they wish to speak.
@@ -243,7 +224,7 @@ namespace DialogGenerator.CharacterSelection
                 {
                     if (i<=0)
                     {
-                        return false;  // didn't have two seconds of data in ReceivedMessages
+                        return false;  // didn't have long enough data in ReceivedMessages
                     }
                     var _timeAgoOfMessage_i = _currentTime - ParseMessageHelper.ReceivedMessages[i].ReceivedTime;
                     if (_timeAgoOfMessage_i < TimeSpan.FromMilliseconds(300))
@@ -281,7 +262,7 @@ namespace DialogGenerator.CharacterSelection
 
         // are the two passed in radio numbers the strongest RSSI pair for the last _Milliseconds  at a
         // rate of _HitPercent?  Work back through time and check RSSI pair strength.
-        private bool _calculateRssiStablity2(int _Ch1, int _Ch2, long _Milliseconds = 300, double _HitPercent = 0.70)
+        private bool _calculateRssiStablity2(int _radio1, int _radio2, long _milliseconds = 300, double _HitPercent = 0.70)
         {   
             try
             {
@@ -297,8 +278,8 @@ namespace DialogGenerator.CharacterSelection
                     {
                         return false;  // ran out of ReceivedMessages before desire time in ms
                     }
-                    var _timeAgoOfMessage_i = _currentTime - ParseMessageHelper.ReceivedMessages[mesg].ReceivedTime;
-                    if (_timeAgoOfMessage_i < TimeSpan.FromMilliseconds(_Milliseconds))
+                    var _timeAgoOfCurrentMessage = _currentTime - ParseMessageHelper.ReceivedMessages[mesg].ReceivedTime;
+                    if (_timeAgoOfCurrentMessage < TimeSpan.FromMilliseconds(_milliseconds))
                     {  // in the time window we are asked to check
                         //assemble a heat map here to pass to _findBigestRSSI
                         if (ParseMessageHelper.ReceivedMessages[mesg].Motion > 48)
@@ -306,7 +287,7 @@ namespace DialogGenerator.CharacterSelection
                             return false;
                         }
                     }
-                    if (_timeAgoOfMessage_i >= TimeSpan.FromMilliseconds(300))
+                    if (_timeAgoOfCurrentMessage >= TimeSpan.FromMilliseconds(300))
                     {  // in the needsToBeStableWindow
                         if (ParseMessageHelper.ReceivedMessages[mesg].Motion > 40)  // we had motion between 300-1500ms ago
                         {
@@ -321,7 +302,7 @@ namespace DialogGenerator.CharacterSelection
                         }
                     }
                     mesg--;
-                    if (_timeAgoOfMessage_i > TimeSpan.FromMilliseconds(1500))  //we are past the window
+                    if (_timeAgoOfCurrentMessage > TimeSpan.FromMilliseconds(1500))  //we are past the window
                         return false;
                 }
                 return false;
@@ -368,65 +349,15 @@ namespace DialogGenerator.CharacterSelection
 
                 return index;
             }
-            catch (Exception)
+            catch (Exception ex)
             {
+                mLogger.Error("_getCharacterMappedIndex exception " + ex.Message);
+
                 return -1;
             }
         }
 
-        private bool _assignNextCharacters(int _tempCh1, int _tempCh2)
-        {
-            try
-            {
-                mLogger.Info(String.Format("Trying to assign characters ch1_radio = {0}, ch2_radio = {1}", _tempCh1, _tempCh2));
-
-                int _nextCharacter1MappedIndex1, _nextCharacter1MappedIndex2;
-                bool _nextCharactersAssigned = false;
-
-                if (mRandom.NextDouble() > 0.5)
-                {
-                    _nextCharacter1MappedIndex1 = _getCharacterMappedIndex(_tempCh1);
-                    _nextCharacter1MappedIndex2 = _getCharacterMappedIndex(_tempCh2);
-                }
-                else
-                {
-                    _nextCharacter1MappedIndex1 = _getCharacterMappedIndex(_tempCh2);
-                    _nextCharacter1MappedIndex2 = _getCharacterMappedIndex(_tempCh1);
-                }
-
-                if (_nextCharacter1MappedIndex1 >= 0 && _nextCharacter1MappedIndex2 >= 0)
-                {
-                    NextCharacter1 = _nextCharacter1MappedIndex1;
-                    NextCharacter2 = _nextCharacter1MappedIndex2;
-
-                    if ((NextCharacter1 != CurrentCharacter1 || NextCharacter2 != CurrentCharacter2) &&
-                         (NextCharacter2 != CurrentCharacter1 || NextCharacter1 != CurrentCharacter2) || mFreshStart)
-                    {
-                        _nextCharactersAssigned = true;
-                        mLogger.Info("New characters assigned by BLE Character 1 is " + NextCharacter1 +
-                            " Character 2 is " + NextCharacter2);
-                    } else
-                    {
-                        mLogger.Info(String.Format("Characters not assigned! Current1 = {0}, Next1 = {1}, Current2 = {2}, Next2 = {3}"
-                            , CurrentCharacter1
-                            , NextCharacter1
-                            , CurrentCharacter2
-                            , NextCharacter2));
-                    }
-                } else
-                {
-                    mLogger.Info(String.Format("Characters not assigned. ch1 = {0}, ch2 = {1}", _nextCharacter1MappedIndex1, _nextCharacter1MappedIndex2));
-                }
-                return _nextCharactersAssigned;
-            }
-            catch (Exception ex)
-            {
-                mLogger.Error("_assignNextCharacters " + ex.Message);
-                return false;
-            }
-        }
-
-        private void _UpdateAndRationalizeTemporaryCharacters()
+        private void _updateTemporaryRadioIndexesToCurrentlySpeakingAndCheck()
         {
             try
             {
@@ -435,29 +366,29 @@ namespace DialogGenerator.CharacterSelection
 
                 if (_ch1 != null && _ch1.RadioNum != -1 && _ch2 != null && _ch2.RadioNum != -1 && _ch1.RadioNum != _ch2.RadioNum)
                 {
-                    mTempCh1 = _ch1.RadioNum;
-                    mTempch2 = _ch2.RadioNum;
+                    mPossibleSpeakingCh1RadioNum = _ch1.RadioNum;
+                    mPossibleSpeakingCh2RadioNum = _ch2.RadioNum;
                 }
                 else
                 {
-                    mTempCh1 = 0;
-                    mTempch2 = 1;
+                    mPossibleSpeakingCh1RadioNum = 0;
+                    mPossibleSpeakingCh2RadioNum = 1;
                 }
 
-                if (mTempCh1 > ApplicationData.Instance.NumberOfRadios - 1 || mTempch2 > ApplicationData.Instance.NumberOfRadios - 1 ||
-                    mTempCh1 < 0 || mTempch2 < 0 || mTempCh1 == mTempch2)
+                if (mPossibleSpeakingCh1RadioNum > ApplicationData.Instance.NumberOfRadios - 1 || mPossibleSpeakingCh2RadioNum > ApplicationData.Instance.NumberOfRadios - 1 ||
+                    mPossibleSpeakingCh1RadioNum < 0 || mPossibleSpeakingCh2RadioNum < 0 || mPossibleSpeakingCh1RadioNum == mPossibleSpeakingCh2RadioNum)
                 {
-                    mTempCh1 = 0;
-                    mTempch2 = 1;
+                    mPossibleSpeakingCh1RadioNum = 0;
+                    mPossibleSpeakingCh2RadioNum = 1;
                 }
             }
             catch (Exception ex)
             {
-                mLogger.Error("_UpdateAndRationalizeTemporaryCharacters " + ex.Message);
+                mLogger.Error("_updateTemporaryRadioIndexesToCurrentlySpeakingAndCheck " + ex.Message);
             }
         }
 
-        private void _ZeroOutUnresponsiveRadiosInHeatMap()
+        private void _zeroOutUnresponsiveRadiosInHeatMap()
         {
             try
             {
@@ -476,48 +407,70 @@ namespace DialogGenerator.CharacterSelection
                         }
                         if (alreadyZero > 0)
                         {
-                            mLogger.Error("_ShouldCharactersChange MaxLastSeenInterval radio # " + i);
+                            mLogger.Error("_zeroOutUnresponsiveRadiosInHeatMap MaxLastSeenInterval radio # " + i);
                         }
                     }
                 }
             }
             catch (Exception ex)
             {
-                mLogger.Error("_ZeroOutUnresponsiveRadiosInHeatMap " + ex.Message);
+                mLogger.Error("_zeroOutUnresponsiveRadiosInHeatMap " + ex.Message);
             }
         }
 
-        private Triggers _ShouldCharactersChange()
+        private bool _areRadioPairsDifferent(int A1, int A2, int B1, int B2)
+        {  //checks if the radio numbers for character pair A and character pair B are the same
+            if ((A1 == B1 && A2 == B2) || (A1 == B2 && A2 == B1))
+            { 
+                return false;
+            }
+            else
+            {
+                return true;
+            }
+        }
+
+        private Triggers _shouldCharactersChange()
         {
             //  This method takes the RSSI values and combines them so that the RSSI for Ch2 looking at 
-            //  Ch1 is added to the RSSI for Ch1 looking at Ch2
+            //  Ch1 is added to the RSSI for Ch1 looking at Ch2.  
+            //  Characters should change if these conditions are met: 
+            //  1. A message has come in, 
+            //  2. We are in the motion window, 
+            //  3. The heat map including the new message gives a higher RSSI pair to new characters vs. currently speaking 
+            //  4. The new radio pair meets the RSSI stability threshold requirements of % highest over time
 
             try
             {
                 bool _rssiStable = false;
-                int i = 0, j = 0;
 
-                _UpdateAndRationalizeTemporaryCharacters();
+                _zeroOutUnresponsiveRadiosInHeatMap();
+                _updateTemporaryRadioIndexesToCurrentlySpeakingAndCheck();
 
                 //only pick up new characters if bigRssi greater not ==
-                BigRssi = HeatMap[mTempCh1, mTempch2] + HeatMap[mTempch2, mTempCh1];
+                int priorLargestRssiPair = HeatMap[mPossibleSpeakingCh1RadioNum, mPossibleSpeakingCh2RadioNum] + HeatMap[mPossibleSpeakingCh2RadioNum, mPossibleSpeakingCh1RadioNum];
+                _findBiggestRssiPair(out int finalRow, out int finalColumn, out int newLargestRssiPair, in HeatMap);
 
-                _ZeroOutUnresponsiveRadiosInHeatMap();
-
-                _findBiggestRssiPair(ref i, ref j, ref BigRssi, HeatMap);
-
-                mTempCh1 = i;
-                mTempch2 = j;                            
+                if (newLargestRssiPair > priorLargestRssiPair && 
+                      _areRadioPairsDifferent(mPossibleSpeakingCh1RadioNum, mPossibleSpeakingCh2RadioNum, finalRow, finalColumn))
+                {
+                    mPossibleSpeakingCh1RadioNum = finalRow;
+                    mPossibleSpeakingCh2RadioNum = finalColumn;
+                }
+                else
+                {  // only consider changing characters when new RSSI is larger so back to start of state machine
+                    return Triggers.ProcessMessage;
+                }
 
                 // TODO, _calculateRssiStableAfterChange and _calculateIfInMotionWindow should be their own states
-                _rssiStable = _calculateRssiStablity(mTempCh1, mTempch2);
+                _rssiStable = _calculateRssiStablity(mPossibleSpeakingCh1RadioNum, mPossibleSpeakingCh2RadioNum);
                 var _inMovementWindow = _calculateIfInMotionWindow();
 
                 if ( _rssiStable && (_inMovementWindow || mFreshStart))
                 {
                     if(mFreshStart)
                     {
-                        if(_calculateRssiStablity(mTempCh1, mTempch2, 1000, 0.95))
+                        if(_calculateRssiStablity(mPossibleSpeakingCh1RadioNum, mPossibleSpeakingCh2RadioNum, 1000, 0.95))
                         {
                             mFreshStart = false;
                         }                        
@@ -533,26 +486,32 @@ namespace DialogGenerator.CharacterSelection
             }
             catch (Exception ex)
             {
-                mLogger.Error("_ShouldCharactersChange " + ex.Message);
+                mLogger.Error("_shouldCharactersChange " + ex.Message);
                 return Triggers.ProcessMessage;
             }
         }
 
-        private void _findBiggestRssiPair(ref int i, ref int j, ref int _bigRssi, int[,] _heatMap)
+        private void _findBiggestRssiPair(out int outRow, out int outColumn, out int _rssiPairMax, in int[,] _heatMap)
         {
             //  This method takes the RSSI values and combines them so that the RSSI for Ch2 looking at 
             //  Ch1 is added to the RSSI for Ch1 looking at Ch2 to find the strongest signal pair
+            _rssiPairMax = 0;
+            outRow = 1;
+            outColumn = 2;
             try
             {
-                for (i = 0; i < ApplicationData.Instance.NumberOfRadios; i++)
+                for (int i = 0; i < ApplicationData.Instance.NumberOfRadios; i++)
                 {
-                    for (j = i + 1; j < ApplicationData.Instance.NumberOfRadios; j++)
+                    for (int j = i + 1; j < ApplicationData.Instance.NumberOfRadios; j++)
                     {
-                        // only need data above the matrix diagonal
-                        if (_heatMap[i, j] + _heatMap[j, i] > _bigRssi)
+                        // only need data above the matrix diagonal to look at both radios view of each other
+
+                        int sum = _heatMap[i, j] + _heatMap[j, i];
+                        if (sum > _rssiPairMax)
                         {
-                            // look at both characters view of each other
-                            _bigRssi = _heatMap[i, j] + _heatMap[j, i];
+                            _rssiPairMax = sum;
+                            outRow = i;
+                            outColumn = j;
                         }
                     }
                 }
@@ -563,11 +522,84 @@ namespace DialogGenerator.CharacterSelection
             }
         }
 
+
+        private void _selectWhichOfNewCharactersSpeaksFirst(int _ch1RadioNum, int _ch2RadioNum, 
+            out int _nextSpeakingCharacter1Index, out int _nextSpeakingCharacter2Index)
+        {
+            _nextSpeakingCharacter1Index = -1;
+            _nextSpeakingCharacter2Index = -1;
+            try
+            {
+                mLogger.Info(String.Format("Trying to assign radios ch1_radio = {0}, ch2_radio = {1} to speak",              
+                                            _ch1RadioNum, _ch2RadioNum));
+
+                if (mRandom.NextDouble() > 0.5)
+                {
+                    _nextSpeakingCharacter1Index = _getCharacterMappedIndex(_ch1RadioNum);
+                    _nextSpeakingCharacter2Index = _getCharacterMappedIndex(_ch2RadioNum);
+                }
+                else
+                {
+                    _nextSpeakingCharacter1Index = _getCharacterMappedIndex(_ch2RadioNum);
+                    _nextSpeakingCharacter2Index = _getCharacterMappedIndex(_ch1RadioNum);
+                }
+            }
+            catch (Exception ex)
+            {
+                mLogger.Error("_selectWhichOfNewCharactersSpeaksFirst " + ex.Message);
+            }
+        }
+
+
+        private bool _assignNextSpeakingCharactersIfNew(int _nextSpeakingCharacter1Index, int _nextSpeakingCharacter2Index)
+        {
+            try
+            {
+                bool _nextCharactersSelectedAreNew = false;
+                if (_nextSpeakingCharacter1Index >= 0 && _nextSpeakingCharacter2Index >= 0)
+                {
+                    NextCharacter1 = _nextSpeakingCharacter1Index;
+                    NextCharacter2 = _nextSpeakingCharacter2Index;
+
+                    if (_areRadioPairsDifferent(NextCharacter1, NextCharacter2, CurrentCharacter1, CurrentCharacter2) 
+                        || mFreshStart)
+                    {
+                        _nextCharactersSelectedAreNew = true;
+                        mLogger.Info("New speaking characters assigned by BLE: Character 1 is " + NextCharacter1 +
+                            " Character 2 is " + NextCharacter2);
+                    }
+                    else
+                    {
+                        mLogger.Info(String.Format("Characters not assigned! Current1 = {0}, Next1 = {1}, Current2 = {2}, Next2 = {3}"
+                            , CurrentCharacter1
+                            , NextCharacter1
+                            , CurrentCharacter2
+                            , NextCharacter2));
+                    }
+                }
+                else
+                {
+                    mLogger.Info(String.Format("Characters not assigned. _speakingCh1Index = {0}, _speakingCh2Index = {1}"
+                        , _nextSpeakingCharacter1Index, _nextSpeakingCharacter2Index));
+                }
+                return _nextCharactersSelectedAreNew;
+            }
+            catch (Exception ex)
+            {
+                mLogger.Error("_selectWhichOfNewCharactersSpeaksFirst " + ex.Message);
+                return false;
+            }
+        }
+
+
         private Triggers _selectNextCharacters()
         {
             try
             {
-                if (_assignNextCharacters(mTempCh1, mTempch2))
+                int _speakingCh1Index, _speakingCh2Index;
+                _selectWhichOfNewCharactersSpeaksFirst(mPossibleSpeakingCh1RadioNum, mPossibleSpeakingCh2RadioNum,
+                       out _speakingCh1Index,  out _speakingCh2Index);
+                if (_assignNextSpeakingCharactersIfNew(_speakingCh1Index, _speakingCh2Index))
                 {
                     mLogger.Info("Characters assigned");
 
@@ -638,7 +670,7 @@ namespace DialogGenerator.CharacterSelection
                             }
                         case Triggers.CalculateClosestPair:
                             {
-                                next = _ShouldCharactersChange();
+                                next = _shouldCharactersChange();
                                 break;
                             }
                         case Triggers.SelectNextCharacters:
