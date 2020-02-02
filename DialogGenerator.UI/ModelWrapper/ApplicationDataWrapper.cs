@@ -27,20 +27,29 @@ namespace DialogGenerator.UI.Wrapper
             {
                 case nameof(DelayBetweenPhrases):
                     {
-
                         if (!_isDecimalFormat(DelayBetweenPhrases.ToString()))
                             errors.Add("Decimal number required.");
                         break;
                     }
                 case nameof(MaxTimeToPlayFile):
                     {
-
                         if (!_isDecimalFormat(MaxTimeToPlayFile.ToString()))
                             errors.Add("Decimal number required.");
                         break;
                     }
+                case nameof(RadioMovesTimeSensitivity):
+                    {
+                        if (!_isDecimalFormat(RadioMovesTimeSensitivity.ToString()))
+                            errors.Add("Decimal number required.");
+                        break;
+                    }
+                case nameof(RadioMovesSignalStrengthSensitivity):
+                    {
+                        if (!_isDecimalFormat(RadioMovesSignalStrengthSensitivity.ToString()))
+                            errors.Add("Decimal number required.");
+                        break;
+                    }
             }
-
             return errors;
         }
 
@@ -103,6 +112,27 @@ namespace DialogGenerator.UI.Wrapper
                 validateProperty(nameof(DelayBetweenPhrases));
             }
         }
+
+        public double RadioMovesTimeSensitivity
+        {
+            get { return getValue<double>(); }
+            set
+            {
+                setValue(value);
+                validateProperty(nameof(RadioMovesTimeSensitivity));
+            }
+        }
+
+        public double RadioMovesSignalStrengthSensitivity
+        {
+            get { return getValue<double>(); }
+            set
+            {
+                setValue(value);
+                validateProperty(nameof(RadioMovesSignalStrengthSensitivity));
+            }
+        }
+
 
         public bool DebugModeOn
         {
