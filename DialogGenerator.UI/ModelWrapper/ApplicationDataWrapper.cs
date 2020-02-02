@@ -38,7 +38,7 @@ namespace DialogGenerator.UI.Wrapper
                         break;
                     }
                 case nameof(RadioMovesTimeSensitivity):
-                    {
+                    {   // TODO check that this and next are between 0-1.0
                         if (!_isDecimalFormat(RadioMovesTimeSensitivity.ToString()))
                             errors.Add("Decimal number required.");
                         break;

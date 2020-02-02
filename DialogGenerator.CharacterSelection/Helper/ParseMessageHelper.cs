@@ -73,7 +73,7 @@ namespace DialogGenerator.CharacterSelection.Helper
         #region - Public functions -
 
 
-        public static void UpdateHeatMapWithMessage(int _rowNum, BLE_Message _newRow)
+        public static void DeepCopyMessageRssisToHeatMap(int _rowNum, in BLE_Message _newRow, int [,] _heatMap)
         {
             try
             {
@@ -81,13 +81,27 @@ namespace DialogGenerator.CharacterSelection.Helper
                 {
                     if (CharacterRepository.GetByAssignedRadio(_rowNum) != null)
                     {
-                        BLESelectionService.HeatMap[_rowNum, _k] = _newRow.msgArray[_k];
+                        _heatMap[_rowNum, _k] = _newRow.msgArray[_k];
                     }
                     else
+                    // otherwise radios that aren't assigned to a character might get selected to talk
                     {
-                        BLESelectionService.HeatMap[_rowNum, _k] = 0;
+                        _heatMap[_rowNum, _k] = 0;
                     }
                 }
+            }
+            catch (Exception ex)
+            {
+                throw ex;
+            }
+        }
+
+
+        public static void UpdateHeatMapWithMessage(int _rowNum, BLE_Message _newRow)
+        {
+            try
+            {
+                DeepCopyMessageRssisToHeatMap( _rowNum, in _newRow, BLESelectionService.HeatMap);
 
                 var _currentDateTime = DateTime.Now;
 

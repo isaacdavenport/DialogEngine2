@@ -175,7 +175,7 @@ namespace DialogGenerator.CharacterSelection
                         mCancellationTokenSource.Cancel();                        
                     }
 
-                    Console.Out.WriteLine("Iddle time: {0}", mIdleTime);
+                    Console.Out.WriteLine("Idle time: {0}", mIdleTime);
                     return Triggers.ProcessMessage;
                 } 
 
@@ -260,9 +260,10 @@ namespace DialogGenerator.CharacterSelection
             }
         }
 
-        // are the two passed in radio numbers the strongest RSSI pair for the last _Milliseconds  at a
-        // rate of _HitPercent?  Work back through time and check RSSI pair strength.
-        private bool _calculateRssiStablity2(int _radio1, int _radio2, long _milliseconds = 300, double _HitPercent = 0.70)
+        // Are the two passed in radio numbers the strongest RSSI pair for the last _Milliseconds  at a
+        // rate of _HitPercent?  Don't cancel a change if they were the strongest pair for 10 or last 12 readings
+        // Work back through time and check RSSI pair strength.
+        private bool _calculateRssiStablity2(int _radio1, int _radio2, long _milliseconds = 300, double _hitPercent = 0.70)
         {   
             try
             {
@@ -271,12 +272,45 @@ namespace DialogGenerator.CharacterSelection
                 {
                     _milliseconds = (long)(_milliseconds * ApplicationData.Instance.RadioMovesTimeSensitivity * 10.0);
                 }
+                TimeSpan _timesSpanOfInterest = TimeSpan.FromMilliseconds(_milliseconds);
+                if (ApplicationData.Instance.RadioMovesSignalStrengthSensitivity > 0 &&
+                         ApplicationData.Instance.RadioMovesSignalStrengthSensitivity < 1.0)
+                {
+                    _hitPercent = _hitPercent * ApplicationData.Instance.RadioMovesSignalStrengthSensitivity * 10.0;
+                }
 
                 DateTime _currentTime = DateTime.Now;
-                int mesg = ParseMessageHelper.ReceivedMessages.Count - 1;
+                int mesg;
+                int lastMessageIndex = ParseMessageHelper.ReceivedMessages.Count - 1;
 
-                if (mesg < 5)
-                    return false;  // not enough readings even if over timespan of > 300ms
+                if (lastMessageIndex < 5 || (_currentTime - ParseMessageHelper.ReceivedMessages[0].ReceivedTime < _timesSpanOfInterest))
+                    return false;  // not enough readings yet
+
+                int startingMessageIndex = 0; 
+                // go backwards through messages to find index of our timeSpanOfInterest
+                for (int i = lastMessageIndex; i >= 0; i--)   
+                {
+                    if (_currentTime - ParseMessageHelper.ReceivedMessages[i].ReceivedTime > _timesSpanOfInterest)
+                    {
+                        // not enough data
+                        if (lastMessageIndex - i  < 5)
+                        {
+                            return false;
+                        }
+                        startingMessageIndex = i;
+                        break;
+                    }
+                }
+
+                int _hits = 0;
+                int _misses = 0;
+                int[,] _heatMap = new int[ApplicationData.Instance.NumberOfRadios, ApplicationData.Instance.NumberOfRadios];
+                for (int j = startingMessageIndex; j <= lastMessageIndex; j++)
+                {
+                    ParseMessageHelper.DeepCopyMessageRssisToHeatMap(3, ParseMessageHelper.ReceivedMessages[j], _heatMap);
+                }
+
+
 
                 while (mesg >= 0)
                 {
@@ -285,7 +319,7 @@ namespace DialogGenerator.CharacterSelection
                         return false;  // ran out of ReceivedMessages before desire time in ms
                     }
                     var _timeAgoOfCurrentMessage = _currentTime - ParseMessageHelper.ReceivedMessages[mesg].ReceivedTime;
-                    if (_timeAgoOfCurrentMessage < TimeSpan.FromMilliseconds(_milliseconds))
+                    if (_timeAgoOfCurrentMessage < _timesSpanOfInterest)
                     {  // in the time window we are asked to check
                         //assemble a heat map here to pass to _findBigestRSSI
                         if (ParseMessageHelper.ReceivedMessages[mesg].Motion > 48)
@@ -307,7 +341,7 @@ namespace DialogGenerator.CharacterSelection
                             return true;
                         }
                     }
-                    mesg--;
+                    mesg++;
                     if (_timeAgoOfCurrentMessage > TimeSpan.FromMilliseconds(1500))  //we are past the window
                         return false;
                 }
