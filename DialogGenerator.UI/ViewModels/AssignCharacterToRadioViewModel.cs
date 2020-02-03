@@ -190,6 +190,12 @@ namespace DialogGenerator.UI.ViewModels
                         mAssignedRadio = newVal;
                     }
                 }
+            } else
+            {
+                SelectedCharacter.RadioNum = newVal;
+                await mCharacterDataProvider.SaveAsync(SelectedCharacter);
+                await mMessageDialogService.ShowMessage("Success", string.Format("The radio {0} was successfully attached to character '{1}'", newVal, SelectedCharacter.CharacterName));
+                mAssignedRadio = newVal;
             }
         }
 
