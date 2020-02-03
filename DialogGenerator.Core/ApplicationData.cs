@@ -141,7 +141,7 @@ namespace DialogGenerator.Core
         [Description("Radio's signal strength sensitivity to switch miniatures 0.01-0.99.")]
         [DisplayName("Strength Sensitivity .01-.99:")]
         [RegularExpression(@"^[0-9]([.,][0-9]{1,3})?$", ErrorMessage = @"Field requires decimal number.")]
-        public double RadioMovesSignalStrengthSensitivity { get; set; } = 0.1;
+        public double RadioMovesSignalStrengthSensitivity { get; set; } = 0.7;
 
 
 

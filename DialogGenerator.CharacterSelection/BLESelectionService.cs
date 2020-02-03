@@ -51,7 +51,13 @@ namespace DialogGenerator.CharacterSelection
         public int mStableRadioIndex1 = -1;
         public int mStableRadioIndex2 = -1;
         public long mLastStableTime = 0;
-        
+
+        private const int mMsOfStillTimeRequired = 300;
+        private const int mAccelerometerMotionThreshold = 40;
+        private const int mAccelerometerStillnessThreshold = 48;
+        private const int mMsMotionWindow = 1500;
+
+
         #endregion
 
         #region - constructor -
@@ -228,16 +234,16 @@ namespace DialogGenerator.CharacterSelection
                         return false;  // didn't have long enough data in ReceivedMessages
                     }
                     var _timeAgoOfMessage_i = _currentTime - ParseMessageHelper.ReceivedMessages[i].ReceivedTime;
-                    if (_timeAgoOfMessage_i < TimeSpan.FromMilliseconds(300))
+                    if (_timeAgoOfMessage_i < TimeSpan.FromMilliseconds(mMsOfStillTimeRequired))
                     {  // in the needsToBeStableWindow
-                        if (ParseMessageHelper.ReceivedMessages[i].Motion > 48)
-                        {  // if the motion was high in the last 300 ms we aren't done moving
+                        if (ParseMessageHelper.ReceivedMessages[i].Motion > mAccelerometerStillnessThreshold)
+                        {  // if the motion was high in the last mMsOfStillTimeRequired we aren't done moving
                             return false;
                         }
                     }
-                    if (_timeAgoOfMessage_i >= TimeSpan.FromMilliseconds(300)) 
-                    {  // in the needsToBeStableWindow
-                        if (ParseMessageHelper.ReceivedMessages[i].Motion > 40)  // we had motion between 300-1500ms ago
+                    if (_timeAgoOfMessage_i >= TimeSpan.FromMilliseconds(mMsOfStillTimeRequired)) 
+                    {  // passed the needsToBeStableWindow now look for motion in deeper past
+                        if (ParseMessageHelper.ReceivedMessages[i].Motion > mAccelerometerMotionThreshold)  
                         {
                             ReceivedMessage msg = ParseMessageHelper.ReceivedMessages[i];
                             string dbgOut = msg.CharacterPrefix + " ";
@@ -250,7 +256,7 @@ namespace DialogGenerator.CharacterSelection
                         }
                     }
                     i--;
-                    if (_timeAgoOfMessage_i > TimeSpan.FromMilliseconds(1500))  //we are past the window
+                    if (_timeAgoOfMessage_i > TimeSpan.FromMilliseconds(mMsMotionWindow))  //we are past the window
                         return false;
                 }
                 return false;  
@@ -261,11 +267,26 @@ namespace DialogGenerator.CharacterSelection
             }
         }
 
+        private bool _checkHeatMapRowNonZero(int _radioNum, int [,] _heatMap)
+        {
+            for (int _k = 0; _k < ApplicationData.Instance.NumberOfRadios; _k++)
+            {
+                if(_heatMap[_radioNum, _k] > 0)
+                {
+                    return true;
+                }
+            }
+            return false;
+        }
+
         // Are the two passed in radio numbers the strongest RSSI pair for the last _Milliseconds  at a
         // rate of _HitPercent?  Don't cancel a change if they were the strongest pair for 10 or last 12 readings
         // Work back through time and check RSSI pair strength.
         private bool _calculateRssiStablity2(int _radio1, int _radio2, long _milSecRequired = 400, double _hitPercent = 0.70)
         {   
+            // in the old way of doing things we would zero out a radio's heat map row after a period of inactivity
+            // this stability calculation does not do that, however, it is typically done for a small time window
+            // so this difference isn't expected to cause performance differences
             try
             {
                 double _timeSensitivity = ApplicationData.Instance.RadioMovesTimeSensitivity;
@@ -276,7 +297,7 @@ namespace DialogGenerator.CharacterSelection
                     _milSecRequired = (long)(_milSecRequired * _timeSensitivity * 10.0);
 
                 if (_strengthSensitivity > 0 && _strengthSensitivity < 1.0)
-                    _hitPercent = _hitPercent * _strengthSensitivity * 10.0;
+                    _hitPercent = _strengthSensitivity;
 
                 List<ReceivedMessage> msgList = ParseMessageHelper.ReceivedMessages;  
                 DateTime _currentTime = DateTime.Now;
@@ -301,17 +322,35 @@ namespace DialogGenerator.CharacterSelection
                     }
                 }
 
-                int _hits = 0;
-                int _misses = 0;
+                double _hits = 0;
+                double _misses = 0;
                 int _numRadios = ApplicationData.Instance.NumberOfRadios;
-                int[,] _heatMap = new int[_numRadios, _numRadios];
+                int[,] _heatMap = new int[_numRadios, _numRadios];  // new array of zero RSSI values
+                int _winner1, _winner2, _sum;
+
                 for (int j = startingMessageIndex; j <= lastMessageIndex; j++)
                 {
-                   /* for ( int k = )
-                    Array.Copy(msgList[j].Rssi, 
-                                _heatMap[msgList[j]. ,], _numRadios);  */
+                    ParseMessageHelper.DeepCopyBLE_MessageRssisToHeatMap(msgList[j].RadioNum, msgList[j].Rssi, _heatMap);
+                    if (_checkHeatMapRowNonZero(_radio1, _heatMap) && _checkHeatMapRowNonZero(_radio2, _heatMap))
+                    {
+                        // only start looking once we have data on the two radios of interest in heatmap
+                        _findBiggestRssiPair(out _winner1, out _winner2, out _sum, _heatMap);
+                        if (_areRadioPairsDifferent(_radio1, _radio2, _winner1, _winner2))
+                        {
+                            // our radios of interest were not the winners in this round for biggest RSSI
+                            _misses++;
+                        } 
+                        else
+                        {
+                            _hits++;
+                        }
+                    }
                 }
-                
+
+                if (_hits / (_hits + _misses) > _hitPercent)
+                {
+                    return true;
+                }
                 return false;
             }
             catch (Exception ex)
@@ -477,14 +516,14 @@ namespace DialogGenerator.CharacterSelection
                 }
 
                 // TODO, _calculateRssiStableAfterChange and _calculateIfInMotionWindow should be their own states
-                _rssiStable = _calculateRssiStablity(mPossibleSpeakingCh1RadioNum, mPossibleSpeakingCh2RadioNum);
+                _rssiStable = _calculateRssiStablity2(mPossibleSpeakingCh1RadioNum, mPossibleSpeakingCh2RadioNum);
                 var _inMovementWindow = _calculateIfInMotionWindow();
 
                 if ( _rssiStable && (_inMovementWindow || mFreshStart))
                 {
                     if(mFreshStart)
                     {
-                        if(_calculateRssiStablity(mPossibleSpeakingCh1RadioNum, mPossibleSpeakingCh2RadioNum, 1000, 0.95))
+                        if(_calculateRssiStablity2(mPossibleSpeakingCh1RadioNum, mPossibleSpeakingCh2RadioNum, 1000, 0.95))
                         {
                             mFreshStart = false;
                         }                        
