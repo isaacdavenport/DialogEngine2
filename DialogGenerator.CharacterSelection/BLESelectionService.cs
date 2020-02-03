@@ -10,6 +10,7 @@ using DialogGenerator.Model;
 using Prism.Events;
 using System;
 using System.Linq;
+using System.Collections.Generic;
 using System.Threading;
 using System.Threading.Tasks;
 
@@ -263,40 +264,38 @@ namespace DialogGenerator.CharacterSelection
         // Are the two passed in radio numbers the strongest RSSI pair for the last _Milliseconds  at a
         // rate of _HitPercent?  Don't cancel a change if they were the strongest pair for 10 or last 12 readings
         // Work back through time and check RSSI pair strength.
-        private bool _calculateRssiStablity2(int _radio1, int _radio2, long _milliseconds = 300, double _hitPercent = 0.70)
+        private bool _calculateRssiStablity2(int _radio1, int _radio2, long _milSecRequired = 400, double _hitPercent = 0.70)
         {   
             try
             {
-                if (ApplicationData.Instance.RadioMovesTimeSensitivity > 0 &&
-                         ApplicationData.Instance.RadioMovesTimeSensitivity < 1.0)
-                {
-                    _milliseconds = (long)(_milliseconds * ApplicationData.Instance.RadioMovesTimeSensitivity * 10.0);
-                }
-                TimeSpan _timesSpanOfInterest = TimeSpan.FromMilliseconds(_milliseconds);
-                if (ApplicationData.Instance.RadioMovesSignalStrengthSensitivity > 0 &&
-                         ApplicationData.Instance.RadioMovesSignalStrengthSensitivity < 1.0)
-                {
-                    _hitPercent = _hitPercent * ApplicationData.Instance.RadioMovesSignalStrengthSensitivity * 10.0;
-                }
+                double _timeSensitivity = ApplicationData.Instance.RadioMovesTimeSensitivity;
+                double _strengthSensitivity = ApplicationData.Instance.RadioMovesSignalStrengthSensitivity;
 
+                // if the user has in bounds settings use them to scale between 1/10th and 10x the default values
+                if (_timeSensitivity > 0 && _timeSensitivity < 1.0)
+                    _milSecRequired = (long)(_milSecRequired * _timeSensitivity * 10.0);
+
+                if (_strengthSensitivity > 0 && _strengthSensitivity < 1.0)
+                    _hitPercent = _hitPercent * _strengthSensitivity * 10.0;
+
+                List<ReceivedMessage> msgList = ParseMessageHelper.ReceivedMessages;  
                 DateTime _currentTime = DateTime.Now;
-                int mesg;
-                int lastMessageIndex = ParseMessageHelper.ReceivedMessages.Count - 1;
+                TimeSpan _timesSpanOfInterest = TimeSpan.FromMilliseconds(_milSecRequired);
+                int lastMessageIndex = msgList.Count - 1;
 
-                if (lastMessageIndex < 5 || (_currentTime - ParseMessageHelper.ReceivedMessages[0].ReceivedTime < _timesSpanOfInterest))
+                if (lastMessageIndex < 5 || (_currentTime - msgList[0].ReceivedTime < _timesSpanOfInterest))
                     return false;  // not enough readings yet
 
                 int startingMessageIndex = 0; 
                 // go backwards through messages to find index of our timeSpanOfInterest
                 for (int i = lastMessageIndex; i >= 0; i--)   
                 {
-                    if (_currentTime - ParseMessageHelper.ReceivedMessages[i].ReceivedTime > _timesSpanOfInterest)
+                    if (_currentTime - msgList[i].ReceivedTime > _timesSpanOfInterest)
                     {
-                        // not enough data
+                        // not enough data in timespan exit method
                         if (lastMessageIndex - i  < 5)
-                        {
                             return false;
-                        }
+
                         startingMessageIndex = i;
                         break;
                     }
@@ -304,51 +303,20 @@ namespace DialogGenerator.CharacterSelection
 
                 int _hits = 0;
                 int _misses = 0;
-                int[,] _heatMap = new int[ApplicationData.Instance.NumberOfRadios, ApplicationData.Instance.NumberOfRadios];
+                int _numRadios = ApplicationData.Instance.NumberOfRadios;
+                int[,] _heatMap = new int[_numRadios, _numRadios];
                 for (int j = startingMessageIndex; j <= lastMessageIndex; j++)
                 {
-                    ParseMessageHelper.DeepCopyMessageRssisToHeatMap(3, ParseMessageHelper.ReceivedMessages[j], _heatMap);
+                   /* for ( int k = )
+                    Array.Copy(msgList[j].Rssi, 
+                                _heatMap[msgList[j]. ,], _numRadios);  */
                 }
-
-
-
-                while (mesg >= 0)
-                {
-                    if (mesg <= 0)
-                    {
-                        return false;  // ran out of ReceivedMessages before desire time in ms
-                    }
-                    var _timeAgoOfCurrentMessage = _currentTime - ParseMessageHelper.ReceivedMessages[mesg].ReceivedTime;
-                    if (_timeAgoOfCurrentMessage < _timesSpanOfInterest)
-                    {  // in the time window we are asked to check
-                        //assemble a heat map here to pass to _findBigestRSSI
-                        if (ParseMessageHelper.ReceivedMessages[mesg].Motion > 48)
-                        {  // if the motion was high in the last 300 ms we aren't done moving
-                            return false;
-                        }
-                    }
-                    if (_timeAgoOfCurrentMessage >= TimeSpan.FromMilliseconds(300))
-                    {  // in the needsToBeStableWindow
-                        if (ParseMessageHelper.ReceivedMessages[mesg].Motion > 40)  // we had motion between 300-1500ms ago
-                        {
-                            ReceivedMessage msg = ParseMessageHelper.ReceivedMessages[mesg];
-                            string dbgOut = msg.CharacterPrefix + " ";
-                            dbgOut += msg.Motion.ToString("D3");
-                            dbgOut += " - ";
-                            dbgOut += msg.ReceivedTime.ToString("HH:mm:ss");
-                            mLogger.Info(dbgOut);
-
-                            return true;
-                        }
-                    }
-                    mesg++;
-                    if (_timeAgoOfCurrentMessage > TimeSpan.FromMilliseconds(1500))  //we are past the window
-                        return false;
-                }
+                
                 return false;
             }
             catch (Exception ex)
             {
+                mLogger.Error("_calculateRssiStablity exception " + ex.Message);
                 throw ex;
             }
         }

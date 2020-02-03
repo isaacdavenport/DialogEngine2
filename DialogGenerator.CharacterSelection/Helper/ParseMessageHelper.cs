@@ -22,11 +22,12 @@ namespace DialogGenerator.CharacterSelection.Helper
 
         #region - Private methods -
 
-        private static void _addMessageToReceivedBuffer(int _characterRowNum, BLE_Message _rw, DateTime _timeStamp)
+        private static void _addMessageToReceivedBuffer(int _radioIndex, BLE_Message _rw, DateTime _timeStamp)
         {
             try
             {
-                if (_characterRowNum > Session.Get<ObservableCollection<Character>>(Constants.CHARACTERS).Count - 1)  
+                // TODO Isaac why do we test that the radio index is less than the number of characters in the character list?
+                if (_radioIndex > Session.Get<ObservableCollection<Character>>(Constants.CHARACTERS).Count - 1)  
                 {
                     return;
                 }
@@ -36,7 +37,8 @@ namespace DialogGenerator.CharacterSelection.Helper
                     ReceivedTime = _timeStamp,
                     Motion =      _rw.msgArray[_rw.msgArray.Length - 2],
                     SequenceNum = _rw.msgArray[_rw.msgArray.Length - 1],
-                    CharacterPrefix = CharacterRepository.GetByAssignedRadio(_characterRowNum).CharacterPrefix
+                    RadioNum = _radioIndex,
+                    CharacterPrefix = CharacterRepository.GetByAssignedRadio(_radioIndex).CharacterPrefix
                 });
 
                 //TODO add a lock around this
@@ -73,20 +75,20 @@ namespace DialogGenerator.CharacterSelection.Helper
         #region - Public functions -
 
 
-        public static void DeepCopyMessageRssisToHeatMap(int _rowNum, in BLE_Message _newRow, int [,] _heatMap)
+        public static void DeepCopyBLE_MessageRssisToHeatMap(int _radioHeatMapIndex, in BLE_Message _newRow, int [,] _heatMap)
         {
             try
             {
                 for (int _k = 0; _k < ApplicationData.Instance.NumberOfRadios; _k++)
                 {
-                    if (CharacterRepository.GetByAssignedRadio(_rowNum) != null)
+                    if (CharacterRepository.GetByAssignedRadio(_radioHeatMapIndex) != null)
                     {
-                        _heatMap[_rowNum, _k] = _newRow.msgArray[_k];
+                        _heatMap[_radioHeatMapIndex, _k] = _newRow.msgArray[_k];
                     }
                     else
                     // otherwise radios that aren't assigned to a character might get selected to talk
                     {
-                        _heatMap[_rowNum, _k] = 0;
+                        _heatMap[_radioHeatMapIndex, _k] = 0;
                     }
                 }
             }
@@ -97,18 +99,18 @@ namespace DialogGenerator.CharacterSelection.Helper
         }
 
 
-        public static void UpdateHeatMapWithMessage(int _rowNum, BLE_Message _newRow)
+        public static void UpdateHeatMapWithMessage(int _radioNum, BLE_Message _newRow)
         {
             try
             {
-                DeepCopyMessageRssisToHeatMap( _rowNum, in _newRow, BLESelectionService.HeatMap);
+                DeepCopyBLE_MessageRssisToHeatMap( _radioNum, in _newRow, BLESelectionService.HeatMap);
 
                 var _currentDateTime = DateTime.Now;
 
-                BLESelectionService.CharactersLastHeatMapUpdateTime[_rowNum] = _currentDateTime;
-                BLESelectionService.MotionVector[_rowNum] = _newRow.msgArray[ApplicationData.Instance.NumberOfRadios];
+                BLESelectionService.CharactersLastHeatMapUpdateTime[_radioNum] = _currentDateTime;
+                BLESelectionService.MotionVector[_radioNum] = _newRow.msgArray[ApplicationData.Instance.NumberOfRadios];
 
-                _addMessageToReceivedBuffer(_rowNum, _newRow, _currentDateTime);
+                _addMessageToReceivedBuffer(_radioNum, _newRow, _currentDateTime);
             }
             catch (Exception ex)
             {
