@@ -127,10 +127,23 @@ namespace DialogGenerator.Core
         [RegularExpression(@"^[0-9]([.,][0-9]{1,3})?$", ErrorMessage = @"Field requires decimal number.")]
         public double DelayBetweenPhrases { get; set; } = 1.0;
 
+
         [Editable(true)]
         [DisplayName("Debug Mode On:")]
         public bool DebugModeOn { get; set; } = false;
-        
+
+        [Description("Radio's time sensitivity to switch miniatures 0.01-0.99.")]
+        [DisplayName("Time Sensitivity .01-.99:")]
+        [RegularExpression(@"^[0-9]([.,][0-9]{1,3})?$", ErrorMessage = @"Field requires decimal number.")]
+        public double RadioMovesTimeSensitivity { get; set; } = 0.1;
+
+
+        [Description("Radio's signal strength sensitivity to switch miniatures 0.01-0.99.")]
+        [DisplayName("Strength Sensitivity .01-.99:")]
+        [RegularExpression(@"^[0-9]([.,][0-9]{1,3})?$", ErrorMessage = @"Field requires decimal number.")]
+        public double RadioMovesSignalStrengthSensitivity { get; set; } = 0.7;
+
+
 
         [XmlIgnore]
         public string RootDirectory

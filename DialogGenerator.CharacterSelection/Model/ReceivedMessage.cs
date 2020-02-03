@@ -10,5 +10,6 @@ namespace DialogGenerator.CharacterSelection.Model
         public int[] Rssi = new int[ApplicationData.Instance.NumberOfRadios];
         public int SequenceNum = -1;
         public int Motion = -1;
+        public int RadioNum = 0;
     }
 }

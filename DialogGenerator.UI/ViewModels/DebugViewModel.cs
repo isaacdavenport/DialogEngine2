@@ -68,7 +68,6 @@ namespace DialogGenerator.UI.ViewModels
                     && (e.AddedItems[0] as TabItem).Content is ListView)
                 {
                     var column = (((e.AddedItems[0] as TabItem).Content as ListView).View as GridView).Columns[0];
-
                     BindingOperations.GetBindingExpression(column, GridViewColumn.WidthProperty).UpdateTarget();
                 }
             }
@@ -82,11 +81,8 @@ namespace DialogGenerator.UI.ViewModels
         {
             var characters = mCharacterDataProvider.GetAll();
             int _characterCount = mCharacterDataProvider.GetAll().Count;
-
             HeatMap = data;
 
-            // Sinisa - 1/31/2020 (Possible fix of DLGEN-434)
-            // TODO - Discussion with Isaac.
             if(data.Character1Index < _characterCount)
             {
                 Character1Prefix = characters[data.Character1Index].CharacterPrefix;
@@ -96,7 +92,6 @@ namespace DialogGenerator.UI.ViewModels
             {
                 Character2Prefix = characters[data.Character2Index].CharacterPrefix;
             }            
-            
         }
 
         #endregion

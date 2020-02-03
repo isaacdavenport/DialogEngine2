@@ -10,9 +10,9 @@ using DialogGenerator.Model;
 using Prism.Events;
 using System;
 using System.Linq;
+using System.Collections.Generic;
 using System.Threading;
 using System.Threading.Tasks;
-using System.Windows.Threading;
 
 namespace DialogGenerator.CharacterSelection
 {
@@ -20,29 +20,25 @@ namespace DialogGenerator.CharacterSelection
     {
         #region - fields -
 
-        public const int StrongRssiBufDepth = /* 26 */ 5;  // TODO we should use a timer as well as relying on a number of incoming packets to switch characters
-
         private ILogger mLogger;
         private IEventAggregator mEventAggregator;
         private ICharacterRepository mCharacterRepository;
         private IBLEDataProviderFactory mBLEDataProviderFactory;
         private IBLEDataProvider mCurrentDataProvider;
-        private int mTempCh1;
-        private int mTempch2;
-        private int[,] mStrongRssiCharacterPairBuf = new int[2, StrongRssiBufDepth];
+        private int mPossibleSpeakingCh1RadioNum;
+        private int mPossibleSpeakingCh2RadioNum;
         private CancellationTokenSource mCancellationTokenSource;
         private BLESelectionWorkflow mWorkflow;
         private Timer mcHeatMapUpdateTimer;
         private Random mRandom = new Random();
         private States mCurrentState;
         private int mFailedBLEMessageAttempts = 0;
-        private long mIddleTime = 0;
+        private long mIdleTime = 0;
         private long mLastAccessTime = 0;
         private bool mRestartRequested = false;
         private bool mFirstFailMessage = true;
         private bool mFreshStart = true;
 
-        private int BigRssi = 0;
         private int CurrentCharacter1;
         private int CurrentCharacter2 = 1;
         private static int NextCharacter1 = 1;
@@ -50,12 +46,18 @@ namespace DialogGenerator.CharacterSelection
         public static int[,] HeatMap = new int[ApplicationData.Instance.NumberOfRadios, ApplicationData.Instance.NumberOfRadios];
         public static int[] MotionVector = new int[ApplicationData.Instance.NumberOfRadios];
         public static DateTime[] CharactersLastHeatMapUpdateTime = new DateTime[ApplicationData.Instance.NumberOfRadios];
-        public readonly TimeSpan MaxLastSeenInterval = new TimeSpan(0, 0, 0, 4, 100);
+        public readonly TimeSpan MaxLastSeenInterval = new TimeSpan(0, 0, 0, 6, 100);
 
         public int mStableRadioIndex1 = -1;
         public int mStableRadioIndex2 = -1;
         public long mLastStableTime = 0;
-        
+
+        private const int mMsOfStillTimeRequired = 300;
+        private const int mAccelerometerMotionThreshold = 40;
+        private const int mAccelerometerStillnessThreshold = 48;
+        private const int mMsMotionWindow = 1500;
+
+
         #endregion
 
         #region - constructor -
@@ -74,41 +76,6 @@ namespace DialogGenerator.CharacterSelection
             _configureWorkflow();
         }
         
-        private bool _moreThanOneRadioIsTransmitting()
-        {
-            //  This method allows us to autoselect whether we should use incoming radio BLE
-            //    or avatar arena based character selection.  Can be overidden in settings to
-            //    force to Avatar Arena.  This method needs to be called on a timer.
-
-            bool _atLeastTwoTransmitting = false;
-            try
-            {
-                int i = 0, j = 0, k = 0;
-
-                var _currentTime = DateTime.Now;
-
-                for (i = 0; i < ApplicationData.Instance.NumberOfRadios; i++)
-                {
-                    if (_currentTime - CharactersLastHeatMapUpdateTime[i] < MaxLastSeenInterval)
-                    {
-                        j++;
-                    }
-                }
-                if (j > 1)
-                {
-                    _atLeastTwoTransmitting = true;
-                }
-                else
-                {
-                    _atLeastTwoTransmitting = false;
-                }
-            }
-            catch (Exception ex)
-            {
-                mLogger.Error("_moreThanOneRadioIsTransmitting " + ex.Message);
-            }
-            return _atLeastTwoTransmitting;
-        }
         private void _mWorkflow_PropertyChanged(object sender, System.ComponentModel.PropertyChangedEventArgs e)
         {
             if (e.PropertyName.Equals("State"))
@@ -120,18 +87,6 @@ namespace DialogGenerator.CharacterSelection
         #endregion
 
         #region - event handlers -
-
-        private void _heatMapUpdateTimer_Tick(object sender, EventArgs e)
-        {
-            mEventAggregator.GetEvent<HeatMapUpdateEvent>().Publish(new HeatMapData
-            {
-                HeatMap = HeatMap,
-                MotionVector = MotionVector,
-                LastHeatMapUpdateTime = CharactersLastHeatMapUpdateTime,
-                Character1Index = NextCharacter1,
-                Character2Index = NextCharacter2
-            });
-        }
 
         private void _updateTimer(object state)
         {
@@ -198,8 +153,8 @@ namespace DialogGenerator.CharacterSelection
         {
             try
             {
-                mTempCh1 = 0;
-                mTempch2 = 0;
+                mPossibleSpeakingCh1RadioNum = 0;
+                mPossibleSpeakingCh2RadioNum = 0;
                 BLE_Message message = new BLE_Message();
                 DateTime nowTime = DateTime.Now;
 
@@ -207,7 +162,6 @@ namespace DialogGenerator.CharacterSelection
 
                 if (message == null)
                 {
-
                     DateTime _nowTime = DateTime.Now;
 
                     if (mFirstFailMessage)
@@ -216,35 +170,27 @@ namespace DialogGenerator.CharacterSelection
                         mLastAccessTime = _toMilliseconds(_nowTime) ;
                     }
 
-                    mIddleTime += _toMilliseconds(_nowTime) - mLastAccessTime;
+                    mIdleTime += _toMilliseconds(_nowTime) - mLastAccessTime;
                     mLastAccessTime = _toMilliseconds(_nowTime);
                     mFailedBLEMessageAttempts++;
                     
-                    if (mIddleTime > 1500)                    
+                    if (mIdleTime > 1500)                    
                     {                        
-                        //Session.Set(Constants.BLE_MODE_ON, false);
-                        //mEventAggregator.GetEvent<RestartDialogEngineEvent>().Publish();
-                        //Console.Out.WriteLine("Restart of Dialog Engine required!!!");
-
-                        mIddleTime = 0l;
+                        mIdleTime = 0L;
                         mRestartRequested = true;
-                        mLogger.Info("BLE Messages have not arrived in 800ms, switching to avatar arena");
+                        mLogger.Info("BLE Messages have not arrived in some time, switching to avatar arena");
                         mCancellationTokenSource.Cancel();                        
                     }
 
-                    //Console.Out.WriteLine("Failed messages " + mFailedBLEMessageAttempts);
-                    Console.Out.WriteLine("Iddle time: {0}", mIddleTime);
+                    Console.Out.WriteLine("Idle time: {0}", mIdleTime);
                     return Triggers.ProcessMessage;
-                } else
-                {
-                    mLastAccessTime = _toMilliseconds(DateTime.Now);
-                    mIddleTime = 0L;
-                    mFailedBLEMessageAttempts = 0;
-                }
-                
-                BLE_Message mNewRow = new BLE_Message();  // added number holds sequence number
-                mLastAccessTime = _toMilliseconds(DateTime.Now);
+                } 
 
+                mLastAccessTime = _toMilliseconds(DateTime.Now);
+                mIdleTime = 0L;
+                mFailedBLEMessageAttempts = 0;
+                BLE_Message mNewRow = new BLE_Message();  // added number holds sequence number
+                
                 var mRowNum = ParseMessageHelper.ParseBle(message, mNewRow);
 
                 if (mRowNum < 0 || mRowNum >= ApplicationData.Instance.NumberOfRadios)
@@ -253,7 +199,7 @@ namespace DialogGenerator.CharacterSelection
                 }
                 else
                 {
-                    ParseMessageHelper.ProcessTheMessage(mRowNum, mNewRow);
+                    ParseMessageHelper.UpdateHeatMapWithMessage(mRowNum, mNewRow);
                     return Triggers.CalculateClosestPair;
                 }
             }
@@ -265,7 +211,7 @@ namespace DialogGenerator.CharacterSelection
         }
  
         /// <summary>
-        /// This method calculates whether all characters have been "still" for a set number (300) of milliseconds since 
+        /// This method calculates whether all radios have been "still" for a set number (300) of milliseconds since 
         /// motion was last detected.  The talking characters should not change unless the toys moved.  The talking
         /// characters should not change unless the toys have been as still as they can be when held in the hand for
         /// a set number of milliseconds in the case the user is holding one or more of the toys they wish to speak.
@@ -278,26 +224,26 @@ namespace DialogGenerator.CharacterSelection
                 DateTime _currentTime = DateTime.Now;
                 int i = ParseMessageHelper.ReceivedMessages.Count - 1;
 
-                if (i < 8)
+                if (i < 5)
                     return false;  // not enough readings even if over timespan of > 300ms
 
                 while (i >= 0)
                 {
                     if (i<=0)
                     {
-                        return false;  // didn't have two seconds of data in ReceivedMessages
+                        return false;  // didn't have long enough data in ReceivedMessages
                     }
                     var _timeAgoOfMessage_i = _currentTime - ParseMessageHelper.ReceivedMessages[i].ReceivedTime;
-                    if (_timeAgoOfMessage_i < TimeSpan.FromMilliseconds(300))
+                    if (_timeAgoOfMessage_i < TimeSpan.FromMilliseconds(mMsOfStillTimeRequired))
                     {  // in the needsToBeStableWindow
-                        if (ParseMessageHelper.ReceivedMessages[i].Motion > 48)
-                        {  // if the motion was high in the last 300 ms we aren't done moving
+                        if (ParseMessageHelper.ReceivedMessages[i].Motion > mAccelerometerStillnessThreshold)
+                        {  // if the motion was high in the last mMsOfStillTimeRequired we aren't done moving
                             return false;
                         }
                     }
-                    if (_timeAgoOfMessage_i >= TimeSpan.FromMilliseconds(300)) 
-                    {  // in the needsToBeStableWindow
-                        if (ParseMessageHelper.ReceivedMessages[i].Motion > 40)  // we had motion between 300-1500ms ago
+                    if (_timeAgoOfMessage_i >= TimeSpan.FromMilliseconds(mMsOfStillTimeRequired)) 
+                    {  // passed the needsToBeStableWindow now look for motion in deeper past
+                        if (ParseMessageHelper.ReceivedMessages[i].Motion > mAccelerometerMotionThreshold)  
                         {
                             ReceivedMessage msg = ParseMessageHelper.ReceivedMessages[i];
                             string dbgOut = msg.CharacterPrefix + " ";
@@ -310,7 +256,7 @@ namespace DialogGenerator.CharacterSelection
                         }
                     }
                     i--;
-                    if (_timeAgoOfMessage_i > TimeSpan.FromMilliseconds(1500))  //we are past the window
+                    if (_timeAgoOfMessage_i > TimeSpan.FromMilliseconds(mMsMotionWindow))  //we are past the window
                         return false;
                 }
                 return false;  
@@ -319,52 +265,112 @@ namespace DialogGenerator.CharacterSelection
             {
                 throw ex;
             }
-
         }
-        private bool _calculateRssiStableAfterChangeNew(int _ch1, int _ch2)  // TODO we want this to be time based not number of BLE vector based
+
+        private bool _checkHeatMapRowNonZero(int _radioNum, int [,] _heatMap)
         {
+            for (int _k = 0; _k < ApplicationData.Instance.NumberOfRadios; _k++)
+            {
+                if(_heatMap[_radioNum, _k] > 0)
+                {
+                    return true;
+                }
+            }
+            return false;
+        }
+
+        // Are the two passed in radio numbers the strongest RSSI pair for the last _Milliseconds  at a
+        // rate of _HitPercent?  Don't cancel a change if they were the strongest pair for 10 or last 12 readings
+        // Work back through time and check RSSI pair strength.
+        private bool _calculateRssiStablity2(int _radio1, int _radio2, long _milSecRequired = 400, double _hitPercent = 0.70)
+        {   
+            // in the old way of doing things we would zero out a radio's heat map row after a period of inactivity
+            // this stability calculation does not do that, however, it is typically done for a small time window
+            // so this difference isn't expected to cause performance differences
             try
             {
-                bool _rssiStable = true;
+                double _timeSensitivity = ApplicationData.Instance.RadioMovesTimeSensitivity;
+                double _strengthSensitivity = ApplicationData.Instance.RadioMovesSignalStrengthSensitivity;
+
+                // if the user has in bounds settings use them to scale between 1/10th and 10x the default values
+                if (_timeSensitivity > 0 && _timeSensitivity < 1.0)
+                    _milSecRequired = (long)(_milSecRequired * _timeSensitivity * 10.0);
+
+                if (_strengthSensitivity > 0 && _strengthSensitivity < 1.0)
+                    _hitPercent = _strengthSensitivity;
+
+                List<ReceivedMessage> msgList = ParseMessageHelper.ReceivedMessages;  
                 DateTime _currentTime = DateTime.Now;
-                int i = ParseMessageHelper.ReceivedMessages.Count - 1;
-                while (i >= 0)
-                {
-                    // scoot data in buffer back by one to make room for next
-                    mStrongRssiCharacterPairBuf[0, i] = mStrongRssiCharacterPairBuf[0, i + 1];
-                    mStrongRssiCharacterPairBuf[1, i] = mStrongRssiCharacterPairBuf[1, i + 1];
-                    i--;
-                    if (_currentTime - ParseMessageHelper.ReceivedMessages[i].ReceivedTime < TimeSpan.FromMilliseconds(300))
-                        break;
-                }
+                TimeSpan _timesSpanOfInterest = TimeSpan.FromMilliseconds(_milSecRequired);
+                int lastMessageIndex = msgList.Count - 1;
 
-                mStrongRssiCharacterPairBuf[0, StrongRssiBufDepth - 1] = _ch1;
-                mStrongRssiCharacterPairBuf[1, StrongRssiBufDepth - 1] = _ch2;
+                if (lastMessageIndex < 5 || (_currentTime - msgList[0].ReceivedTime < _timesSpanOfInterest))
+                    return false;  // not enough readings yet
 
-                for (int j = 0; j < StrongRssiBufDepth - 2; j++)
+                int startingMessageIndex = 0; 
+                // go backwards through messages to find index of our timeSpanOfInterest
+                for (int i = lastMessageIndex; i >= 0; i--)   
                 {
-                    if ((mStrongRssiCharacterPairBuf[0, j] != mStrongRssiCharacterPairBuf[0, j + 1]
-                        || mStrongRssiCharacterPairBuf[1, j] != mStrongRssiCharacterPairBuf[1, j + 1])
-                        &&
-                          (mStrongRssiCharacterPairBuf[0, j] != mStrongRssiCharacterPairBuf[1, j + 1]
-                        || mStrongRssiCharacterPairBuf[1, j] != mStrongRssiCharacterPairBuf[0, j + 1]))
+                    if (_currentTime - msgList[i].ReceivedTime > _timesSpanOfInterest)
                     {
-                        _rssiStable = false;
+                        // not enough data in timespan exit method
+                        if (lastMessageIndex - i  < 5)
+                            return false;
+
+                        startingMessageIndex = i;
                         break;
                     }
                 }
 
-                return _rssiStable;
+                double _hits = 0;
+                double _misses = 0;
+                int _numRadios = ApplicationData.Instance.NumberOfRadios;
+                int[,] _heatMap = new int[_numRadios, _numRadios];  // new array of zero RSSI values
+                int _winner1, _winner2, _sum;
+
+                for (int j = startingMessageIndex; j <= lastMessageIndex; j++)
+                {
+                    ParseMessageHelper.DeepCopyBLE_MessageRssisToHeatMap(msgList[j].RadioNum, msgList[j].Rssi, _heatMap);
+                    if (_checkHeatMapRowNonZero(_radio1, _heatMap) && _checkHeatMapRowNonZero(_radio2, _heatMap))
+                    {
+                        // only start looking once we have data on the two radios of interest in heatmap
+                        _findBiggestRssiPair(out _winner1, out _winner2, out _sum, _heatMap);
+                        if (_areRadioPairsDifferent(_radio1, _radio2, _winner1, _winner2))
+                        {
+                            // our radios of interest were not the winners in this round for biggest RSSI
+                            _misses++;
+                        } 
+                        else
+                        {
+                            _hits++;
+                        }
+                    }
+                }
+
+                if (_hits / (_hits + _misses) > _hitPercent)
+                {
+                    return true;
+                }
+                return false;
             }
             catch (Exception ex)
             {
+                mLogger.Error("_calculateRssiStablity exception " + ex.Message);
                 throw ex;
             }
         }
 
-        private bool _calculateRssiStableAfterChange1(int _Ch1, int _Ch2, long _Milliseconds = 500)
-        {           
-            if((_Ch1 != mStableRadioIndex1 || _Ch2 != mStableRadioIndex2) && (_Ch1 != mStableRadioIndex2 || _Ch2 != mStableRadioIndex1))
+
+        private bool _calculateRssiStablity(int _Ch1, int _Ch2, long _milliseconds = 250, double _HitPercent = 0.70)
+        {
+            if (ApplicationData.Instance.RadioMovesTimeSensitivity > 0 &&
+                     ApplicationData.Instance.RadioMovesTimeSensitivity < 1.0)
+            { 
+                _milliseconds = (long)(_milliseconds * ApplicationData.Instance.RadioMovesTimeSensitivity * 10.0);
+            }
+
+            if ((_Ch1 != mStableRadioIndex1 || _Ch2 != mStableRadioIndex2) &&
+                (_Ch1 != mStableRadioIndex2 || _Ch2 != mStableRadioIndex1))
             {
                 mLastStableTime = _toMilliseconds(DateTime.Now);
                 mStableRadioIndex1 = _Ch1;
@@ -373,68 +379,12 @@ namespace DialogGenerator.CharacterSelection
             }
 
             long _currentTime = _toMilliseconds(DateTime.Now);
-            if(_currentTime - mLastStableTime >= _Milliseconds)
+            if (_currentTime - mLastStableTime >= _milliseconds)
             {
                 return true;
             }
 
             return false;
-        }
-
-        private bool _calculateRssiStableAfterChange(int _ch1, int _ch2)
-        {
-            try
-            {
-                bool _rssiStable = true;
-
-                for (int i = 0; i < StrongRssiBufDepth - 1; i++)
-                {
-                    // scoot data in buffer back by one to make room for next
-                    mStrongRssiCharacterPairBuf[0, i] = mStrongRssiCharacterPairBuf[0, i + 1];
-                    mStrongRssiCharacterPairBuf[1, i] = mStrongRssiCharacterPairBuf[1, i + 1];
-                }
-
-                mStrongRssiCharacterPairBuf[0, StrongRssiBufDepth - 1] = _ch1;
-                mStrongRssiCharacterPairBuf[1, StrongRssiBufDepth - 1] = _ch2;
-
-                for (int i = 0; i < StrongRssiBufDepth - 2; i++)
-                {
-                    if ((mStrongRssiCharacterPairBuf[0, i] != mStrongRssiCharacterPairBuf[0, i + 1]
-                        || mStrongRssiCharacterPairBuf[1, i] != mStrongRssiCharacterPairBuf[1, i + 1])
-                        &&
-                          (mStrongRssiCharacterPairBuf[0, i] != mStrongRssiCharacterPairBuf[1, i + 1]
-                        || mStrongRssiCharacterPairBuf[1, i] != mStrongRssiCharacterPairBuf[0, i + 1]))
-                    {
-                        _rssiStable = false;
-                        break;
-                    }
-                }
-
-                if(!_rssiStable)
-                {
-                    string dbgOut1 = "Char1 Buff ";
-                    for(int i = 0; i < StrongRssiBufDepth; i++)
-                    {
-                        dbgOut1 += mStrongRssiCharacterPairBuf[0, i].ToString("D3");
-                        dbgOut1 += " ";
-                    }
-                    string dbgOut2 = "Char2 Buff ";
-                    for (int i = 0; i < StrongRssiBufDepth; i++)
-                    {
-                        dbgOut2 += mStrongRssiCharacterPairBuf[1, i].ToString("D3");
-                        dbgOut2 += " ";
-                    }
-
-                    mLogger.Info(dbgOut1);
-                    mLogger.Info(dbgOut2);
-                }
-
-                return _rssiStable;
-            }
-            catch (Exception ex)
-            {
-                throw ex;
-            }
         }
 
         private int _getCharacterMappedIndex(int _radioNum)
@@ -452,143 +402,128 @@ namespace DialogGenerator.CharacterSelection
 
                 return index;
             }
-            catch (Exception)
+            catch (Exception ex)
             {
+                mLogger.Error("_getCharacterMappedIndex exception " + ex.Message);
+
                 return -1;
             }
         }
 
-        private bool _assignNextCharacters(int _tempCh1, int _tempCh2)
+        private void _updateTemporaryRadioIndexesToCurrentlySpeakingAndCheck()
         {
             try
             {
-                mLogger.Info(String.Format("Trying to assign characters ch1_radio = {0}, ch2_radio = {1}", _tempCh1, _tempCh2));
-
-                int _nextCharacter1MappedIndex1, _nextCharacter1MappedIndex2;
-                bool _nextCharactersAssigned = false;
-
-                if (mRandom.NextDouble() > 0.5)
-                {
-                    _nextCharacter1MappedIndex1 = _getCharacterMappedIndex(_tempCh1);
-                    _nextCharacter1MappedIndex2 = _getCharacterMappedIndex(_tempCh2);
-                }
-                else
-                {
-                    _nextCharacter1MappedIndex1 = _getCharacterMappedIndex(_tempCh2);
-                    _nextCharacter1MappedIndex2 = _getCharacterMappedIndex(_tempCh1);
-                }
-
-                if (_nextCharacter1MappedIndex1 >= 0 && _nextCharacter1MappedIndex2 >= 0)
-                {
-                    NextCharacter1 = _nextCharacter1MappedIndex1;
-                    NextCharacter2 = _nextCharacter1MappedIndex2;
-
-                    if ((NextCharacter1 != CurrentCharacter1 || NextCharacter2 != CurrentCharacter2) &&
-                         (NextCharacter2 != CurrentCharacter1 || NextCharacter1 != CurrentCharacter2) || mFreshStart)
-                    {
-                        _nextCharactersAssigned = true;
-                        mLogger.Info("New characters assigned by BLE Character 1 is " + NextCharacter1 +
-                            " Character 2 is " + NextCharacter2);
-                    } else
-                    {
-                        mLogger.Info(String.Format("Characters not assigned! Current1 = {0}, Next1 = {1}, Current2 = {2}, Next2 = {3}"
-                            , CurrentCharacter1
-                            , NextCharacter1
-                            , CurrentCharacter2
-                            , NextCharacter2));
-                    }
-                } else
-                {
-                    mLogger.Info(String.Format("Characters not assigned. ch1 = {0}, ch2 = {1}", _nextCharacter1MappedIndex1, _nextCharacter1MappedIndex2));
-                }
-                return _nextCharactersAssigned;
-            }
-            catch (Exception ex)
-            {
-                throw ex;
-            }
-        }
-
-        private Triggers _findBiggestRssiPair()
-        {
-            //  This method takes the RSSI values and combines them so that the RSSI for Ch2 looking at 
-            //  Ch1 is added to the RSSI for Ch1 looking at Ch2
-
-            try
-            {
-                bool _rssiStable = false;
-                int i = 0, j = 0, k = 0;
-
-                var _currentTime = DateTime.Now;
-
                 Character _ch1 = mCharacterRepository.GetAll()[NextCharacter1];
                 Character _ch2 = mCharacterRepository.GetAll()[NextCharacter2];
 
                 if (_ch1 != null && _ch1.RadioNum != -1 && _ch2 != null && _ch2.RadioNum != -1 && _ch1.RadioNum != _ch2.RadioNum)
                 {
-                    mTempCh1 = _ch1.RadioNum;
-                    mTempch2 = _ch2.RadioNum;
+                    mPossibleSpeakingCh1RadioNum = _ch1.RadioNum;
+                    mPossibleSpeakingCh2RadioNum = _ch2.RadioNum;
                 }
                 else
                 {
-                    mTempCh1 = 0;
-                    mTempch2 = 1;
+                    mPossibleSpeakingCh1RadioNum = 0;
+                    mPossibleSpeakingCh2RadioNum = 1;
                 }
 
-                // S.Ristic - This is commented because it is not clear what this condition does. mTempCh1 relates to radio index, and 
-                // NextCharacter1 relates to the character index in the character repository. These are the two different data types.
-
-                //mTempCh1 = NextCharacter1;
-                //mTempch2 = NextCharacter2;
-
-                if (mTempCh1 > ApplicationData.Instance.NumberOfRadios - 1 || mTempch2 > ApplicationData.Instance.NumberOfRadios - 1 ||
-                    mTempCh1 < 0 || mTempch2 < 0 || mTempCh1 == mTempch2)
+                if (mPossibleSpeakingCh1RadioNum > ApplicationData.Instance.NumberOfRadios - 1 || mPossibleSpeakingCh2RadioNum > ApplicationData.Instance.NumberOfRadios - 1 ||
+                    mPossibleSpeakingCh1RadioNum < 0 || mPossibleSpeakingCh2RadioNum < 0 || mPossibleSpeakingCh1RadioNum == mPossibleSpeakingCh2RadioNum)
                 {
-                    mTempCh1 = 0;
-                    mTempch2 = 1;
+                    mPossibleSpeakingCh1RadioNum = 0;
+                    mPossibleSpeakingCh2RadioNum = 1;
                 }
+            }
+            catch (Exception ex)
+            {
+                mLogger.Error("_updateTemporaryRadioIndexesToCurrentlySpeakingAndCheck " + ex.Message);
+            }
+        }
 
-                //only pick up new characters if bigRssi greater not =
-                BigRssi = HeatMap[mTempCh1, mTempch2] + HeatMap[mTempch2, mTempCh1];
+        private void _zeroOutUnresponsiveRadiosInHeatMap()
+        {
+            try
+            {
+                var _currentTime = DateTime.Now;
 
-                for (i = 0; i < ApplicationData.Instance.NumberOfRadios; i++)
+                for (int i = 0; i < ApplicationData.Instance.NumberOfRadios; i++)
                 {
                     // it shouldn't happen often that a character has dissapeared, if so zero him out
                     if (_currentTime - CharactersLastHeatMapUpdateTime[i] > MaxLastSeenInterval)
                     {
                         int alreadyZero = 0;   // to prevent logging messages each time we pass through
-                        for (k = 0; k < ApplicationData.Instance.NumberOfRadios; k++)
+                        for (int k = 0; k < ApplicationData.Instance.NumberOfRadios; k++)
                         {
                             alreadyZero += HeatMap[i, k];
                             HeatMap[i, k] = 0;
                         }
                         if (alreadyZero > 0)
                         {
-                            mLogger.Error("_findBiggestRssiPair MaxLastSeenInterval radio # " + i);
-                        }
-                    }
-                    for (j = i + 1; j < ApplicationData.Instance.NumberOfRadios; j++)
-                    {
-                        // only need data above the matrix diagonal
-                        if (HeatMap[i, j] + HeatMap[j, i] > BigRssi)
-                        {
-                            // look at both characters view of each other
-                            BigRssi = HeatMap[i, j] + HeatMap[j, i];
-                            mTempCh1 = i;
-                            mTempch2 = j;                            
+                            mLogger.Error("_zeroOutUnresponsiveRadiosInHeatMap MaxLastSeenInterval radio # " + i);
                         }
                     }
                 }
+            }
+            catch (Exception ex)
+            {
+                mLogger.Error("_zeroOutUnresponsiveRadiosInHeatMap " + ex.Message);
+            }
+        }
+
+        private bool _areRadioPairsDifferent(int A1, int A2, int B1, int B2)
+        {  //checks if the radio numbers for character pair A and character pair B are the same
+            if ((A1 == B1 && A2 == B2) || (A1 == B2 && A2 == B1))
+            { 
+                return false;
+            }
+            else
+            {
+                return true;
+            }
+        }
+
+        private Triggers _shouldCharactersChange()
+        {
+            //  This method takes the RSSI values and combines them so that the RSSI for Ch2 looking at 
+            //  Ch1 is added to the RSSI for Ch1 looking at Ch2.  
+            //  Characters should change if these conditions are met: 
+            //  1. A message has come in, 
+            //  2. We are in the motion window, 
+            //  3. The heat map including the new message gives a higher RSSI pair to new characters vs. currently speaking 
+            //  4. The new radio pair meets the RSSI stability threshold requirements of % highest over time
+
+            try
+            {
+                bool _rssiStable = false;
+
+                _zeroOutUnresponsiveRadiosInHeatMap();
+                _updateTemporaryRadioIndexesToCurrentlySpeakingAndCheck();
+
+                //only pick up new characters if bigRssi greater not ==
+                int priorLargestRssiPair = HeatMap[mPossibleSpeakingCh1RadioNum, mPossibleSpeakingCh2RadioNum] + HeatMap[mPossibleSpeakingCh2RadioNum, mPossibleSpeakingCh1RadioNum];
+                _findBiggestRssiPair(out int finalRow, out int finalColumn, out int newLargestRssiPair, in HeatMap);
+
+                if (newLargestRssiPair > priorLargestRssiPair && 
+                      _areRadioPairsDifferent(mPossibleSpeakingCh1RadioNum, mPossibleSpeakingCh2RadioNum, finalRow, finalColumn))
+                {
+                    mPossibleSpeakingCh1RadioNum = finalRow;
+                    mPossibleSpeakingCh2RadioNum = finalColumn;
+                }
+                else
+                {  // only consider changing characters when new RSSI is larger so back to start of state machine
+                    return Triggers.ProcessMessage;
+                }
 
                 // TODO, _calculateRssiStableAfterChange and _calculateIfInMotionWindow should be their own states
-                _rssiStable = _calculateRssiStableAfterChange1(mTempCh1, mTempch2);
+                _rssiStable = _calculateRssiStablity2(mPossibleSpeakingCh1RadioNum, mPossibleSpeakingCh2RadioNum);
                 var _inMovementWindow = _calculateIfInMotionWindow();
 
                 if ( _rssiStable && (_inMovementWindow || mFreshStart))
                 {
                     if(mFreshStart)
                     {
-                        if(_calculateRssiStableAfterChange1(mTempCh1, mTempch2, 1000))
+                        if(_calculateRssiStablity2(mPossibleSpeakingCh1RadioNum, mPossibleSpeakingCh2RadioNum, 1000, 0.95))
                         {
                             mFreshStart = false;
                         }                        
@@ -604,16 +539,120 @@ namespace DialogGenerator.CharacterSelection
             }
             catch (Exception ex)
             {
-                mLogger.Error("_findBiggestRssiPair " + ex.Message);
+                mLogger.Error("_shouldCharactersChange " + ex.Message);
                 return Triggers.ProcessMessage;
             }
         }
+
+        private void _findBiggestRssiPair(out int outRow, out int outColumn, out int _rssiPairMax, in int[,] _heatMap)
+        {
+            //  This method takes the RSSI values and combines them so that the RSSI for Ch2 looking at 
+            //  Ch1 is added to the RSSI for Ch1 looking at Ch2 to find the strongest signal pair
+            _rssiPairMax = 0;
+            outRow = 1;
+            outColumn = 2;
+            try
+            {
+                for (int i = 0; i < ApplicationData.Instance.NumberOfRadios; i++)
+                {
+                    for (int j = i + 1; j < ApplicationData.Instance.NumberOfRadios; j++)
+                    {
+                        // only need data above the matrix diagonal to look at both radios view of each other
+
+                        int sum = _heatMap[i, j] + _heatMap[j, i];
+                        if (sum > _rssiPairMax)
+                        {
+                            _rssiPairMax = sum;
+                            outRow = i;
+                            outColumn = j;
+                        }
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                mLogger.Error("_findBiggestRssiPair " + ex.Message);
+            }
+        }
+
+
+        private void _selectWhichOfNewCharactersSpeaksFirst(int _ch1RadioNum, int _ch2RadioNum, 
+            out int _nextSpeakingCharacter1Index, out int _nextSpeakingCharacter2Index)
+        {
+            _nextSpeakingCharacter1Index = -1;
+            _nextSpeakingCharacter2Index = -1;
+            try
+            {
+                mLogger.Info(String.Format("Trying to assign radios ch1_radio = {0}, ch2_radio = {1} to speak",              
+                                            _ch1RadioNum, _ch2RadioNum));
+
+                if (mRandom.NextDouble() > 0.5)
+                {
+                    _nextSpeakingCharacter1Index = _getCharacterMappedIndex(_ch1RadioNum);
+                    _nextSpeakingCharacter2Index = _getCharacterMappedIndex(_ch2RadioNum);
+                }
+                else
+                {
+                    _nextSpeakingCharacter1Index = _getCharacterMappedIndex(_ch2RadioNum);
+                    _nextSpeakingCharacter2Index = _getCharacterMappedIndex(_ch1RadioNum);
+                }
+            }
+            catch (Exception ex)
+            {
+                mLogger.Error("_selectWhichOfNewCharactersSpeaksFirst " + ex.Message);
+            }
+        }
+
+
+        private bool _assignNextSpeakingCharactersIfNew(int _nextSpeakingCharacter1Index, int _nextSpeakingCharacter2Index)
+        {
+            try
+            {
+                bool _nextCharactersSelectedAreNew = false;
+                if (_nextSpeakingCharacter1Index >= 0 && _nextSpeakingCharacter2Index >= 0)
+                {
+                    NextCharacter1 = _nextSpeakingCharacter1Index;
+                    NextCharacter2 = _nextSpeakingCharacter2Index;
+
+                    if (_areRadioPairsDifferent(NextCharacter1, NextCharacter2, CurrentCharacter1, CurrentCharacter2) 
+                        || mFreshStart)
+                    {
+                        _nextCharactersSelectedAreNew = true;
+                        mLogger.Info("New speaking characters assigned by BLE: Character 1 is " + NextCharacter1 +
+                            " Character 2 is " + NextCharacter2);
+                    }
+                    else
+                    {
+                        mLogger.Info(String.Format("Characters not assigned! Current1 = {0}, Next1 = {1}, Current2 = {2}, Next2 = {3}"
+                            , CurrentCharacter1
+                            , NextCharacter1
+                            , CurrentCharacter2
+                            , NextCharacter2));
+                    }
+                }
+                else
+                {
+                    mLogger.Info(String.Format("Characters not assigned. _speakingCh1Index = {0}, _speakingCh2Index = {1}"
+                        , _nextSpeakingCharacter1Index, _nextSpeakingCharacter2Index));
+                }
+                return _nextCharactersSelectedAreNew;
+            }
+            catch (Exception ex)
+            {
+                mLogger.Error("_selectWhichOfNewCharactersSpeaksFirst " + ex.Message);
+                return false;
+            }
+        }
+
 
         private Triggers _selectNextCharacters()
         {
             try
             {
-                if (_assignNextCharacters(mTempCh1, mTempch2))
+                int _speakingCh1Index, _speakingCh2Index;
+                _selectWhichOfNewCharactersSpeaksFirst(mPossibleSpeakingCh1RadioNum, mPossibleSpeakingCh2RadioNum,
+                       out _speakingCh1Index,  out _speakingCh2Index);
+                if (_assignNextSpeakingCharactersIfNew(_speakingCh1Index, _speakingCh2Index))
                 {
                     mLogger.Info("Characters assigned");
 
@@ -684,7 +723,7 @@ namespace DialogGenerator.CharacterSelection
                             }
                         case Triggers.CalculateClosestPair:
                             {
-                                next = _findBiggestRssiPair();
+                                next = _shouldCharactersChange();
                                 break;
                             }
                         case Triggers.SelectNextCharacters:

@@ -24,7 +24,11 @@ namespace DialogGenerator.UI.Converters
             }
 
             var characters = Session.Get<ObservableCollection<Character>>(Constants.CHARACTERS);
-            if(characters.Count == 0)
+            int ch1 = Session.Get<int>(Constants.NEXT_CH_1);
+            int ch2 = Session.Get<int>(Constants.NEXT_CH_2);
+
+            if (characters.Count == 0 || ch1 >= characters.Count || ch2 >= characters.Count
+                || ch1 < 0 || ch2 < 0)
             {
                 return null;
             }
@@ -32,14 +36,14 @@ namespace DialogGenerator.UI.Converters
             // first column is row header so we need to sub for 1
             int _heatMapColumn = column - 1;
 
-            var nc1 = characters[Session.Get<int>(Constants.NEXT_CH_1)];
-            var nc2 = characters[Session.Get<int>(Constants.NEXT_CH_2)];
+            var nc1 = characters[ch1];
+            var nc2 = characters[ch2];
 
 
             if (row == _heatMapColumn && _heatMap[row, _heatMapColumn] > 0)
             {
-                if (row == characters[Session.Get<int>(Constants.NEXT_CH_1)].RadioNum
-                  || row == characters[Session.Get<int>(Constants.NEXT_CH_2)].RadioNum)
+                if (row == nc1.RadioNum
+                  || row == nc2.RadioNum)
                 {
                     return Brushes.Red;
                 }
