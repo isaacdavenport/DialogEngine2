@@ -86,5 +86,19 @@ namespace DialogGenerator.UI.ViewModels
                 RaisePropertyChanged();
             }
         }
+        
+        public ArenaAvatarViewModel Clone()
+        {
+            ArenaAvatarViewModel _clone = new ArenaAvatarViewModel
+            {
+                Character = this.Character,
+                Left = this.Left,
+                Top = this.Top,
+                Active = this.Active,
+                InPlayground = this.InPlayground
+            };
+
+            return _clone;
+        }
     }
 }

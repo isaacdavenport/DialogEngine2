@@ -99,8 +99,22 @@ namespace DialogGenerator.UI.ViewModels
 
         private void _characterPairChanged(SelectedCharactersPairEventArgs obj)
         {
-            int _radioIndex1 = mCharacterRepository.GetAll()[obj.Character1Index].RadioNum;
-            int _radioIndex2 = mCharacterRepository.GetAll()[obj.Character2Index].RadioNum;
+            if(obj == null)
+            {
+                return;
+            }
+
+            int _radioIndex1 = -1;
+            int _radioIndex2 = -1;
+            if (obj.Character1Index != -1)
+            {
+                _radioIndex1 = mCharacterRepository.GetAll()[obj.Character1Index].RadioNum;
+            }
+
+            if(obj.Character2Index != -1)
+            {
+                _radioIndex2 = mCharacterRepository.GetAll()[obj.Character2Index].RadioNum;
+            }
 
             if(Session.Get<bool>(Constants.BLE_MODE_ON) && RadioCharacters.Count > 0)
             {

@@ -110,8 +110,28 @@ namespace DialogGenerator.UI.ViewModels
 
         private void _onSelectedCharactersPairChangedEvent(SelectedCharactersPairEventArgs obj)
         {
-            FirstSelectedCharacter = mCharacterRepository.GetAll()[obj.Character1Index];
-            SecondSelectedCharacter = mCharacterRepository.GetAll()[obj.Character2Index];
+            if(obj == null)
+            {
+                return;
+            }
+
+            if(obj.Character1Index != -1)
+            {
+                FirstSelectedCharacter = mCharacterRepository.GetAll()[obj.Character1Index];
+            } else
+            {
+                FirstSelectedCharacter = null;
+            }
+
+            if (obj.Character2Index != -1)
+            {
+                SecondSelectedCharacter = mCharacterRepository.GetAll()[obj.Character2Index];
+            }
+            else
+            {
+                SecondSelectedCharacter = null;
+            }
+           
         }
 
         private void _onCharacterCollectionLoaded()
@@ -169,8 +189,13 @@ namespace DialogGenerator.UI.ViewModels
             set
             {
                 mFirstSelectedCharacter = value;
-                int idx = mCharacterRepository.IndexOf(mFirstSelectedCharacter);
-                Session.Set(Constants.NEXT_CH_1, idx);
+                int _idx = -1;
+                if(mFirstSelectedCharacter != null)
+                {
+                    _idx = mCharacterRepository.IndexOf(mFirstSelectedCharacter);
+                }
+                
+                Session.Set(Constants.NEXT_CH_1, _idx);
 
                 RaisePropertyChanged();
             }
@@ -200,8 +225,13 @@ namespace DialogGenerator.UI.ViewModels
             set
             {
                 mSecondSelectedCharacter = value;
-                int idx = mCharacterRepository.IndexOf(mSecondSelectedCharacter);
-                Session.Set(Constants.NEXT_CH_2, idx);
+                int _idx = -1;
+                if(mSecondSelectedCharacter != null)
+                {
+                    _idx = mCharacterRepository.IndexOf(mSecondSelectedCharacter);
+                }
+                
+                Session.Set(Constants.NEXT_CH_2, _idx);
 
                 RaisePropertyChanged();
             }

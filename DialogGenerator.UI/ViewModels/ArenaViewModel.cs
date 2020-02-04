@@ -10,6 +10,7 @@ using System.Collections.ObjectModel;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using System.Windows;
 
 namespace DialogGenerator.UI.ViewModels
 {
@@ -48,6 +49,8 @@ namespace DialogGenerator.UI.ViewModels
             }
         }
 
+        public Size CanvasBounds { get; set; } = new Size();
+
         public void AddAvatarToPlayground(ArenaAvatarViewModel _Avatar)
         {
             PlaygroundAvatars.Add(_Avatar);
@@ -69,10 +72,15 @@ namespace DialogGenerator.UI.ViewModels
             return null;
         }
 
-        public AvatarPair FindClosestAvatarPair()
+        public AvatarPair FindClosestAvatarPair(bool _Create = false)
         {
             double _distance = Double.MaxValue;
             AvatarPair _closestPair = null;
+
+            if(_Create)
+            {
+                _createAvatarPairs();
+            }
 
             foreach (AvatarPair _ap in mAvatarPairs)
             {
@@ -126,19 +134,36 @@ namespace DialogGenerator.UI.ViewModels
 
         private void _onCharacterCollectionLoaded()
         {
-            ObservableCollection<Character> _characters = mCharacterRepository.GetAll();
-            foreach(Character _c in _characters)
+            ObservableCollection<Character> _characters = mCharacterRepository.GetAll();                        
+            
+            // Rememeber the playground avatars
+            var query = PlaygroundAvatars.Select((c, index) => new { Index = index, Prefix = c.Character.CharacterPrefix });
+
+            // Clear collections.
+            PlaygroundAvatars.Clear();
+            AvatarGalleryItems.Clear();
+            foreach (Character _c in _characters)
             {
-                AvatarGalleryItems.Add(new ArenaAvatarViewModel
+                ArenaAvatarViewModel _am = new ArenaAvatarViewModel
                 {
                     Character = _c,
                     Active = false,
                     InPlayground = false,
-                    Left = 0, 
+                    Left = 0,
                     Top = 0
-                });
+                };
+
+                AvatarGalleryItems.Add(_am);
+
+                foreach(var item in query)
+                {
+                    string _prefix = item.GetType().GetProperty("Prefix").GetValue(item).ToString();
+                    if(_prefix.Equals(_am.Character.CharacterPrefix))
+                    {
+                        PlaygroundAvatars.Add(_am);
+                    }
+                }
             }
-            
         }
 
         private void _createAvatarPairs()

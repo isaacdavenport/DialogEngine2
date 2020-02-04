@@ -9,7 +9,10 @@
              xmlns:local="clr-namespace:DialogGenerator.UI.Views"
              mc:Ignorable="d" 
              MinHeight="300"
-             d:DesignHeight="850" d:DesignWidth="800" Loaded="UserControl_Loaded">
+             MaxHeight="500"
+             d:DesignHeight="850" 
+             d:DesignWidth="800" 
+             Loaded="UserControl_Loaded">
     <UserControl.Resources>
         <converters:ImageToFullPathValueConverter x:Key="ImageToFullPathValueConverter" />
         <converters:ImageContentValueConverter x:Key="ImageContentValueConverter" />
@@ -39,19 +42,30 @@
                 AllowDrop="True" 
                 Drop="Playground_Drop" 
                 DragEnter="Playground_DragEnter" 
-                MouseLeftButtonUp="Playground_MouseLeftButtonUp"/>
+                MouseLeftButtonUp="Playground_MouseLeftButtonUp" 
+                SizeChanged="Playground_SizeChanged"/>
         <Separator Grid.Column="1" Width="2"/>
-        <ItemsControl x:Name="AvatarGallery" Grid.Column="2" Background="LightGray" Width="220" ItemsSource="{Binding AvatarGalleryItems}" ItemTemplate="{StaticResource AvatarPanel}">
-            <ItemsControl.ItemsPanel>
-                <ItemsPanelTemplate>
-                    <WrapPanel />
-                </ItemsPanelTemplate>
-            </ItemsControl.ItemsPanel>
-            <ItemsControl.Resources>
-                <Style TargetType="materialDesign:Card">
-                    <EventSetter Event="MouseMove" Handler="Card_MouseMove" />
-                </Style>
-            </ItemsControl.Resources>
-        </ItemsControl>
+        <ScrollViewer VerticalScrollBarVisibility="Auto" Grid.Column="2">
+            <ItemsControl x:Name="AvatarGallery" 
+                          Background="LightGray" 
+                          Width="220" 
+                          ItemsSource="{Binding AvatarGalleryItems}" 
+                          ItemTemplate="{StaticResource AvatarPanel}" 
+                          AllowDrop="True" 
+                          Drop="AvatarGallery_Drop" 
+                          DragEnter="AvatarGallery_DragEnter" 
+                          MouseRightButtonUp="AvatarGallery_MouseRightButtonUp">
+                <ItemsControl.ItemsPanel>
+                    <ItemsPanelTemplate>
+                        <WrapPanel />
+                    </ItemsPanelTemplate>
+                </ItemsControl.ItemsPanel>
+                <ItemsControl.Resources>
+                    <Style TargetType="materialDesign:Card">
+                        <EventSetter Event="MouseMove" Handler="Card_MouseMove" />
+                    </Style>
+                </ItemsControl.Resources>
+            </ItemsControl>
+        </ScrollViewer>
     </Grid>
 </UserControl>

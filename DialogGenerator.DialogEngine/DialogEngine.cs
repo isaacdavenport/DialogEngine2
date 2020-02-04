@@ -169,8 +169,12 @@ namespace DialogGenerator.DialogEngine
                 mWorkflow.Fire(Triggers.PrepareDialogParameters);
             }
 
-            mLogger.Debug($"_onSelectedCharactersPairChanged- c_ch1 - {mRandomSelectionDataCached?.Character1Index} c_ch2-{mRandomSelectionDataCached?.Character2Index} " +
+            if(obj != null)
+            {
+                mLogger.Debug($"_onSelectedCharactersPairChanged- c_ch1 - {mRandomSelectionDataCached?.Character1Index} c_ch2-{mRandomSelectionDataCached?.Character2Index} " +
                 $"- ch1:{obj.Character1Index} ch2: {obj.Character2Index} ", ApplicationData.Instance.DialogLoggerKey);
+            }
+            
         }
 
         private void _playAudio(string _pathAndFileName)

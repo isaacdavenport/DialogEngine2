@@ -29,6 +29,8 @@
         public const string CREATE_CHARACTER_VIEW_MODEL = "CreateCharacterViewModel";
         public const string BLE_MODE_ON = "BLEModeSwitchedOn";
         public const string NEEDS_RESTART = "NeedsRestart";
+        public const string ARENA_WIDTH = "ArenaWidth";
+        public const string ARENA_HEIGHT = "ArenaHeight";
         
     }
 }

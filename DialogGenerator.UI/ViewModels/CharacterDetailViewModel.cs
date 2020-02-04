@@ -456,6 +456,10 @@ namespace DialogGenerator.UI.ViewModels
 
                 await mCharacterDataProvider.Remove(Character.Model, _imageFileName);
 
+                // S.Ristic 02/03/2020
+                // This should notify the gallery of arena view that the collection has changed.
+                mEventAggregator.GetEvent<CharacterCollectionLoadedEvent>().Publish();
+
                 // S.Ristic 10/12/2019
                 // Find out if the deleted character has participated in the conversation and 
                 // if it had, remove it's index from the forced character indices and decrease the 

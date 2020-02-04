@@ -768,26 +768,48 @@ namespace DialogGenerator.UI.ViewModels
                         }
 
                         Character.State = Model.Enum.CharacterState.On;
+
+                        // Add the character to the collection.
                         await mCharacterDataProvider.AddAsync(Character);
+
+                        // Notify all interested parties that the collection has new element (has changed).
+                        mEventAgregator.GetEvent<CharacterCollectionLoadedEvent>().Publish();
+                        
+                        // Get the index of new character.
                         _idx = mCharacterDataProvider.IndexOf(Character);
 
+                        // If the character has the radio assigned notify the interested parties.
                         if (Character.RadioNum != -1)
                         {                            
                             mEventAgregator.GetEvent<RadioAssignedEvent>().Publish(Character.RadioNum);
                         }
+
+                        // Reset the conversation in the case of the new character.
+                        Session.Set(Constants.NEXT_CH_1, -1);
+                        Session.Set(Constants.NEXT_CH_2, -1);
                     }
 
 
-                    Session.Set(Constants.NEXT_CH_1, _idx);
-                    int _idx2 = Session.Get<int>(Constants.NEXT_CH_2);                    
-                    mEventAgregator.GetEvent<StopPlayingCurrentDialogLineEvent>().Publish();
-                    mEventAgregator.GetEvent<SelectedCharactersPairChangedEvent>().
-                    Publish(new SelectedCharactersPairEventArgs
-                    {
-                        Character1Index = _idx,
-                        Character2Index = _idx2
-                    });
+                    //Session.Set(Constants.NEXT_CH_1, _idx);
+                    //int _idx2 = Session.Get<int>(Constants.NEXT_CH_2);                    
+                    //mEventAgregator.GetEvent<StopPlayingCurrentDialogLineEvent>().Publish();
 
+                    //if(_idx != -1 && _idx2 != -1)
+                    //{
+                    //    mEventAgregator.GetEvent<SelectedCharactersPairChangedEvent>().
+                    //    Publish(new SelectedCharactersPairEventArgs
+                    //    {
+                    //        Character1Index = _idx,
+                    //        Character2Index = _idx2
+                    //    });
+                    //} else
+                    //{
+                    //    mEventAgregator.GetEvent<SelectedCharactersPairChangedEvent>()
+                    //        .Publish(null);
+                    //}
+
+                    
+                    
                     // Check if we have reached the end?
                     if(mWizardPassthroughIndex == mDialogWizards.Count)
                     {
