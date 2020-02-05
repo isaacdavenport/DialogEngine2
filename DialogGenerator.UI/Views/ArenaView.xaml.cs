@@ -67,15 +67,16 @@ namespace DialogGenerator.UI.Views
                     if(/* !_model.PlaygroundAvatars.Contains(_am) */ _canAdd(_am) )
                     {
                         Point pos = e.GetPosition(sender as IInputElement);
-                        ArenaAvatarView _aView = new ArenaAvatarView();                        
+                        ArenaAvatarView _aView = new ArenaAvatarView();
+                        _am = _am.Clone();
                         _aView.DataContext = _am;
                         _aView.SetValue(Canvas.LeftProperty, pos.X);
                         _aView.SetValue(Canvas.TopProperty, pos.Y);
                         _am.Left = (int)pos.X;
                         _am.Top = (int)pos.Y;
 
-                        this.Playground.Children.Add(_aView);                        
-                        _model.AddAvatarToPlayground(_aView.DataContext as ArenaAvatarViewModel);
+                        this.Playground.Children.Add(_aView);
+                        _model.PlaygroundAvatars.Add(_am);
 
                         if(this.Playground.Children.Count > 6)
                         {
@@ -84,7 +85,7 @@ namespace DialogGenerator.UI.Views
                     } else
                     {
                         MessageDialogService _dialogService = new MessageDialogService();
-                        await _dialogService.ShowMessage("Error", string.Format("Playground already contains '{0}'", _am.Character.CharacterName));
+                        await _dialogService.ShowMessage("Error", string.Format("Playground already contains maximum count of '{0}' avatars!", _am.Character.CharacterName));
                     }                    
                 }
             }
@@ -93,7 +94,7 @@ namespace DialogGenerator.UI.Views
         private bool _canAdd(ArenaAvatarViewModel am)
         {
             ArenaViewModel _model = (ArenaViewModel)this.DataContext;
-            if(_model.PlaygroundAvatars.Where(_avm => _avm.Character.CharacterPrefix.Equals(am.Character.CharacterPrefix)).Count() > 0)
+            if(_model.PlaygroundAvatars.Where(_avm => _avm.Character.CharacterPrefix.Equals(am.Character.CharacterPrefix)).Count() > 1)
             {
                 return false;
             }

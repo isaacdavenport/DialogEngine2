@@ -257,8 +257,8 @@ namespace DialogGenerator.DialogEngine
         {
             SelectedCharactersPairEventArgs args = mRandomSelectionDataCached;
             if (args == null || args.Character1Index < 0 || args.Character1Index >= mContext.CharactersList.Count
-                || args.Character2Index < 0 || args.Character2Index >= mContext.CharactersList.Count ||
-                args.Character1Index == args.Character2Index)
+                || args.Character2Index < 0 || args.Character2Index >= mContext.CharactersList.Count /* ||
+                args.Character1Index == args.Character2Index *//* Sinisa 02/05/2020 - DLGEN-438 */)
             {
                 return false;
             }
@@ -269,7 +269,7 @@ namespace DialogGenerator.DialogEngine
             var _tempChar1 = mContext.Character1Num;
             var _tempChar2 = mContext.Character2Num;
 
-            if (_tempChar1 == _tempChar2 || _tempChar1 >= mContext.CharactersList.Count || _tempChar2 >= mContext.CharactersList.Count)
+            if (/* _tempChar1 == _tempChar2 || */ /* Sinisa 02/05/2020 - DLGEN-438 */ _tempChar1 >= mContext.CharactersList.Count || _tempChar2 >= mContext.CharactersList.Count)
                 return false;
 
             mContext.SameCharactersAsLast = (_tempChar1 == mPriorCharacter1Num || _tempChar1 == mPriorCharacter2Num)
@@ -279,6 +279,10 @@ namespace DialogGenerator.DialogEngine
             mContext.Character2Num = _tempChar2;
             mPriorCharacter1Num = mContext.Character1Num;
             mPriorCharacter2Num = mContext.Character2Num;
+
+            // Notify the interested parties that the selected characters are about 
+            // to start the conversation.
+            mEventAggregator.GetEvent<CharactersInConversationEvent>().Publish(args);
 
             return true;
         }

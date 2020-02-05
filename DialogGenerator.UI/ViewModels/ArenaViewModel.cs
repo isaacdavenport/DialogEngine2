@@ -1,6 +1,7 @@
 ﻿using DialogGenerator.Core;
 using DialogGenerator.DataAccess;
 using DialogGenerator.Events;
+using DialogGenerator.Events.EventArgs;
 using DialogGenerator.Model;
 using Prism.Events;
 using Prism.Mvvm;
@@ -29,6 +30,23 @@ namespace DialogGenerator.UI.ViewModels
             mCharacterRepository = _CharacterRepository;
 
             mEventAggregator.GetEvent<CharacterCollectionLoadedEvent>().Subscribe(_onCharacterCollectionLoaded);
+            mEventAggregator.GetEvent<CharactersInConversationEvent>().Subscribe(_onCharactersInConversation);
+        }
+
+        private void _onCharactersInConversation(SelectedCharactersPairEventArgs obj)
+        {
+            foreach (ArenaAvatarViewModel _am in PlaygroundAvatars)
+            {
+                int _characterIndex = mCharacterRepository.IndexOf(_am.Character);
+                if(_characterIndex == obj.Character1Index ||
+                   _characterIndex == obj.Character2Index)
+                {
+                    _am.Active = true;
+                } else
+                {
+                    _am.Active = false;
+                }                                
+            }
         }
 
         public ObservableCollection<ArenaAvatarViewModel> AvatarGalleryItems { get; } = new ObservableCollection<ArenaAvatarViewModel>();
@@ -93,16 +111,16 @@ namespace DialogGenerator.UI.ViewModels
 
             if(_closestPair != null)
             {
-                foreach(ArenaAvatarViewModel _am in PlaygroundAvatars)
-                {
-                    if(_closestPair.Contains(_am))
-                    {
-                        _am.Active = true;
-                    } else
-                    {
-                        _am.Active = false;
-                    }
-                }
+                //foreach(ArenaAvatarViewModel _am in PlaygroundAvatars)
+                //{
+                //    if(_closestPair.Contains(_am))
+                //    {
+                //        _am.Active = true;
+                //    } else
+                //    {
+                //        _am.Active = false;
+                //    }
+                //}
 
                 int _characterIndex1 = -1;
                 int _characterIndex2 = -1;
