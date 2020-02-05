@@ -49,8 +49,12 @@
                   Width="100" 
                   Height="110"/>
         <StackPanel Grid.Row="2" Height="50" VerticalAlignment="Center" HorizontalAlignment="Center" Orientation="Vertical">
-            <TextBlock Text="Shake radio in order to attach it to character" Margin="0,25,0,0"/>
+            <TextBlock Text="{Binding AssignedRadioText}" Margin="0,25,0,0"/>
         </StackPanel>
-        <Button x:Name="CloseButton" Content="Close" Click="Button_Click" Grid.Row="3" Width="150"/>
+        <StackPanel Orientation="Horizontal" HorizontalAlignment="Center" Grid.Row="3">
+            <Button x:Name="CloseButton" Content="Save" Click="Button_Click" Width="150" Margin="0,0,10,0"/>
+            <Button x:Name="CancelButton" Content="Cancel" Click="CancelButton_Click" Width="150" Margin="10, 0, 0, 0"/>
+        </StackPanel>
+        
     </Grid>
 </UserControl>

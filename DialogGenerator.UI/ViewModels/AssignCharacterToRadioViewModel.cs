@@ -33,6 +33,7 @@ namespace DialogGenerator.UI.ViewModels
         private ICharacterDataProvider mCharacterDataProvider;
         private IMessageDialogService mMessageDialogService;
         private int mAssignedRadio = -1;
+        private string mAssignedRadioText = string.Empty;
 
         public AssignCharacterToRadioViewModel(ILogger _Logger
             , IEventAggregator _EventAggregator
@@ -47,6 +48,7 @@ namespace DialogGenerator.UI.ViewModels
             mBLEDataProviderFactory = _BLEDataProviderFactory;
             mCharacterDataProvider = _CharacterDataProvider;
             mMessageDialogService = _MessageDialogService;
+            AssignedRadioText = "Shake radio in order to attach it to character";
 
             _bindCommands();
         }
@@ -68,6 +70,41 @@ namespace DialogGenerator.UI.ViewModels
                 RaisePropertyChanged();
             }
         }
+
+        public int AssignedRadio
+        {
+            get
+            {
+                return mAssignedRadio;
+            }
+
+            set
+            {
+                mAssignedRadio = value;
+                RaisePropertyChanged();
+                if(mAssignedRadio != -1)
+                {
+                    AssignedRadioText = string.Format("Assigned radio with index {0}", mAssignedRadio);
+                } else
+                {
+                    AssignedRadioText = "No radio assigned";
+                }                
+            }
+        }
+
+        public string AssignedRadioText
+        {
+            get
+            {
+                return mAssignedRadioText;
+            }
+
+            set
+            {
+                mAssignedRadioText = value;
+                RaisePropertyChanged();
+            }
+        }
     
         #endregion
 
@@ -76,6 +113,25 @@ namespace DialogGenerator.UI.ViewModels
 
         public DelegateCommand ViewLoadedCommand { get; set; }
         public DelegateCommand ViewUnloadedCommand { get; set; }
+
+        #endregion
+
+        #region Public methods
+
+        public async Task<bool> SaveRadioSettings()
+        {
+            if (mAssignedRadio != -1)
+            {
+                if(await _selectToyToCharacter(mAssignedRadio))
+                {
+                    mEventAggregator.GetEvent<RadioAssignedEvent>().Publish(mAssignedRadio);
+                    mAssignedRadio = -1;
+                    return true;
+                }                
+            }
+
+            return false;
+        }
 
         #endregion
 
@@ -108,11 +164,8 @@ namespace DialogGenerator.UI.ViewModels
         private void _viewUnloaded_Execute()
         {
             _stopRadioScanning();
-            if(mAssignedRadio != -1)
-            {
-                mEventAggregator.GetEvent<RadioAssignedEvent>().Publish(mAssignedRadio);
-                mAssignedRadio = -1;
-            }
+
+            
             
         }
 
@@ -148,7 +201,8 @@ namespace DialogGenerator.UI.ViewModels
                         {
                             if (_radioIndex != _oldIndex)
                             {
-                                await _selectToyToCharacter(_radioIndex);
+                                //await _selectToyToCharacter(_radioIndex);
+                                AssignedRadio = _radioIndex;
                                 _oldIndex = _radioIndex;
                             }
                         }
@@ -169,7 +223,7 @@ namespace DialogGenerator.UI.ViewModels
             mCancellationTokenSource.Cancel();
         }
 
-        private async Task _selectToyToCharacter(int newVal)
+        private async Task<bool> _selectToyToCharacter(int newVal)
         {
             var _oldChars = mCharacterDataProvider.GetAll().Where(c => c.RadioNum == newVal);
             if (_oldChars.Count() > 0)
@@ -187,16 +241,20 @@ namespace DialogGenerator.UI.ViewModels
                         await mCharacterDataProvider.SaveAsync(_oldChar);
                         SelectedCharacter.RadioNum = newVal;
                         await mCharacterDataProvider.SaveAsync(SelectedCharacter);
-                        mAssignedRadio = newVal;
+
+                        return true;
+                    } else
+                    {
+                        return false;
                     }
                 }
-            } else
-            {
-                SelectedCharacter.RadioNum = newVal;
-                await mCharacterDataProvider.SaveAsync(SelectedCharacter);
-                await mMessageDialogService.ShowMessage("Success", string.Format("The radio {0} was successfully attached to character '{1}'", newVal, SelectedCharacter.CharacterName));
-                mAssignedRadio = newVal;
-            }
+            } 
+
+            SelectedCharacter.RadioNum = newVal;
+            await mCharacterDataProvider.SaveAsync(SelectedCharacter);
+            await mMessageDialogService.ShowMessage("Success", string.Format("The radio {0} was successfully attached to character '{1}'", newVal, SelectedCharacter.CharacterName));
+
+            return true;
         }
 
         #endregion

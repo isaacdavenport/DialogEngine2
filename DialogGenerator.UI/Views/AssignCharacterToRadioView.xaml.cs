@@ -1,4 +1,5 @@
-﻿using MaterialDesignThemes.Wpf;
+﻿using DialogGenerator.UI.ViewModels;
+using MaterialDesignThemes.Wpf;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -26,7 +27,15 @@ namespace DialogGenerator.UI.Views
             InitializeComponent();
         }
 
-        private void Button_Click(object sender, RoutedEventArgs e)
+        private async void Button_Click(object sender, RoutedEventArgs e)
+        {
+            if(await (this.DataContext as AssignCharacterToRadioViewModel).SaveRadioSettings())
+            {
+                DialogHost.CloseDialogCommand.Execute(null, this.CloseButton);
+            }            
+        }
+
+        private void CancelButton_Click(object sender, RoutedEventArgs e)
         {
             DialogHost.CloseDialogCommand.Execute(null, this.CloseButton);
         }
