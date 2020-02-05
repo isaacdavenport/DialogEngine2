@@ -50,6 +50,9 @@ namespace DialogGenerator.CharacterSelection.Data
             {
                 var sections = args.Advertisement.DataSections;
 
+                if (ApplicationData.Instance.IgnoreRadioSignals)
+                    return;
+
                 if (sections.Count < 2)
                 return;
 
