@@ -31,6 +31,7 @@
         public const string NEEDS_RESTART = "NeedsRestart";
         public const string ARENA_WIDTH = "ArenaWidth";
         public const string ARENA_HEIGHT = "ArenaHeight";
+        public const string CANCEL_DIALOG = "CancelDialog";
         
     }
 }

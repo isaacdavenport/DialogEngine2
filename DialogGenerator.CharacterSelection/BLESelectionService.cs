@@ -52,12 +52,6 @@ namespace DialogGenerator.CharacterSelection
         public int mStableRadioIndex2 = -1;
         public long mLastStableTime = 0;
 
-        private const int mMsOfStillTimeRequired = 300;
-        private const int mAccelerometerMotionThreshold = 40;
-        private const int mAccelerometerStillnessThreshold = 48;
-        private const int mMsMotionWindow = 1500;
-
-
         #endregion
 
         #region - constructor -
@@ -234,16 +228,16 @@ namespace DialogGenerator.CharacterSelection
                         return false;  // didn't have long enough data in ReceivedMessages
                     }
                     var _timeAgoOfMessage_i = _currentTime - ParseMessageHelper.ReceivedMessages[i].ReceivedTime;
-                    if (_timeAgoOfMessage_i < TimeSpan.FromMilliseconds(mMsOfStillTimeRequired))
+                    if (_timeAgoOfMessage_i < TimeSpan.FromMilliseconds(ApplicationData.Instance.MsOfStillTimeRequired))
                     {  // in the needsToBeStableWindow
-                        if (ParseMessageHelper.ReceivedMessages[i].Motion > mAccelerometerStillnessThreshold)
-                        {  // if the motion was high in the last mMsOfStillTimeRequired we aren't done moving
+                        if (ParseMessageHelper.ReceivedMessages[i].Motion > ApplicationData.Instance.AccelerometerStillnessThreshold)
+                        {  // if the motion was high in the last ApplicationData.Instance.MsOfStillTimeRequired we aren't done moving
                             return false;
                         }
                     }
-                    if (_timeAgoOfMessage_i >= TimeSpan.FromMilliseconds(mMsOfStillTimeRequired)) 
+                    if (_timeAgoOfMessage_i >= TimeSpan.FromMilliseconds(ApplicationData.Instance.MsOfStillTimeRequired)) 
                     {  // passed the needsToBeStableWindow now look for motion in deeper past
-                        if (ParseMessageHelper.ReceivedMessages[i].Motion > mAccelerometerMotionThreshold)  
+                        if (ParseMessageHelper.ReceivedMessages[i].Motion > ApplicationData.Instance.AccelerometerMotionThreshold)  
                         {
                             ReceivedMessage msg = ParseMessageHelper.ReceivedMessages[i];
                             string dbgOut = msg.CharacterPrefix + " ";
@@ -256,7 +250,7 @@ namespace DialogGenerator.CharacterSelection
                         }
                     }
                     i--;
-                    if (_timeAgoOfMessage_i > TimeSpan.FromMilliseconds(mMsMotionWindow))  //we are past the window
+                    if (_timeAgoOfMessage_i > TimeSpan.FromMilliseconds(ApplicationData.Instance.MsMotionWindow))  //we are past the window
                         return false;
                 }
                 return false;  

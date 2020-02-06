@@ -72,6 +72,8 @@ namespace DialogGenerator.CharacterSelection
 
                             mEventAggregator.GetEvent<StopPlayingCurrentDialogLineEvent>().Publish();
 
+                            Session.Set(Constants.CANCEL_DIALOG, true);
+
                             mEventAggregator.GetEvent<SelectedCharactersPairChangedEvent>().
                             Publish(new SelectedCharactersPairEventArgs
                             {

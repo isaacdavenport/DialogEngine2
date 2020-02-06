@@ -143,7 +143,21 @@ namespace DialogGenerator.Core
         [RegularExpression(@"^[0-9]([.,][0-9]{1,3})?$", ErrorMessage = @"Field requires decimal number.")]
         public double RadioMovesSignalStrengthSensitivity { get; set; } = 0.7;
 
+        [Editable(true)]
+        [DisplayName("Still time required:")]        
+        public int MsOfStillTimeRequired { get; set; } = 300;
 
+        [Editable(true)]
+        [DisplayName("Acc. motion threshold:")]
+        public int AccelerometerMotionThreshold { get; set; } = 40;
+
+        [Editable(true)]
+        [DisplayName("Acc. stillness threshold:")]
+        public int AccelerometerStillnessThreshold { get; set; } = 48;
+
+        [Editable(true)]
+        [DisplayName("Motion window:")]
+        public int MsMotionWindow { get; set; } = 1500;
 
         [XmlIgnore]
         public string RootDirectory

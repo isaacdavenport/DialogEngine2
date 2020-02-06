@@ -364,8 +364,9 @@ namespace DialogGenerator.DialogEngine
                 foreach (var _currentPhraseType in mContext.DialogModelsList[mIndexOfCurrentDialogModel].PhraseTypeSequence)
                 {
                     token.ThrowIfCancellationRequested();
-                    if(Session.Get<bool>(Constants.NEEDS_RESTART))
+                    if(Session.Get<bool>(Constants.NEEDS_RESTART) || Session.Get<bool>(Constants.CANCEL_DIALOG))
                     {
+                        Session.Set(Constants.CANCEL_DIALOG, false);
                         throw (new OperationCanceledException());
                     }
 
@@ -378,8 +379,9 @@ namespace DialogGenerator.DialogEngine
                         }
 
                         token.ThrowIfCancellationRequested();
-                        if (Session.Get<bool>(Constants.NEEDS_RESTART))
+                        if (Session.Get<bool>(Constants.NEEDS_RESTART) || Session.Get<bool>(Constants.CANCEL_DIALOG))
                         {
+                            Session.Set(Constants.CANCEL_DIALOG, false);
                             throw (new OperationCanceledException());
                         }
 
@@ -393,8 +395,9 @@ namespace DialogGenerator.DialogEngine
                         }
 
                         token.ThrowIfCancellationRequested();
-                        if (Session.Get<bool>(Constants.NEEDS_RESTART))
+                        if (Session.Get<bool>(Constants.NEEDS_RESTART) || Session.Get<bool>(Constants.CANCEL_DIALOG))
                         {
+                            Session.Set(Constants.CANCEL_DIALOG, false);
                             throw (new OperationCanceledException());
                         }
 
@@ -408,8 +411,9 @@ namespace DialogGenerator.DialogEngine
                         }
 
                         token.ThrowIfCancellationRequested();
-                        if (Session.Get<bool>(Constants.NEEDS_RESTART))
+                        if (Session.Get<bool>(Constants.NEEDS_RESTART) || Session.Get<bool>(Constants.CANCEL_DIALOG))
                         {
+                            Session.Set(Constants.CANCEL_DIALOG, false);
                             throw (new OperationCanceledException());
                         }
 

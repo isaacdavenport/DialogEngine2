@@ -143,5 +143,45 @@ namespace DialogGenerator.UI.Wrapper
                 validateProperty(nameof(DebugModeOn));
             }
         }
+
+        public int MsOfStillTimeRequired
+        {
+            get { return getValue<int>(); }
+            set
+            {
+                setValue(value);
+                validateProperty(nameof(MsOfStillTimeRequired));
+            }
+        }
+
+        public int AccelerometerMotionThreshold
+        {
+            get { return getValue<int>(); }
+            set
+            {
+                setValue(value);
+                validateProperty(nameof(AccelerometerMotionThreshold));
+            }
+        }
+
+        public int AccelerometerStillnessThreshold
+        {
+            get { return getValue<int>(); }
+            set
+            {
+                setValue(value);
+                validateProperty(nameof(AccelerometerStillnessThreshold));
+            }
+        }
+
+        public int MsMotionWindow
+        {
+            get { return getValue<int>(); }
+            set
+            {
+                setValue(value);
+                validateProperty(nameof(MsMotionWindow));
+            }
+        }
     }
 }

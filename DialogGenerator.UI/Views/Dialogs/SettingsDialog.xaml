@@ -59,6 +59,12 @@
                 <RowDefinition Height="auto" />
                 <RowDefinition Height="auto" />
                 <RowDefinition Height="auto" />
+                <RowDefinition Height="auto" />
+                <RowDefinition Height="auto" />
+                <RowDefinition Height="auto" />
+                <RowDefinition Height="auto" />
+                <RowDefinition Height="auto" />
+                <RowDefinition Height="auto" />
             </Grid.RowDefinitions>
 
             <Label Content="Complete anyway after stop(seconds):" Margin="10" Grid.Row="1" HorizontalAlignment="Right" />
@@ -89,28 +95,43 @@
             <TextBox Grid.Row="8" MinWidth="75" Text="{Binding Settings.RadioMovesSignalStrengthSensitivity,UpdateSourceTrigger=LostFocus,Mode=TwoWay}" 
                      HorizontalAlignment="Left" Margin="10" Grid.Column="2" materialDesign:ValidationAssist.UsePopup="True" />
 
-            <Label Content="Website:" Grid.Column="0" HorizontalAlignment="Right" Margin="10" Grid.Row="9" />
+            <Label Content="Still time required:" Grid.Column="0" HorizontalAlignment="Right" Margin="10" Grid.Row="9" />
+            <TextBox Grid.Row="9" MinWidth="75" Text="{Binding Settings.MsOfStillTimeRequired,UpdateSourceTrigger=LostFocus,Mode=TwoWay}" 
+                     HorizontalAlignment="Left" Margin="10" Grid.Column="2" materialDesign:ValidationAssist.UsePopup="True" />
+
+            <Label Content="Acc. motion threshold:" Grid.Column="0" HorizontalAlignment="Right" Margin="10" Grid.Row="10" />
+            <TextBox Grid.Row="10" MinWidth="75" Text="{Binding Settings.AccelerometerMotionThreshold,UpdateSourceTrigger=LostFocus,Mode=TwoWay}" 
+                     HorizontalAlignment="Left" Margin="10" Grid.Column="2" materialDesign:ValidationAssist.UsePopup="True" />
+
+            <Label Content="Acc. stillness threshold:" Grid.Column="0" HorizontalAlignment="Right" Margin="10" Grid.Row="11" />
+            <TextBox Grid.Row="11" MinWidth="75" Text="{Binding Settings.AccelerometerStillnessThreshold,UpdateSourceTrigger=LostFocus,Mode=TwoWay}" 
+                     HorizontalAlignment="Left" Margin="10" Grid.Column="2" materialDesign:ValidationAssist.UsePopup="True" />
+
+            <Label Content="Motion window:" Grid.Column="0" HorizontalAlignment="Right" Margin="10" Grid.Row="12" />
+            <TextBox Grid.Row="12" MinWidth="75" Text="{Binding Settings.MsMotionWindow,UpdateSourceTrigger=LostFocus,Mode=TwoWay}" 
+                     HorizontalAlignment="Left" Margin="10" Grid.Column="2" materialDesign:ValidationAssist.UsePopup="True" />
+
+            <Label Content="Website:" Grid.Column="0" HorizontalAlignment="Right" Margin="10" Grid.Row="13" />
             <Button Content="{Binding Website}" 
-                    Grid.Row="9" 
+                    Grid.Row="13" 
                     Grid.Column="2" 
                     Style="{StaticResource MaterialDesignToolForegroundButton}"
                     Command="{Binding WebsiteCommand}" 
                     Margin="0" 
                     HorizontalAlignment="Left" />
 
-            <Label Content="Version:" Grid.Column="0" HorizontalAlignment="Right" Margin="10" Grid.Row="10" />
-            <Label Content="{Binding Version}" Grid.Column="2" HorizontalAlignment="Left" Margin="0,10,0,0" Grid.Row="10" />
-
-
+            <Label Content="Version:" Grid.Column="0" HorizontalAlignment="Right" Margin="10" Grid.Row="14" />
+            <Label Content="{Binding Version}" Grid.Column="2" HorizontalAlignment="Left" Margin="0,10,0,0" Grid.Row="14" />
 
             <Button Content="Save"
                     x:Name="CloseBtn"
                     Style="{StaticResource MaterialDesignRaisedButton}"
-                    Grid.Row="10"
+                    Grid.Row="15"
+                    Grid.ColumnSpan="3"
                     IsEnabled="{Binding Settings.HasErrors,Converter={StaticResource InvertValueConverter}}"
                     Command="{Binding CloseCommand}"
-                    Margin="118,0,0,14.5"
-                    HorizontalAlignment="Left" RenderTransformOrigin="0.597,0.177" />
+                    Margin="0,20,0,14.5"
+                    HorizontalAlignment="Center" RenderTransformOrigin="0.597,0.177" />
         </Grid>
     </GroupBox>
 </UserControl>
