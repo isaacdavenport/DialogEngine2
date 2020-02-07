@@ -109,19 +109,8 @@ namespace DialogGenerator.UI.ViewModels
                 }
             }
 
-            if(_closestPair != null)
+            if (_closestPair != null)
             {
-                //foreach(ArenaAvatarViewModel _am in PlaygroundAvatars)
-                //{
-                //    if(_closestPair.Contains(_am))
-                //    {
-                //        _am.Active = true;
-                //    } else
-                //    {
-                //        _am.Active = false;
-                //    }
-                //}
-
                 int _characterIndex1 = -1;
                 int _characterIndex2 = -1;
 
@@ -154,8 +143,19 @@ namespace DialogGenerator.UI.ViewModels
         {
             ObservableCollection<Character> _characters = mCharacterRepository.GetAll();                        
             
-            // Rememeber the playground avatars
-            var query = PlaygroundAvatars.Select((c, index) => new { Index = index, Prefix = c.Character.CharacterPrefix });
+            // Rememeber the playground avatars if there are any.
+            var _query = PlaygroundAvatars.Select((c, index) => new { 
+                Index = index, 
+                Prefix = c.Character.CharacterPrefix,
+                Left = c.Left,
+                Top = c.Top,
+            });
+
+            //List<int> _playgroundIndices = new List<int>();
+            //foreach(var _item in _query)
+            //{
+
+            //}
 
             // Clear collections.
             PlaygroundAvatars.Clear();
@@ -173,15 +173,124 @@ namespace DialogGenerator.UI.ViewModels
 
                 AvatarGalleryItems.Add(_am);
 
-                foreach(var item in query)
+                foreach(var item in _query)
                 {
                     string _prefix = item.GetType().GetProperty("Prefix").GetValue(item).ToString();
                     if(_prefix.Equals(_am.Character.CharacterPrefix))
                     {
+                        ArenaAvatarViewModel _playgroundAM = _am.Clone();
+                        _am.Left = (int)item.GetType().GetProperty("Left").GetValue(item);
+                        _am.Top = (int)item.GetType().GetProperty("Top").GetValue(item);
+                        //_am.Active = (bool)item.GetType().GetProperty("Active").GetValue(item);
+                        //_am.InPlayground = (bool)item.GetType().GetProperty("InPlayground").GetValue(item);
+                        PlaygroundAvatars.Add(_playgroundAM);
+                    }
+                }
+            }
+
+            int _selIndex1 = Session.Get<int>(Constants.NEXT_CH_1);
+            int _selIndex2 = Session.Get<int>(Constants.NEXT_CH_2);
+
+            if (PlaygroundAvatars.Count == 0)
+            {
+                Character _c = null;                                
+                if (_selIndex1 != -1)
+                {
+                    _c = mCharacterRepository.GetAll()[_selIndex1];
+                    
+                } else
+                {
+                    if (_selIndex2 != -1) {
+                        _selIndex1 = _firstIndexNotInList(new List<int> { _selIndex2 });
+                    } else
+                    {
+                        _selIndex1 = 0;
+                    }
+
+                    _c = mCharacterRepository.GetAll()[_selIndex1];
+                }
+
+                if(_c != null)
+                {
+                    ArenaAvatarViewModel _aavm = AvatarGalleryItems.Where(_am => _am.Character.CharacterPrefix.Equals(_c.CharacterPrefix)).First();
+                    ArenaAvatarViewModel _pgvm = _aavm.Clone();
+                    _pgvm.Left = 50;
+                    _pgvm.Top = 50;
+                    PlaygroundAvatars.Add(_pgvm);
+                }
+
+                _c = null;
+
+                if (_selIndex2 != -1)
+                {
+                    if(_selIndex2 == _selIndex1)
+                    {
+                        _c = mCharacterRepository.GetAll()[_firstIndexNotInList(new List<int> { _selIndex1 })];
+                    } else
+                    {
+                        _c = mCharacterRepository.GetAll()[_selIndex2];
+                    }                    
+                }
+                else
+                {
+                    if (_selIndex1 != -1)
+                    {
+                        _selIndex2 = _firstIndexNotInList(new List<int> { _selIndex1 });
+                    }
+                    else
+                    {
+                        _selIndex2 = 0;
+                    }
+
+                    _c = mCharacterRepository.GetAll()[_selIndex2];
+                }
+
+                if (_c != null)
+                {
+                    ArenaAvatarViewModel _aavm = AvatarGalleryItems.Where(_am => _am.Character.CharacterPrefix.Equals(_c.CharacterPrefix)).First();
+                    ArenaAvatarViewModel _pgvm = _aavm.Clone();
+                    _pgvm.Left = 250;
+                    _pgvm.Top = 50;
+                    PlaygroundAvatars.Add(_pgvm);
+                }
+            } else
+            {
+                List<int> _indices = new List<int> { _selIndex1, _selIndex2 };
+                foreach (int _index in _indices)
+                {
+                    if (PlaygroundAvatars.Where(p => mCharacterRepository.IndexOf(p.Character) == _index).Count() == 0)
+                    {
+                        // Dodaj ga
+                        ArenaAvatarViewModel _am = new ArenaAvatarViewModel
+                        {
+                            Character = mCharacterRepository.GetAll()[_index],
+                            Left = 200,
+                            Top = 200
+                        };
+
                         PlaygroundAvatars.Add(_am);
                     }
                 }
             }
+            
+        }
+
+        private int _firstIndexNotInList(List<int> _Lista, int _Limit = 50) 
+        {
+            int _counter = 0;
+            int _retval = -1;
+
+            while(_retval == -1 && _counter != _Limit)
+            {
+                if(!_Lista.Contains(_counter))
+                {
+                    _retval = _counter;
+                }
+
+                _counter++;
+            }
+
+            return _retval;
         }
 
         private void _createAvatarPairs()

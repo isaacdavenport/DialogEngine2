@@ -772,12 +772,13 @@ namespace DialogGenerator.UI.ViewModels
                         // Add the character to the collection.
                         await mCharacterDataProvider.AddAsync(Character);
 
+                        // Get the index of new character.
+                        _idx = mCharacterDataProvider.IndexOf(Character);
+                        Session.Set(Constants.NEXT_CH_1, _idx);
+
                         // Notify all interested parties that the collection has new element (has changed).
                         mEventAgregator.GetEvent<CharacterCollectionLoadedEvent>().Publish();
                         
-                        // Get the index of new character.
-                        _idx = mCharacterDataProvider.IndexOf(Character);
-
                         // If the character has the radio assigned notify the interested parties.
                         if (Character.RadioNum != -1)
                         {                            
@@ -785,8 +786,9 @@ namespace DialogGenerator.UI.ViewModels
                         }
 
                         // Reset the conversation in the case of the new character.
-                        Session.Set(Constants.NEXT_CH_1, -1);
-                        Session.Set(Constants.NEXT_CH_2, -1);
+                        //Session.Set(Constants.NEXT_CH_1, -1);
+                        //Session.Set(Constants.NEXT_CH_2, -1);
+
                     }
 
 

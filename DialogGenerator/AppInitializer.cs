@@ -98,6 +98,8 @@ namespace DialogGenerator
             Session.Set(Constants.CHARACTERS, _JSONObjectTypesList.Characters);
             Session.Set(Constants.DIALOG_MODELS, _JSONObjectTypesList.DialogModels);
             Session.Set(Constants.WIZARDS, _JSONObjectTypesList.Wizards);
+            Session.Set(Constants.NEXT_CH_1, -1);
+            Session.Set(Constants.NEXT_CH_2, -1);
             mEventAggregator.GetEvent<CharacterCollectionLoadedEvent>().Publish();
 
             mLogger.Info("Finished importing characters: " + _JSONObjectTypesList.Characters.Count + " DialogModelGroups: " + 

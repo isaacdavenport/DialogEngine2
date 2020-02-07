@@ -36,6 +36,7 @@ namespace DialogGenerator.UI.Views
                 this.Playground.Children.Add(_avatarView);
             }
 
+            _model.FindClosestAvatarPair(true);
             _model.PlaygroundAvatars.CollectionChanged += PlaygroundAvatars_CollectionChanged;
         }
 

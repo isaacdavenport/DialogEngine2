@@ -547,11 +547,11 @@ namespace DialogGenerator.DialogEngine
                         }
 
                         mEventAggregator.GetEvent<CharacterSelectionModelChangedEvent>().Publish();
-                        if(!Session.Get<bool>(Constants.BLE_MODE_ON))
-                        {
-                            Session.Set(Constants.NEXT_CH_1, -1);
-                            Session.Set(Constants.NEXT_CH_2, -1);
-                        }
+                        //if(!Session.Get<bool>(Constants.BLE_MODE_ON))
+                        //{
+                        //    Session.Set(Constants.NEXT_CH_1, -1);
+                        //    Session.Set(Constants.NEXT_CH_2, -1);
+                        //}
                         _characterSelectionTask = mCharacterSelection.StartCharacterSelection();
                         Session.Set(Constants.NEEDS_RESTART, false);
                     }
