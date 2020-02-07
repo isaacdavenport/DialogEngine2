@@ -139,23 +139,17 @@ namespace DialogGenerator.UI.ViewModels
             return _closestPair;
         }
 
+        private struct PlaygroundEntry
+        {
+            public int Index { get; set; }
+            public int Left { get; set; }
+            public int Top { get; set; }
+
+        };
+
         private void _onCharacterCollectionLoaded()
         {
-            ObservableCollection<Character> _characters = mCharacterRepository.GetAll();                        
-            
-            // Rememeber the playground avatars if there are any.
-            var _query = PlaygroundAvatars.Select((c, index) => new { 
-                Index = index, 
-                Prefix = c.Character.CharacterPrefix,
-                Left = c.Left,
-                Top = c.Top,
-            });
-
-            //List<int> _playgroundIndices = new List<int>();
-            //foreach(var _item in _query)
-            //{
-
-            //}
+            ObservableCollection<Character> _characters = mCharacterRepository.GetAll();                                   
 
             // Clear collections.
             PlaygroundAvatars.Clear();
@@ -171,33 +165,18 @@ namespace DialogGenerator.UI.ViewModels
                     Top = 0
                 };
 
-                AvatarGalleryItems.Add(_am);
-
-                foreach(var item in _query)
-                {
-                    string _prefix = item.GetType().GetProperty("Prefix").GetValue(item).ToString();
-                    if(_prefix.Equals(_am.Character.CharacterPrefix))
-                    {
-                        ArenaAvatarViewModel _playgroundAM = _am.Clone();
-                        _am.Left = (int)item.GetType().GetProperty("Left").GetValue(item);
-                        _am.Top = (int)item.GetType().GetProperty("Top").GetValue(item);
-                        //_am.Active = (bool)item.GetType().GetProperty("Active").GetValue(item);
-                        //_am.InPlayground = (bool)item.GetType().GetProperty("InPlayground").GetValue(item);
-                        PlaygroundAvatars.Add(_playgroundAM);
-                    }
-                }
+                AvatarGalleryItems.Add(_am);                
             }
 
             int _selIndex1 = Session.Get<int>(Constants.NEXT_CH_1);
             int _selIndex2 = Session.Get<int>(Constants.NEXT_CH_2);
 
-            if (PlaygroundAvatars.Count == 0)
+            if (PlaygroundAvatars.Count == 0 /* S.Ristic - and actually it always is */)
             {
                 Character _c = null;                                
-                if (_selIndex1 != -1)
+                if (_selIndex1 >= 0 && _selIndex1 < mCharacterRepository.GetAll().Count)
                 {
-                    _c = mCharacterRepository.GetAll()[_selIndex1];
-                    
+                    _c = mCharacterRepository.GetAll()[_selIndex1];                    
                 } else
                 {
                     if (_selIndex2 != -1) {
@@ -221,7 +200,7 @@ namespace DialogGenerator.UI.ViewModels
 
                 _c = null;
 
-                if (_selIndex2 != -1)
+                if (_selIndex2 >= 0 && _selIndex2 < mCharacterRepository.GetAll().Count)
                 {
                     if(_selIndex2 == _selIndex1)
                     {
@@ -253,24 +232,18 @@ namespace DialogGenerator.UI.ViewModels
                     _pgvm.Top = 50;
                     PlaygroundAvatars.Add(_pgvm);
                 }
-            } else
-            {
-                List<int> _indices = new List<int> { _selIndex1, _selIndex2 };
-                foreach (int _index in _indices)
-                {
-                    if (PlaygroundAvatars.Where(p => mCharacterRepository.IndexOf(p.Character) == _index).Count() == 0)
-                    {
-                        // Dodaj ga
-                        ArenaAvatarViewModel _am = new ArenaAvatarViewModel
-                        {
-                            Character = mCharacterRepository.GetAll()[_index],
-                            Left = 200,
-                            Top = 200
-                        };
+            } 
 
-                        PlaygroundAvatars.Add(_am);
-                    }
-                }
+            // If the indices have changed send the event.
+            if((_selIndex1 != Session.Get<int>(Constants.NEXT_CH_1) || 
+                _selIndex2 != Session.Get<int>(Constants.NEXT_CH_2)) &&
+               (_selIndex1 != Session.Get<int>(Constants.NEXT_CH_2) || 
+                _selIndex2 != Session.Get<int>(Constants.NEXT_CH_1))) {
+                mEventAggregator.GetEvent<SelectedCharactersPairChangedEvent>().Publish(new SelectedCharactersPairEventArgs
+                {
+                    Character1Index = _selIndex1,
+                    Character2Index = _selIndex2
+                });
             }
             
         }

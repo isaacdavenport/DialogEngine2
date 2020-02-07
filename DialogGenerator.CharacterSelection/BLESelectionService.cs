@@ -497,17 +497,22 @@ namespace DialogGenerator.CharacterSelection
                 //only pick up new characters if bigRssi greater not ==
                 int priorLargestRssiPair = HeatMap[mPossibleSpeakingCh1RadioNum, mPossibleSpeakingCh2RadioNum] + HeatMap[mPossibleSpeakingCh2RadioNum, mPossibleSpeakingCh1RadioNum];
                 _findBiggestRssiPair(out int finalRow, out int finalColumn, out int newLargestRssiPair, in HeatMap);
+                // S. Ristic - This condition will prevent the character selection
+                // while entering the play mode in guided character creation mode.
 
-                if (newLargestRssiPair > priorLargestRssiPair && 
-                      _areRadioPairsDifferent(mPossibleSpeakingCh1RadioNum, mPossibleSpeakingCh2RadioNum, finalRow, finalColumn))
-                {
-                    mPossibleSpeakingCh1RadioNum = finalRow;
-                    mPossibleSpeakingCh2RadioNum = finalColumn;
-                }
-                else
-                {  // only consider changing characters when new RSSI is larger so back to start of state machine
-                    return Triggers.ProcessMessage;
-                }
+                //if (newLargestRssiPair > priorLargestRssiPair && 
+                //      _areRadioPairsDifferent(mPossibleSpeakingCh1RadioNum, mPossibleSpeakingCh2RadioNum, finalRow, finalColumn))
+                //{
+                //    mPossibleSpeakingCh1RadioNum = finalRow;
+                //    mPossibleSpeakingCh2RadioNum = finalColumn;
+                //}
+                //else
+                //{  // only consider changing characters when new RSSI is larger so back to start of state machine
+                //    return Triggers.ProcessMessage;
+                //}
+
+                mPossibleSpeakingCh1RadioNum = finalRow;
+                mPossibleSpeakingCh2RadioNum = finalColumn;
 
                 // TODO, _calculateRssiStableAfterChange and _calculateIfInMotionWindow should be their own states
                 _rssiStable = _calculateRssiStablity2(mPossibleSpeakingCh1RadioNum, mPossibleSpeakingCh2RadioNum);
@@ -607,9 +612,10 @@ namespace DialogGenerator.CharacterSelection
                 {
                     NextCharacter1 = _nextSpeakingCharacter1Index;
                     NextCharacter2 = _nextSpeakingCharacter2Index;
-
-                    if (_areRadioPairsDifferent(NextCharacter1, NextCharacter2, CurrentCharacter1, CurrentCharacter2) 
-                        || mFreshStart)
+                    // S. Ristic - This condition will prevent the character selection
+                    // while entering the play mode in guided character creation mode.
+                    if (/* _areRadioPairsDifferent(NextCharacter1, NextCharacter2, CurrentCharacter1, CurrentCharacter2) 
+                        || mFreshStart */  true)
                     {
                         _nextCharactersSelectedAreNew = true;
                         mLogger.Info("New speaking characters assigned by BLE: Character 1 is " + NextCharacter1 +
