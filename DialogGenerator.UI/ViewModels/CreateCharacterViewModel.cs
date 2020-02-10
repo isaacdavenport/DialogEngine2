@@ -54,7 +54,7 @@ namespace DialogGenerator.UI.ViewModels
         private IBLEDataProviderFactory mBLEDataProviderFactory;
         private IBLEDataProvider mCurrentDataProvider;
         private CancellationTokenSource mCancellationTokenSource;
-        private string mSelectRadioTitle = Properties.Resources.ShakeRadio;
+        private string mSelectRadioTitle = Properties.Resources.ShakeRadio;       
 
         internal void SetCurrentStep(int index)
         {
@@ -455,6 +455,9 @@ namespace DialogGenerator.UI.ViewModels
             if(_idx == -1)
             {
                 await mCharacterDataProvider.AddAsync(Character);
+                _idx = mCharacterDataProvider.IndexOf(Character);
+                Session.Set(Constants.NEXT_CH_1, _idx);
+                mEventAgregator.GetEvent<CharacterCollectionLoadedEvent>().Publish();
             }
 
             _initEntries();
