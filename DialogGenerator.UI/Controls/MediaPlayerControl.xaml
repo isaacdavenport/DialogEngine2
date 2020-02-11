@@ -12,16 +12,22 @@
     <Grid HorizontalAlignment="Stretch" VerticalAlignment="Stretch" Background="#FF595959">
         <Grid.RowDefinitions>
             <RowDefinition Height="*" />
-            <RowDefinition Height="auto"/>
+            <RowDefinition Height="Auto" />
+            <RowDefinition Height="auto" />
         </Grid.RowDefinitions>
 
         <Border Grid.Row="0" Background="#FF333333" CornerRadius="2,2,2,2" BorderThickness="0" Margin="2,2,2,2">
             <MediaElement   x:Name="VideoPlayer" Stretch="Fill" LoadedBehavior="Manual" ScrubbingEnabled="True"
                             Source="{Binding CurrentVideoFilePath}"
-                            HorizontalAlignment="Stretch" VerticalAlignment="Stretch"  />
+                            HorizontalAlignment="Stretch" VerticalAlignment="Stretch" LayoutUpdated="VideoPlayer_LayoutUpdated"/>
         </Border>
-
-        <StackPanel x:Name="ToolbarSP" Grid.Row="1" Orientation="Horizontal"
+        <ScrollBar Grid.Row="1" x:Name="VideoPositionScroll" Orientation="Horizontal" 
+                   Height="15" Maximum="{Binding ElementName=VideoPlayer, 
+                   Path=NaturalDuration.TimeSpan.TotalMilliseconds, Mode=OneTime}" 
+                   Minimum="0" 
+                   PreviewMouseLeftButtonUp="VideoPositionScroll_PreviewMouseLeftButtonUp"/>
+                
+        <StackPanel x:Name="ToolbarSP" Grid.Row="2" Orientation="Horizontal"
             Background="#FF595959" HorizontalAlignment="Stretch" VerticalAlignment="Bottom">
             <Button Width="25" x:Name="StartBtn" Height="25" Command="{Binding StartVideoCommand}" Margin="10,10,10,10">
                 <Button.Content>
