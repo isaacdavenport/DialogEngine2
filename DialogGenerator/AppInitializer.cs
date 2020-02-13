@@ -10,6 +10,9 @@ using DialogGenerator.Model.Enum;
 using System.Diagnostics;
 using Prism.Events;
 using DialogGenerator.Events;
+using System.Collections.ObjectModel;
+using DialogGenerator.Model;
+using System.Linq;
 
 namespace DialogGenerator
 {
@@ -94,7 +97,9 @@ namespace DialogGenerator
                 mUserLogger.Error(error);
                 mLogger.Error(error);
             }
-            
+
+            _checkForMultipleRadioAssignments(_JSONObjectTypesList.Characters);
+
             Session.Set(Constants.CHARACTERS, _JSONObjectTypesList.Characters);
             Session.Set(Constants.DIALOG_MODELS, _JSONObjectTypesList.DialogModels);
             Session.Set(Constants.WIZARDS, _JSONObjectTypesList.Wizards);
@@ -106,6 +111,29 @@ namespace DialogGenerator
                 _JSONObjectTypesList.DialogModels.Count + " Wizards: " + _JSONObjectTypesList.Wizards.Count);
 
             mWorkflow.Fire(Triggers.InitializeDialogEngine);
+        }
+
+        private void _checkForMultipleRadioAssignments(ObservableCollection<Character> _Characters)
+        {
+            Dictionary<int, bool> _radioCheck = new Dictionary<int, bool>();
+            for(int i = 0; i < ApplicationData.Instance.NumberOfRadios; i++)
+            {
+                _radioCheck.Add(i, false);            
+            }
+
+            var _charsWithRadios = _Characters.Where(_r => _r.RadioNum != -1);
+            foreach(var _character in _charsWithRadios)
+            {                
+                // If there is already a character with that 
+                // radio number, set the radio number to -1.
+                if(_radioCheck[_character.RadioNum])
+                {
+                    _character.RadioNum = -1;
+                } else
+                {
+                    _radioCheck[_character.RadioNum] = true;
+                }                
+            }
         }
 
         private  void _checkDirectories()
