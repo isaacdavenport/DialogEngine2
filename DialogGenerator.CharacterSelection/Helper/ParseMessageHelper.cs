@@ -26,11 +26,19 @@ namespace DialogGenerator.CharacterSelection.Helper
         {
             try
             {
-                // TODO Isaac why do we test that the radio index is less than the number of characters in the character list?
-                if (_radioIndex > Session.Get<ObservableCollection<Character>>(Constants.CHARACTERS).Count - 1)  
+                // S.Ristic 3/2/2020 - If the radio is not attached to a character don't record the message. (DLGEN-441)
+                int _radioCount = Session.Get<ObservableCollection<Character>>(Constants.CHARACTERS).Where(c => c.RadioNum == _radioIndex).Count();
+                if(_radioCount == 0)
                 {
                     return;
                 }
+
+                // S.Ristic 2/13/2020 - Commented because the above condition has replaced this.
+                //// TODO Isaac why do we test that the radio index is less than the number of characters in the character list?
+                //if (_radioIndex > Session.Get<ObservableCollection<Character>>(Constants.CHARACTERS).Count - 1)  
+                //{
+                //    return;
+                //}
 
                 ReceivedMessages.Add(new ReceivedMessage()
                 {
