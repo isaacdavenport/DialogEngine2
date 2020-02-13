@@ -56,8 +56,8 @@
             <RowDefinition Height="Auto" />
         </Grid.RowDefinitions>
 
-        <Border BorderBrush="DarkGray" BorderThickness="2" Visibility="{Binding RadioModeOn, Converter={StaticResource NotBoolToVisibilityConverter}}">
-            <view:ArenaView x:Name="ArenaView" Grid.Row="0" />
+        <Border Grid.Row="0" BorderBrush="DarkGray" BorderThickness="2" Visibility="{Binding RadioModeOn, Converter={StaticResource NotBoolToVisibilityConverter}}">
+            <view:ArenaView x:Name="ArenaView"  />
         </Border>
 
         <Grid Grid.Row="0" Visibility="Collapsed" Height="300">
@@ -145,93 +145,108 @@
 
         </Grid>
 
-        <ItemsControl   x:Name="TextOutput"
+        <Grid Grid.Row="1">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="*"/>
+                <ColumnDefinition Width="5"/>
+                <ColumnDefinition>
+                    <ColumnDefinition.Style>
+                        <Style TargetType="ColumnDefinition">
+                            <Setter Property="Width" Value="*" />
+                            <Style.Triggers>
+                                <DataTrigger Binding="{Binding IsDebugViewVisible}" Value="False">
+                                    <Setter Property="Width" Value="0"/>
+                                </DataTrigger>
+                            </Style.Triggers>
+                        </Style>
+                    </ColumnDefinition.Style>
+                </ColumnDefinition>
+            </Grid.ColumnDefinitions>
+            <ItemsControl   x:Name="TextOutput"
                         ScrollViewer.VerticalScrollBarVisibility="Auto" 
                         HorizontalContentAlignment="Stretch"  
                         SnapsToDevicePixels="True"
-                        Grid.Row="1"
+                        Grid.Column="0"
                         Margin="0"
                         Padding="0,20,0,20"
                         Background="White"
                         VerticalAlignment="Stretch" 
                         HorizontalAlignment="Stretch"
                         ItemsSource="{Binding DialogLinesCollection}">
-            
-            <ItemsControl.Resources>
-                <DataTemplate DataType="{x:Type eventArgs:NewDialogLineEventArgs }">
-                    <DockPanel HorizontalAlignment="Left" Margin="50,10,20,10">
-                        <Grid>
+
+                <ItemsControl.Resources>
+                    <DataTemplate DataType="{x:Type eventArgs:NewDialogLineEventArgs }">
+                        <DockPanel HorizontalAlignment="Left" Margin="50,10,20,10">
+                            <Grid>
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="auto" />
+                                    <ColumnDefinition />
+                                </Grid.ColumnDefinitions>
+                                <materialDesign:ColorZone  Background="Transparent" VerticalAlignment="Stretch" 
+                                                      Content="{Binding Character.CharacterImage, Converter={StaticResource ImageContentSmallSizeValueConverter}}" >
+                                </materialDesign:ColorZone>
+                                <StackPanel Grid.Column="1">
+                                    <TextBlock Padding="8,10,4,4" TextWrapping="Wrap" FontWeight="Bold"
+                                           Text="{Binding Character.CharacterName }" Width="auto" HorizontalAlignment="Left"  />
+                                    <TextBlock Padding="8,4,4,4" TextWrapping="Wrap" Text="{Binding Path=DialogLine }" Width="auto" HorizontalAlignment="Left"  />
+                                </StackPanel>
+                            </Grid>
+                        </DockPanel>
+                    </DataTemplate>
+
+                    <DataTemplate DataType="{x:Type s:String}">
+                        <Grid HorizontalAlignment="Stretch">
                             <Grid.ColumnDefinitions>
+                                <ColumnDefinition />
                                 <ColumnDefinition Width="auto" />
                                 <ColumnDefinition />
                             </Grid.ColumnDefinitions>
-                            <materialDesign:ColorZone  Background="Transparent" VerticalAlignment="Stretch" 
-                                                      Content="{Binding Character.CharacterImage, Converter={StaticResource ImageContentSmallSizeValueConverter}}" >
-                            </materialDesign:ColorZone>
-                            <StackPanel Grid.Column="1">
-                                <TextBlock Padding="8,10,4,4" TextWrapping="Wrap" FontWeight="Bold"
-                                           Text="{Binding Character.CharacterName }" Width="auto" HorizontalAlignment="Left"  />
-                                <TextBlock Padding="8,4,4,4" TextWrapping="Wrap" Text="{Binding Path=DialogLine }" Width="auto" HorizontalAlignment="Left"  />
-                            </StackPanel>
+
+                            <Line Stroke="LightGray" Stretch="Fill" X2="1" />
+                            <TextBlock Text="{Binding}" FontWeight="SemiBold" Grid.Column="1" />
+                            <Line Stroke="LightGray" Grid.Column="2" Stretch="Fill" X2="1" />
                         </Grid>
-                    </DockPanel>
-                </DataTemplate>
+                    </DataTemplate>
+                </ItemsControl.Resources>
 
-                <DataTemplate DataType="{x:Type s:String}">
-                    <Grid HorizontalAlignment="Stretch">
-                        <Grid.ColumnDefinitions>
-                            <ColumnDefinition />
-                            <ColumnDefinition Width="auto" />
-                            <ColumnDefinition />
-                        </Grid.ColumnDefinitions>
+                <ItemsControl.Template>
+                    <ControlTemplate>
+                        <ScrollViewer x:Name="ScrollViewerMessages">
+                            <ItemsPresenter SnapsToDevicePixels="True" />
+                        </ScrollViewer>
+                    </ControlTemplate>
+                </ItemsControl.Template>
 
-                        <Line Stroke="LightGray" Stretch="Fill" X2="1" />
-                        <TextBlock Text="{Binding}" FontWeight="SemiBold" Grid.Column="1" />
-                        <Line Stroke="LightGray" Grid.Column="2" Stretch="Fill" X2="1" />
-                    </Grid>
-                </DataTemplate>
-            </ItemsControl.Resources>
+                <ItemsControl.ItemsPanel>
+                    <ItemsPanelTemplate>
+                        <VirtualizingStackPanel VerticalAlignment="Bottom" HorizontalAlignment="Stretch"/>
+                    </ItemsPanelTemplate>
+                </ItemsControl.ItemsPanel>
 
-            <ItemsControl.Template>
-                <ControlTemplate>
-                    <ScrollViewer x:Name="ScrollViewerMessages">
-                        <ItemsPresenter SnapsToDevicePixels="True" />
-                    </ScrollViewer>
-                </ControlTemplate>
-            </ItemsControl.Template>
-
-            <ItemsControl.ItemsPanel>
-                <ItemsPanelTemplate>
-                    <VirtualizingStackPanel VerticalAlignment="Bottom" HorizontalAlignment="Stretch"/>
-                </ItemsPanelTemplate>
-            </ItemsControl.ItemsPanel>
-
-            <ItemsControl.ContextMenu>
-                <ContextMenu Background="White">
-                    <MenuItem Header="Clear All" FontSize="13" Command="{Binding ClearAllMessagesCommand}"   Background="White" >
-                        <MenuItem.Icon>
-                            <materialDesign:PackIcon Kind="DeleteEmpty" Foreground="Red" />
-                        </MenuItem.Icon>
-                    </MenuItem>
-                </ContextMenu>
-            </ItemsControl.ContextMenu>
-
-        </ItemsControl>
-
-        <GridSplitter Grid.Row="2" HorizontalAlignment="Stretch" Visibility="{Binding IsDebugViewVisible}" Height="10"  VerticalAlignment="Center" >
-            <GridSplitter.Template>
-                <ControlTemplate TargetType="{x:Type GridSplitter}">
-                    <Grid>
-                        <Label Content="..." Height="10" Foreground="Red"/>
-                    </Grid>
-                </ControlTemplate>
-            </GridSplitter.Template>
-        </GridSplitter>
-
-        <Border Grid.Row="3" BorderBrush="LightGray" HorizontalAlignment="Stretch" 
+                <ItemsControl.ContextMenu>
+                    <ContextMenu Background="White">
+                        <MenuItem Header="Clear All" FontSize="13" Command="{Binding ClearAllMessagesCommand}"   Background="White" >
+                            <MenuItem.Icon>
+                                <materialDesign:PackIcon Kind="DeleteEmpty" Foreground="Red" />
+                            </MenuItem.Icon>
+                        </MenuItem>
+                    </ContextMenu>
+                </ItemsControl.ContextMenu>
+            </ItemsControl>
+            <GridSplitter Grid.Column="1" HorizontalAlignment="Stretch" Visibility="{Binding IsDebugViewVisible}" Height="10"  VerticalAlignment="Center" >
+                <GridSplitter.Template>
+                    <ControlTemplate TargetType="{x:Type GridSplitter}">
+                        <Grid>
+                            <Label Content="..." Height="10" Foreground="Red"/>
+                        </Grid>
+                    </ControlTemplate>
+                </GridSplitter.Template>
+            </GridSplitter>
+            <Border Grid.Column="2" BorderBrush="LightGray" HorizontalAlignment="Stretch" 
                 Visibility="{Binding IsDebugViewVisible}" VerticalAlignment="Stretch" BorderThickness="0,1,0,0" >
-            <views:DebugView HorizontalAlignment="Stretch" VerticalAlignment="Stretch" />
-        </Border>
+                <views:DebugView HorizontalAlignment="Stretch" VerticalAlignment="Stretch" />
+            </Border>
+        </Grid>
 
         <Border  Grid.Row="4" Background="White"   BorderBrush="LightGray" BorderThickness="0,1,0,0">
             <Grid>
