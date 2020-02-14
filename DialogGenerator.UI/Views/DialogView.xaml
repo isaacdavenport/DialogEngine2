@@ -60,92 +60,7 @@
             <view:ArenaView x:Name="ArenaView"  />
         </Border>
 
-        <Grid Grid.Row="0" Visibility="Collapsed" Height="300">
-            <Grid.ColumnDefinitions>
-                <ColumnDefinition Width="*" />
-                <ColumnDefinition Width="Auto" />
-                <ColumnDefinition Width="200" />
-                <ColumnDefinition Width="Auto" />
-                <ColumnDefinition Width="*" />
-            </Grid.ColumnDefinitions>
-
-            
-            <Grid Grid.Column="0">
-                    <Grid.RowDefinitions>
-                        <RowDefinition Height="*" />
-                        <RowDefinition Height="Auto" />
-                        <RowDefinition Height="100"/>
-                        <RowDefinition Height="Auto" />
-                        <RowDefinition Height="*" />
-                    </Grid.RowDefinitions>
-                <TextBlock Grid.Row="1" Text="{Binding FirstSelectedCharacter.CharacterName}" HorizontalAlignment="Center" Margin="0,0,0,20" FontWeight="Bold"/>
-                <materialDesign:ColorZone Grid.Row="2" Mode="PrimaryLight" VerticalAlignment="Stretch" HorizontalAlignment="Center" 
-                                                              Content="{Binding FirstSelectedCharacter.CharacterImage, Converter={StaticResource ImageContentValueConverter}}" />
-                <StackPanel Grid.Row="3" Orientation="Vertical" Width="300" Margin="0,20,0,0">
-                    <TextBlock Text="{Binding FirstCharacterDialogLine}" HorizontalAlignment="Center" TextWrapping="Wrap"/>
-                </StackPanel>
-                
-            </Grid>
-
-            <Button Grid.Column ="1" x:Name="btnFirstSelect" 
-                        HorizontalAlignment="Center" VerticalAlignment="Center" 
-                        Width="200" Margin="100, 0, 100, 0" Height="Auto" Command="{Binding SelectFirstCharacterCommand}" >
-                <StackPanel>
-                    <materialDesign:PackIcon Kind="ArrowBottomLeft" Height="20" Width="20" Foreground="White" HorizontalAlignment="Center" VerticalAlignment="Center" />
-                    <TextBlock>First Character</TextBlock>
-                </StackPanel>
-            </Button>
-            <Grid Grid.Column="2">
-                <Grid.RowDefinitions>
-                    <RowDefinition Height="20" />
-                    <RowDefinition Height="Auto" />
-                    <RowDefinition Height="*" />
-                    <RowDefinition Height="20" />
-                </Grid.RowDefinitions>
-                <TextBlock Grid.Row="1" HorizontalAlignment="Center" FontWeight="Bold" Text="Character List" Margin="0, 0, 0, 20"/>
-                <Grid Grid.Row="2">
-                    <Border Margin="10" BorderBrush="Black" BorderThickness="1" Background="White">
-                        <Border.Effect>
-                            <DropShadowEffect/>
-                        </Border.Effect>
-                    </Border>
-                    <Border Margin="10" BorderBrush="Black" BorderThickness="1">
-                        
-                            <ListBox x:Name="lstCharacters" ItemsSource="{Binding Characters}" SelectedItem="{Binding ListSelectedCharacter}" Width="Auto" Height="Auto"/>
-                        
-                    </Border>
-                </Grid>
-                
-                
-            </Grid>
-            
-            <Button Grid.Column ="3" x:Name="btnSecondSelect" 
-                        HorizontalAlignment="Center" VerticalAlignment="Center" 
-                        Width="200" Margin="100, 0, 100, 0" Height="Auto" Command="{Binding SelectSecondCharacterCommand}">
-                <StackPanel>
-                    <materialDesign:PackIcon Kind="ArrowBottomRight" Height="20" Width="20" Foreground="White" HorizontalAlignment="Center" VerticalAlignment="Center" />
-                    <TextBlock>Second Character</TextBlock>
-                </StackPanel>
-            </Button>
-            <Grid Grid.Column="4">
-                <Grid.RowDefinitions>
-                    <RowDefinition Height="*" />
-                    <RowDefinition Height="Auto" />
-                    <RowDefinition Height="100"/>
-                    <RowDefinition Height="Auto" />
-                    <RowDefinition Height="*" />
-                </Grid.RowDefinitions>
-                <TextBlock Grid.Row="1" Text="{Binding SecondSelectedCharacter.CharacterName}" HorizontalAlignment="Center" Margin="0,0,0,20" FontWeight="Bold"/>
-                <materialDesign:ColorZone Grid.Row="2" Mode="PrimaryLight" VerticalAlignment="Stretch" 
-                                                              Content="{Binding SecondSelectedCharacter.CharacterImage, Converter={StaticResource ImageContentValueConverter}}" />
-                <StackPanel Grid.Row="3" Orientation="Vertical" Width="300" Margin="0,20,0,0">
-                    <TextBlock Text="{Binding SecondCharacterDialogLine}" HorizontalAlignment="Center" TextWrapping="Wrap"/>
-                </StackPanel>
-            </Grid>
-
-        </Grid>
-
-        <Grid Grid.Row="1">
+        <Grid Grid.Row="1" HorizontalAlignment="Stretch">
             <Grid.ColumnDefinitions>
                 <ColumnDefinition Width="*"/>
                 <ColumnDefinition Width="5"/>
@@ -154,7 +69,10 @@
                         <Style TargetType="ColumnDefinition">
                             <Setter Property="Width" Value="*" />
                             <Style.Triggers>
-                                <DataTrigger Binding="{Binding IsDebugViewVisible}" Value="False">
+                                <DataTrigger Binding="{Binding IsDebugViewVisible}" Value="Visible">
+                                    <Setter Property="Width" Value="*"/>
+                                </DataTrigger>
+                                <DataTrigger Binding="{Binding IsDebugViewVisible}" Value="Collapsed">
                                     <Setter Property="Width" Value="0"/>
                                 </DataTrigger>
                             </Style.Triggers>
@@ -169,71 +87,73 @@
                         Grid.Column="0"
                         Margin="0"
                         Padding="0,20,0,20"
-                        Background="White"
+                        Background="Yellow"
                         VerticalAlignment="Stretch" 
                         HorizontalAlignment="Stretch"
                         ItemsSource="{Binding DialogLinesCollection}">
 
-                <ItemsControl.Resources>
-                    <DataTemplate DataType="{x:Type eventArgs:NewDialogLineEventArgs }">
-                        <DockPanel HorizontalAlignment="Left" Margin="50,10,20,10">
-                            <Grid>
+                    <ItemsControl.Resources>
+                        <DataTemplate DataType="{x:Type eventArgs:NewDialogLineEventArgs }">
+                            <DockPanel HorizontalAlignment="Left" Margin="50,10,20,10">
+                                <Grid>
+                                    <Grid.ColumnDefinitions>
+                                        <ColumnDefinition Width="auto" />
+                                        <ColumnDefinition />
+                                    </Grid.ColumnDefinitions>
+                                    <materialDesign:ColorZone  Background="Transparent" VerticalAlignment="Stretch" 
+                                                      Content="{Binding Character.CharacterImage, Converter={StaticResource ImageContentSmallSizeValueConverter}}" >
+                                    </materialDesign:ColorZone>
+                                    <StackPanel Grid.Column="1">
+                                        <TextBlock Padding="8,10,4,4" TextWrapping="Wrap" FontWeight="Bold"
+                                           Text="{Binding Character.CharacterName }" Width="auto" HorizontalAlignment="Left"  />
+                                        <TextBlock Padding="8,4,4,4" TextWrapping="Wrap" Text="{Binding Path=DialogLine }" Width="auto" HorizontalAlignment="Left"  />
+                                    </StackPanel>
+                                </Grid>
+                            </DockPanel>
+                        </DataTemplate>
+
+                        <DataTemplate DataType="{x:Type s:String}">
+                            <Grid HorizontalAlignment="Stretch">
                                 <Grid.ColumnDefinitions>
+                                    <ColumnDefinition />
                                     <ColumnDefinition Width="auto" />
                                     <ColumnDefinition />
                                 </Grid.ColumnDefinitions>
-                                <materialDesign:ColorZone  Background="Transparent" VerticalAlignment="Stretch" 
-                                                      Content="{Binding Character.CharacterImage, Converter={StaticResource ImageContentSmallSizeValueConverter}}" >
-                                </materialDesign:ColorZone>
-                                <StackPanel Grid.Column="1">
-                                    <TextBlock Padding="8,10,4,4" TextWrapping="Wrap" FontWeight="Bold"
-                                           Text="{Binding Character.CharacterName }" Width="auto" HorizontalAlignment="Left"  />
-                                    <TextBlock Padding="8,4,4,4" TextWrapping="Wrap" Text="{Binding Path=DialogLine }" Width="auto" HorizontalAlignment="Left"  />
-                                </StackPanel>
+
+                                <Line Stroke="LightGray" Stretch="Fill" X2="1" />
+                                <TextBlock Text="{Binding}" FontWeight="SemiBold" Grid.Column="1" />
+                                <Line Stroke="LightGray" Grid.Column="2" Stretch="Fill" X2="1" />
                             </Grid>
-                        </DockPanel>
-                    </DataTemplate>
+                        </DataTemplate>
+                    </ItemsControl.Resources>
 
-                    <DataTemplate DataType="{x:Type s:String}">
-                        <Grid HorizontalAlignment="Stretch">
-                            <Grid.ColumnDefinitions>
-                                <ColumnDefinition />
-                                <ColumnDefinition Width="auto" />
-                                <ColumnDefinition />
-                            </Grid.ColumnDefinitions>
+                    <ItemsControl.Template>
+                        <ControlTemplate>
+                            <ScrollViewer x:Name="ScrollViewerMessages">
+                                <ItemsPresenter SnapsToDevicePixels="True" />
+                            </ScrollViewer>
+                        </ControlTemplate>
+                    </ItemsControl.Template>
 
-                            <Line Stroke="LightGray" Stretch="Fill" X2="1" />
-                            <TextBlock Text="{Binding}" FontWeight="SemiBold" Grid.Column="1" />
-                            <Line Stroke="LightGray" Grid.Column="2" Stretch="Fill" X2="1" />
-                        </Grid>
-                    </DataTemplate>
-                </ItemsControl.Resources>
+                    <ItemsControl.ItemsPanel>
+                        <ItemsPanelTemplate>
+                            <VirtualizingStackPanel VerticalAlignment="Bottom" HorizontalAlignment="Stretch"/>
+                        </ItemsPanelTemplate>
+                    </ItemsControl.ItemsPanel>
 
-                <ItemsControl.Template>
-                    <ControlTemplate>
-                        <ScrollViewer x:Name="ScrollViewerMessages">
-                            <ItemsPresenter SnapsToDevicePixels="True" />
-                        </ScrollViewer>
-                    </ControlTemplate>
-                </ItemsControl.Template>
-
-                <ItemsControl.ItemsPanel>
-                    <ItemsPanelTemplate>
-                        <VirtualizingStackPanel VerticalAlignment="Bottom" HorizontalAlignment="Stretch"/>
-                    </ItemsPanelTemplate>
-                </ItemsControl.ItemsPanel>
-
-                <ItemsControl.ContextMenu>
-                    <ContextMenu Background="White">
-                        <MenuItem Header="Clear All" FontSize="13" Command="{Binding ClearAllMessagesCommand}"   Background="White" >
-                            <MenuItem.Icon>
-                                <materialDesign:PackIcon Kind="DeleteEmpty" Foreground="Red" />
-                            </MenuItem.Icon>
-                        </MenuItem>
-                    </ContextMenu>
-                </ItemsControl.ContextMenu>
-            </ItemsControl>
-            <GridSplitter Grid.Column="1" HorizontalAlignment="Stretch" Visibility="{Binding IsDebugViewVisible}" Height="10"  VerticalAlignment="Center" >
+                    <ItemsControl.ContextMenu>
+                        <ContextMenu Background="White">
+                            <MenuItem Header="Clear All" FontSize="13" Command="{Binding ClearAllMessagesCommand}"   Background="White" >
+                                <MenuItem.Icon>
+                                    <materialDesign:PackIcon Kind="DeleteEmpty" Foreground="Red" />
+                                </MenuItem.Icon>
+                            </MenuItem>
+                        </ContextMenu>
+                    </ItemsControl.ContextMenu>
+                </ItemsControl>
+            
+            
+            <!--<GridSplitter Grid.Column="1" HorizontalAlignment="Stretch" Visibility="{Binding IsDebugViewVisible}" Height="10"  VerticalAlignment="Center" >
                 <GridSplitter.Template>
                     <ControlTemplate TargetType="{x:Type GridSplitter}">
                         <Grid>
@@ -241,10 +161,10 @@
                         </Grid>
                     </ControlTemplate>
                 </GridSplitter.Template>
-            </GridSplitter>
+            </GridSplitter>-->
             <Border Grid.Column="2" BorderBrush="LightGray" HorizontalAlignment="Stretch" 
-                Visibility="{Binding IsDebugViewVisible}" VerticalAlignment="Stretch" BorderThickness="0,1,0,0" >
-                <views:DebugView HorizontalAlignment="Stretch" VerticalAlignment="Stretch" />
+                Visibility="{Binding IsDebugViewVisible}" VerticalAlignment="Stretch" BorderThickness="1,1,0,0" >
+                <views:DebugView HorizontalAlignment="Stretch" VerticalAlignment="Stretch" Visibility="{Binding IsDebugViewVisible}"/>
             </Border>
         </Grid>
 
