@@ -577,14 +577,18 @@ namespace DialogGenerator.UI.ViewModels
                 }
             }
             string[] _fileNameParts = VoiceRecorderControlViewModel.CurrentFilePath.Split('_');
+            
             var _phraseEntry = new PhraseEntry
             {
                 PhraseRating = CurrentTutorialStep.PhraseRating,
                 DialogStr = DialogStr,
-                PhraseWeights = CurrentTutorialStep.PhraseWeights,
+                PhraseWeights = CurrentTutorialStep.PhraseWeights, 
                 FileName = $"{_fileNameParts[_fileNameParts.Length-2]}_{_fileNameParts.Last()}"
             };
 
+            //by adding the mp3 filename for a phrase as a phraseweight we can access an exact phrase
+            // from an existing character without editing that character, for instance a built in character
+            _phraseEntry.PhraseWeights.Add(mCharacter.CharacterPrefix + "_" + _phraseEntry.FileName, 1.0);
             mCharacter.Phrases.Add(_phraseEntry);
 
             await mCharacterDataProvider.SaveAsync(Character);

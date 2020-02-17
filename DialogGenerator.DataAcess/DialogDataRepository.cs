@@ -28,23 +28,7 @@ namespace DialogGenerator.DataAccess
                 for (int i = 0; i < characters.Count; i++)
                 {
                     characters[i].FileName = _fileName;
-                    characters[i].JsonArrayIndex = i;
-                    // by adding the mp3 filename for a phrase as a phraseweight we can access an exact phrase
-                    // from an existing character without editing that character, for instance a built in character
-                    // however, because we write out from memory to a JSON file for editing a character, this may 
-                    // cause duplicate mp3 filename based phraseweight entries each time a character is edited unless
-                    // we check if the key is already in there.  _processLoadedData() will need to be called each time
-                    // an update is made to a JSON file's character's phrases 
-                    for (int j = 0; j < characters[i].Phrases.Count; j++)
-                    {
-                        if (!characters[i].Phrases[j].PhraseWeights.ContainsKey
-                            (characters[i].CharacterPrefix + "_" + characters[i].Phrases[j].FileName)) 
-                        {
-                            characters[i].Phrases[j].PhraseWeights.Add
-                                (characters[i].CharacterPrefix + "_" + characters[i].Phrases[j].FileName, 1.0); 
-                        }
-
-                    }
+                    characters[i].JsonArrayIndex = i;                    
                 }
             }
 
