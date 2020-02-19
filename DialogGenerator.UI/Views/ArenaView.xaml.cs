@@ -6,6 +6,7 @@ using System;
 using System.Linq;
 using System.Windows;
 using System.Windows.Controls;
+using System.Windows.Data;
 
 namespace DialogGenerator.UI.Views
 {
@@ -32,12 +33,25 @@ namespace DialogGenerator.UI.Views
                 _avatarView.DataContext = _am;
                 _avatarView.SetValue(Canvas.LeftProperty, (double)_am.Left);
                 _avatarView.SetValue(Canvas.TopProperty, (double)_am.Top);
+
+                _setBindings(_avatarView, _am);
                 
                 this.Playground.Children.Add(_avatarView);
             }
 
             _model.FindClosestAvatarPair(true);
             _model.PlaygroundAvatars.CollectionChanged += PlaygroundAvatars_CollectionChanged;
+        }
+
+        private void _setBindings(ArenaAvatarView _avatarView, ArenaAvatarViewModel _am)
+        {
+            Binding leftBinding = new Binding("Left");
+            leftBinding.Source = _am;
+            _avatarView.SetBinding(Canvas.LeftProperty, leftBinding);
+
+            Binding topBinding = new Binding("Top");
+            topBinding.Source = _am;
+            _avatarView.SetBinding(Canvas.TopProperty, topBinding);
         }
 
         private void PlaygroundAvatars_CollectionChanged(object sender, System.Collections.Specialized.NotifyCollectionChangedEventArgs e)
@@ -75,6 +89,8 @@ namespace DialogGenerator.UI.Views
                         _aView.SetValue(Canvas.TopProperty, pos.Y);
                         _am.Left = (int)pos.X;
                         _am.Top = (int)pos.Y;
+
+                        _setBindings(_aView, _am);                        
 
                         this.Playground.Children.Add(_aView);
                         _model.PlaygroundAvatars.Add(_am);

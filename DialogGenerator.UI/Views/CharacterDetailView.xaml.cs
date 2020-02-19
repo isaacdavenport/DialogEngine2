@@ -27,7 +27,7 @@ namespace DialogGenerator.UI.Views
 
         private void _characterDetailView_Loaded(object sender,RoutedEventArgs e)
         {
-            TabControl.SelectedIndex = 0;
+            
         }
     }
 }

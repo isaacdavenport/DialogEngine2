@@ -148,6 +148,7 @@ namespace DialogGenerator.UI.ViewModels
         {
             var character =mRegionManager.Regions[Constants.ContentRegion].Context as Character;
             Load(string.IsNullOrEmpty(character.CharacterPrefix) ? "" : character.CharacterPrefix);
+            Session.Set(Constants.SELECTED_CHARACTER, character);
             await _startRadioScanning();
         }        
 
@@ -166,6 +167,7 @@ namespace DialogGenerator.UI.ViewModels
             //}
 
             _stopRadioScanning();
+            //Session.Set(Constants.SELECTED_CHARACTER, null);
         }
 
         private async Task _startRadioScanning()
@@ -535,7 +537,8 @@ namespace DialogGenerator.UI.ViewModels
 
         private void _onOpenCharacterDetailView(string _characterPrefix)
         {
-            Load(_characterPrefix);
+            //Load(_characterPrefix);
+            string _prefix = _characterPrefix;
         }
 
         // Mason Zhwiti                -> MZ

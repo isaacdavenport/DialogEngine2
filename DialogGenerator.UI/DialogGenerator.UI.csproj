@@ -173,6 +173,7 @@
     <Compile Include="ViewModels\AssignCharacterToRadioViewModel.cs" />
     <Compile Include="ViewModels\AssignedRadiosViewModel.cs" />
     <Compile Include="ViewModels\CharacterDetailViewModel.cs" />
+    <Compile Include="ViewModels\CharacterDialogLinesViewModel.cs" />
     <Compile Include="ViewModels\ComputerSelectsViewModel.cs" />
     <Compile Include="ViewModels\CreateCharacterViewModel.cs" />
     <Compile Include="ViewModels\CreateViewModel.cs" />
@@ -205,6 +206,9 @@
     <Compile Include="Views\CharacterDataTemplateSelector.cs" />
     <Compile Include="Views\CharacterDetailView.xaml.cs">
       <DependentUpon>CharacterDetailView.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="Views\CharacterDialogLinesView.xaml.cs">
+      <DependentUpon>CharacterDialogLinesView.xaml</DependentUpon>
     </Compile>
     <Compile Include="Views\CharactersDataTemplateSelector.cs" />
     <Compile Include="Views\CharacterSelectionView.xaml.cs">
@@ -317,6 +321,10 @@
       <Generator>MSBuild:Compile</Generator>
     </Page>
     <Page Include="Views\CharacterDetailView.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="Views\CharacterDialogLinesView.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>

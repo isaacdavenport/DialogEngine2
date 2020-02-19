@@ -36,6 +36,7 @@ namespace DialogGenerator.UI
             mContainer.RegisterType<object, HomeView>(typeof(HomeView).FullName, new ContainerControlledLifetimeManager());
             mContainer.RegisterType<object, CharacterSelectionView>(typeof(CharacterSelectionView).FullName, new ContainerControlledLifetimeManager());
             mContainer.RegisterType<object, ComputerSelectsView>(typeof(ComputerSelectsView).FullName, new ContainerControlledLifetimeManager());
+            
 
             mContainer.RegisterType<WizardViewModel>(new ContainerControlledLifetimeManager());
             mContainer.RegisterType<CharacterDetailViewModel>(new ContainerControlledLifetimeManager());
@@ -48,12 +49,15 @@ namespace DialogGenerator.UI
             mRegionManager.RegisterViewWithRegion(Constants.ContentRegion, typeof(DialogView));
             mRegionManager.RegisterViewWithRegion(Constants.ContentRegion, typeof(HomeView));
             mRegionManager.RegisterViewWithRegion(Constants.ContentRegion, typeof(CreateView));
-            mRegionManager.RegisterViewWithRegion(Constants.ContentRegion, typeof(WizardView));            
+            mRegionManager.RegisterViewWithRegion(Constants.ContentRegion, typeof(WizardView));
+            mRegionManager.RegisterViewWithRegion(Constants.ContentRegion, typeof(CharacterDialogLinesView));
                                    
             mContainer.RegisterType<CreateCharacterViewModel>(new ContainerControlledLifetimeManager());
             mContainer.RegisterType<ArenaViewModel>(new ContainerControlledLifetimeManager());
             mContainer.RegisterType<AssignedRadiosViewModel>(new ContainerControlledLifetimeManager());
             mRegionManager.RegisterViewWithRegion(Constants.ContentRegion, typeof(CreateCharacterView));
+            mContainer.RegisterType<CharacterDialogLinesViewModel>(new ContainerControlledLifetimeManager());
+            
 
         }
     }

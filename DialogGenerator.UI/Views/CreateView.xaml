@@ -173,7 +173,8 @@
                             </StackPanel>
                         </Grid>
                 </materialDesign:Card>
-            </StackPanel>
+                    
+                </StackPanel>
 
         </Grid>
         </Border>

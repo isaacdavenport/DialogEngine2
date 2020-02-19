@@ -70,8 +70,8 @@ namespace DialogGenerator.UI.Views
 
                 if(_checkBounds(_left, _deltaX, _top, _deltaY))
                 {
-                    this.SetValue(Canvas.LeftProperty, _left);
-                    this.SetValue(Canvas.TopProperty, _top);
+                    //this.SetValue(Canvas.LeftProperty, _left);
+                    //this.SetValue(Canvas.TopProperty, _top);
                     ((ArenaAvatarViewModel)DataContext).Left = (int)_left;
                     ((ArenaAvatarViewModel)DataContext).Top = (int)_top;
                 }                
