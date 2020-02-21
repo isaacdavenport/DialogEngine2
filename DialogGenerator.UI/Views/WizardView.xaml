@@ -158,10 +158,12 @@
                                     HorizontalAlignment="Stretch" VerticalAlignment="Stretch"
                                     CornerRadius="2,2,2,2" BorderBrush="#FF595959">
 
-                                <controls:VoiceRecorderControl x:Name="voiceRecorder" HorizontalAlignment="Stretch" VerticalAlignment="Stretch"
+                                <!--<controls:VoiceRecorderControl x:Name="voiceRecorder" HorizontalAlignment="Stretch" VerticalAlignment="Stretch"
                                         DataContext="{Binding DataContext.VoiceRecorderControlViewModel, RelativeSource={RelativeSource 
-                                                              Mode=FindAncestor, AncestorType=local:WizardView}}" />
-                            </Border>
+                                                              Mode=FindAncestor, AncestorType=local:WizardView}}" />-->
+                                <controls:VoiceRecorderControl x:Name="voiceRecorder" HorizontalAlignment="Stretch" VerticalAlignment="Stretch"
+                                        DataContext="{Binding VoiceRecorderControlViewModel}" />
+                        </Border>
 
                         </Grid>
 

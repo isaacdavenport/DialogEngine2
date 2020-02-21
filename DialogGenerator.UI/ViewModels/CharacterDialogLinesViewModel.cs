@@ -2,6 +2,7 @@
 using DialogGenerator.Events;
 using DialogGenerator.Model;
 using DialogGenerator.UI.Data;
+using DialogGenerator.UI.Views;
 using DialogGenerator.UI.Views.Dialogs;
 using DialogGenerator.Utilities;
 using Prism.Commands;
@@ -79,6 +80,7 @@ namespace DialogGenerator.UI.ViewModels
         public DelegateCommand ViewLoadedCommand { get; set; }
         public DelegateCommand<string> PlayDialogLineCommand { get; set; }
         public DelegateCommand<PhraseEntry>DeletePhraseCommand { get; set; }
+        public DelegateCommand<PhraseEntry>EditPhraseCommand { get; set; }
 
         public ICollectionView PhrasesViewSource
         {
@@ -101,6 +103,22 @@ namespace DialogGenerator.UI.ViewModels
             ViewLoadedCommand = new DelegateCommand(_viewLoadedExecute);
             PlayDialogLineCommand = new DelegateCommand<string>(_playDialogLine_Execute, _playDialogLine_CanExecute);
             DeletePhraseCommand = new DelegateCommand<PhraseEntry>(_deletePhrase_Execute, _deletePrhase_CanExecute);
+            EditPhraseCommand = new DelegateCommand<PhraseEntry>(_editPhrase_Execute, _editPhrase_CanExecute);
+        }
+
+        private bool _editPhrase_CanExecute(PhraseEntry _phraseEntry)
+        {
+            return !IsDialogStarted;
+        }
+
+        private async void _editPhrase_Execute(PhraseEntry _phraseEntry)
+        {
+            EditPhraseViewModel _editPhraseViewModel = new EditPhraseViewModel(Character, _phraseEntry, mCharacterDataProvider);
+            EditPhraseView _editPhraseView = new EditPhraseView();
+            _editPhraseView.DataContext = _editPhraseViewModel;
+
+            await mMessageDialogService.ShowDedicatedDialogAsync<int?>(_editPhraseView);
+            mPhrasesCollectionViewSource.View?.Refresh();
         }
 
         private bool _deletePrhase_CanExecute(PhraseEntry arg)

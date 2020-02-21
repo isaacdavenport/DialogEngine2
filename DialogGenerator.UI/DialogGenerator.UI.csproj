@@ -108,6 +108,9 @@
     <Compile Include="Controls\MediaPlayerControl.xaml.cs">
       <DependentUpon>MediaPlayerControl.xaml</DependentUpon>
     </Compile>
+    <Compile Include="Controls\MediaRecorderControl.xaml.cs">
+      <DependentUpon>MediaRecorderControl.xaml</DependentUpon>
+    </Compile>
     <Compile Include="Controls\SpectrumAnalyzer.cs" />
     <Compile Include="Controls\VoiceRecorderControl.xaml.cs">
       <DependentUpon>VoiceRecorderControl.xaml</DependentUpon>
@@ -182,6 +185,7 @@
     <Compile Include="ViewModels\DialogModelsNavigationViewModel.cs" />
     <Compile Include="ViewModels\DialogModelsViewModel.cs" />
     <Compile Include="ViewModels\DialogViewModel.cs" />
+    <Compile Include="ViewModels\EditPhraseViewModel.cs" />
     <Compile Include="ViewModels\IDetailViewModel.cs" />
     <Compile Include="ViewModels\INavigationViewModel.cs" />
     <Compile Include="ViewModels\MediaPlayerControlViewModel.cs" />
@@ -250,6 +254,9 @@
     <Compile Include="Views\DialogView.xaml.cs">
       <DependentUpon>DialogView.xaml</DependentUpon>
     </Compile>
+    <Compile Include="Views\EditPhraseView.xaml.cs">
+      <DependentUpon>EditPhraseView.xaml</DependentUpon>
+    </Compile>
     <Compile Include="Views\HomeView.xaml.cs">
       <DependentUpon>HomeView.xaml</DependentUpon>
     </Compile>
@@ -269,6 +276,10 @@
     <Compile Include="ModelWrapper\ApplicationDataWrapper.cs" />
     <Compile Include="ModelWrapper\CharacterWrapper.cs" />
     <Page Include="Controls\MediaPlayerControl.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="Controls\MediaRecorderControl.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
@@ -377,6 +388,10 @@
       <Generator>MSBuild:Compile</Generator>
     </Page>
     <Page Include="Views\DialogView.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="Views\EditPhraseView.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>

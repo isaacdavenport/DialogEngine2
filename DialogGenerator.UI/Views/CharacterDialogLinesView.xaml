@@ -105,6 +105,8 @@
                                             <StackPanel x:Name="toolsSP" Orientation="Horizontal" Margin="10,0,0,0" Grid.Column="2" HorizontalAlignment="Right">
                                                 <Button Style="{StaticResource MaterialDesignFlatButton}" Content="Play" Command="{Binding DataContext.PlayDialogLineCommand, 
                                                                 RelativeSource={RelativeSource Mode=FindAncestor,AncestorType=view:CharacterDialogLinesView}}" CommandParameter="{Binding FileName}" />
+                                                <Button Style="{StaticResource MaterialDesignFlatButton}" Content="Edit" Command="{Binding DataContext.EditPhraseCommand, 
+                                                                RelativeSource={RelativeSource Mode=FindAncestor,AncestorType=view:CharacterDialogLinesView}}" CommandParameter="{Binding}" />
                                                 <Button Style="{StaticResource MaterialDesignFlatButton}" Content="Delete" Foreground="#017a84"  
                                                                 Command="{Binding DataContext.DeletePhraseCommand,
                                                                 RelativeSource={RelativeSource Mode=FindAncestor,AncestorType=view:CharacterDialogLinesView}}" CommandParameter="{Binding}" />

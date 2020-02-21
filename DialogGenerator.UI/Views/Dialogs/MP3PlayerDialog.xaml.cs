@@ -20,6 +20,7 @@ namespace DialogGenerator.UI.Views.Dialogs
         private string mFilePath;
         private NAudioEngine mSoundPlayer;
         private Visibility mStopBtnVisibility = Visibility.Collapsed;
+
         public event PropertyChangedEventHandler PropertyChanged;
 
         #endregion
@@ -57,9 +58,9 @@ namespace DialogGenerator.UI.Views.Dialogs
             {
                 case nameof(SoundPlayer.IsPlaying):
                     {
-                        StopBtnVisibility = SoundPlayer.IsPlaying ? Visibility.Visible : Visibility.Collapsed;
+                        StopBtnVisibility = SoundPlayer.IsPlaying ? Visibility.Visible : Visibility.Collapsed;                    
                         break;
-                    }
+                    }                                    
             }
         }
 
@@ -126,12 +127,14 @@ namespace DialogGenerator.UI.Views.Dialogs
             }
         }
 
+        
+
         public string FilePath
         {
             get { return mFilePath; }
             set
             {
-                mFilePath = value;
+                mFilePath = value;                
                 ((DelegateCommand)StartPlayingFileCommand)?.RaiseCanExecuteChanged();
             }
         }
