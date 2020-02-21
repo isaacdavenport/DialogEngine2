@@ -1,0 +1,71 @@
+﻿<UserControl x:Class="DialogGenerator.UI.Views.ArenaView"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
+             xmlns:materialDesign="http://materialdesigninxaml.net/winfx/xaml/themes"
+             xmlns:prism="http://prismlibrary.com/"      
+             xmlns:converters="clr-namespace:DialogGenerator.UI.Converters"
+             xmlns:local="clr-namespace:DialogGenerator.UI.Views"
+             mc:Ignorable="d" 
+             MinHeight="300"
+             MaxHeight="300"
+             d:DesignHeight="850" 
+             d:DesignWidth="800" 
+             Loaded="UserControl_Loaded">
+    <UserControl.Resources>
+        <converters:ImageToFullPathValueConverter x:Key="ImageToFullPathValueConverter" />
+        <converters:ImageContentValueConverter x:Key="ImageContentValueConverter" />
+        <DataTemplate x:Key="AvatarPanel">
+            <materialDesign:Card Width="60" Margin="5" Background="AliceBlue" BorderBrush="Green" BorderThickness="2">
+                <Grid>
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="50"/>
+                        <RowDefinition Height="20"/>
+                    </Grid.RowDefinitions>
+                    <Image Width="50" Grid.Row="0" Source="{Binding Character.CharacterImage, Converter={StaticResource ImageToFullPathValueConverter}}"/>
+                    <TextBlock Grid.Row="1" Text="{Binding Character.CharacterName}" HorizontalAlignment="Center" TextWrapping="Wrap"/>
+                </Grid>
+            </materialDesign:Card>
+        </DataTemplate>
+    </UserControl.Resources>
+
+    <Grid>
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="*"/>
+            <ColumnDefinition Width="Auto"/>
+            <ColumnDefinition Width="Auto"/>
+        </Grid.ColumnDefinitions>
+        <Canvas x:Name="Playground" 
+                Grid.Column="0" 
+                Background="#efefef" 
+                AllowDrop="True" 
+                Drop="Playground_Drop" 
+                DragEnter="Playground_DragEnter" 
+                MouseLeftButtonUp="Playground_MouseLeftButtonUp" 
+                SizeChanged="Playground_SizeChanged"/>
+        <Separator Grid.Column="1" Width="2"/>
+        <ScrollViewer VerticalScrollBarVisibility="Auto" Grid.Column="2">
+            <ItemsControl x:Name="AvatarGallery" 
+                          Background="LightGray" 
+                          Width="220" 
+                          ItemsSource="{Binding AvatarGalleryItems}" 
+                          ItemTemplate="{StaticResource AvatarPanel}" 
+                          AllowDrop="True" 
+                          Drop="AvatarGallery_Drop" 
+                          DragEnter="AvatarGallery_DragEnter" 
+                          MouseRightButtonUp="AvatarGallery_MouseRightButtonUp">
+                <ItemsControl.ItemsPanel>
+                    <ItemsPanelTemplate>
+                        <WrapPanel />
+                    </ItemsPanelTemplate>
+                </ItemsControl.ItemsPanel>
+                <ItemsControl.Resources>
+                    <Style TargetType="materialDesign:Card">
+                        <EventSetter Event="MouseMove" Handler="Card_MouseMove" />
+                    </Style>
+                </ItemsControl.Resources>
+            </ItemsControl>
+        </ScrollViewer>
+    </Grid>
+</UserControl>

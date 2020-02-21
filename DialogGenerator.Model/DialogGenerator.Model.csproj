@@ -62,6 +62,8 @@
     <Compile Include="Attributes\RadioNumRangeAttribute.cs" />
     <Compile Include="Attributes\ValidCharacterPrefixAttribute.cs" />
     <Compile Include="Character.cs" />
+    <Compile Include="CreateCharacterWizard.cs" />
+    <Compile Include="CreateCharacterWizardStep.cs" />
     <Compile Include="Enum\CharacterState.cs" />
     <Compile Include="Enum\ModelDialogState.cs" />
     <Compile Include="Enum\SelectionMode.cs" />

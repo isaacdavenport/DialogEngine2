@@ -103,5 +103,15 @@ namespace DialogGenerator.UI.Wrapper
         {
             get { return Model.RadioNum; }
         }
+
+        public string Author
+        {
+            get { return getValue<string>(); }
+            set
+            {
+                setValue(value);
+                validateProperty(nameof(Author));
+            }
+        }
     }
 }

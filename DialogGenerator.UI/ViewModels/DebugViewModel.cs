@@ -68,7 +68,6 @@ namespace DialogGenerator.UI.ViewModels
                     && (e.AddedItems[0] as TabItem).Content is ListView)
                 {
                     var column = (((e.AddedItems[0] as TabItem).Content as ListView).View as GridView).Columns[0];
-
                     BindingOperations.GetBindingExpression(column, GridViewColumn.WidthProperty).UpdateTarget();
                 }
             }
@@ -81,10 +80,18 @@ namespace DialogGenerator.UI.ViewModels
         private void _onHeatMapUpdate(HeatMapData data)
         {
             var characters = mCharacterDataProvider.GetAll();
-
+            int _characterCount = mCharacterDataProvider.GetAll().Count;
             HeatMap = data;
-            Character1Prefix = characters[data.Character1Index].CharacterPrefix;
-            Character2Prefix = characters[data.Character2Index].CharacterPrefix;
+
+            if(data.Character1Index < _characterCount)
+            {
+                Character1Prefix = characters[data.Character1Index].CharacterPrefix;
+            }
+
+            if(data.Character2Index < _characterCount)
+            {
+                Character2Prefix = characters[data.Character2Index].CharacterPrefix;
+            }            
         }
 
         #endregion

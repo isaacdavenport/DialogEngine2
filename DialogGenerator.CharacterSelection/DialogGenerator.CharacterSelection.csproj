@@ -87,6 +87,7 @@
     <Reference Include="WindowsBase" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="ArenaCharacterSelection.cs" />
     <Compile Include="BLEDataProviderFactory.cs" />
     <Compile Include="CharacterSelectionFactory.cs" />
     <Compile Include="CharacterSelectionModule.cs" />

@@ -5,6 +5,7 @@
         <ResourceDictionary Source="pack://application:,,,/MaterialDesignColors;component/Themes/Recommended/Primary/MaterialDesignColor.Indigo.xaml" />
         <ResourceDictionary Source="pack://application:,,,/MaterialDesignColors;component/Themes/Recommended/Accent/MaterialDesignColor.Indigo.xaml" />
         <ResourceDictionary Source="pack://application:,,,/DialogGenerator.UI;component/Themes/GridStyle.xaml" />
+        <ResourceDictionary Source="pack://application:,,,/DialogGenerator.UI;component/Themes/ListBoxStyle.xaml"/>
         <!--<ResourceDictionary Source="ScrollBarStyle.xaml" />-->
     </ResourceDictionary.MergedDictionaries>
 </ResourceDictionary>

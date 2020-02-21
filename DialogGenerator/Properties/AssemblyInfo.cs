@@ -10,7 +10,7 @@ using System.Windows;
 [assembly: AssemblyConfiguration("")]
 [assembly: AssemblyCompany("Toys2Life")]
 [assembly: AssemblyProduct("DialogGenerator")]
-[assembly: AssemblyCopyright("Copyright ©  2019")]
+[assembly: AssemblyCopyright("Copyright ©  2020")]
 [assembly: AssemblyTrademark("")]
 [assembly: AssemblyCulture("")]
 
@@ -38,5 +38,6 @@ using System.Windows;
                                               // app, or any theme specific resource dictionaries)
 )]
 
-//This is the version number picked up for display in debug/settings screen
-[assembly: AssemblyVersion("2.21.*")]
+//This is the version number picked up for  display in debug/settings screen
+[assembly: AssemblyVersion("3.32.*")] 
+

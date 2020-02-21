@@ -1,0 +1,62 @@
+﻿<UserControl x:Class="DialogGenerator.UI.Views.AssignedRadiosView"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
+             xmlns:local="clr-namespace:DialogGenerator.UI.Views"
+             xmlns:materialDesign="http://materialdesigninxaml.net/winfx/xaml/themes"
+             xmlns:prism="http://prismlibrary.com/"      
+             xmlns:converters="clr-namespace:DialogGenerator.UI.Converters"    
+             xmlns:i="clr-namespace:System.Windows.Interactivity;assembly=System.Windows.Interactivity"
+             mc:Ignorable="d" 
+             d:DesignHeight="450" d:DesignWidth="800">
+    <UserControl.Resources>
+        <converters:ImageToFullPathValueConverter x:Key="ImageToFullPathValueConverter" />
+        <converters:ImageContentValueConverter x:Key="ImageContentValueConverter" />
+        <converters:BoolToColorConverter x:Key="BoolToColorConverter" />
+        <DataTemplate x:Key="CharacterPanel">
+            <StackPanel Orientation="Vertical" Margin="20, 0, 20, 0">
+                <StackPanel Orientation="Horizontal" HorizontalAlignment="Center">
+                    <TextBlock Text="Radio "/>
+                    <TextBlock Text="{Binding Character.RadioNum}"/>
+                </StackPanel>
+                <Border BorderThickness="2" CornerRadius="10" Background="#efefef" Padding="5" BorderBrush="{Binding Active, Converter={StaticResource BoolToColorConverter}, ConverterParameter=Magenta}">
+                    <StackPanel Orientation="Vertical">
+                        <Image Source="{Binding Character.CharacterImage, Converter={StaticResource ImageToFullPathValueConverter}}" Height="50" Margin="0,5,0,0"/>
+                        <TextBlock Text="{Binding Character.CharacterName}" HorizontalAlignment="Center"/>
+                    </StackPanel>
+                </Border>
+            </StackPanel>
+        </DataTemplate>
+    </UserControl.Resources>
+    <i:Interaction.Triggers>
+        <i:EventTrigger EventName="Loaded">
+            <i:InvokeCommandAction Command="{Binding ViewLoadedCommand}" />
+        </i:EventTrigger>
+    </i:Interaction.Triggers>
+    <Grid>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="*"/>
+        </Grid.RowDefinitions>
+        <TextBlock x:Name="Title" Text="Characters With Radios" HorizontalAlignment="Center" FontWeight="Bold"/>
+        <Grid Grid.Row="1">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="*"/>
+                <ColumnDefinition Width="Auto"/>
+                <ColumnDefinition Width="*"/>
+            </Grid.ColumnDefinitions>
+            <ItemsControl 
+                x:Name="RadioCharacters" 
+                Grid.Column="1"
+                ItemsSource="{Binding RadioCharacters}" 
+                ItemTemplate="{StaticResource CharacterPanel}" Margin="0,5,0,5">
+                <ItemsControl.ItemsPanel>
+                    <ItemsPanelTemplate>
+                        <WrapPanel />
+                    </ItemsPanelTemplate>
+                </ItemsControl.ItemsPanel>
+            </ItemsControl>
+        </Grid>
+    </Grid>
+</UserControl>

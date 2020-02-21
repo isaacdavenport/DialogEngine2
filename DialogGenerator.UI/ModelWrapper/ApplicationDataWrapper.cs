@@ -27,20 +27,29 @@ namespace DialogGenerator.UI.Wrapper
             {
                 case nameof(DelayBetweenPhrases):
                     {
-
                         if (!_isDecimalFormat(DelayBetweenPhrases.ToString()))
                             errors.Add("Decimal number required.");
                         break;
                     }
                 case nameof(MaxTimeToPlayFile):
                     {
-
                         if (!_isDecimalFormat(MaxTimeToPlayFile.ToString()))
                             errors.Add("Decimal number required.");
                         break;
                     }
+                case nameof(RadioMovesTimeSensitivity):
+                    {   // TODO check that this and next are between 0-1.0
+                        if (!_isDecimalFormat(RadioMovesTimeSensitivity.ToString()))
+                            errors.Add("Decimal number required.");
+                        break;
+                    }
+                case nameof(RadioMovesSignalStrengthSensitivity):
+                    {
+                        if (!_isDecimalFormat(RadioMovesSignalStrengthSensitivity.ToString()))
+                            errors.Add("Decimal number required.");
+                        break;
+                    }
             }
-
             return errors;
         }
 
@@ -64,13 +73,13 @@ namespace DialogGenerator.UI.Wrapper
             }
         }
 
-        public bool UseBLERadios
+        public bool IgnoreRadioSignals
         {
             get { return getValue<bool>(); }
             set
             {
                 setValue(value);
-                validateProperty(nameof(UseBLERadios));
+                validateProperty(nameof(IgnoreRadioSignals));
             }
         }
 
@@ -104,13 +113,74 @@ namespace DialogGenerator.UI.Wrapper
             }
         }
 
-        public int NumberOfDialogModelsCompleted
+        public double RadioMovesTimeSensitivity
+        {
+            get { return getValue<double>(); }
+            set
+            {
+                setValue(value);
+                validateProperty(nameof(RadioMovesTimeSensitivity));
+            }
+        }
+
+        public double RadioMovesSignalStrengthSensitivity
+        {
+            get { return getValue<double>(); }
+            set
+            {
+                setValue(value);
+                validateProperty(nameof(RadioMovesSignalStrengthSensitivity));
+            }
+        }
+
+
+        public bool DebugModeOn
+        {
+            get { return getValue<bool>(); }
+            set
+            {
+                setValue(value);
+                validateProperty(nameof(DebugModeOn));
+            }
+        }
+
+        public int MsOfStillTimeRequired
         {
             get { return getValue<int>(); }
             set
             {
                 setValue(value);
-                validateProperty(nameof(NumberOfDialogModelsCompleted));
+                validateProperty(nameof(MsOfStillTimeRequired));
+            }
+        }
+
+        public int AccelerometerMotionThreshold
+        {
+            get { return getValue<int>(); }
+            set
+            {
+                setValue(value);
+                validateProperty(nameof(AccelerometerMotionThreshold));
+            }
+        }
+
+        public int AccelerometerStillnessThreshold
+        {
+            get { return getValue<int>(); }
+            set
+            {
+                setValue(value);
+                validateProperty(nameof(AccelerometerStillnessThreshold));
+            }
+        }
+
+        public int MsMotionWindow
+        {
+            get { return getValue<int>(); }
+            set
+            {
+                setValue(value);
+                validateProperty(nameof(MsMotionWindow));
             }
         }
     }

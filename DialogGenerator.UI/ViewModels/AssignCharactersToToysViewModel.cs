@@ -55,7 +55,7 @@ namespace DialogGenerator.UI.ViewModels
 
         private void _viewLoaded_Execute()
         {
-            ApplicationData.Instance.UseBLERadios = true;
+            Session.Set(Constants.BLE_MODE_ON, true);
             ApplicationData.Instance.Save();
         }
 

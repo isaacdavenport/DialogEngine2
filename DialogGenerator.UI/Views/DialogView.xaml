@@ -13,6 +13,7 @@
              xmlns:i="clr-namespace:System.Windows.Interactivity;assembly=System.Windows.Interactivity"             
              xmlns:s="clr-namespace:System;assembly=mscorlib"
              xmlns:views="clr-namespace:DialogGenerator.UI.Views"
+             xmlns:sys="clr-namespace:System;assembly=mscorlib"
              TextElement.FontWeight="Regular"
              TextElement.FontSize="13"
              TextOptions.TextFormattingMode="Ideal" 
@@ -29,6 +30,11 @@
             <converters:InvertVisibilityValueConverter x:Key="InvertVisibilityValueConverter" />
             <converters:CloneValuesConverter x:Key="CloneValuesConverter" />
             <converters:ImageContentSmallSizeValueConverter x:Key="ImageContentSmallSizeValueConverter" />
+            <converters:BoolToVisibilityConverter x:Key="BoolToVisibilityConverter" />
+            <converters:NotBoolToVisibilityConverter x:Key="NotBoolToVisibilityConverter" />
+            <converters:ImageContentValueConverter x:Key="ImageContentValueConverter" />
+            <converters:BoolToRowHeightConverter x:Key="BoolToRowHeightConverter"/>
+            <sys:Int32 x:Key="rowHeight">300</sys:Int32>
         </ResourceDictionary>
     </UserControl.Resources>
 
@@ -41,203 +47,173 @@
         </i:EventTrigger>
     </i:Interaction.Triggers>
 
-    <Grid>
+    <Grid Background="White">
         <Grid.RowDefinitions>
+            <RowDefinition Height="Auto"/>
             <RowDefinition Height="*"/>
             <RowDefinition Height="Auto" />
             <RowDefinition Height="Auto"/>
             <RowDefinition Height="Auto" />
-        </Grid.RowDefinitions> 
+        </Grid.RowDefinitions>
 
-        <ItemsControl   x:Name="TextOutput"
+        <Border Grid.Row="0" BorderBrush="DarkGray" BorderThickness="2" Visibility="{Binding RadioModeOn, Converter={StaticResource NotBoolToVisibilityConverter}}">
+            <view:ArenaView x:Name="ArenaView"  />
+        </Border>
+
+        <Grid Grid.Row="1" HorizontalAlignment="Stretch">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="*"/>
+                <ColumnDefinition Width="5"/>
+                <ColumnDefinition>
+                    <ColumnDefinition.Style>
+                        <Style TargetType="ColumnDefinition">
+                            <Setter Property="Width" Value="*" />
+                            <Style.Triggers>
+                                <DataTrigger Binding="{Binding IsDebugViewVisible}" Value="Visible">
+                                    <Setter Property="Width" Value="*"/>
+                                </DataTrigger>
+                                <DataTrigger Binding="{Binding IsDebugViewVisible}" Value="Collapsed">
+                                    <Setter Property="Width" Value="0"/>
+                                </DataTrigger>
+                            </Style.Triggers>
+                        </Style>
+                    </ColumnDefinition.Style>
+                </ColumnDefinition>
+            </Grid.ColumnDefinitions>
+            <ItemsControl   x:Name="TextOutput"
                         ScrollViewer.VerticalScrollBarVisibility="Auto" 
                         HorizontalContentAlignment="Stretch"  
                         SnapsToDevicePixels="True"
-                        Grid.Row="0"
+                        Grid.Column="0"
                         Margin="0"
                         Padding="0,20,0,20"
-                        Background="White"
+                        Background="Yellow"
                         VerticalAlignment="Stretch" 
                         HorizontalAlignment="Stretch"
                         ItemsSource="{Binding DialogLinesCollection}">
-            
-            <ItemsControl.Resources>
-                <DataTemplate DataType="{x:Type eventArgs:NewDialogLineEventArgs }">
-                    <DockPanel HorizontalAlignment="Left" Margin="50,10,20,10">
-                        <Grid>
-                            <Grid.ColumnDefinitions>
-                                <ColumnDefinition Width="auto" />
-                                <ColumnDefinition />
-                            </Grid.ColumnDefinitions>
-                            <materialDesign:ColorZone  Background="Transparent" VerticalAlignment="Stretch" 
+
+                    <ItemsControl.Resources>
+                        <DataTemplate DataType="{x:Type eventArgs:NewDialogLineEventArgs }">
+                            <DockPanel HorizontalAlignment="Left" Margin="50,10,20,10">
+                                <Grid>
+                                    <Grid.ColumnDefinitions>
+                                        <ColumnDefinition Width="auto" />
+                                        <ColumnDefinition />
+                                    </Grid.ColumnDefinitions>
+                                    <materialDesign:ColorZone  Background="Transparent" VerticalAlignment="Stretch" 
                                                       Content="{Binding Character.CharacterImage, Converter={StaticResource ImageContentSmallSizeValueConverter}}" >
-                            </materialDesign:ColorZone>
-                            <StackPanel Grid.Column="1">
-                                <TextBlock Padding="8,10,4,4" TextWrapping="Wrap" FontWeight="Bold"
+                                    </materialDesign:ColorZone>
+                                    <StackPanel Grid.Column="1">
+                                        <TextBlock Padding="8,10,4,4" TextWrapping="Wrap" FontWeight="Bold"
                                            Text="{Binding Character.CharacterName }" Width="auto" HorizontalAlignment="Left"  />
-                                <TextBlock Padding="8,4,4,4" TextWrapping="Wrap" Text="{Binding Path=DialogLine }" Width="auto" HorizontalAlignment="Left"  />
-                            </StackPanel>
+                                        <TextBlock Padding="8,4,4,4" TextWrapping="Wrap" Text="{Binding Path=DialogLine }" Width="auto" HorizontalAlignment="Left"  />
+                                    </StackPanel>
+                                </Grid>
+                            </DockPanel>
+                        </DataTemplate>
+
+                        <DataTemplate DataType="{x:Type s:String}">
+                            <Grid HorizontalAlignment="Stretch">
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition />
+                                    <ColumnDefinition Width="auto" />
+                                    <ColumnDefinition />
+                                </Grid.ColumnDefinitions>
+
+                                <Line Stroke="LightGray" Stretch="Fill" X2="1" />
+                                <TextBlock Text="{Binding}" FontWeight="SemiBold" Grid.Column="1" />
+                                <Line Stroke="LightGray" Grid.Column="2" Stretch="Fill" X2="1" />
+                            </Grid>
+                        </DataTemplate>
+                    </ItemsControl.Resources>
+
+                    <ItemsControl.Template>
+                        <ControlTemplate>
+                            <ScrollViewer x:Name="ScrollViewerMessages">
+                                <ItemsPresenter SnapsToDevicePixels="True" />
+                            </ScrollViewer>
+                        </ControlTemplate>
+                    </ItemsControl.Template>
+
+                    <ItemsControl.ItemsPanel>
+                        <ItemsPanelTemplate>
+                            <VirtualizingStackPanel VerticalAlignment="Bottom" HorizontalAlignment="Stretch"/>
+                        </ItemsPanelTemplate>
+                    </ItemsControl.ItemsPanel>
+
+                    <ItemsControl.ContextMenu>
+                        <ContextMenu Background="White">
+                            <MenuItem Header="Clear All" FontSize="13" Command="{Binding ClearAllMessagesCommand}"   Background="White" >
+                                <MenuItem.Icon>
+                                    <materialDesign:PackIcon Kind="DeleteEmpty" Foreground="Red" />
+                                </MenuItem.Icon>
+                            </MenuItem>
+                        </ContextMenu>
+                    </ItemsControl.ContextMenu>
+                </ItemsControl>
+            
+            
+            <!--<GridSplitter Grid.Column="1" HorizontalAlignment="Stretch" Visibility="{Binding IsDebugViewVisible}" Height="10"  VerticalAlignment="Center" >
+                <GridSplitter.Template>
+                    <ControlTemplate TargetType="{x:Type GridSplitter}">
+                        <Grid>
+                            <Label Content="..." Height="10" Foreground="Red"/>
                         </Grid>
-                    </DockPanel>
-                </DataTemplate>
+                    </ControlTemplate>
+                </GridSplitter.Template>
+            </GridSplitter>-->
+            <Border Grid.Column="2" BorderBrush="LightGray" HorizontalAlignment="Stretch" 
+                Visibility="{Binding IsDebugViewVisible}" VerticalAlignment="Stretch" BorderThickness="1,1,0,0" >
+                <views:DebugView HorizontalAlignment="Stretch" VerticalAlignment="Stretch" Visibility="{Binding IsDebugViewVisible}"/>
+            </Border>
+        </Grid>
 
-                <DataTemplate DataType="{x:Type s:String}">
-                    <Grid HorizontalAlignment="Stretch">
-                        <Grid.ColumnDefinitions>
-                            <ColumnDefinition />
-                            <ColumnDefinition Width="auto" />
-                            <ColumnDefinition />
-                        </Grid.ColumnDefinitions>
-
-                        <Line Stroke="LightGray" Stretch="Fill" X2="1" />
-                        <TextBlock Text="{Binding}" FontWeight="SemiBold" Grid.Column="1" />
-                        <Line Stroke="LightGray" Grid.Column="2" Stretch="Fill" X2="1" />
-                    </Grid>
-                </DataTemplate>
-            </ItemsControl.Resources>
-
-            <ItemsControl.Template>
-                <ControlTemplate>
-                    <ScrollViewer x:Name="ScrollViewerMessages">
-                        <ItemsPresenter SnapsToDevicePixels="True" />
-                    </ScrollViewer>
-                </ControlTemplate>
-            </ItemsControl.Template>
-
-            <ItemsControl.ItemsPanel>
-                <ItemsPanelTemplate>
-                    <VirtualizingStackPanel VerticalAlignment="Bottom" HorizontalAlignment="Stretch"/>
-                </ItemsPanelTemplate>
-            </ItemsControl.ItemsPanel>
-
-            <ItemsControl.ContextMenu>
-                <ContextMenu Background="White">
-                    <MenuItem Header="Clear All" FontSize="13" Command="{Binding ClearAllMessagesCommand}"   Background="White" >
-                        <MenuItem.Icon>
-                            <materialDesign:PackIcon Kind="DeleteEmpty" Foreground="Red" />
-                        </MenuItem.Icon>
-                    </MenuItem>
-                </ContextMenu>
-            </ItemsControl.ContextMenu>
-
-        </ItemsControl>
-
-        <GridSplitter Grid.Row="1" HorizontalAlignment="Stretch" Visibility="{Binding IsDebugViewVisible}" Height="10"  VerticalAlignment="Center" >
-            <GridSplitter.Template>
-                <ControlTemplate TargetType="{x:Type GridSplitter}">
-                    <Grid>
-                        <Label Content="..." Height="10" Foreground="Red"/>
-                    </Grid>
-                </ControlTemplate>
-            </GridSplitter.Template>
-        </GridSplitter>
-
-        <Border Grid.Row="2" BorderBrush="LightGray" HorizontalAlignment="Stretch" 
-                Visibility="{Binding IsDebugViewVisible}" VerticalAlignment="Stretch" BorderThickness="0,1,0,0" >
-            <views:DebugView HorizontalAlignment="Stretch" VerticalAlignment="Stretch" />
-        </Border>
-
-        <Border  Grid.Row="3" Background="White"   BorderBrush="LightGray" BorderThickness="0,1,0,0">
+        <Border  Grid.Row="4" Background="White"   BorderBrush="LightGray" BorderThickness="0,1,0,0">
             <Grid>
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="Auto"/>
+                    <ColumnDefinition Width="*" />
+                </Grid.ColumnDefinitions>
 
-                <StackPanel Orientation="Horizontal" VerticalAlignment="Center" Margin="0,0,5,0" HorizontalAlignment="Left">
-
-                    <materialDesign:Card Width="150" HorizontalAlignment="Left" VerticalAlignment="Center"  Height="150" Margin="10" Background="#017a84" >
+                <StackPanel Orientation="Horizontal" VerticalAlignment="Center" Margin="0,0,5,0" HorizontalAlignment="Left" Grid.Column="0">
+                    <materialDesign:Card Width="150" HorizontalAlignment="Left" VerticalAlignment="Center"  Height="150" Margin="10" Background="Orange" >
                         <Grid Style="{StaticResource CardGrid}">
                             <StackPanel HorizontalAlignment="Center" VerticalAlignment="Center">
-                                <materialDesign:PackIcon Kind="Home" HorizontalAlignment="Center" Height="50" Width="50" Foreground="White" />
-                                <TextBlock Text="Home" Foreground="White" FontSize="20" HorizontalAlignment="Center" VerticalAlignment="Center" />
+                                <materialDesign:PackIcon Kind="Creation" HorizontalAlignment="Center" Height="50" Width="50" Foreground="White" />
+                                <TextBlock Text="{Binding CreateButtonName}" Foreground="White" FontSize="20" HorizontalAlignment="Center" VerticalAlignment="Center" />
                             </StackPanel>
                             <Grid.InputBindings>
-                                <MouseBinding MouseAction="LeftClick" Command="NavigationCommands.GoToPage">
-                                    <MouseBinding.CommandParameter>
-                                        <MultiBinding Converter="{StaticResource CloneValuesConverter}">
-                                            <Binding Source="{x:Static inf:Constants.ContentRegion}" />
-                                            <Binding Source="{x:Type view:HomeView}" />
-                                        </MultiBinding>
-                                    </MouseBinding.CommandParameter>
-                                </MouseBinding>
+                                <MouseBinding MouseAction="LeftClick" Command="{Binding ExpertModeCommand}" />
                             </Grid.InputBindings>
                         </Grid>
                     </materialDesign:Card>
 
-                    <materialDesign:Card Width="150" HorizontalAlignment="Left" Height="150" Margin="10" Background="#51cb8c" >
+                    <materialDesign:Card Width="150" Height="150" Margin="10" Background="#51cb8c" HorizontalAlignment="Left"  >
                         <Grid Style="{StaticResource CardGrid}">
                             <StackPanel HorizontalAlignment="Center" VerticalAlignment="Center">
-                                <materialDesign:PackIcon Kind="AccountCheck" HorizontalAlignment="Center" Height="50" Width="50" Foreground="White" />
-                                <TextBlock Text="Choose How Characters Are Selected" Foreground="White" FontSize="20" TextWrapping="Wrap" HorizontalAlignment="Center" VerticalAlignment="Center" />
+                                <materialDesign:PackIcon Kind="Settings" HorizontalAlignment="Center" Height="50" Width="50" Foreground="White" />
+                                <TextBlock Text="Settings" Foreground="White" FontSize="20" HorizontalAlignment="Center" VerticalAlignment="Center" />
                             </StackPanel>
                             <Grid.InputBindings>
-                                <MouseBinding MouseAction="LeftClick" Command="NavigationCommands.GoToPage">
-                                    <MouseBinding.CommandParameter>
-                                        <MultiBinding Converter="{StaticResource CloneValuesConverter}">
-                                            <Binding Source="{x:Static inf:Constants.ContentRegion}" />
-                                            <Binding Source="{x:Type view:CharacterSelectionView}" />
-                                        </MultiBinding>
-                                    </MouseBinding.CommandParameter>
-                                </MouseBinding>
+                                <MouseBinding MouseAction="LeftClick" Command="{Binding OpenSettingsDialogCommand}" CommandParameter="{Binding ElementName=TextOutput}" />
                             </Grid.InputBindings>
                         </Grid>
                     </materialDesign:Card>
-
-                  <materialDesign:Card Width="150" HorizontalAlignment="Left" Visibility="{Binding IsDebugViewVisible}"
-                       Height="150" Margin="10" Background="#51cb8c" >
-                    <Grid Style="{StaticResource CardGrid}">
-                      <StackPanel HorizontalAlignment="Center" VerticalAlignment="Center">
-                        <materialDesign:PackIcon Kind="WindowMinimize" HorizontalAlignment="Center" Height="50" Width="50" Foreground="White" />
-                        <TextBlock Text="Hide debug view" Foreground="White" FontSize="20" HorizontalAlignment="Center" VerticalAlignment="Center" />
-                      </StackPanel>
-                      <Grid.InputBindings>
-                        <MouseBinding MouseAction="LeftClick" Command="{Binding ChangeDebugVisibilityCommand}" CommandParameter="{Binding ElementName=TextOutput}" />
-                      </Grid.InputBindings>
-                    </Grid>
-                  </materialDesign:Card>
-
-                  <materialDesign:Card Width="150" HorizontalAlignment="Left" Height="150" Margin="10" Background="#51cb8c" Visibility="{Binding IsDebugViewVisible}" >
-                    <Grid Style="{StaticResource CardGrid}">
-                      <StackPanel HorizontalAlignment="Center" VerticalAlignment="Center">
-                        <materialDesign:PackIcon Kind="Forum" HorizontalAlignment="Center" Height="50" Width="50" Foreground="White" />
-                        <TextBlock Text="Show Dialog Models" Foreground="White" FontSize="20" TextWrapping="Wrap" HorizontalAlignment="Center" VerticalAlignment="Center" />
-                      </StackPanel>
-                      <Grid.InputBindings>
-                        <MouseBinding MouseAction="LeftClick" Command="NavigationCommands.GoToPage">
-                          <MouseBinding.CommandParameter>
-                            <MultiBinding Converter="{StaticResource CloneValuesConverter}">
-                              <Binding Source="{x:Static inf:Constants.ContentRegion}" />
-                              <Binding Source="{x:Type view:DialogModelsView}" />
-                            </MultiBinding>
-                          </MouseBinding.CommandParameter>
-                        </MouseBinding>
-                      </Grid.InputBindings>
-                    </Grid>
-                  </materialDesign:Card>
-
-                  <materialDesign:Card Width="150" Height="150" Margin="10" Background="#51cb8c" HorizontalAlignment="Left" Visibility="{Binding IsDebugViewVisible}" >
-                    <Grid Style="{StaticResource CardGrid}">
-                      <StackPanel HorizontalAlignment="Center" VerticalAlignment="Center">
-                        <materialDesign:PackIcon Kind="Settings" HorizontalAlignment="Center" Height="50" Width="50" Foreground="White" />
-                        <TextBlock Text="Settings" Foreground="White" FontSize="20" HorizontalAlignment="Center" VerticalAlignment="Center" />
-                      </StackPanel>
-                      <Grid.InputBindings>
-                        <MouseBinding MouseAction="LeftClick" Command="{Binding OpenSettingsDialogCommand}" CommandParameter="{Binding ElementName=TextOutput}" />
-                      </Grid.InputBindings>
-                    </Grid>
-                  </materialDesign:Card>
-
-                  <materialDesign:Card Width="150" HorizontalAlignment="Left"  Height="150" Margin="10" Background="#51cb8c"
-                      Visibility="{Binding IsDebugViewVisible, Converter={StaticResource InvertVisibilityValueConverter}}" >
-
-                    <Grid Style="{StaticResource CardGrid}">
-                      <StackPanel HorizontalAlignment="Center" VerticalAlignment="Center">
-                        <materialDesign:PackIcon Kind="Bug" HorizontalAlignment="Center" Height="50" Width="50" Foreground="White" />
-                        <TextBlock Text="Debug View" Foreground="White" FontSize="20" HorizontalAlignment="Center" VerticalAlignment="Center" />
-                      </StackPanel>
-                      <Grid.InputBindings>
-                        <MouseBinding MouseAction="LeftClick"
-                                      Command="{Binding ChangeDebugVisibilityCommand}" CommandParameter="{Binding ElementName=TextOutput}" />
-                      </Grid.InputBindings>
-                    </Grid>
-                  </materialDesign:Card>
+                    <materialDesign:Card Width="150" HorizontalAlignment="Left"  Height="150" Margin="10" Background="#51cb8c" Visibility="{Binding RadioModeOn, Converter={StaticResource BoolToVisibilityConverter}}">
+                        <Grid Style="{StaticResource CardGrid}">
+                            <StackPanel HorizontalAlignment="Center" VerticalAlignment="Center">
+                                <materialDesign:PackIcon Kind="Radio" HorizontalAlignment="Center" Height="50" Width="50" Foreground="White" />
+                                <TextBlock Text="Assign Radio" Foreground="White" FontSize="20" HorizontalAlignment="Center" VerticalAlignment="Center" />
+                            </StackPanel>
+                            <Grid.InputBindings>
+                                <MouseBinding MouseAction="LeftClick"
+                                      Command="{Binding ToggleAssignedRadiosCommand}" />
+                            </Grid.InputBindings>
+                        </Grid>
+                    </materialDesign:Card>
+                </StackPanel>
+                <StackPanel Visibility="{Binding RadioModeOn, Converter={StaticResource BoolToVisibilityConverter}}" Grid.Column="1">
+                    <view:AssignedRadiosView x:Name="AssignedRadiosControl" Height="150" Margin="0,10,0,0"/>
                 </StackPanel>
             </Grid>
         </Border>

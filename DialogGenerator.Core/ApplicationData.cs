@@ -92,38 +92,27 @@ namespace DialogGenerator.Core
         }
 
         public bool MonitorMessageParseFails { get; set; } = false;
-        public bool CheckStuckTransmissions { get; set; } = false;
-        public bool MonitorReceiveBufferSize { get; set; } = false;
-        public bool ShowDupePhrases { get; set; } = false;
         public string JSONEditorExeFileName { get; set; } = "JSONedit.exe"; 
         public string WebsiteUrl { get; set; } = "www.toys2life.org";
-        public string TutorialFileName { get; set; } = "tutorial.pdf";
-        public string DecimalSerialDirectBLELoggerKey { get; set; } = "DecimalSerialLogDirectBLE";
+        public string TutorialFileName { get; set; } = "tutorial.pdf"; 
+        public string BLEVectorsLoggerKey { get; set; } = "BLEVectorsLog";
         public string DialogLoggerKey { get; set; } = "LogDialog";
         public string DefaultLoggerKey { get; set; } = "DefaultLog";
         public string DefaultImage { get; set; } = "avatar.png";
-        public string JSONFilesVersion { get; set; } = "1.2";
+        public string JSONFilesVersion { get; set; } = "1.3";  //updated after adding author field
         public int NumberOfRadios { get; set; } = 6;
         public string URLToUpdateFile { get; set; } = "http://drive.google.com/uc?export=download&id=1nkflu9P-y1gQMajnxv58BRU7TqrgBh9U";
         public int CheckForUpdateInterval { get; set; } = 30; // minutes
 
-        [Editable(true)]
-        [Description("Check which tags will not be used in dialog.")]
-        [DisplayName("Check tag usage:")]
-        public bool TagUsageCheck { get; set; } = false;
-
-        [Editable(true)]
-        [Description("Is dialog text visible during dialog.")]
-        [DisplayName("Text dialog enabled:")]
         public bool TextDialogsOn { get; set; } = true;
 
         [Editable(true)]
-        [Description(" Use BLE radios or random selection of characters.")]
-        [DisplayName("Use BLE radios:")]
-        public bool UseBLERadios { get; set; } = false;
+        [Description("Override radio signal checking")]
+        [DisplayName("Ignore radio signals:")]
+        public bool IgnoreRadioSignals { get; set; } = false;
 
-        [Description("Determine how long current dialog can play, if new characters selected. Value is in seconds.")]
-        [DisplayName("Max time to play .mp3 file:")]
+        [Description("Determine how long current dialog can play to finish a line after new characters selected. Value is in seconds.")]
+        [DisplayName("Max time past stop to play:")]
         [RegularExpression(@"^[0-9]([.,][0-9]{1,3})?$", ErrorMessage = @"Field requires decimal number.")]
         public double MaxTimeToPlayFile { get; set; } = 1.5;
 
@@ -138,9 +127,37 @@ namespace DialogGenerator.Core
         [RegularExpression(@"^[0-9]([.,][0-9]{1,3})?$", ErrorMessage = @"Field requires decimal number.")]
         public double DelayBetweenPhrases { get; set; } = 1.0;
 
-        [DisplayName("Number of dialog models:")]
-        [RegularExpression(@"^[1-9]+$", ErrorMessage = @"Field requires number.")]
-        public int NumberOfDialogModelsCompleted { get; set; } = 5;
+
+        [Editable(true)]
+        [DisplayName("Debug Mode On:")]
+        public bool DebugModeOn { get; set; } = false;
+
+        [Description("Radio's time sensitivity to switch miniatures 0.01-0.99.")]
+        [DisplayName("Time Sensitivity .01-.99:")]
+        [RegularExpression(@"^[0-9]([.,][0-9]{1,3})?$", ErrorMessage = @"Field requires decimal number.")]
+        public double RadioMovesTimeSensitivity { get; set; } = 0.1;
+
+
+        [Description("Radio's signal strength sensitivity to switch miniatures 0.01-0.99.")]
+        [DisplayName("Strength Sensitivity .01-.99:")]
+        [RegularExpression(@"^[0-9]([.,][0-9]{1,3})?$", ErrorMessage = @"Field requires decimal number.")]
+        public double RadioMovesSignalStrengthSensitivity { get; set; } = 0.7;
+
+        [Editable(true)]
+        [DisplayName("Still time required:")]        
+        public int MsOfStillTimeRequired { get; set; } = 300;
+
+        [Editable(true)]
+        [DisplayName("Acc. motion threshold:")]
+        public int AccelerometerMotionThreshold { get; set; } = 40;
+
+        [Editable(true)]
+        [DisplayName("Acc. stillness threshold:")]
+        public int AccelerometerStillnessThreshold { get; set; } = 48;
+
+        [Editable(true)]
+        [DisplayName("Motion window:")]
+        public int MsMotionWindow { get; set; } = 1500;
 
         [XmlIgnore]
         public string RootDirectory

@@ -1,0 +1,326 @@
+﻿<UserControl x:Class="DialogGenerator.UI.Views.CreateCharacterView"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
+             xmlns:prism="http://prismlibrary.com/"            
+            prism:ViewModelLocator.AutoWireViewModel="True"
+            xmlns:enums ="clr-namespace:DialogGenerator.Model.Enum;assembly=DialogGenerator.Model"
+            xmlns:materialDesign="http://materialdesigninxaml.net/winfx/xaml/themes"
+            xmlns:inf="clr-namespace:DialogGenerator.Core;assembly=DialogGenerator.Core"
+            xmlns:view="clr-namespace:DialogGenerator.UI.Views"
+            xmlns:converters="clr-namespace:DialogGenerator.UI.Converters"
+             xmlns:i="clr-namespace:System.Windows.Interactivity;assembly=System.Windows.Interactivity"    
+             mc:Ignorable="d" 
+             d:DesignHeight="450" d:DesignWidth="800">
+    
+    <ContentControl.Resources>
+        <ResourceDictionary>
+            <ResourceDictionary.MergedDictionaries>
+                <ResourceDictionary>
+                    <converters:CharacterStateToColorValueConverter x:Key="CharacterStateToColorValueConverter" />
+                    <converters:CloneValuesConverter x:Key="CloneValuesConverter" />
+                    <converters:ImageToFullPathValueConverter x:Key="ImageToFullPathValueConverter" />
+                    <converters:ImageContentValueConverter x:Key="ImageContentValueConverter" />
+                    <converters:IdentifierConverter x:Key="IdentifierConverter"/>
+
+                    <ControlTemplate x:Key="NameControl">
+                        <Grid Background="White">
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="2*"/>
+                                <ColumnDefinition Width="Auto"/>
+                                <ColumnDefinition Width="*"/>
+                                <ColumnDefinition Width="2*"/>
+                            </Grid.ColumnDefinitions>
+                            <Label Grid.Column="1" Height="30" Margin="0, 8, 20, 0" HorizontalAlignment="Right">Name:</Label>
+                            <TextBox x:Name="FirstName" Grid.Column="2" Height="30" Text="{Binding CharacterName}"/>
+                        </Grid>
+                    </ControlTemplate>
+                    <ControlTemplate x:Key="InitialsControl">
+                        <Grid Background="White">
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="2*"/>
+                                <ColumnDefinition Width="Auto"/>
+                                <ColumnDefinition Width="Auto"/>
+                                <ColumnDefinition Width="Auto"/>
+                                <ColumnDefinition Width="2*"/>
+                            </Grid.ColumnDefinitions>
+                            <Label Grid.Column="1" Height="30" Margin="0, 8, 20, 0" HorizontalAlignment="Right">Prefix:</Label>
+                            <StackPanel Orientation="Horizontal" HorizontalAlignment="Left" Grid.Column="2">
+                                <TextBox x:Name="Initials" Height="30" Text="{Binding CharacterInitials}" />
+                                <!--<TextBlock Height="30" Text="_" IsEnabled="False"/>-->
+                                <TextBox x:Name="Prefix" Grid.Column="3" Height="30" Text="{Binding CharacterIdentifier, Converter={StaticResource IdentifierConverter}}" IsEnabled="False"/>
+                            </StackPanel>
+                        </Grid>
+                    </ControlTemplate>
+                    <ControlTemplate x:Key="AgeControl">
+                        <Grid Background="White">
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="*"/>
+                                <ColumnDefinition Width="120"/>
+                                <ColumnDefinition Width="100"/>
+                                <ColumnDefinition Width="*"/>
+                            </Grid.ColumnDefinitions>
+                            <Label Grid.Column="1" Height="30" Margin="0, 8, 20, 0">Age:</Label>
+                            <ComboBox 
+                                Grid.Column="2" 
+                                x:Name="CharacterAge" 
+                                ItemsSource="{Binding AgesCollection}" 
+                                SelectedValue="{Binding CharacterAge}"
+                                Style="{StaticResource MaterialDesignComboBox}">
+                                <ComboBox.ItemsPanel>
+                                    <ItemsPanelTemplate>
+                                        <VirtualizingStackPanel />
+                                    </ItemsPanelTemplate>
+                                </ComboBox.ItemsPanel>
+                            </ComboBox>
+                        </Grid>
+                    </ControlTemplate>
+                    <ControlTemplate x:Key="GenderControl">
+                        <Grid Background="White">
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="*"/>
+                                <ColumnDefinition Width="120"/>
+                                <ColumnDefinition Width="100"/>
+                                <ColumnDefinition Width="*"/>
+                            </Grid.ColumnDefinitions>
+                            <Label Grid.Column="1" Height="30" Margin="0, 8, 20, 0">Gender:</Label>
+                            <ComboBox 
+                                Grid.Column="2" 
+                                x:Name="CharacterGender" 
+                                ItemsSource="{Binding Genders}" 
+                                SelectedValue="{Binding CharacterGender}"
+                                Style="{StaticResource MaterialDesignComboBox}">
+                                <ComboBox.ItemsPanel>
+                                    <ItemsPanelTemplate>
+                                        <VirtualizingStackPanel />
+                                    </ItemsPanelTemplate>
+                                </ComboBox.ItemsPanel>
+                            </ComboBox>
+                        </Grid>
+                    </ControlTemplate>
+                    <ControlTemplate x:Key="AvatarControl">
+                        <Grid Background="White">
+                            <Grid.RowDefinitions>
+                                <RowDefinition Height="*"/>
+                            </Grid.RowDefinitions>
+                            <materialDesign:ColorZone Mode="PrimaryLight" VerticalAlignment="Stretch" 
+                                                              Content="{Binding CharacterImage, Converter={StaticResource ImageContentValueConverter}}" >
+                            </materialDesign:ColorZone>
+                            <Button Grid.Row="0" Command="{Binding ChooseImageCommand}" Style="{StaticResource MaterialDesignFloatingActionMiniAccentButton}" 
+                                        HorizontalAlignment="Center" BorderBrush="#51cb8c" Background="#51cb8c"  VerticalAlignment="Center"
+                                        Margin="0 0 -180 0">
+                                <materialDesign:PackIcon Kind="Pencil" Foreground="White" />
+                            </Button>
+                        </Grid>
+                    </ControlTemplate>
+                    <ControlTemplate x:Key="AuthorControl">
+                        <Grid Background="White">
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="2*"/>
+                                <ColumnDefinition Width="Auto"/>
+                                <ColumnDefinition Width="*"/>
+                                <ColumnDefinition Width="2*"/>
+                            </Grid.ColumnDefinitions>
+                            <Label Grid.Column="1" Height="30" Margin="0, 8, 20, 0" HorizontalAlignment="Right">Author:</Label>
+                            <TextBox x:Name="Author" Grid.Column="2" Height="30" Text="{Binding CharacterAuthor}" materialDesign:HintAssist.Hint="Enter Author's Nickname ..."/>
+                        </Grid>
+                    </ControlTemplate>
+                    <ControlTemplate x:Key="AssignToyToCharacterControl">
+                        <Grid Background="White">
+                            <Grid.RowDefinitions>
+                                <RowDefinition Height="Auto" />
+                                <RowDefinition Height="*" />
+                            </Grid.RowDefinitions>
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="2*"/>
+                                <ColumnDefinition Width="Auto"/>
+                                <ColumnDefinition Width="*"/>
+                                <ColumnDefinition Width="2*"/>
+                            </Grid.ColumnDefinitions>
+                            <TextBlock Grid.ColumnSpan="4" Grid.Row="0" Text="{Binding SelectRadioTitle}" VerticalAlignment="Center" HorizontalAlignment="Center" FontSize="20"/>
+                            <Label Grid.Row="1" Grid.Column="1" Height="30" Margin="0, 8, 20, 0" HorizontalAlignment="Right">Assigned Radio:</Label>
+                            <ComboBox 
+                                Grid.Row="1"
+                                Grid.Column="2" 
+                                x:Name="SelectedRadio" 
+                                ItemsSource="{Binding RadiosCollection}" 
+                                SelectedValue="{Binding SelectedRadio}"
+                                Style="{StaticResource MaterialDesignComboBox}">
+                                <ComboBox.ItemsPanel>
+                                    <ItemsPanelTemplate>
+                                        <VirtualizingStackPanel />
+                                    </ItemsPanelTemplate>
+                                </ComboBox.ItemsPanel>
+                            </ComboBox>
+                        </Grid>
+                    </ControlTemplate>
+                    
+                    <ControlTemplate x:Key="WizardControl">
+                        <Grid Background="White">
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="*"/>
+                                <ColumnDefinition Width="Auto"/>
+                                <ColumnDefinition Width="*"/>
+                            </Grid.ColumnDefinitions>
+                            <Grid.RowDefinitions>
+                                <RowDefinition Height="*"/>
+                                <RowDefinition Height="Auto"/>
+                                <RowDefinition Height="*"/>
+                            </Grid.RowDefinitions>
+                            <Label Grid.Column="1" Grid.Row="0" VerticalAlignment="Bottom" HorizontalAlignment="Center" FontSize="30" Margin="0,0,0,30">Character Details</Label>
+                            <Grid Grid.Column="1" Grid.Row="1">
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="Auto"/>
+                                    <ColumnDefinition Width="Auto"/>
+                                    <ColumnDefinition Width="*"/>
+                                </Grid.ColumnDefinitions>
+                                <Grid.RowDefinitions>
+                                    <RowDefinition Height="Auto"/>
+                                    <RowDefinition Height="Auto"/>
+                                    <RowDefinition Height="Auto"/>
+                                    <RowDefinition Height="Auto"/>
+                                    <RowDefinition Height="Auto"/>
+                                    <RowDefinition Height="Auto"/>
+                                    <RowDefinition Height="*"/>
+                                </Grid.RowDefinitions>
+                                <Label FontWeight="SemiBold">Name:</Label>
+                                <TextBlock Grid.Column="1" Text="{Binding CharacterName}" Margin="5"/>
+                                <Label Grid.Row="1" Grid.Column="0" FontWeight="SemiBold">Prefix:</Label>
+                                <TextBlock Grid.Row="1" Grid.Column="1" Text="{Binding CharacterPrefix}" Margin="5"/>
+                                <Label Grid.Row="2" Grid.Column="0" FontWeight="SemiBold">Age:</Label>
+                                <TextBlock Grid.Row="2" Grid.Column="1" Text="{Binding CharacterAge}" Margin="5"/>
+                                <Label Grid.Row="3" Grid.Column="0" FontWeight="SemiBold">Gender:</Label>
+                                <TextBlock Grid.Row="3" Grid.Column="1" Text="{Binding CharacterGender}" Margin="5"/>
+                                <Label Grid.Row="4" Grid.Column="0" FontWeight="SemiBold" Content="Avatar:" VerticalAlignment="Center"/>
+                                <materialDesign:ColorZone Grid.Column="1" Grid.Row="4" Mode="PrimaryLight" VerticalAlignment="Stretch" 
+                                                              Content="{Binding CharacterImage, Converter={StaticResource ImageContentValueConverter}}" Margin="0,10">
+                                </materialDesign:ColorZone>
+                            </Grid>
+                            <Button Grid.Row="2" Grid.Column="1" Content="Start Dialog Wizard" Width="Auto" HorizontalAlignment="Center">
+                                <Button.InputBindings>
+                                    <MouseBinding MouseAction="LeftClick" Command="NavigationCommands.GoToPage">
+                                        <MouseBinding.CommandParameter>
+                                            <MultiBinding Converter="{StaticResource CloneValuesConverter}">
+                                                <Binding Source="{x:Static inf:Constants.ContentRegion}" />
+                                                <Binding Source="{x:Type view:WizardView}" />
+                                            </MultiBinding>
+                                        </MouseBinding.CommandParameter>
+                                    </MouseBinding>
+                                </Button.InputBindings>
+                            </Button>
+
+                        </Grid>
+                    </ControlTemplate>
+                </ResourceDictionary>
+            </ResourceDictionary.MergedDictionaries>
+        </ResourceDictionary>
+
+    </ContentControl.Resources>
+
+    <i:Interaction.Triggers>
+        <i:EventTrigger EventName="Loaded">
+            <i:InvokeCommandAction Command="{Binding ViewLoadedCommand}" />
+        </i:EventTrigger>
+        <i:EventTrigger EventName="Unloaded">
+            <i:InvokeCommandAction Command="{Binding ViewUnloadedCommand}" />
+        </i:EventTrigger>
+    </i:Interaction.Triggers>
+    
+    <Grid Background="White">
+        <Grid.RowDefinitions>
+            <RowDefinition Height="*"/>
+            <RowDefinition Height="50"/>
+        </Grid.RowDefinitions>
+        <Grid Grid.Row="0">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="*"/>
+                <ColumnDefinition Width="4*"/>
+            </Grid.ColumnDefinitions>
+            <Border BorderBrush="Gray" BorderThickness="1" Grid.Column="0">
+
+                <Grid Background="#017a84">
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="Auto"/>
+                        <RowDefinition Height="5" />
+                        <RowDefinition Height="*"/>
+                    </Grid.RowDefinitions>
+
+                    <StackPanel Orientation="Vertical" Grid.Row="0">
+                        <TextBlock FontSize="30" Foreground="White" TextWrapping="Wrap" Margin="20">Create New Character Wizard</TextBlock>
+                        <TextBlock FontSize="14" Foreground="White" TextWrapping="Wrap" Margin="20">
+                    This wizard helps You create the new character. Just follow the steps. You can navigate forth and back by using the navigation buttons.
+                        </TextBlock>
+                    </StackPanel>
+
+                    <ListBox x:Name="StepsList" 
+                     Grid.Row="2" 
+                     Margin="20"
+                     ItemsSource="{Binding Steps}" 
+                     SelectedIndex="{Binding CurrentStepIndex, Mode=OneWay}"
+                     IsEnabled="False"
+                     Foreground="White" 
+                     ItemContainerStyle="{StaticResource ContainerStyle}"/>
+                </Grid>
+            </Border>
+                        
+            <Grid Grid.Column="1" Margin="1,0,0,0">
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="Auto"/>
+                    <RowDefinition Height="*"/>
+                </Grid.RowDefinitions>
+                <Border BorderBrush="Gray" BorderThickness="1" Grid.Row="0" Margin="10, 0, 10, 10">
+                    <Border.Effect>
+                        <DropShadowEffect Color="#FF51CB8C"/>
+
+                    </Border.Effect>
+                    <Grid Background="#51cb8c">
+                        <Grid.RowDefinitions>
+                            <RowDefinition Height="Auto" />
+                            <RowDefinition Height="Auto" />
+                            <RowDefinition Height="*"/>
+                        </Grid.RowDefinitions>
+                        <TextBlock Grid.Row="0" FontSize="25" HorizontalAlignment="Center" Text="{Binding CurrentStep.StepName}" Margin="0,20,0,0" Foreground="White"></TextBlock>
+                        <TextBlock Grid.Row="1" FontSize="14" HorizontalAlignment="Center" Text="{Binding CurrentStep.StepDescription}" Margin="0,10,0,10" Foreground="White"></TextBlock>
+                    </Grid>
+                </Border>
+                <ContentControl Name="ContentControl" Grid.Row="1" Margin="5,5,5,5" Template="{StaticResource NameControl}"/>
+            </Grid>
+        </Grid>
+        <Border Grid.Row="1" BorderBrush="Gray" BorderThickness="1">
+            <Grid>
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="*"/>
+                    <ColumnDefinition Width="*"/>
+                </Grid.ColumnDefinitions>
+                <Button Grid.Column="0" HorizontalAlignment="Left" Content="Edit Existing" Width="120" Margin="10,0,0,0" Command="{Binding CreateCommand}">
+                    <!--<Button.InputBindings>
+                        <MouseBinding MouseAction="LeftClick" Command="NavigationCommands.GoToPage">
+                            <MouseBinding.CommandParameter>
+                                <MultiBinding Converter="{StaticResource CloneValuesConverter}">
+                                    <Binding Source="{x:Static inf:Constants.ContentRegion}" />
+                                    <Binding Source="{x:Type view:CreateView}" />
+                                </MultiBinding>
+                            </MouseBinding.CommandParameter>
+                        </MouseBinding>
+                    </Button.InputBindings>-->
+                </Button>
+                <Button Grid.Column="0" HorizontalAlignment="Right" Content="Previous" Margin="0,0,10,0" Width="120" Click="ButtonPrev_Click"/>
+                <Button Grid.Column="1" HorizontalAlignment="Left" Content="{Binding NextButtonText}" Margin="10, 0, 0, 0" Width="120" Click="ButtonNext_Click"/>
+                <Button Grid.Column="1" HorizontalAlignment="Right" Content="Cancel" Width="120" Margin="0,0,10,0" Command="{Binding HomeCommand}">
+                    <!--<Button.InputBindings>
+                        <MouseBinding MouseAction="LeftClick" Command="NavigationCommands.GoToPage">
+                            <MouseBinding.CommandParameter>
+                                <MultiBinding Converter="{StaticResource CloneValuesConverter}">
+                                    <Binding Source="{x:Static inf:Constants.ContentRegion}" />
+                                    <Binding Source="{x:Type view:HomeView}" />
+                                </MultiBinding>
+                            </MouseBinding.CommandParameter>
+                        </MouseBinding>
+                    </Button.InputBindings>-->
+                </Button>
+            </Grid>
+        </Border>
+        
+    </Grid>
+</UserControl>

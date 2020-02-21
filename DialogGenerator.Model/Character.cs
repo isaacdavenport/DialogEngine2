@@ -20,6 +20,7 @@ namespace DialogGenerator.Model
         private int mRadioNum =-1;
         private PhraseEntry mPhraseTotals;
         private string mCharacterImage = ApplicationData.Instance.DefaultImage;
+        private string mAuthor = String.Empty;
 
         #endregion
 
@@ -127,6 +128,21 @@ namespace DialogGenerator.Model
             set
             {
                 mPhrases = value;
+            }
+        }
+
+        [JsonProperty("Author", NullValueHandling = NullValueHandling.Ignore)]
+        public string Author
+        {
+            get
+            {
+                return mAuthor;
+            }
+
+            set
+            {
+                mAuthor = value;
+                OnPropertyChanged("Author");
             }
         }
 

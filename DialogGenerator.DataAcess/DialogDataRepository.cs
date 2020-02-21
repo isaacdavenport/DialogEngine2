@@ -28,7 +28,7 @@ namespace DialogGenerator.DataAccess
                 for (int i = 0; i < characters.Count; i++)
                 {
                     characters[i].FileName = _fileName;
-                    characters[i].JsonArrayIndex = i;
+                    characters[i].JsonArrayIndex = i;                    
                 }
             }
 

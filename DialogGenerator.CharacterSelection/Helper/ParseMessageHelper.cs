@@ -22,21 +22,31 @@ namespace DialogGenerator.CharacterSelection.Helper
 
         #region - Private methods -
 
-        private static void _addMessageToReceivedBuffer(int _characterRowNum, BLE_Message _rw, DateTime _timeStamp)
+        private static void _addMessageToReceivedBuffer(int _radioIndex, BLE_Message _rw, DateTime _timeStamp)
         {
             try
             {
-                if (_characterRowNum > Session.Get<ObservableCollection<Character>>(Constants.CHARACTERS).Count - 1)  
+                // S.Ristic 3/2/2020 - If the radio is not attached to a character don't record the message. (DLGEN-441)
+                int _radioCount = Session.Get<ObservableCollection<Character>>(Constants.CHARACTERS).Where(c => c.RadioNum == _radioIndex).Count();
+                if(_radioCount == 0)
                 {
                     return;
                 }
+
+                // S.Ristic 2/13/2020 - Commented because the above condition has replaced this.
+                //// TODO Isaac why do we test that the radio index is less than the number of characters in the character list?
+                //if (_radioIndex > Session.Get<ObservableCollection<Character>>(Constants.CHARACTERS).Count - 1)  
+                //{
+                //    return;
+                //}
 
                 ReceivedMessages.Add(new ReceivedMessage()
                 {
                     ReceivedTime = _timeStamp,
                     Motion =      _rw.msgArray[_rw.msgArray.Length - 2],
                     SequenceNum = _rw.msgArray[_rw.msgArray.Length - 1],
-                    CharacterPrefix = CharacterRepository.GetByAssignedRadio(_characterRowNum).CharacterPrefix
+                    RadioNum = _radioIndex,
+                    CharacterPrefix = CharacterRepository.GetByAssignedRadio(_radioIndex).CharacterPrefix
                 });
 
                 //TODO add a lock around this
@@ -55,7 +65,7 @@ namespace DialogGenerator.CharacterSelection.Helper
 
                 _debugString += ReceivedMessages[ReceivedMessages.Count - 1].Motion.ToString("D3") + " ";
                 _debugString += ReceivedMessages[ReceivedMessages.Count - 1].SequenceNum.ToString("D3");
-                Logger.Info(_debugString, ApplicationData.Instance.DecimalSerialDirectBLELoggerKey);
+                Logger.Info(_debugString, ApplicationData.Instance.BLEVectorsLoggerKey);
 
                 if (ReceivedMessages.Count > 30000)
                 {
@@ -73,28 +83,42 @@ namespace DialogGenerator.CharacterSelection.Helper
         #region - Public functions -
 
 
-        public static void ProcessTheMessage(int _rowNum, BLE_Message _newRow)
+        public static void DeepCopyBLE_MessageRssisToHeatMap(int _radioHeatMapIndex, in int [] _newRssiArray, int [,] _heatMap)
         {
             try
             {
                 for (int _k = 0; _k < ApplicationData.Instance.NumberOfRadios; _k++)
                 {
-                    if (CharacterRepository.GetByAssignedRadio(_rowNum) != null)
+                    if (CharacterRepository.GetByAssignedRadio(_radioHeatMapIndex) != null)
                     {
-                        BLESelectionService.HeatMap[_rowNum, _k] = _newRow.msgArray[_k];
+                        _heatMap[_radioHeatMapIndex, _k] = _newRssiArray[_k];
                     }
                     else
+                    // otherwise radios that aren't assigned to a character might get selected to talk
                     {
-                        BLESelectionService.HeatMap[_rowNum, _k] = 0;
+                        _heatMap[_radioHeatMapIndex, _k] = 0;
                     }
                 }
+            }
+            catch (Exception ex)
+            {
+                throw ex;
+            }
+        }
+
+
+        public static void UpdateHeatMapWithMessage(int _radioNum, BLE_Message _newRow)
+        {
+            try
+            {
+                DeepCopyBLE_MessageRssisToHeatMap( _radioNum, in _newRow.msgArray, BLESelectionService.HeatMap);
 
                 var _currentDateTime = DateTime.Now;
 
-                BLESelectionService.CharactersLastHeatMapUpdateTime[_rowNum] = _currentDateTime;
-                BLESelectionService.MotionVector[_rowNum] = _newRow.msgArray[ApplicationData.Instance.NumberOfRadios];
+                BLESelectionService.CharactersLastHeatMapUpdateTime[_radioNum] = _currentDateTime;
+                BLESelectionService.MotionVector[_radioNum] = _newRow.msgArray[ApplicationData.Instance.NumberOfRadios];
 
-                _addMessageToReceivedBuffer(_rowNum, _newRow, _currentDateTime);
+                _addMessageToReceivedBuffer(_radioNum, _newRow, _currentDateTime);
             }
             catch (Exception ex)
             {

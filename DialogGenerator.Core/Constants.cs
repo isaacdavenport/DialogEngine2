@@ -24,5 +24,15 @@
         public const string COMPLETED_DLG_MODELS = "CompletedDialogModels";
         public const string BLE_DATA_PROVIDER = "BLEDataProvider";
         public const string FILENAME_CHECK_REGEX = @"^[-a-zA-Z0-9_' ]+$";
+        public const string CHARACTER_EDIT_MODE = "CharacterEditMode";
+        public const string NEW_CHARACTER = "NewCharacter";
+        public const string SELECTED_CHARACTER = "SelectedCharacter";
+        public const string CREATE_CHARACTER_VIEW_MODEL = "CreateCharacterViewModel";
+        public const string BLE_MODE_ON = "BLEModeSwitchedOn";
+        public const string NEEDS_RESTART = "NeedsRestart";
+        public const string ARENA_WIDTH = "ArenaWidth";
+        public const string ARENA_HEIGHT = "ArenaHeight";
+        public const string CANCEL_DIALOG = "CancelDialog";
+        
     }
 }

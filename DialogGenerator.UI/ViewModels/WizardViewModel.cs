@@ -1,8 +1,11 @@
 ﻿using DialogGenerator.Core;
+using DialogGenerator.Events;
+using DialogGenerator.Events.EventArgs;
 using DialogGenerator.Model;
 using DialogGenerator.UI.Data;
 using DialogGenerator.UI.Views;
 using DialogGenerator.UI.Views.Dialogs;
+using DialogGenerator.UI.Workflow.CreateCharacterWorkflow;
 using DialogGenerator.UI.Workflow.WizardWorkflow;
 using DialogGenerator.Utilities;
 using Prism.Commands;
@@ -40,6 +43,7 @@ namespace DialogGenerator.UI.ViewModels
         private IMessageDialogService mMessageDialogService;
         private ICharacterDataProvider mCharacterDataProvider;
         private IRegionManager mRegionManager;
+        private IEventAggregator mEventAggregator;
         private int mCurrentStepIndex;
         private string mDialogStr;
         private WizardFormDialog mWizardFormDialog;
@@ -49,6 +53,7 @@ namespace DialogGenerator.UI.ViewModels
         private Wizard mCurrentWizard;
         private TutorialStep mCurrentTutorialStep;
         private CancellationTokenSource mCancellationTokenSource;
+        private bool mIsFinished = false;
 
         #endregion
 
@@ -69,6 +74,7 @@ namespace DialogGenerator.UI.ViewModels
             mWizardFormDialog = _wizardFormDialog;
             mCharacterDataProvider = _characterDataProvider;
             mRegionManager = _regionManager;
+            mEventAggregator = _eventAggregator;
 
             Workflow = new WizardWorkflow(action: () => { });
             MediaPlayerControlViewModel = new MediaPlayerControlViewModel(Workflow);
@@ -451,11 +457,42 @@ namespace DialogGenerator.UI.ViewModels
         private void _leaveWizard()
         {
             try
-            {
+            {                
                 VoiceRecorderControlViewModel.StateMachine.PropertyChanged -= _vrc_stateMachine_PropertyChanged;
                 MediaPlayerControlViewModel.StateMachine.PropertyChanged -= _mpc_stateMachine_PropertyChanged;
                 var _contentRegion = mRegionManager.Regions[Constants.ContentRegion];
-                _contentRegion.NavigationService.Journal.GoBack();
+                if (_checkIsCreateCharacterSession())
+                {
+                    // Get parent view oGo to play view
+                    CreateCharacterViewModel viewModel = Session.Get(Constants.CREATE_CHARACTER_VIEW_MODEL) as CreateCharacterViewModel;
+
+                    // S.Ristic (12/10/2019) - Commented that so that the user doesn't skip play mode if the 
+                    // >>
+                    // wizard has not finished yet.
+                    //if (mIsFinished)
+                    //    viewModel.Workflow.Fire(Triggers.GoPlay);
+                    //else
+                    //{
+                    //    _contentRegion.NavigationService.Journal.GoBack();
+                    //    viewModel.Workflow.Fire(Triggers.CheckCounter);
+                    //}
+                    // <<
+                    // End of commented part                    
+
+                    if(mIsFinished)
+                    {
+                        viewModel.Workflow.Fire(Triggers.GoPlay);
+                        
+                    } else
+                    {
+                        viewModel.Workflow.Fire(Triggers.Finish);
+                        mRegionManager.Regions[Constants.ContentRegion].NavigationService.RequestNavigate("DialogView");
+                    }
+                    
+                } else
+                {                    
+                    _contentRegion.NavigationService.Journal.GoBack();                    
+                }
 
                 Workflow.Fire(WizardTriggers.Start);
             }
@@ -467,21 +504,40 @@ namespace DialogGenerator.UI.ViewModels
 
         private async void _view_Loaded()
         {
-            var result =  await mMessageDialogService.ShowDedicatedDialogAsync<int?>(mWizardFormDialog);
-
-            if (result.HasValue)
+            if(Session.Contains(Constants.CHARACTER_EDIT_MODE) && (bool) Session.Get(Constants.CHARACTER_EDIT_MODE))
             {
-                CurrentWizard = mWizardDataProvider.GetByIndex(result.Value);
-                Character = mRegionManager.Regions[Constants.ContentRegion].Context as Character;
-
+                CreateCharacterViewModel createCharacterViewModel = Session.Get(Constants.CREATE_CHARACTER_VIEW_MODEL) as CreateCharacterViewModel;
+                CurrentWizard = mWizardDataProvider.GetByName(createCharacterViewModel.CurrentDialogWizard);
+                Character = Session.Get(Constants.NEW_CHARACTER) as Character;
                 _setDataForTutorialStep(CurrentStepIndex);
-
                 Workflow.Fire(WizardTriggers.ReadyForUserAction);
-            }
-            else
+            } else
             {
-                Workflow.Fire(WizardTriggers.LeaveWizard);
+                var result = await mMessageDialogService.ShowDedicatedDialogAsync<int?>(mWizardFormDialog);
+
+                if (result.HasValue)
+                {
+                    CurrentWizard = mWizardDataProvider.GetByIndex(result.Value);
+
+                    if (Session.Contains(Constants.CHARACTER_EDIT_MODE) && (bool)Session.Get(Constants.CHARACTER_EDIT_MODE) == true)
+                    {
+                        Character = Session.Get(Constants.NEW_CHARACTER) as Character;
+                    }
+                    else
+                    {
+                        Character = mRegionManager.Regions[Constants.ContentRegion].Context as Character;
+                    }
+
+                    _setDataForTutorialStep(CurrentStepIndex);
+
+                    Workflow.Fire(WizardTriggers.ReadyForUserAction);
+                }
+                else
+                {
+                    Workflow.Fire(WizardTriggers.LeaveWizard);
+                }
             }
+            
         }
 
         private void _nextStep()
@@ -521,14 +577,18 @@ namespace DialogGenerator.UI.ViewModels
                 }
             }
             string[] _fileNameParts = VoiceRecorderControlViewModel.CurrentFilePath.Split('_');
+            
             var _phraseEntry = new PhraseEntry
             {
                 PhraseRating = CurrentTutorialStep.PhraseRating,
                 DialogStr = DialogStr,
-                PhraseWeights = CurrentTutorialStep.PhraseWeights,
+                PhraseWeights = CurrentTutorialStep.PhraseWeights, 
                 FileName = $"{_fileNameParts[_fileNameParts.Length-2]}_{_fileNameParts.Last()}"
             };
 
+            //by adding the mp3 filename for a phrase as a phraseweight we can access an exact phrase
+            // from an existing character without editing that character, for instance a built in character
+            _phraseEntry.PhraseWeights.Add(mCharacter.CharacterPrefix + "_" + _phraseEntry.FileName, 1.0);
             mCharacter.Phrases.Add(_phraseEntry);
 
             await mCharacterDataProvider.SaveAsync(Character);
@@ -544,19 +604,49 @@ namespace DialogGenerator.UI.ViewModels
 
         private async  void _finish()
         {
-            var result = await mMessageDialogService.ShowOKCancelDialogAsync("Character successfully updated!", "Info",
+            if(_checkIsCreateCharacterSession())
+            {
+                var result = await mMessageDialogService.ShowOKCancelDialogAsync("Character successfully updated!", "Info",
+                "Next", "Cancel");
+
+                if(result == MessageDialogResult.Cancel)
+                {
+                    CreateCharacterViewModel cvwModel = Session.Get<CreateCharacterViewModel>(Constants.CREATE_CHARACTER_VIEW_MODEL);
+                    if(cvwModel != null)
+                    {
+                        cvwModel.Workflow.Fire(Triggers.Finish);
+                    }
+                }
+
+                mIsFinished = true;
+                Workflow.Fire(WizardTriggers.LeaveWizard);                
+            } else
+            {
+                var result = await mMessageDialogService.ShowOKCancelDialogAsync("Character successfully updated!", "Info",
                 "Run another wizard", "Close wizard");
 
-            if (result != MessageDialogResult.Cancel)
-            {
-                CurrentStepIndex = 0;
-                DialogStr = "";
-                Workflow.Fire(WizardTriggers.ShowChooseWizardDialog);
+                if (result != MessageDialogResult.Cancel)
+                {
+                    CurrentStepIndex = 0;
+                    DialogStr = "";
+                    Workflow.Fire(WizardTriggers.ShowChooseWizardDialog);
+                }
+                else
+                {
+                    Workflow.Fire(WizardTriggers.LeaveWizard);
+                }
             }
-            else
+                        
+        }
+
+        private bool _checkIsCreateCharacterSession()
+        {
+            if(Session.Contains(Constants.CHARACTER_EDIT_MODE) && (bool)Session.Get(Constants.CHARACTER_EDIT_MODE))
             {
-                Workflow.Fire(WizardTriggers.LeaveWizard);
+                return true;
             }
+
+            return false;
         }
 
         #endregion

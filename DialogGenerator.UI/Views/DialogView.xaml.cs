@@ -1,4 +1,5 @@
-﻿using System.Collections.Specialized;
+﻿using DialogGenerator.UI.ViewModels;
+using System.Collections.Specialized;
 using System.Windows.Controls;
 using System.Windows.Media;
 
@@ -15,8 +16,14 @@ namespace DialogGenerator.UI.Views
             InitializeComponent();
 
             ((INotifyCollectionChanged)TextOutput.Items).CollectionChanged += _textOutput_CollectionChanged;
+
+            DialogViewModel model = this.DataContext as DialogViewModel;
+            this.ArenaView.DataContext = model.ArenaViewModel;
+            this.AssignedRadiosControl.DataContext = model.AssignedRadiosViewModel;
         }
-        
+
+
+
         private void _textOutput_CollectionChanged(object sender, NotifyCollectionChangedEventArgs e)
         {
             if(e.Action == NotifyCollectionChangedAction.Add)

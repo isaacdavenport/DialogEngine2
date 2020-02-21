@@ -8,6 +8,11 @@ using System.Collections.Generic;
 using DialogGenerator.Utilities;
 using DialogGenerator.Model.Enum;
 using System.Diagnostics;
+using Prism.Events;
+using DialogGenerator.Events;
+using System.Collections.ObjectModel;
+using DialogGenerator.Model;
+using System.Linq;
 
 namespace DialogGenerator
 {
@@ -22,20 +27,23 @@ namespace DialogGenerator
         private IDialogEngine mDialogEngine;
         private AppInitializerWorkflow mWorkflow;
         private States mCurrentState;
+        private IEventAggregator mEventAggregator;
         public event EventHandler Completed;
+
 
         #endregion
 
         #region - constructor -
 
         public AppInitializer(ILogger logger,IUserLogger _userLogger, IDialogDataRepository _dialogRepository,
-            IDialogEngine _dialogEngine,ICharacterRepository _characterRepository)
+            IDialogEngine _dialogEngine,ICharacterRepository _characterRepository, IEventAggregator _eventAggregator)
         {
             mLogger = logger;
             mUserLogger = _userLogger;
             mDialogDataRepository = _dialogRepository;
             mCharacterRepository = _characterRepository;
             mDialogEngine = _dialogEngine;
+            mEventAggregator = _eventAggregator;
 
             mWorkflow = new AppInitializerWorkflow(() => { });
             mWorkflow.PropertyChanged += _mWorkflow_PropertyChanged;
@@ -76,8 +84,9 @@ namespace DialogGenerator
 
         private  void _loadData()
         {
-            mLogger.Info("Starting DialogEngine Version " +                 
-                $"{ FileVersionInfo.GetVersionInfo(Path.Combine(ApplicationData.Instance.RootDirectory, "DialogGenerator.exe")).FileVersion.ToString()}");
+            mLogger.Info("-------------------- Starting DialogEngine Version " +                 
+                $"{ FileVersionInfo.GetVersionInfo(Path.Combine(ApplicationData.Instance.RootDirectory, "DialogGenerator.exe")).FileVersion.ToString()}" + 
+                " -----------------------");
             _checkDirectories();
 
             IList<string> errors;
@@ -88,15 +97,43 @@ namespace DialogGenerator
                 mUserLogger.Error(error);
                 mLogger.Error(error);
             }
-            
+
+            _checkForMultipleRadioAssignments(_JSONObjectTypesList.Characters);
+
             Session.Set(Constants.CHARACTERS, _JSONObjectTypesList.Characters);
             Session.Set(Constants.DIALOG_MODELS, _JSONObjectTypesList.DialogModels);
             Session.Set(Constants.WIZARDS, _JSONObjectTypesList.Wizards);
+            Session.Set(Constants.NEXT_CH_1, -1);
+            Session.Set(Constants.NEXT_CH_2, -1);
+            mEventAggregator.GetEvent<CharacterCollectionLoadedEvent>().Publish();
 
             mLogger.Info("Finished importing characters: " + _JSONObjectTypesList.Characters.Count + " DialogModelGroups: " + 
                 _JSONObjectTypesList.DialogModels.Count + " Wizards: " + _JSONObjectTypesList.Wizards.Count);
 
             mWorkflow.Fire(Triggers.InitializeDialogEngine);
+        }
+
+        private void _checkForMultipleRadioAssignments(ObservableCollection<Character> _Characters)
+        {
+            Dictionary<int, bool> _radioCheck = new Dictionary<int, bool>();
+            for(int i = 0; i < ApplicationData.Instance.NumberOfRadios; i++)
+            {
+                _radioCheck.Add(i, false);            
+            }
+
+            var _charsWithRadios = _Characters.Where(_r => _r.RadioNum != -1);
+            foreach(var _character in _charsWithRadios)
+            {                
+                // If there is already a character with that 
+                // radio number, set the radio number to -1.
+                if(_radioCheck[_character.RadioNum])
+                {
+                    _character.RadioNum = -1;
+                } else
+                {
+                    _radioCheck[_character.RadioNum] = true;
+                }                
+            }
         }
 
         private  void _checkDirectories()
@@ -174,11 +211,12 @@ namespace DialogGenerator
             }
 
             Session.Set(Constants.FORCED_CH_COUNT, _forcedCharacters.Count);
-            Session.Set(Constants.NEXT_CH_1, 1);
-            Session.Set(Constants.NEXT_CH_2, 2);
+            Session.Set(Constants.NEXT_CH_1, -1);
+            Session.Set(Constants.NEXT_CH_2, -1);
             Session.Set(Constants.DIALOG_SPEED, 1000); // ms
             Session.Set(Constants.SELECTED_DLG_MODEL, -1);
             Session.Set(Constants.COMPLETED_DLG_MODELS, 0);
+            Session.Set(Constants.BLE_MODE_ON, true);
 
             Completed?.Invoke(this, new EventArgs());
         }

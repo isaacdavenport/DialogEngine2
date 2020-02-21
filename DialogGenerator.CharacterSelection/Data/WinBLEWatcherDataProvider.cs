@@ -1,13 +1,10 @@
 ﻿using DialogGenerator.Core;
 using System;
-using System.Threading;
 using Windows.Devices.Bluetooth.Advertisement;
 using Windows.Storage.Streams;
-using System.Collections.Generic;
 using System.Runtime.InteropServices;
-using System.Runtime.Remoting.Messaging;
 using System.Threading.Tasks;
-using System.Windows.Navigation;
+using System.Collections.Generic;
 
 namespace DialogGenerator.CharacterSelection.Data
 {
@@ -17,11 +14,10 @@ namespace DialogGenerator.CharacterSelection.Data
         
         private ILogger mLogger;
         private BluetoothLEAdvertisementWatcher mWatcher;
-        //private BetterScanner bScanner;
         private BLE_Message mMessage = new BLE_Message();
-        private bool mNewDataAvailable;
-        //private static List<string> receivedBLE = new List<string>();
-        
+        private int mBLETotalMessageCount = 0;
+        private Queue<BLE_Message> mMessageQueue = new Queue<BLE_Message>();
+
         #endregion
 
         #region - constructor -
@@ -53,6 +49,9 @@ namespace DialogGenerator.CharacterSelection.Data
             try
             {
                 var sections = args.Advertisement.DataSections;
+
+                if (ApplicationData.Instance.IgnoreRadioSignals)
+                    return;
 
                 if (sections.Count < 2)
                 return;
@@ -92,7 +91,18 @@ namespace DialogGenerator.CharacterSelection.Data
                     }
 
                     mMessage = strippedInput.DeepCopy();
-                    mNewDataAvailable = true;
+                    mBLETotalMessageCount++;
+                    mMessageQueue.Enqueue(mMessage);
+                    if (mMessageQueue.Count > 1000)
+                    {
+                        mMessageQueue.Clear();
+                    }
+
+                    if (mBLETotalMessageCount % 100 == 0)
+                    {
+                        mLogger.Info("BLE Total Good Message Count: " + mBLETotalMessageCount + " Current queue size: "
+                            + mMessageQueue.Count + "  " + DateTime.Now.ToString());
+                    }
                 }
             }
             catch (Exception ex)
@@ -105,10 +115,9 @@ namespace DialogGenerator.CharacterSelection.Data
 
         public BLE_Message GetMessage()
         {
-            if (mNewDataAvailable)
+            if (mMessageQueue.Count > 0)
             {
-                mNewDataAvailable = false;
-                BLE_Message returnMessage = mMessage.DeepCopy();
+                BLE_Message returnMessage = mMessageQueue.Dequeue().DeepCopy();
                 return returnMessage;
             }
             return null;
@@ -116,12 +125,16 @@ namespace DialogGenerator.CharacterSelection.Data
 
         public async Task StartReadingData()
         {
+            mMessageQueue.Clear();
+            mLogger.Info("StartReadingData BLE");
             mWatcher.Start();
             await BetterScanner.StartScanner(0, 29, 29);
         }
 
         public void StopReadingData()
         {
+            mMessageQueue.Clear();
+            mLogger.Info("StopReadingData BLE");
             mWatcher.Stop();
             BetterScanner.Cancel();
         }

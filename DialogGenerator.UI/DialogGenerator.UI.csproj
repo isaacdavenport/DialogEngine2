@@ -65,6 +65,9 @@
     <Reference Include="NAudio, Version=1.8.4.0, Culture=neutral, processorArchitecture=MSIL">
       <HintPath>..\packages\NAudio.1.8.4\lib\net35\NAudio.dll</HintPath>
     </Reference>
+    <Reference Include="Newtonsoft.Json, Version=12.0.0.0, Culture=neutral, PublicKeyToken=30ad4fe6b2a6aeed, processorArchitecture=MSIL">
+      <HintPath>..\packages\Newtonsoft.Json.12.0.1\lib\net45\Newtonsoft.Json.dll</HintPath>
+    </Reference>
     <Reference Include="PresentationFramework.Aero" />
     <Reference Include="Prism, Version=6.3.0.0, Culture=neutral, PublicKeyToken=40ee6c3a2184dc59, processorArchitecture=MSIL">
       <HintPath>..\packages\Prism.Core.6.3.0\lib\net45\Prism.dll</HintPath>
@@ -105,12 +108,18 @@
     <Compile Include="Controls\MediaPlayerControl.xaml.cs">
       <DependentUpon>MediaPlayerControl.xaml</DependentUpon>
     </Compile>
+    <Compile Include="Controls\MediaRecorderControl.xaml.cs">
+      <DependentUpon>MediaRecorderControl.xaml</DependentUpon>
+    </Compile>
     <Compile Include="Controls\SpectrumAnalyzer.cs" />
     <Compile Include="Controls\VoiceRecorderControl.xaml.cs">
       <DependentUpon>VoiceRecorderControl.xaml</DependentUpon>
     </Compile>
     <Compile Include="Converters\ActiveDialogModelBtnVisibilityValueConverter.cs" />
     <Compile Include="Converters\AssignedCharacter2NameValueConverter.cs" />
+    <Compile Include="Converters\BoolToColorConverter.cs" />
+    <Compile Include="Converters\BoolToRowHeightConverter.cs" />
+    <Compile Include="Converters\BoolToVisibilityConverter.cs" />
     <Compile Include="Converters\CharaccterStateToNameValueConverter.cs" />
     <Compile Include="Converters\CharacterDataTemplateSelectorValueConverter.cs" />
     <Compile Include="Converters\CharacterGenderValueConverter.cs" />
@@ -118,6 +127,8 @@
     <Compile Include="Converters\CharacterStateToColorValueConverter.cs" />
     <Compile Include="Converters\CloneValuesConverter.cs" />
     <Compile Include="Converters\DivideBy2ValueConverter.cs" />
+    <Compile Include="Converters\IdentifierConverter.cs" />
+    <Compile Include="Converters\NotBoolToVisibilityConverter.cs" />
     <Compile Include="Converters\ToyNumberToAssignedCharacterImageValueConverter.cs" />
     <Compile Include="Converters\ToyNumberToAssignedCharacterValueConverter.cs" />
     <Compile Include="Converters\ToyNumberToAssignedChForegroundValueConverter.cs" />
@@ -158,28 +169,50 @@
     <Compile Include="Data\WizardDataProvider.cs" />
     <Compile Include="Helpers\FileHelper.cs" />
     <Compile Include="UIModule.cs" />
+    <Compile Include="ViewModels\ArenaAvatarViewModel.cs" />
+    <Compile Include="ViewModels\ArenaViewModel.cs" />
     <Compile Include="ViewModels\AssignCharactersToToysBindingProxy.cs" />
     <Compile Include="ViewModels\AssignCharactersToToysViewModel.cs" />
+    <Compile Include="ViewModels\AssignCharacterToRadioViewModel.cs" />
+    <Compile Include="ViewModels\AssignedRadiosViewModel.cs" />
     <Compile Include="ViewModels\CharacterDetailViewModel.cs" />
+    <Compile Include="ViewModels\CharacterDialogLinesViewModel.cs" />
     <Compile Include="ViewModels\ComputerSelectsViewModel.cs" />
+    <Compile Include="ViewModels\CreateCharacterViewModel.cs" />
     <Compile Include="ViewModels\CreateViewModel.cs" />
     <Compile Include="ViewModels\DebugViewModel.cs" />
     <Compile Include="ViewModels\DialogModelDetailViewModel.cs" />
     <Compile Include="ViewModels\DialogModelsNavigationViewModel.cs" />
     <Compile Include="ViewModels\DialogModelsViewModel.cs" />
     <Compile Include="ViewModels\DialogViewModel.cs" />
+    <Compile Include="ViewModels\EditPhraseViewModel.cs" />
     <Compile Include="ViewModels\IDetailViewModel.cs" />
     <Compile Include="ViewModels\INavigationViewModel.cs" />
     <Compile Include="ViewModels\MediaPlayerControlViewModel.cs" />
     <Compile Include="ViewModels\HomeViewModel.cs" />
     <Compile Include="ViewModels\VoiceRecorderControlViewModel.cs" />
     <Compile Include="ViewModels\WizardViewModel.cs" />
+    <Compile Include="Views\ArenaAvatarView.xaml.cs">
+      <DependentUpon>ArenaAvatarView.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="Views\AssignCharacterToRadioView.xaml.cs">
+      <DependentUpon>AssignCharacterToRadioView.xaml</DependentUpon>
+    </Compile>
     <Compile Include="Views\AssignCharactersToToysView.xaml.cs">
       <DependentUpon>AssignCharactersToToysView.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="Views\ArenaView.xaml.cs">
+      <DependentUpon>ArenaView.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="Views\AssignedRadiosView.xaml.cs">
+      <DependentUpon>AssignedRadiosView.xaml</DependentUpon>
     </Compile>
     <Compile Include="Views\CharacterDataTemplateSelector.cs" />
     <Compile Include="Views\CharacterDetailView.xaml.cs">
       <DependentUpon>CharacterDetailView.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="Views\CharacterDialogLinesView.xaml.cs">
+      <DependentUpon>CharacterDialogLinesView.xaml</DependentUpon>
     </Compile>
     <Compile Include="Views\CharactersDataTemplateSelector.cs" />
     <Compile Include="Views\CharacterSelectionView.xaml.cs">
@@ -190,6 +223,9 @@
     </Compile>
     <Compile Include="Views\ComputerSelectsView.xaml.cs">
       <DependentUpon>ComputerSelectsView.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="Views\CreateCharacterView.xaml.cs">
+      <DependentUpon>CreateCharacterView.xaml</DependentUpon>
     </Compile>
     <Compile Include="Views\CreateView.xaml.cs">
       <DependentUpon>CreateView.xaml</DependentUpon>
@@ -218,6 +254,9 @@
     <Compile Include="Views\DialogView.xaml.cs">
       <DependentUpon>DialogView.xaml</DependentUpon>
     </Compile>
+    <Compile Include="Views\EditPhraseView.xaml.cs">
+      <DependentUpon>EditPhraseView.xaml</DependentUpon>
+    </Compile>
     <Compile Include="Views\HomeView.xaml.cs">
       <DependentUpon>HomeView.xaml</DependentUpon>
     </Compile>
@@ -230,12 +269,17 @@
     <Compile Include="Views\WizardView.xaml.cs">
       <DependentUpon>WizardView.xaml</DependentUpon>
     </Compile>
+    <Compile Include="Workflow\CreateCharacterWorkflow.cs" />
     <Compile Include="Workflow\MP3RecorderStateMachine.cs" />
     <Compile Include="Workflow\VideoPlayerStateMachine.cs" />
     <Compile Include="Workflow\WizardWorkflow.cs" />
     <Compile Include="ModelWrapper\ApplicationDataWrapper.cs" />
     <Compile Include="ModelWrapper\CharacterWrapper.cs" />
     <Page Include="Controls\MediaPlayerControl.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="Controls\MediaRecorderControl.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
@@ -251,6 +295,10 @@
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
+    <Page Include="Themes\ListBoxStyle.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
     <Page Include="Themes\MaterialDesignThemes.GroupBox.Overrides.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
@@ -263,11 +311,31 @@
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
+    <Page Include="Views\ArenaAvatarView.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="Views\AssignCharacterToRadioView.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
     <Page Include="Views\AssignCharactersToToysView.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
+    <Page Include="Views\ArenaView.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="Views\AssignedRadiosView.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
     <Page Include="Views\CharacterDetailView.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="Views\CharacterDialogLinesView.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
@@ -280,6 +348,10 @@
       <Generator>MSBuild:Compile</Generator>
     </Page>
     <Page Include="Views\ComputerSelectsView.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="Views\CreateCharacterView.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
@@ -319,6 +391,10 @@
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
+    <Page Include="Views\EditPhraseView.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
     <Page Include="Views\HomeView.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
@@ -354,6 +430,7 @@
       <Generator>ResXFileCodeGenerator</Generator>
       <LastGenOutput>Resources.Designer.cs</LastGenOutput>
     </EmbeddedResource>
+    <None Include="app.config" />
     <None Include="packages.config" />
     <None Include="Properties\Settings.settings">
       <Generator>SettingsSingleFileGenerator</Generator>
@@ -361,6 +438,10 @@
     </None>
   </ItemGroup>
   <ItemGroup>
+    <ProjectReference Include="..\DialogGenerator.CharacterSelection\DialogGenerator.CharacterSelection.csproj">
+      <Project>{2302A9F6-72B8-4AAE-BB7E-02AFDE420D57}</Project>
+      <Name>DialogGenerator.CharacterSelection</Name>
+    </ProjectReference>
     <ProjectReference Include="..\DialogGenerator.Core\DialogGenerator.Core.csproj">
       <Project>{de5ab434-bc15-4a64-b275-3e7379d6fcfd}</Project>
       <Name>DialogGenerator.Core</Name>
