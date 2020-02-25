@@ -33,7 +33,7 @@
                                 <ColumnDefinition Width="2*"/>
                             </Grid.ColumnDefinitions>
                             <Label Grid.Column="1" Height="30" Margin="0, 8, 20, 0" HorizontalAlignment="Right">Name:</Label>
-                            <TextBox x:Name="FirstName" Grid.Column="2" Height="30" Text="{Binding CharacterName}"/>
+                            <TextBox x:Name="FirstName" Grid.Column="2" Height="30" Text="{Binding CharacterName, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}" />
                         </Grid>
                     </ControlTemplate>
                     <ControlTemplate x:Key="InitialsControl">
@@ -284,7 +284,7 @@
                         <TextBlock Grid.Row="1" FontSize="14" HorizontalAlignment="Center" Text="{Binding CurrentStep.StepDescription}" Margin="0,10,0,10" Foreground="White"></TextBlock>
                     </Grid>
                 </Border>
-                <ContentControl Name="ContentControl" Grid.Row="1" Margin="5,5,5,5" Template="{StaticResource NameControl}"/>
+                <ContentControl Name="ContentControl" Grid.Row="1" Margin="5,5,5,5" />
             </Grid>
         </Grid>
         <Border Grid.Row="1" BorderBrush="Gray" BorderThickness="1">
@@ -306,7 +306,7 @@
                     </Button.InputBindings>-->
                 </Button>
                 <Button Grid.Column="0" HorizontalAlignment="Right" Content="Previous" Margin="0,0,10,0" Width="120" Click="ButtonPrev_Click"/>
-                <Button Grid.Column="1" HorizontalAlignment="Left" Content="{Binding NextButtonText}" Margin="10, 0, 0, 0" Width="120" Click="ButtonNext_Click"/>
+                <Button Grid.Column="1" HorizontalAlignment="Left" Content="{Binding NextButtonText}" Margin="10, 0, 0, 0" Width="120" Command="{Binding NextStepCommand}" />
                 <Button Grid.Column="1" HorizontalAlignment="Right" Content="Cancel" Width="120" Margin="0,0,10,0" Command="{Binding HomeCommand}">
                     <!--<Button.InputBindings>
                         <MouseBinding MouseAction="LeftClick" Command="NavigationCommands.GoToPage">

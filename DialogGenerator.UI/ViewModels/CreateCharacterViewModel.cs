@@ -54,7 +54,7 @@ namespace DialogGenerator.UI.ViewModels
         private IBLEDataProviderFactory mBLEDataProviderFactory;
         private IBLEDataProvider mCurrentDataProvider;
         private CancellationTokenSource mCancellationTokenSource;
-        private string mSelectRadioTitle = Properties.Resources.ShakeRadio;       
+        private string mSelectRadioTitle = Properties.Resources.ShakeRadio;
 
         internal void SetCurrentStep(int index)
         {
@@ -81,7 +81,7 @@ namespace DialogGenerator.UI.ViewModels
             mWizardDataProvider = _WizardDataProvider;
 
             mWizard = new CreateCharacterWizard();
-            mCurrentStep = mWizard.Steps[mCurrentStepIndex];
+            CurrentStep = mWizard.Steps[mCurrentStepIndex];            
 
             for (int i = 5; i < 100; i++)
             {
@@ -109,14 +109,13 @@ namespace DialogGenerator.UI.ViewModels
             Workflow.PropertyChanged += _workflow_PropertyChanged;
             _configureWorkflow();
 
-            Character = new Character();
+            Character = new Character();   
 
             _initDialogWizards();
 
-            //_openCreateSession();
             _bindCommands();
         }
-        
+
         public List<ToyEntry> RadiosCollection
         {
             get
@@ -209,7 +208,9 @@ namespace DialogGenerator.UI.ViewModels
         }
 
         public CreateCharacterWorkflow Workflow { get; set; }
-        public Character Character {get;set;}
+
+        public Character Character { get; set; }
+
         public string CurrentDialogWizard
         {
             get
@@ -236,6 +237,7 @@ namespace DialogGenerator.UI.ViewModels
                 mCharacterInitials = _getCharacterInitials();
                 RaisePropertyChanged("CharacterName");
                 RaisePropertyChanged("CharacterInitials");
+                NextStepCommand.RaiseCanExecuteChanged();
                 CharacterInitials = _getCharacterInitials();
                 CharacterIdentifier = _getCharacterIdentifier();
             }
@@ -425,6 +427,14 @@ namespace DialogGenerator.UI.ViewModels
             }
         }
 
+        public bool NextEnabled
+        {
+            get
+            {
+                return !string.IsNullOrEmpty(CharacterName);
+            }
+        }
+
         public ICommand ChooseImageCommand { get; set; }
         public ICommand HomeCommand { get; set; }
         public ICommand CreateCommand { get; set; }
@@ -433,6 +443,7 @@ namespace DialogGenerator.UI.ViewModels
         public ICommand PlayCommand { get; set; }
         public ICommand ViewLoadedCommand { get; set; }
         public ICommand ViewUnloadedCommand { get; set; }
+        public DelegateCommand NextStepCommand { get; set; }
 
         public void nextStep()
         {
@@ -479,6 +490,8 @@ namespace DialogGenerator.UI.ViewModels
             WizardPassthroughIndex = 0;
             mIsFinished = false;
             SelectedRadio = RadiosCollection[0];
+
+            Character = new Character();
             
             _closeCreateSession();
         }
@@ -492,7 +505,11 @@ namespace DialogGenerator.UI.ViewModels
             String result = String.Empty;
             for(int i = 0; i < tokens.Length; i++)
             {
-                result += tokens[i].First();
+                if(!string.IsNullOrEmpty(tokens[i]))
+                {
+                    result += tokens[i].First();
+                }
+                
             }
 
             return result.ToUpper();
@@ -520,12 +537,25 @@ namespace DialogGenerator.UI.ViewModels
             PlayCommand = new DelegateCommand(_onPlayCommand_execute);
             ViewLoadedCommand = new DelegateCommand(_viewLoaded_execute);
             ViewUnloadedCommand = new DelegateCommand(_viewUnloaded_execute);
+            NextStepCommand = new DelegateCommand(_nextStep_Execute, _nextStep_CanExecute);
+        }
+
+        private bool _nextStep_CanExecute()
+        {
+            return !string.IsNullOrEmpty(CharacterName);
+        }
+
+        private void _nextStep_Execute()
+        {
+            nextStep();
         }
 
         private async void _viewLoaded_execute()
         {
             await _checkWizardConfiguration();
+            Workflow.Fire(Triggers.SetName);
         }
+
         private void _viewUnloaded_execute()
         {
             

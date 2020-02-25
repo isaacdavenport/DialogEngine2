@@ -136,6 +136,12 @@ namespace DialogGenerator.UI.ViewModels
 
                 mCharacterDataProvider.RemovePhrase(Character, _phrase);
                 await mCharacterDataProvider.SaveAsync(Character);
+                string _audioFileName = ApplicationData.Instance.AudioDirectory + "\\" + Character.CharacterPrefix + "_" + _phrase.FileName + ".mp3";
+                if(File.Exists(_audioFileName))
+                {
+                    File.Delete(_audioFileName);
+                }
+
                 FilterText = "";
             }
             catch (Exception ex)
