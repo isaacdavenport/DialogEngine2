@@ -34,7 +34,7 @@ namespace DialogGenerator.UI.Views
 
         private async void CloseDialogButton_Click(object sender, RoutedEventArgs e)
         {
-            await ((EditPhraseViewModel)DataContext).SaveChanges();
+            await ((EditPhraseViewModel)DataContext).SaveChanges2();
             DialogHost.CloseDialogCommand.Execute(null, CloseDialogButton);
         }
 

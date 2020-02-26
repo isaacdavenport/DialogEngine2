@@ -471,5 +471,17 @@
       <Name>DialogGenerator.Utilities</Name>
     </ProjectReference>
   </ItemGroup>
+  <ItemGroup>
+    <Resource Include="Views\Pictures\Button-Add-icon.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="Views\Pictures\add-1-icon %2824%29.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="Views\Pictures\add-icon.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="Views\Pictures\Apps-Dialog-Remove-icon.png" />
+  </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>

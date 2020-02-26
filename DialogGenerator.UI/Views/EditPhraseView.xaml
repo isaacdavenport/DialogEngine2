@@ -34,9 +34,45 @@
             <RowDefinition Height="*" />
             <RowDefinition Height="Auto" />
         </Grid.RowDefinitions>
-        <TextBlock Grid.Row="0" x:Name="Title" Text="Edit Phrase" Background="#51cb8c" Foreground="White" Margin="0,0,0,5" HorizontalAlignment="Stretch" TextAlignment="Center" Padding="0,5,0,5"/>
+        <TextBlock Grid.Row="0" x:Name="Title" Text="Edit Phrase" Background="#51cb8c" 
+                   Foreground="White" Margin="0,0,0,5" HorizontalAlignment="Stretch" TextAlignment="Center" Padding="0,5,0,5"/>
         <Label Grid.Row="1" Content="Phrase Weights" HorizontalContentAlignment="Center" Margin="0,20,0,0" FontWeight="Bold" />
-        <TextBox x:Name="PhrasesList" Grid.Row="2" HorizontalAlignment="Stretch" HorizontalContentAlignment="Center" Text="{Binding PhraseWeights}" />
+        <!--<TextBox x:Name="PhrasesList" Grid.Row="2" HorizontalAlignment="Stretch" HorizontalContentAlignment="Center" Text="{Binding PhraseWeights}" />-->
+        <Grid Grid.Row="2">
+            <Grid.RowDefinitions>
+                <RowDefinition Height="Auto" />
+                <RowDefinition Height="Auto" />
+            </Grid.RowDefinitions>
+            <StackPanel Orientation="Horizontal" HorizontalAlignment="Center" Margin="0,10,0,0" Grid.Row="0">
+                <Button x:Name="AddButton" Command="{Binding AddPhraseWeightCommand}" BorderBrush="Transparent" Background="Transparent" ToolTip="Add new phrase">
+                    <StackPanel>
+                        <Image Source="Pictures/add-icon.png" Width="24" Height="24"/>
+                    </StackPanel>
+                </Button>
+            </StackPanel>
+            <ItemsControl x:Name="PhrasesCollectionList" Grid.Row="1" HorizontalAlignment="Stretch" ItemsSource="{Binding PhraseWeightsCollection}">
+                <ItemsControl.ItemsPanel>
+                    <ItemsPanelTemplate>
+                        <StackPanel Orientation="Vertical" />
+                    </ItemsPanelTemplate>
+                </ItemsControl.ItemsPanel>
+                <ItemsControl.ItemTemplate>
+                    <DataTemplate>
+                        <StackPanel Orientation="Horizontal" HorizontalAlignment="Center" >
+                            <TextBox Width="300" Text="{Binding Key, UpdateSourceTrigger=PropertyChanged}" Margin="0,0,10,0" />
+                            <TextBox Width="50" Text="{Binding Value}" />
+                            <Button x:Name="RemoveButton" Command="{Binding DataContext.RemovePhraseWeightCommand, RelativeSource={RelativeSource AncestorType=UserControl}}" 
+                                    CommandParameter="{Binding}" BorderBrush="Transparent" Background="Transparent" ToolTip="Remove this phrase">
+                                <StackPanel>
+                                    <Image Source="Pictures/Apps-Dialog-Remove-icon.png" Width="24" Height="24"  />
+                                </StackPanel>
+                            </Button>
+                        </StackPanel>
+                    </DataTemplate>
+                </ItemsControl.ItemTemplate>
+            </ItemsControl>
+        </Grid>
+        
         <Label Grid.Row="3" Content="Phrase Text" HorizontalContentAlignment="Center" Margin="0,20,0,0" FontWeight="Bold" />
         <TextBox Grid.Row="4" Text="{Binding DialogLineText}" HorizontalAlignment="Stretch" Height="50" VerticalContentAlignment="Top" Margin="5,0,5,0" TextWrapping="Wrap"/>
         <Label Grid.Row="5" Content="Audio" HorizontalContentAlignment="Center" Margin="0,20,0,0" FontWeight="Bold" />

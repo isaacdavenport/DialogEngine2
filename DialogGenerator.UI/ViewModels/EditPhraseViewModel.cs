@@ -1,19 +1,16 @@
 ﻿using DialogGenerator.Core;
 using DialogGenerator.Model;
 using DialogGenerator.UI.Data;
-using DialogGenerator.UI.Workflow.WizardWorkflow;
-using DialogGenerator.Utilities;
-using MaterialDesignThemes.Wpf;
 using Prism.Commands;
 using Prism.Mvvm;
 using System;
-using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.ComponentModel;
 using System.IO;
 using System.Linq;
-using System.Text;
 using System.Threading.Tasks;
+using System.Windows.Controls;
+using System.Windows.Data;
 
 namespace DialogGenerator.UI.ViewModels
 {
@@ -26,6 +23,8 @@ namespace DialogGenerator.UI.ViewModels
         private string mPhraseWeights = string.Empty;
         private ICharacterDataProvider mCharacterDataProvider;
         private Character mCharacter;
+        private CollectionViewSource mPhraseWeightsCollection;
+        private ObservableCollection<PhraseWeight> mWeights = new ObservableCollection<PhraseWeight>(); 
 
         public EditPhraseViewModel(Character _Character, PhraseEntry _PhraseEntry, ICharacterDataProvider _CharacterDataProvider)
         {
@@ -36,17 +35,16 @@ namespace DialogGenerator.UI.ViewModels
 
             FileName = Path.Combine(ApplicationData.Instance.AudioDirectory, _Character.CharacterPrefix + "_" + mPhraseEntry.FileName + ".mp3");
             EditFileName = Path.Combine(ApplicationData.Instance.AudioDirectory, _Character.CharacterPrefix + "_" + mPhraseEntry.FileName + "_edit.mp3");
-            
-            if(File.Exists(EditFileName))
+
+            if (File.Exists(EditFileName))
             {
                 File.Delete(EditFileName);
             }
 
             File.Copy(FileName, EditFileName);
-
             foreach (var entry in mPhraseEntry.PhraseWeights)
             {
-                if(string.IsNullOrEmpty(PhraseWeights)) {
+                if (string.IsNullOrEmpty(PhraseWeights)) {
                     PhraseWeights = "";
                 } else
                 {
@@ -56,15 +54,29 @@ namespace DialogGenerator.UI.ViewModels
                 PhraseWeights += entry.Key;
                 PhraseWeights += "/";
                 PhraseWeights += entry.Value.ToString();
+                mWeights.Add(new PhraseWeight
+                {
+                    Key = entry.Key,
+                    Value = entry.Value
+                });
             }
 
-            CloseCommand = new DelegateCommand(_viewClose_Execute);
+            mPhraseWeightsCollection = new CollectionViewSource();
+            mPhraseWeightsCollection.Source = mWeights;                       
+            
+            _bindCommands();
 
-        }
-
-        
+        }        
 
         #region Properties
+
+        public ICollectionView PhraseWeightsCollection
+        {
+            get
+            {
+                return mPhraseWeightsCollection.View;
+            }
+        }
 
         public string PhraseWeights
         {
@@ -124,7 +136,9 @@ namespace DialogGenerator.UI.ViewModels
 
         #endregion
 
-        public DelegateCommand CloseCommand { get; set; }
+        public DelegateCommand CloseCommand { get; private set; }
+        public DelegateCommand AddPhraseWeightCommand { get; private set; }
+        public DelegateCommand<PhraseWeight> RemovePhraseWeightCommand { get; private set; }
 
         public async Task SaveChanges()
         {
@@ -159,11 +173,117 @@ namespace DialogGenerator.UI.ViewModels
             await mCharacterDataProvider.SaveAsync(mCharacter);            
         }
 
+        public async Task SaveChanges2()
+        {
+            File.Delete(FileName);
+            File.Copy(EditFileName, FileName);
+            foreach (var _phraseEntry in mCharacter.Phrases)
+            {
+                if (_phraseEntry.Equals(mPhraseEntry))
+                {
+                    _phraseEntry.DialogStr = DialogLineText;
+
+                    if(mWeights.Count > 0)
+                    {
+                        _phraseEntry.PhraseWeights.Clear();
+                        foreach(var _phraseWeight in mWeights)
+                        {
+                            _phraseEntry.PhraseWeights.Add(_phraseWeight.Key, _phraseWeight.Value);
+                        }
+                    }                    
+                }
+            }
+
+            await mCharacterDataProvider.SaveAsync(mCharacter);
+        }
+
         private void _viewClose_Execute()
         {
             if(!string.IsNullOrEmpty(EditFileName) && File.Exists(EditFileName))
             {
                 File.Delete(EditFileName);
+            }
+        }
+
+        #region Commands implementation
+
+        private void _bindCommands()
+        {
+            CloseCommand = new DelegateCommand(_viewClose_Execute);
+            AddPhraseWeightCommand = new DelegateCommand(_addPhraseWeight_Execute, _addPhraseWeight_CanExecute);
+            RemovePhraseWeightCommand = new DelegateCommand<PhraseWeight>(_removePhraseWeight_Execute, _removePhraseWeight_CanExecute);
+        }
+
+        private bool _removePhraseWeight_CanExecute(PhraseWeight arg)
+        {
+            return mWeights.Count > 1;
+        }
+
+        private bool _addPhraseWeight_CanExecute()
+        {
+            bool _hasEmptyEntries = mWeights.Where(phw => string.IsNullOrEmpty(phw.Key)).Count() > 0;
+            return !_hasEmptyEntries;
+        }
+
+        private void _addPhraseWeight_Execute()
+        {
+            var _phraseWeight = new PhraseWeight
+            {
+                Key = string.Empty,
+                Value = 0
+            };
+
+            _phraseWeight.PropertyChanged += _phraseWeight_PropertyChanged;
+            mWeights.Add(_phraseWeight);
+            mPhraseWeightsCollection.View?.Refresh();
+            AddPhraseWeightCommand.RaiseCanExecuteChanged();
+            RemovePhraseWeightCommand.RaiseCanExecuteChanged();
+        }
+
+        private void _phraseWeight_PropertyChanged(object sender, PropertyChangedEventArgs e)
+        {
+            if(e.PropertyName.Equals("Key"))
+            {
+                AddPhraseWeightCommand.RaiseCanExecuteChanged();
+            }
+        }
+
+        private void _removePhraseWeight_Execute(PhraseWeight _phraseWeight)
+        {
+            mWeights.Remove(_phraseWeight);
+            mPhraseWeightsCollection.View?.Refresh();
+            AddPhraseWeightCommand.RaiseCanExecuteChanged();
+            RemovePhraseWeightCommand.RaiseCanExecuteChanged();
+        }
+
+        #endregion
+    }
+
+    public class PhraseWeight : INotifyPropertyChanged
+    {
+        private string mKey;
+        public event PropertyChangedEventHandler PropertyChanged;
+
+        public string Key { 
+            get
+            {
+                return mKey;
+            }
+
+            set
+            {
+                mKey = value;
+                OnNofityPropertyChanged(nameof(Key));
+            }
+        }
+
+        public double Value { get; set; }
+
+        private void OnNofityPropertyChanged(string _PropertyName)
+        {
+            if(PropertyChanged != null)
+            {
+                PropertyChanged.Invoke(this, new PropertyChangedEventArgs(_PropertyName));
             }
         }
     }
