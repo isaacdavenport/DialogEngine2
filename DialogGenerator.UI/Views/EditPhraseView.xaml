@@ -8,7 +8,7 @@
              xmlns:prism="http://prismlibrary.com/"
              xmlns:i="clr-namespace:System.Windows.Interactivity;assembly=System.Windows.Interactivity"
              xmlns:materialDesign="http://materialdesigninxaml.net/winfx/xaml/themes"
-             xmlns:converters="clr-namespace:DialogGenerator.UI.Converters"
+             xmlns:converters="clr-namespace:DialogGenerator.UI.Converters"           
              mc:Ignorable="d" 
              MinWidth="600"
              Width="600"
@@ -59,8 +59,10 @@
                 <ItemsControl.ItemTemplate>
                     <DataTemplate>
                         <StackPanel Orientation="Horizontal" HorizontalAlignment="Center" >
-                            <TextBox Width="300" Text="{Binding Key, UpdateSourceTrigger=PropertyChanged}" Margin="0,0,10,0" />
-                            <TextBox Width="50" Text="{Binding Value}" />
+                            <!--<TextBox Width="300" Text="{Binding Key, UpdateSourceTrigger=PropertyChanged}" Margin="0,0,10,0" />-->
+                            <!--<TextBox Width="50" Text="{Binding Value}" />-->
+                            <ComboBox Width="300" ItemsSource="{Binding Keys}" SelectedItem="{Binding Key}" IsEditable="True" IsTextSearchEnabled="True"/>
+                            <ComboBox Width="50" ItemsSource="{Binding Values}" SelectedItem="{Binding Value}" IsEditable="True" IsTextSearchEnabled="True" HorizontalContentAlignment="Center"/>
                             <Button x:Name="RemoveButton" Command="{Binding DataContext.RemovePhraseWeightCommand, RelativeSource={RelativeSource AncestorType=UserControl}}" 
                                     CommandParameter="{Binding}" BorderBrush="Transparent" Background="Transparent" ToolTip="Remove this phrase">
                                 <StackPanel>

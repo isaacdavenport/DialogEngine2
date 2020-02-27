@@ -1,6 +1,8 @@
 ﻿using DialogGenerator.Core;
+using DialogGenerator.DataAccess.Helper;
 using DialogGenerator.Model;
 using DialogGenerator.UI.Data;
+using Newtonsoft.Json;
 using Prism.Commands;
 using Prism.Mvvm;
 using System;
@@ -24,7 +26,10 @@ namespace DialogGenerator.UI.ViewModels
         private ICharacterDataProvider mCharacterDataProvider;
         private Character mCharacter;
         private CollectionViewSource mPhraseWeightsCollection;
-        private ObservableCollection<PhraseWeight> mWeights = new ObservableCollection<PhraseWeight>(); 
+        private ObservableCollection<PhraseWeight> mWeights = new ObservableCollection<PhraseWeight>();
+
+        private CollectionViewSource mPhraseTypesCollection;
+        private CollectionViewSource mPhraseValuesCollection;
 
         public EditPhraseViewModel(Character _Character, PhraseEntry _PhraseEntry, ICharacterDataProvider _CharacterDataProvider)
         {
@@ -54,19 +59,20 @@ namespace DialogGenerator.UI.ViewModels
                 PhraseWeights += entry.Key;
                 PhraseWeights += "/";
                 PhraseWeights += entry.Value.ToString();
-                mWeights.Add(new PhraseWeight
-                {
-                    Key = entry.Key,
-                    Value = entry.Value
-                });
+                mWeights.Add(new PhraseWeight(entry.Key, entry.Value));
             }
 
             mPhraseWeightsCollection = new CollectionViewSource();
-            mPhraseWeightsCollection.Source = mWeights;                       
+            mPhraseWeightsCollection.Source = mWeights;
+
+            mPhraseTypesCollection = new CollectionViewSource();
+            mPhraseValuesCollection = new CollectionViewSource();
             
             _bindCommands();
 
-        }        
+        }
+
+
 
         #region Properties
 
@@ -133,6 +139,21 @@ namespace DialogGenerator.UI.ViewModels
                 RaisePropertyChanged();
             }
         }
+
+        public ICollectionView PhraseTypeValues
+        {
+            get
+            {
+                return mPhraseTypesCollection.View;
+            }
+        }
+
+        public ICollectionView PhraseWeightValues { 
+            get
+            {
+                return mPhraseValuesCollection.View;
+            }
+        } 
 
         #endregion
 
@@ -227,12 +248,8 @@ namespace DialogGenerator.UI.ViewModels
 
         private void _addPhraseWeight_Execute()
         {
-            var _phraseWeight = new PhraseWeight
-            {
-                Key = string.Empty,
-                Value = 0
-            };
-
+            var _phraseWeight = new PhraseWeight(string.Empty, 0);
+            
             _phraseWeight.PropertyChanged += _phraseWeight_PropertyChanged;
             mWeights.Add(_phraseWeight);
             mPhraseWeightsCollection.View?.Refresh();
@@ -257,12 +274,24 @@ namespace DialogGenerator.UI.ViewModels
         }
 
         #endregion
+
+
     }
 
     public class PhraseWeight : INotifyPropertyChanged
     {
         private string mKey;
         public event PropertyChangedEventHandler PropertyChanged;
+
+        public PhraseWeight(string _Key, double _Value)
+        {
+            Key = _Key;
+            Value = _Value;
+            _initLists();
+        }
+
+        public ObservableCollection<string> Keys { get; set; } = new ObservableCollection<string>();
+        public ObservableCollection<double> Values { get; set; } = new ObservableCollection<double>();
 
         public string Key { 
             get
@@ -285,6 +314,51 @@ namespace DialogGenerator.UI.ViewModels
             {
                 PropertyChanged.Invoke(this, new PropertyChangedEventArgs(_PropertyName));
             }
+        }
+
+        private class PhraseTypesCollection
+        {
+            string mVersionNumber;
+            ObservableCollection<string> mPhrases = new ObservableCollection<string>();
+
+            [JsonProperty("Version")]
+            public string Version { get; set; }
+
+            [JsonProperty("Phrases")]
+            public ObservableCollection<string> Phrases
+            {
+                get
+                {
+                    return mPhrases;
+                }
+            }
+        }
+
+        private void _initLists()
+        {
+            string _filePath = ApplicationData.Instance.DataDirectory + "\\Phrases.cfg";
+            try
+            {
+                using (var _reader = new StreamReader(_filePath))
+                {
+                    string _jsonString = _reader.ReadToEnd();
+                    var _phraseTypesCollection = Serializer.Deserialize<PhraseTypesCollection>(_jsonString);
+                    if (_phraseTypesCollection != null && _phraseTypesCollection.Phrases.Count() > 0)
+                    {
+                        Keys.AddRange(_phraseTypesCollection.Phrases);
+                    }                    
+                }
+
+                var _phraseWeightValues = new ObservableCollection<double>();
+                for (double i = 0; i < 500; i++)
+                {
+                    Values.Add(i);
+                }                
+            }
+            catch (IOException)
+            {                
+            }
+            
         }
     }
 }
