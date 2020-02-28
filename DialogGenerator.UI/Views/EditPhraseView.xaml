@@ -61,7 +61,7 @@
                         <StackPanel Orientation="Horizontal" HorizontalAlignment="Center" >
                             <!--<TextBox Width="300" Text="{Binding Key, UpdateSourceTrigger=PropertyChanged}" Margin="0,0,10,0" />-->
                             <!--<TextBox Width="50" Text="{Binding Value}" />-->
-                            <ComboBox Width="300" ItemsSource="{Binding Keys}" SelectedItem="{Binding Key}" IsEditable="True" IsTextSearchEnabled="True"/>
+                            <ComboBox Width="300" ItemsSource="{Binding Keys}" Text="{Binding Key}" IsEditable="True" IsTextSearchEnabled="True"  />
                             <ComboBox Width="50" ItemsSource="{Binding Values}" SelectedItem="{Binding Value}" IsEditable="True" IsTextSearchEnabled="True" HorizontalContentAlignment="Center"/>
                             <Button x:Name="RemoveButton" Command="{Binding DataContext.RemovePhraseWeightCommand, RelativeSource={RelativeSource AncestorType=UserControl}}" 
                                     CommandParameter="{Binding}" BorderBrush="Transparent" Background="Transparent" ToolTip="Remove this phrase">
