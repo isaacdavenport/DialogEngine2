@@ -4,6 +4,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using System.Threading;
 using System.Threading.Tasks;
 using System.Windows;
 
@@ -16,6 +17,7 @@ namespace DialogGenerator.UI.ViewModels
         private int mTop;
         private bool mActive = false;
         private bool mInPlayground = false;
+        private CancellationTokenSource mCancellationTokenSource;
 
         public Character Character
         {
@@ -99,6 +101,46 @@ namespace DialogGenerator.UI.ViewModels
             };
 
             return _clone;
+        }
+
+        public async Task StartAnimation()
+        {
+            mCancellationTokenSource = new CancellationTokenSource();
+            await Task.Run(() =>
+            {
+                do
+                {
+                    Random random = new Random();
+                    int _decision = random.Next(1, 8);
+                    switch(_decision)
+                    {
+                        case 1: // up
+                        case 5:
+                            Top -= 2;
+                            break;
+                        case 2: // right
+                        case 6:
+                            Left += 2;
+                            break;
+                        case 3: // bottom
+                        case 7:
+                            Top += 2;
+                            break;
+                        case 4: // left
+                        case 8:
+                            Left -= 2;
+                            break;
+                    }
+
+                    Thread.Sleep(500);
+
+                } while (!mCancellationTokenSource.IsCancellationRequested);
+            });
+        }
+
+        public void StopAnimation()
+        {
+            mCancellationTokenSource.Cancel();
         }
     }
 }

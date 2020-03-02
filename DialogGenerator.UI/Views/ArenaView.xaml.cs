@@ -83,17 +83,21 @@ namespace DialogGenerator.UI.Views
                     {
                         Point pos = e.GetPosition(sender as IInputElement);
                         ArenaAvatarView _aView = new ArenaAvatarView();
+                        string[] _tokens = _am.Character.CharacterName.Split(' ', '\'');
+                        foreach(var _token in _tokens)
+                        {
+                            _aView.Name += _token;
+                        }
+
                         _am = _am.Clone();
                         _aView.DataContext = _am;
-                        _aView.SetValue(Canvas.LeftProperty, pos.X);
-                        _aView.SetValue(Canvas.TopProperty, pos.Y);
+                        _setBindings(_aView, _am);
                         _am.Left = (int)pos.X;
                         _am.Top = (int)pos.Y;
-
-                        _setBindings(_aView, _am);                        
-
+                        
                         this.Playground.Children.Add(_aView);
                         _model.PlaygroundAvatars.Add(_am);
+                        
 
                         if(this.Playground.Children.Count > 6)
                         {
