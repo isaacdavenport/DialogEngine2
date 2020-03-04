@@ -53,13 +53,13 @@ namespace DialogGenerator.UI.ViewModels
 
         #region - commands -State
 
-        public ICommand StartRecordingCommand { get; set; }
-        public ICommand StopRecorderCommand { get; set; }
-        public ICommand StartPlayingCommand { get; set; }
-        public ICommand PlayInContextCommand { get; set; }
-        public ICommand StopPlayingInContextCommand { get; set; }
-        public ICommand LoadedCommand { get; set; }
-        public ICommand UnloadedCommand { get; set; }
+        public DelegateCommand StartRecordingCommand { get; set; }
+        public DelegateCommand StopRecorderCommand { get; set; }
+        public DelegateCommand StartPlayingCommand { get; set; }
+        public DelegateCommand PlayInContextCommand { get; set; }
+        public DelegateCommand StopPlayingInContextCommand { get; set; }
+        public DelegateCommand LoadedCommand { get; set; }
+        public DelegateCommand UnloadedCommand { get; set; }
 
         #endregion
 

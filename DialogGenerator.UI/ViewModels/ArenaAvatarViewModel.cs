@@ -18,6 +18,11 @@ namespace DialogGenerator.UI.ViewModels
         private bool mActive = false;
         private bool mInPlayground = false;
         private CancellationTokenSource mCancellationTokenSource;
+        private const int mMaxIterationsCount = 3;
+        private int mCurrentIteration = mMaxIterationsCount;
+        private const int mStep = 1;        
+        private int mDecision = 1;
+        private int mSleepInterval = 50;
 
         public Character Character
         {
@@ -42,7 +47,7 @@ namespace DialogGenerator.UI.ViewModels
 
             set
             {
-                mLeft = value;
+                mLeft = value >= 0 ? value : 0;
                 RaisePropertyChanged();
             }
         }
@@ -56,7 +61,7 @@ namespace DialogGenerator.UI.ViewModels
 
             set
             {
-                mTop = value;
+                mTop = value >= 0 ? value : 0;
                 RaisePropertyChanged();
             }
         }
@@ -110,29 +115,36 @@ namespace DialogGenerator.UI.ViewModels
             {
                 do
                 {
-                    Random random = new Random();
-                    int _decision = random.Next(1, 8);
-                    switch(_decision)
+                    if(mCurrentIteration == mMaxIterationsCount)
+                    {
+                        Random random = new Random();
+                        mDecision = random.Next(1, 8);
+                        mCurrentIteration = 1;
+                    }
+                    
+                    switch(mDecision)
                     {
                         case 1: // up
                         case 5:
-                            Top -= 2;
+                            Top -= mStep;
                             break;
                         case 2: // right
                         case 6:
-                            Left += 2;
+                            Left += mStep;
                             break;
                         case 3: // bottom
                         case 7:
-                            Top += 2;
+                            Top += mStep;
                             break;
                         case 4: // left
                         case 8:
-                            Left -= 2;
+                            Left -= mStep;
                             break;
                     }
 
-                    Thread.Sleep(500);
+                    mCurrentIteration++;
+
+                    Thread.Sleep(mSleepInterval);
 
                 } while (!mCancellationTokenSource.IsCancellationRequested);
             });

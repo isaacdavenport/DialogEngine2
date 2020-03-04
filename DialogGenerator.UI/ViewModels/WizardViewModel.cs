@@ -16,6 +16,7 @@ using System;
 using System.ComponentModel;
 using System.IO;
 using System.Linq;
+using System.Speech.Synthesis;
 using System.Threading;
 using System.Threading.Tasks;
 using System.Windows;
@@ -269,7 +270,7 @@ namespace DialogGenerator.UI.ViewModels
                 }
 
                 return Workflow.State == WizardStates.WaitingForUserAction
-                       && VoiceRecorderControlViewModel.StartPlayingCommand.CanExecute(null);
+                       && VoiceRecorderControlViewModel.StartPlayingCommand.CanExecute();
             }
             catch (Exception){}
             return false;
@@ -304,9 +305,9 @@ namespace DialogGenerator.UI.ViewModels
         {
             mCancellationTokenSource.Cancel();
 
-            if (VoiceRecorderControlViewModel.StopPlayingInContextCommand.CanExecute(null))
+            if (VoiceRecorderControlViewModel.StopPlayingInContextCommand.CanExecute())
             {
-                VoiceRecorderControlViewModel.StopPlayingInContextCommand.Execute(null);
+                VoiceRecorderControlViewModel.StopPlayingInContextCommand.Execute();
             }
             else if (MediaPlayerControlViewModel.StopPlayingInContextCommand.CanExecute(null))
             {
@@ -337,8 +338,8 @@ namespace DialogGenerator.UI.ViewModels
                             {
                                 Application.Current.Dispatcher.Invoke(() =>
                                 {
-                                    if (VoiceRecorderControlViewModel.PlayInContextCommand.CanExecute(null))
-                                        VoiceRecorderControlViewModel.PlayInContextCommand.Execute(null);
+                                    if (VoiceRecorderControlViewModel.PlayInContextCommand.CanExecute())
+                                        VoiceRecorderControlViewModel.PlayInContextCommand.Execute();
                                 });
                             }
                             else
@@ -703,7 +704,34 @@ namespace DialogGenerator.UI.ViewModels
             set
             {
                 mDialogStr = value;
+                if(!string.IsNullOrEmpty(mDialogStr))
+                {
+                    _generateSpeech(mDialogStr);
+                }
+                
                 RaisePropertyChanged();
+            }
+        }
+
+        private void _generateSpeech(string value)
+        {
+            string _outfile = string.Empty;
+
+            using(SpeechSynthesizer _synth = new SpeechSynthesizer())
+            {
+                _synth.Volume = 100;
+                _synth.Rate = -1;
+                string _outfile_original = ApplicationData.Instance.AudioDirectory + "\\" + VoiceRecorderControlViewModel.CurrentFilePath + ".mp3";
+                _outfile = _outfile_original.Replace(".mp3", ".wav");
+                _synth.SetOutputToWaveFile(_outfile);
+                _synth.Speak(value);
+                cs_ffmpeg_mp3_converter.FFMpeg.Convert2Mp3(_outfile, _outfile_original);                
+                VoiceRecorderControlViewModel.StartPlayingCommand.RaiseCanExecuteChanged();
+            }
+
+            if(!string.IsNullOrEmpty(_outfile) && File.Exists(_outfile))
+            {
+                File.Delete(_outfile);
             }
         }
 

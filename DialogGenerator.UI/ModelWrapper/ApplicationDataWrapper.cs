@@ -183,5 +183,39 @@ namespace DialogGenerator.UI.Wrapper
                 validateProperty(nameof(MsMotionWindow));
             }
         }
+
+        public bool Text2SpeechEnabled
+        {
+            get
+            {
+                return getValue<bool>();
+            }
+
+            set
+            {
+                setValue(value);
+                validateProperty(nameof(Text2SpeechEnabled));
+            }
+        }
+
+        public int SpeechRate
+        {
+            get { return getValue<int>(); }
+            set
+            {
+                setValue(value);
+                validateProperty(nameof(SpeechRate));
+            }
+        }
+
+        public string VoiceType
+        {
+            get { return getValue<string>(); }
+            set
+            {
+                setValue(value);
+                validateProperty(nameof(VoiceType));
+            }
+        }
     }
 }
