@@ -94,7 +94,7 @@ namespace DialogGenerator.UI.ViewModels
         public ICommand DialogHostLoaded { get; set; }
         public ICommand SaveAndNext { get; set; }
         public ICommand SkipStep { get; set; }
-        public ICommand PlayInContext { get; set; }
+        public DelegateCommand PlayInContext { get; set; }
         public ICommand StopPlayingInContext { get; set; }
         public ICommand Cancel { get; set; }
 
@@ -728,6 +728,7 @@ namespace DialogGenerator.UI.ViewModels
                 _synth.Speak(value);
                 cs_ffmpeg_mp3_converter.FFMpeg.Convert2Mp3(_outfile, _outfile_original);                
                 VoiceRecorderControlViewModel.StartPlayingCommand.RaiseCanExecuteChanged();
+                PlayInContext.RaiseCanExecuteChanged();
             }
 
             if(!string.IsNullOrEmpty(_outfile) && File.Exists(_outfile))
