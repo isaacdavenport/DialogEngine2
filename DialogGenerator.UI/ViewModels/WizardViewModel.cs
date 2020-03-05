@@ -721,7 +721,16 @@ namespace DialogGenerator.UI.ViewModels
             {
                 _synth.Volume = 100;
                 _synth.Rate = -1;
-                _synth.SelectVoice(ApplicationData.Instance.VoiceType);
+                if(_synth.GetInstalledVoices().Count() == 0)
+                {
+                    return;
+                }
+
+                if(_synth.GetInstalledVoices().Where(iv => iv.VoiceInfo.Name.Equals(ApplicationData.Instance.VoiceType)).Count() > 0)
+                {
+                    _synth.SelectVoice(ApplicationData.Instance.VoiceType);
+                }
+                
                 string _outfile_original = ApplicationData.Instance.AudioDirectory + "\\" + VoiceRecorderControlViewModel.CurrentFilePath + ".mp3";
                 _outfile = _outfile_original.Replace(".mp3", ".wav");
                 _synth.SetOutputToWaveFile(_outfile);
