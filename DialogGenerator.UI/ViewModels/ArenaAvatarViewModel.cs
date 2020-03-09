@@ -110,6 +110,7 @@ namespace DialogGenerator.UI.ViewModels
 
         public async Task StartAnimation()
         {
+            mCurrentIteration = mMaxIterationsCount;
             mCancellationTokenSource = new CancellationTokenSource();
             await Task.Run(() =>
             {
