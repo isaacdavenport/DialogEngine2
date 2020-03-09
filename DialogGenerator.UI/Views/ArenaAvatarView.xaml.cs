@@ -46,7 +46,7 @@ namespace DialogGenerator.UI.Views
 
         private void ArenaAvatarViewModel_PropertyChanged(object sender, System.ComponentModel.PropertyChangedEventArgs e)
         {            
-            Dispatcher.Invoke(() =>
+            Application.Current.Dispatcher.Invoke(() =>
             {
                 ArenaAvatarViewModel _model = (ArenaAvatarViewModel)sender;
                 if (e.PropertyName.Equals("Left"))

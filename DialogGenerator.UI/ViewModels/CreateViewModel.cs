@@ -226,6 +226,8 @@ namespace DialogGenerator.UI.ViewModels
                 mEventAggregator.GetEvent<InitializeDialogModelEvent>().Publish();
 
                 Load();
+
+                mEventAggregator.GetEvent<CharacterCollectionLoadedEvent>().Publish();
             }
             catch (Exception ex)
             {
