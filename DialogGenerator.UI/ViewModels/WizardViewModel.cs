@@ -347,13 +347,20 @@ namespace DialogGenerator.UI.ViewModels
 
                                 if (Path.HasExtension(_dialogLine))
                                 {
-                                    MediaPlayerControlViewModel.CurrentVideoFilePath = 
+                                    Application.Current.Dispatcher.Invoke(() =>
+                                    {
+                                        MediaPlayerControlViewModel.CurrentVideoFilePath =
                                        Path.Combine(ApplicationData.Instance.VideoDirectory, _dialogLine);
+                                    });
+                                    
                                 }
                                 else
-                                {                                    
-                                    MediaPlayerControlViewModel.CurrentVideoFilePath =
-                                       Path.Combine(ApplicationData.Instance.VideoDirectory, _dialogLine + ".avi");
+                                {
+                                    Application.Current.Dispatcher.Invoke(() => {
+                                        MediaPlayerControlViewModel.CurrentVideoFilePath =
+                                           Path.Combine(ApplicationData.Instance.VideoDirectory, _dialogLine + ".avi");
+                                    });
+                                    
                                 }
                                 Application.Current.Dispatcher.Invoke(() =>
                                 {
