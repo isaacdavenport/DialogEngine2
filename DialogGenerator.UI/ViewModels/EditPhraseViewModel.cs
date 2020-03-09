@@ -31,6 +31,10 @@ namespace DialogGenerator.UI.ViewModels
         private CollectionViewSource mPhraseTypesCollection;
         private CollectionViewSource mPhraseValuesCollection;
 
+        private bool mIsPlaying = false;
+        private bool mIsRecording = false;
+        private bool mCanCloseDialog = true;
+
         public EditPhraseViewModel(Character _Character, PhraseEntry _PhraseEntry, ICharacterDataProvider _CharacterDataProvider)
         {
             mPhraseEntry = _PhraseEntry;
@@ -46,7 +50,24 @@ namespace DialogGenerator.UI.ViewModels
                 File.Delete(EditFileName);
             }
 
-            File.Copy(FileName, EditFileName);
+            if(File.Exists(FileName))
+            {
+                File.Copy(FileName, EditFileName);
+            } else
+            {                
+                int _counter = 1;
+                string _newFileName = Path.Combine(ApplicationData.Instance.AudioDirectory, _Character.CharacterPrefix + "_" + _Character.CharacterName + _counter + "_edit.mp3");
+                while (File.Exists(_newFileName))
+                {
+                    _counter++;
+                    _newFileName = Path.Combine(ApplicationData.Instance.AudioDirectory, _Character.CharacterPrefix + "_" + _Character.CharacterName + _counter + "_edit.mp3");
+                }
+
+                File.Create(_newFileName);
+                EditFileName = _newFileName;
+                FileName = EditFileName.Replace("_edit", string.Empty);
+            }
+            
             foreach (var entry in mPhraseEntry.PhraseWeights)
             {
                 if (string.IsNullOrEmpty(PhraseWeights)) {
@@ -75,6 +96,50 @@ namespace DialogGenerator.UI.ViewModels
 
 
         #region Properties
+
+        public bool CanCloseDialog
+        {
+            get
+            {
+                return mCanCloseDialog;
+            }
+
+            set
+            {
+                mCanCloseDialog = value;
+                RaisePropertyChanged();
+            }
+        }
+
+        public bool IsPlaying
+        {
+            get
+            {
+                return mIsPlaying;
+            }
+
+            set
+            {
+                mIsPlaying = value;
+                RaisePropertyChanged();
+                CanCloseDialog = !mIsRecording && !mIsPlaying;
+            }
+        }
+
+        public bool IsRecording
+        {
+            get
+            {
+                return mIsRecording;
+            }
+
+            set
+            {
+                mIsRecording = value;
+                RaisePropertyChanged();
+                CanCloseDialog = !mIsRecording && !mIsPlaying;
+            }
+        }
 
         public ICollectionView PhraseWeightsCollection
         {
@@ -109,6 +174,7 @@ namespace DialogGenerator.UI.ViewModels
             {
                 mDialogLineText = value;
                 RaisePropertyChanged();
+                
             }
         }
 
@@ -123,6 +189,7 @@ namespace DialogGenerator.UI.ViewModels
             {
                 mFileName = value;
                 RaisePropertyChanged();
+                
             }
         }
 
@@ -163,8 +230,16 @@ namespace DialogGenerator.UI.ViewModels
 
         public async Task SaveChanges()
         {
-            File.Delete(FileName);
-            File.Copy(EditFileName, FileName);
+            if(File.Exists(FileName))
+            {
+                File.Delete(FileName);
+            }
+            
+            if(File.Exists(EditFileName))
+            {
+                File.Copy(EditFileName, FileName);
+            }
+            
             foreach(var _phraseEntry in mCharacter.Phrases)
             {
                 if(_phraseEntry.Equals(mPhraseEntry))
@@ -196,8 +271,16 @@ namespace DialogGenerator.UI.ViewModels
 
         public async Task SaveChanges2()
         {
-            File.Delete(FileName);
-            File.Copy(EditFileName, FileName);
+            if(File.Exists(FileName))
+            {
+                File.Delete(FileName);
+            }
+            
+            if(File.Exists(EditFileName))
+            {
+                File.Copy(EditFileName, FileName);
+            }
+            
             foreach (var _phraseEntry in mCharacter.Phrases)
             {
                 if (_phraseEntry.Equals(mPhraseEntry))
@@ -230,9 +313,14 @@ namespace DialogGenerator.UI.ViewModels
 
         private void _bindCommands()
         {
-            CloseCommand = new DelegateCommand(_viewClose_Execute);
+            CloseCommand = new DelegateCommand(_viewClose_Execute, _viewClose_CanExecute);
             AddPhraseWeightCommand = new DelegateCommand(_addPhraseWeight_Execute, _addPhraseWeight_CanExecute);
             RemovePhraseWeightCommand = new DelegateCommand<PhraseWeight>(_removePhraseWeight_Execute, _removePhraseWeight_CanExecute);
+        }
+
+        private bool _viewClose_CanExecute()
+        {
+            return (!mIsPlaying && !mIsRecording);
         }
 
         private bool _removePhraseWeight_CanExecute(PhraseWeight arg)

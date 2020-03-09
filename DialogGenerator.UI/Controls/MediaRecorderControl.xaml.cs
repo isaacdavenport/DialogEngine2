@@ -31,6 +31,8 @@ namespace DialogGenerator.UI.Controls
         public static readonly DependencyProperty StopBtnVisibilityProperty = DependencyProperty.Register("StopBtnVisibility", typeof(Visibility), typeof(MediaRecorderControl), new UIPropertyMetadata(Visibility.Collapsed));
         public static readonly DependencyProperty StartRecordingBtnVisibilityProperty = DependencyProperty.Register("StartRecordingBtnVisibility", typeof(Visibility), typeof(MediaRecorderControl), new UIPropertyMetadata(Visibility.Collapsed));
         public static readonly DependencyProperty StopRecordingBtnVisibilityProperty = DependencyProperty.Register("StopRecordingBtnVisibility", typeof(Visibility), typeof(MediaRecorderControl), new UIPropertyMetadata(Visibility.Collapsed));
+        public static readonly DependencyProperty IsPlayingProperty = DependencyProperty.Register("IsPlaying", typeof(bool), typeof(MediaRecorderControl), new UIPropertyMetadata(false));
+        public static readonly DependencyProperty IsRecordingProperty = DependencyProperty.Register("IsRecording", typeof(bool), typeof(MediaRecorderControl), new UIPropertyMetadata(false));
 
         public event PropertyChangedEventHandler PropertyChanged;
 
@@ -91,6 +93,18 @@ namespace DialogGenerator.UI.Controls
             set { SetValue(StopRecordingBtnVisibilityProperty, value); }
         }
 
+        public bool IsPlaying
+        {
+            get { return (bool)GetValue(IsPlayingProperty); }
+            set { SetValue(IsPlayingProperty, value); }
+        }
+
+        public bool IsRecording
+        {
+            get { return (bool)GetValue(IsRecordingProperty); }
+            set { SetValue(IsRecordingProperty, value); }
+        }
+
         public bool HasFileName
         {
             get
@@ -141,7 +155,9 @@ namespace DialogGenerator.UI.Controls
                             PlayBtnVisibility = SoundPlayer.IsPlaying || SoundPlayer.IsRecording ? Visibility.Collapsed : Visibility.Visible;
                             StopBtnVisibility = SoundPlayer.IsPlaying && !SoundPlayer.IsRecording ? Visibility.Visible : Visibility.Collapsed;
                             StartRecordingBtnVisibility = SoundPlayer.IsPlaying || SoundPlayer.IsRecording ? Visibility.Collapsed : Visibility.Visible;
-                            StopRecordingBtnVisibility = !SoundPlayer.IsPlaying && SoundPlayer.IsRecording ? Visibility.Visible : Visibility.Collapsed; 
+                            StopRecordingBtnVisibility = !SoundPlayer.IsPlaying && SoundPlayer.IsRecording ? Visibility.Visible : Visibility.Collapsed;
+                            IsPlaying = SoundPlayer.IsPlaying;
+                            IsRecording = SoundPlayer.IsRecording;
                         });                        
                         break;
                     }                

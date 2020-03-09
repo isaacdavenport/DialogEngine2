@@ -80,12 +80,14 @@
         <Label Grid.Row="5" Content="Audio" HorizontalContentAlignment="Center" Margin="0,20,0,0" FontWeight="Bold" />
         <Border x:Name="VoiceRcrdBorder" Grid.Row="6" BorderThickness="2" HorizontalAlignment="Stretch" 
                 VerticalAlignment="Stretch" Background="#FF333333" CornerRadius="3,3,3,3">
-            <control:MediaRecorderControl x:Name="SoundRecorder" Height="200"/>
+            <control:MediaRecorderControl x:Name="SoundRecorder" Height="200" 
+                                          IsPlaying="{Binding DataContext.IsPlaying, RelativeSource={RelativeSource AncestorType=UserControl}, Mode=OneWayToSource}" 
+                                          IsRecording="{Binding DataContext.IsRecording, RelativeSource={RelativeSource AncestorType=UserControl}, Mode=OneWayToSource}"/>
         </Border>
         
         <StackPanel Grid.Row="7" Orientation="Horizontal" HorizontalAlignment="Center" Margin="5,30,5,20">
-            <Button x:Name="CloseDialogButton" Click="CloseDialogButton_Click" Margin="0,0,10,0" Width="100">Save</Button>
-            <Button x:Name="CancelDialogButton" Click="CancelDialogButton_Click" Margin="10,0,0,0" Width="100">Cancel</Button>
+            <Button x:Name="CloseDialogButton" Click="CloseDialogButton_Click" Margin="0,0,10,0" Width="100" IsEnabled="{Binding CanCloseDialog}">Save</Button>
+            <Button x:Name="CancelDialogButton" Click="CancelDialogButton_Click" Margin="10,0,0,0" Width="100" IsEnabled="{Binding CanCloseDialog}">Cancel</Button>
         </StackPanel>
     </Grid>
 </UserControl>
