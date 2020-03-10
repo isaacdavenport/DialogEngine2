@@ -10,6 +10,7 @@ using System.Collections.ObjectModel;
 using System.ComponentModel;
 using System.IO;
 using System.Linq;
+using System.Speech.Synthesis;
 using System.Threading.Tasks;
 using System.Windows.Controls;
 using System.Windows.Data;
@@ -220,14 +221,18 @@ namespace DialogGenerator.UI.ViewModels
             {
                 return mPhraseValuesCollection.View;
             }
-        } 
+        }
 
         #endregion
 
+        #region Commands
         public DelegateCommand CloseCommand { get; private set; }
         public DelegateCommand AddPhraseWeightCommand { get; private set; }
         public DelegateCommand<PhraseWeight> RemovePhraseWeightCommand { get; private set; }
 
+        #endregion
+
+        #region Public methods
         public async Task SaveChanges()
         {
             if(File.Exists(FileName))
@@ -301,6 +306,10 @@ namespace DialogGenerator.UI.ViewModels
             await mCharacterDataProvider.SaveAsync(mCharacter);
         }
 
+        #endregion
+
+        #region Commands implementation
+
         private void _viewClose_Execute()
         {
             if(!string.IsNullOrEmpty(EditFileName) && File.Exists(EditFileName))
@@ -308,9 +317,7 @@ namespace DialogGenerator.UI.ViewModels
                 File.Delete(EditFileName);
             }
         }
-
-        #region Commands implementation
-
+        
         private void _bindCommands()
         {
             CloseCommand = new DelegateCommand(_viewClose_Execute, _viewClose_CanExecute);
@@ -363,7 +370,11 @@ namespace DialogGenerator.UI.ViewModels
 
         #endregion
 
+        #region Private methods
 
+       
+
+        #endregion
     }
 
     public class PhraseWeight : INotifyPropertyChanged
@@ -402,7 +413,7 @@ namespace DialogGenerator.UI.ViewModels
             {
                 PropertyChanged.Invoke(this, new PropertyChangedEventArgs(_PropertyName));
             }
-        }
+        }        
 
         private class PhraseTypesCollection
         {

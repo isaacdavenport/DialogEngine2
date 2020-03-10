@@ -711,7 +711,7 @@ namespace DialogGenerator.UI.ViewModels
             set
             {
                 mDialogStr = value;
-                if(!string.IsNullOrEmpty(mDialogStr))
+                if(!string.IsNullOrEmpty(mDialogStr) && ApplicationData.Instance.Text2SpeechEnabled)
                 {
                     _generateSpeech(mDialogStr);
                 }
@@ -720,38 +720,7 @@ namespace DialogGenerator.UI.ViewModels
             }
         }
 
-        private void _generateSpeech(string value)
-        {
-            string _outfile = string.Empty;
-
-            using(SpeechSynthesizer _synth = new SpeechSynthesizer())
-            {
-                _synth.Volume = 100;
-                _synth.Rate = -1;
-                if(_synth.GetInstalledVoices().Count() == 0)
-                {
-                    return;
-                }
-
-                if(_synth.GetInstalledVoices().Where(iv => iv.VoiceInfo.Name.Equals(ApplicationData.Instance.VoiceType)).Count() > 0)
-                {
-                    _synth.SelectVoice(ApplicationData.Instance.VoiceType);
-                }
-                
-                string _outfile_original = ApplicationData.Instance.AudioDirectory + "\\" + VoiceRecorderControlViewModel.CurrentFilePath + ".mp3";
-                _outfile = _outfile_original.Replace(".mp3", ".wav");
-                _synth.SetOutputToWaveFile(_outfile);
-                _synth.Speak(value);
-                cs_ffmpeg_mp3_converter.FFMpeg.Convert2Mp3(_outfile, _outfile_original);                
-                VoiceRecorderControlViewModel.StartPlayingCommand.RaiseCanExecuteChanged();
-                PlayInContext.RaiseCanExecuteChanged();
-            }
-
-            if(!string.IsNullOrEmpty(_outfile) && File.Exists(_outfile))
-            {
-                File.Delete(_outfile);
-            }
-        }
+        
 
         public MediaPlayerControlViewModel MediaPlayerControlViewModel
         {
@@ -770,6 +739,43 @@ namespace DialogGenerator.UI.ViewModels
             {
                 mVoiceRecorderControlViewModel = value;
                 RaisePropertyChanged();
+            }
+        }
+
+        #endregion
+
+        #region Private methods
+
+        private void _generateSpeech(string value)
+        {
+            string _outfile = string.Empty;
+
+            using (SpeechSynthesizer _synth = new SpeechSynthesizer())
+            {
+                _synth.Volume = 100;
+                _synth.Rate = -1;
+                if (_synth.GetInstalledVoices().Count() == 0)
+                {
+                    return;
+                }
+
+                if (_synth.GetInstalledVoices().Where(iv => iv.VoiceInfo.Name.Equals(ApplicationData.Instance.VoiceType)).Count() > 0)
+                {
+                    _synth.SelectVoice(ApplicationData.Instance.VoiceType);
+                }
+
+                string _outfile_original = ApplicationData.Instance.AudioDirectory + "\\" + VoiceRecorderControlViewModel.CurrentFilePath + ".mp3";
+                _outfile = _outfile_original.Replace(".mp3", ".wav");
+                _synth.SetOutputToWaveFile(_outfile);
+                _synth.Speak(value);
+                cs_ffmpeg_mp3_converter.FFMpeg.Convert2Mp3(_outfile, _outfile_original);
+                VoiceRecorderControlViewModel.StartPlayingCommand.RaiseCanExecuteChanged();
+                PlayInContext.RaiseCanExecuteChanged();
+            }
+
+            if (!string.IsNullOrEmpty(_outfile) && File.Exists(_outfile))
+            {
+                File.Delete(_outfile);
             }
         }
 

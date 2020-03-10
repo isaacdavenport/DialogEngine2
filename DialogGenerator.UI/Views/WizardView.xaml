@@ -136,7 +136,7 @@
                                 TextWrapping="Wrap"
                                 BorderThickness="2"
                                 VerticalScrollBarVisibility="Auto" 
-                                materialDesign:HintAssist.Hint="Write text for this tag..." />
+                                materialDesign:HintAssist.Hint="Write text for this tag..." SpellCheck.IsEnabled="True" />
                     </Grid>
 
                         <Grid x:Name="MediaGrid" Grid.Column="2" HorizontalAlignment="Center" 

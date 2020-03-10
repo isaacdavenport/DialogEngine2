@@ -2,6 +2,8 @@
 using DialogGenerator.UI.ViewModels;
 using MaterialDesignThemes.Wpf;
 using System.IO;
+using System.Linq;
+using System.Speech.Synthesis;
 using System.Windows;
 using System.Windows.Controls;
 
@@ -41,6 +43,39 @@ namespace DialogGenerator.UI.Views
         private void CancelDialogButton_Click(object sender, RoutedEventArgs e)
         {
             DialogHost.CloseDialogCommand.Execute(null, CancelDialogButton);
+        }
+
+        private void _generateSpeech(string value)
+        {
+            string _outfile = string.Empty;
+            EditPhraseViewModel _model = this.DataContext as EditPhraseViewModel;
+
+            using (SpeechSynthesizer _synth = new SpeechSynthesizer())
+            {
+                _synth.Volume = 100;
+                _synth.Rate = -1;
+                if (_synth.GetInstalledVoices().Count() == 0)
+                {
+                    return;
+                }
+
+                if (_synth.GetInstalledVoices().Where(iv => iv.VoiceInfo.Name.Equals(ApplicationData.Instance.VoiceType)).Count() > 0)
+                {
+                    _synth.SelectVoice(ApplicationData.Instance.VoiceType);
+                }
+
+                string _outfile_original = ApplicationData.Instance.AudioDirectory + "\\" + _model.EditFileName + ".mp3";
+                _outfile = _outfile_original.Replace(".mp3", ".wav");
+                _synth.SetOutputToWaveFile(_outfile);
+                _synth.Speak(value);
+                cs_ffmpeg_mp3_converter.FFMpeg.Convert2Mp3(_outfile, _outfile_original);
+
+            }
+
+            if (!string.IsNullOrEmpty(_outfile) && File.Exists(_outfile))
+            {
+                File.Delete(_outfile);
+            }
         }
     }
 }
