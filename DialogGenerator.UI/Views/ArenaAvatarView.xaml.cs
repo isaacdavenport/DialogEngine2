@@ -45,42 +45,45 @@ namespace DialogGenerator.UI.Views
         }
 
         private void ArenaAvatarViewModel_PropertyChanged(object sender, System.ComponentModel.PropertyChangedEventArgs e)
-        {            
-            Dispatcher.Invoke(() =>
+        {
+            try
             {
-                ArenaAvatarViewModel _model = (ArenaAvatarViewModel)sender;
-                if (e.PropertyName.Equals("Left"))
+                Dispatcher.Invoke(() =>
                 {
-                    if (_model.Left + this.Width > Session.Get<double>(Constants.ARENA_WIDTH))
+                    ArenaAvatarViewModel _model = (ArenaAvatarViewModel)sender;
+                    if (e.PropertyName.Equals("Left"))
                     {
-                        double _difference = _model.Left + this.Width - Session.Get<double>(Constants.ARENA_WIDTH);
-                        _model.Left -= (int)_difference;
+                        if (_model.Left + this.Width > Session.Get<double>(Constants.ARENA_WIDTH))
+                        {
+                            double _difference = _model.Left + this.Width - Session.Get<double>(Constants.ARENA_WIDTH);
+                            _model.Left -= (int)_difference;
+                        }
+
+                        if (_model.Left < 0)
+                        {
+                            _model.Left = 0;
+                        }
+
                     }
 
-                    if (_model.Left < 0)
+                    if (e.PropertyName.Equals("Top"))
                     {
-                        _model.Left = 0;
+                        if (_model.Top + this.Height > Session.Get<double>(Constants.ARENA_HEIGHT))
+                        {
+                            double _difference = _model.Top + this.Height - Session.Get<double>(Constants.ARENA_HEIGHT);
+                            _model.Top -= (int)_difference;
+                        }
+
+                        if (_model.Top < 0)
+                        {
+                            _model.Top = 0;
+                        }
+
                     }
-
-                }
-
-                if (e.PropertyName.Equals("Top"))
-                {
-                    if (_model.Top + this.Height > Session.Get<double>(Constants.ARENA_HEIGHT))
-                    {
-                        double _difference = _model.Top + this.Height - Session.Get<double>(Constants.ARENA_HEIGHT);
-                        _model.Top -= (int)_difference;
-                    }
-
-                    if (_model.Top < 0)
-                    {
-                        _model.Top = 0;
-                    }
-
-                }
-            });
-
-            
+                });
+            }
+            catch (System.Threading.Tasks.TaskCanceledException) { }
+                                                    
         }
 
         private void UserControl_MouseDown(object sender, MouseButtonEventArgs e)

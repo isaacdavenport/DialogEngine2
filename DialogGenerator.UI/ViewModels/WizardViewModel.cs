@@ -79,20 +79,23 @@ namespace DialogGenerator.UI.ViewModels
 
             Workflow = new WizardWorkflow(action: () => { });
             MediaPlayerControlViewModel = new MediaPlayerControlViewModel(Workflow);
-            VoiceRecorderControlViewModel = new VoiceRecorderControlViewModel(NAudioEngine.Instance,Workflow,mMessageDialogService);
+            VoiceRecorderControlViewModel = new VoiceRecorderControlViewModel(NAudioEngine.Instance,Workflow,mMessageDialogService, _eventAggregator);
 
             Workflow.PropertyChanged += _workflow_PropertyChanged;
             this.PropertyChanged += _wizardViewModel_PropertyChanged;
             _configureWorkflow();
+            _bindEvents();
             _bindCommands();
         }
+
+       
 
         #endregion
 
         #region - commands -
 
         public ICommand DialogHostLoaded { get; set; }
-        public ICommand SaveAndNext { get; set; }
+        public DelegateCommand SaveAndNext { get; set; }
         public ICommand SkipStep { get; set; }
         public DelegateCommand PlayInContext { get; set; }
         public ICommand StopPlayingInContext { get; set; }
@@ -240,6 +243,25 @@ namespace DialogGenerator.UI.ViewModels
             PlayInContext = new DelegateCommand(_playDialogLineInContext_Execute,_playInContext_CanExecute);
             StopPlayingInContext = new DelegateCommand(_stopPlayingDialogLineInContext_Execute, _stopPlayingDialogLineInContext_CanExecute);
             Cancel = new DelegateCommand(() => { Workflow.Fire(WizardTriggers.LeaveWizard); },_cancel_CanExecute);
+        }
+
+        private void _bindEvents()
+        {
+            mEventAggregator.GetEvent<RequestTranslationEvent>().Subscribe(_onTranslationRequired);
+        }
+
+        private async void _onTranslationRequired(string obj)
+        {            
+            if (!string.IsNullOrEmpty(DialogStr))
+            {
+                _generateSpeech(mDialogStr);
+                await mMessageDialogService.ShowMessage("Notification", "The sound was generated from the text box");
+                SaveAndNext.RaiseCanExecuteChanged();
+                
+            } else
+            {
+                await mMessageDialogService.ShowMessage("Error", "Since the recording was disabled, the text box should contain some meaningfull text which will be converted to speech and must not be empty!");
+            }
         }
 
         private bool _stopPlayingDialogLineInContext_CanExecute()
@@ -460,6 +482,7 @@ namespace DialogGenerator.UI.ViewModels
             CurrentWizard = null;
             CurrentStepIndex = 0;
             DialogStr = "";
+            VoiceRecorderControlViewModel.EnableRecording = true;
         }
 
         private void _leaveWizard()
@@ -701,6 +724,7 @@ namespace DialogGenerator.UI.ViewModels
             set
             {
                 mCharacter = value;
+                VoiceRecorderControlViewModel.EnableRecording = !mCharacter.HasNoVoice;
                 RaisePropertyChanged();
             }
         }
@@ -711,10 +735,10 @@ namespace DialogGenerator.UI.ViewModels
             set
             {
                 mDialogStr = value;
-                if(!string.IsNullOrEmpty(mDialogStr) && ApplicationData.Instance.Text2SpeechEnabled)
-                {
-                    _generateSpeech(mDialogStr);
-                }
+                //if(!string.IsNullOrEmpty(mDialogStr) && ApplicationData.Instance.Text2SpeechEnabled)
+                //{
+                //    _generateSpeech(mDialogStr);
+                //}
                 
                 RaisePropertyChanged();
             }

@@ -20,6 +20,7 @@ using System.Collections.ObjectModel;
 using System.ComponentModel;
 using System.IO;
 using System.Linq;
+using System.Speech.Synthesis;
 using System.Threading;
 using System.Threading.Tasks;
 using System.Windows.Input;
@@ -50,11 +51,13 @@ namespace DialogGenerator.UI.ViewModels
         private string mCurrentDialogWizard = String.Empty;
         private string mNextButtonText = "Next";
         private bool mIsFinished = false;
-
         private IBLEDataProviderFactory mBLEDataProviderFactory;
         private IBLEDataProvider mCurrentDataProvider;
         private CancellationTokenSource mCancellationTokenSource;
         private string mSelectRadioTitle = Properties.Resources.ShakeRadio;
+        private bool mHasNoVoice = false;
+        private string mVoice = string.Empty;
+        
 
         internal void SetCurrentStep(int index)
         {
@@ -112,9 +115,12 @@ namespace DialogGenerator.UI.ViewModels
             Character = new Character();   
 
             _initDialogWizards();
+            _initVoiceCollection();
+            
 
             _bindCommands();
         }
+        
 
         public List<ToyEntry> RadiosCollection
         {
@@ -160,38 +166,7 @@ namespace DialogGenerator.UI.ViewModels
                 mSelectRadioTitle = value;
                 RaisePropertyChanged();
             }
-        }
-
-        private async void _selectToyToCharacter(int oldVal = -1)
-        {
-            if (mSelectedRadio.Key == -1)
-                return;
-
-            var _oldChars = mCharacterDataProvider.GetAll().Where(c => c.RadioNum == mSelectedRadio.Key);
-            if(_oldChars.Count() > 0)
-            {
-                var _oldChar = _oldChars.First();
-                _oldChar = mCharacterDataProvider.GetAll().Where(c => c.RadioNum == mSelectedRadio.Key).First();
-                if (_oldChar != null)
-                {
-                    // izbaci message box
-                    MessageDialogResult result = await mMessageDialogService.ShowOKCancelDialogAsync(String.Format("The toy with index {0} is assigned to character {1}. Are You sure that you want to re-asign it?", mSelectedRadio.Key, _oldChar.CharacterName), "Check");
-                    if (result == MessageDialogResult.OK)
-                    {
-                        // settuj na Unassigned ako je Yes
-                        _oldChar.RadioNum = -1;
-                        await mCharacterDataProvider.SaveAsync(_oldChar);
-                    } else
-                    {
-                        mSelectedRadio = mRadiosCollection.First(p => p.Key == oldVal);
-                        RaisePropertyChanged("SelectedRadio");
-                        SelectRadioTitle = Properties.Resources.ShakeRadio;
-                    }
-                }
-            }
-            
-            Character.RadioNum = mSelectedRadio.Key;
-        }
+        }       
 
         public int WizardPassthroughIndex
         {
@@ -335,6 +310,37 @@ namespace DialogGenerator.UI.ViewModels
             }
         }
 
+        public bool CharacterHasNoVoice
+        {
+            get
+            {
+                return mHasNoVoice;
+            }
+
+            set
+            {
+                mHasNoVoice = value;
+                RaisePropertyChanged();
+            }
+        }
+
+        public string CharacterVoice
+        {
+            get
+            {
+                return mVoice;
+            }
+
+            set
+            {
+                mVoice = value;
+                RaisePropertyChanged();
+            }
+        }
+
+        public List<string> VoiceCollection { get; set; } = new List<string>();
+
+
         public List<int> AgesCollection
         {
             get
@@ -444,6 +450,7 @@ namespace DialogGenerator.UI.ViewModels
         public ICommand ViewLoadedCommand { get; set; }
         public ICommand ViewUnloadedCommand { get; set; }
         public DelegateCommand NextStepCommand { get; set; }
+        public DelegateCommand PreviewPlayCommand { get; set; }
 
         public void nextStep()
         {
@@ -477,6 +484,57 @@ namespace DialogGenerator.UI.ViewModels
                         
         }
 
+        private async void _selectToyToCharacter(int oldVal = -1)
+        {
+            if (mSelectedRadio.Key == -1)
+                return;
+
+            var _oldChars = mCharacterDataProvider.GetAll().Where(c => c.RadioNum == mSelectedRadio.Key);
+            if (_oldChars.Count() > 0)
+            {
+                var _oldChar = _oldChars.First();
+                _oldChar = mCharacterDataProvider.GetAll().Where(c => c.RadioNum == mSelectedRadio.Key).First();
+                if (_oldChar != null)
+                {
+                    // izbaci message box
+                    MessageDialogResult result = await mMessageDialogService.ShowOKCancelDialogAsync(String.Format("The toy with index {0} is assigned to character {1}. Are You sure that you want to re-asign it?", mSelectedRadio.Key, _oldChar.CharacterName), "Check");
+                    if (result == MessageDialogResult.OK)
+                    {
+                        // settuj na Unassigned ako je Yes
+                        _oldChar.RadioNum = -1;
+                        await mCharacterDataProvider.SaveAsync(_oldChar);
+                    }
+                    else
+                    {
+                        mSelectedRadio = mRadiosCollection.First(p => p.Key == oldVal);
+                        RaisePropertyChanged("SelectedRadio");
+                        SelectRadioTitle = Properties.Resources.ShakeRadio;
+                    }
+                }
+            }
+
+            Character.RadioNum = mSelectedRadio.Key;
+        }
+
+        private void _initVoiceCollection()
+        {
+
+            using (var _synth = new SpeechSynthesizer())
+            {
+                foreach (var _installedVoice in _synth.GetInstalledVoices())
+                {
+                    VoiceCollection.Add(_installedVoice.VoiceInfo.Name);
+                }
+
+                if (VoiceCollection.Count > 0)
+                {
+                    CharacterVoice = VoiceCollection[0];
+                }
+
+            }
+
+        }
+
         private void _initEntries()
         {
             CharacterName = String.Empty;
@@ -485,6 +543,12 @@ namespace DialogGenerator.UI.ViewModels
             CharacterAge = 10;
             CharacterGender = "Male";
             CharacterImage = "Avatar.png";
+            CharacterHasNoVoice = false;
+            if(VoiceCollection.Count > 0)
+            {
+                CharacterVoice = VoiceCollection[0];
+            }
+            
             CurrentStepIndex = 0;
             NextButtonText = "Next";
             WizardPassthroughIndex = 0;
@@ -538,6 +602,18 @@ namespace DialogGenerator.UI.ViewModels
             ViewLoadedCommand = new DelegateCommand(_viewLoaded_execute);
             ViewUnloadedCommand = new DelegateCommand(_viewUnloaded_execute);
             NextStepCommand = new DelegateCommand(_nextStep_Execute, _nextStep_CanExecute);
+            PreviewPlayCommand = new DelegateCommand(_previewPlayCommand);
+        }
+
+        private void _previewPlayCommand()
+        {
+            using (var _synth = new SpeechSynthesizer())
+            {
+                _synth.SelectVoice(CharacterVoice);
+                _synth.Rate = ApplicationData.Instance.SpeechRate;
+                _synth.Volume = 100;
+                _synth.Speak(CharacterVoice);
+            }
         }
 
         private bool _nextStep_CanExecute()
@@ -678,6 +754,12 @@ namespace DialogGenerator.UI.ViewModels
             {
                 case "Name":
                     Character.CharacterName = CharacterName;
+                    Character.HasNoVoice = CharacterHasNoVoice;
+                    if(CharacterHasNoVoice)
+                    {
+                        Character.Voice = CharacterVoice;
+                    }
+
                     break;
                 case "Initials":
                     Character.CharacterPrefix = CharacterPrefix;
@@ -719,6 +801,12 @@ namespace DialogGenerator.UI.ViewModels
                 case "Name":
                     CurrentStepIndex = 0;                    
                     CharacterName = Character.CharacterName;
+                    CharacterHasNoVoice = Character.HasNoVoice;
+                    if(!string.IsNullOrEmpty(Character.Voice))
+                    {
+                        CharacterVoice = CharacterVoice;
+                    }
+
                     break;
                 case "Initials":
                     CurrentStepIndex = 1;

@@ -21,6 +21,8 @@ namespace DialogGenerator.Model
         private PhraseEntry mPhraseTotals;
         private string mCharacterImage = ApplicationData.Instance.DefaultImage;
         private string mAuthor = String.Empty;
+        private bool mHasNoVoice = false;
+        private string mVoice = string.Empty;
 
         #endregion
 
@@ -143,6 +145,36 @@ namespace DialogGenerator.Model
             {
                 mAuthor = value;
                 OnPropertyChanged("Author");
+            }
+        }
+
+        [JsonProperty("HasNoVoice", NullValueHandling = NullValueHandling.Ignore)]
+        public bool HasNoVoice
+        {
+            get
+            {
+                return mHasNoVoice;
+            }
+
+            set
+            {
+                mHasNoVoice = value;
+                OnPropertyChanged("HasNoVoice");
+            }
+        }
+
+        [JsonProperty("Voice", NullValueHandling = NullValueHandling.Ignore)]
+        public string Voice
+        {
+            get
+            {
+                return mVoice;
+            }
+
+            set
+            {
+                mVoice = value;
+                OnPropertyChanged("Voice");
             }
         }
 

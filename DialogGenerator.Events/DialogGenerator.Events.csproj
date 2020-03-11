@@ -72,6 +72,7 @@
     <Compile Include="OpenDialogModeldetailViewEvent.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="RadioAssignedEvent.cs" />
+    <Compile Include="RequestTranslationEvent.cs" />
     <Compile Include="SelectedCharactersPairChangedEvent.cs" />
     <Compile Include="StopImmediatelyPlayingCurrentDialogLIne.cs" />
     <Compile Include="StopPlayingCurrentDialogLineEvent.cs" />

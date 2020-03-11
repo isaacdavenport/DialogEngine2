@@ -113,5 +113,25 @@ namespace DialogGenerator.UI.Wrapper
                 validateProperty(nameof(Author));
             }
         }
+
+        public bool HasNoVoice
+        {
+            get { return getValue<bool>(); }
+            set
+            {
+                setValue(value);
+                validateProperty(nameof(HasNoVoice));
+            }            
+        }
+
+        public string Voice
+        {
+            get { return getValue<string>(); }
+            set
+            {
+                setValue(value);
+                validateProperty(nameof(Voice));
+            }
+        }
     }
 }
