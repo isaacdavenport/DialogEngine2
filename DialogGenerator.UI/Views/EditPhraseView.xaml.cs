@@ -20,26 +20,46 @@ namespace DialogGenerator.UI.Views
             this.DataContextChanged += EditPhraseView_DataContextChanged;
         }
 
-
-
         private void EditPhraseView_DataContextChanged(object sender, DependencyPropertyChangedEventArgs e)
         {
-            ((EditPhraseViewModel)this.DataContext).PropertyChanged -= EditPhraseView_PropertyChanged;
-            ((EditPhraseViewModel)this.DataContext).PropertyChanged += EditPhraseView_PropertyChanged;          
-            SoundRecorder.FilePath = ((EditPhraseViewModel)this.DataContext).EditFileName;
+            EditPhraseViewModel _model = (EditPhraseViewModel)DataContext;
+            this.SoundRecorder.DataContext = _model.MediaRecorderControlViewModel;
+
+            _model.PropertyChanged -= EditPhraseView_PropertyChanged;
+            _model.PropertyChanged += EditPhraseView_PropertyChanged;
+
+            _model.MediaRecorderControlViewModel.FilePath = _model.EditFileName;
+
+            //SoundRecorder.FilePath = ((EditPhraseViewModel)this.DataContext).EditFileName;
         }
 
         private void EditPhraseView_PropertyChanged(object sender, System.ComponentModel.PropertyChangedEventArgs e)
         {
-            if(e.PropertyName.Equals("FileName"))
+           if(this.Dispatcher.CheckAccess())
             {
-                this.SoundRecorder.FilePath = ((EditPhraseViewModel)sender).FileName;
-            }
+                EditPhraseViewModel _model = (EditPhraseViewModel)DataContext;
+                if (e.PropertyName.Equals("FileName"))
+                {
+                    _model.MediaRecorderControlViewModel.FilePath = ((EditPhraseViewModel)sender).FileName;
+                }
+            } else
+            {
+                this.Dispatcher.Invoke(() =>
+                {
+                    EditPhraseViewModel _model = (EditPhraseViewModel)DataContext;
+                    if (e.PropertyName.Equals("FileName"))
+                    {
+                        _model.MediaRecorderControlViewModel.FilePath = ((EditPhraseViewModel)sender).FileName;
+                    }
+                });
+            }            
+
         }
 
         private async void CloseDialogButton_Click(object sender, RoutedEventArgs e)
         {
             await ((EditPhraseViewModel)DataContext).SaveChanges2();
+            ((EditPhraseViewModel)DataContext).PropertyChanged -= EditPhraseView_PropertyChanged;
             DialogHost.CloseDialogCommand.Execute(null, CloseDialogButton);
         }
 
@@ -79,6 +99,11 @@ namespace DialogGenerator.UI.Views
             {
                 File.Delete(_outfile);
             }
+        }
+
+        private void UserControl_Unloaded(object sender, RoutedEventArgs e)
+        {
+            ((EditPhraseViewModel)DataContext).UnbindEvents();
         }
     }
 }

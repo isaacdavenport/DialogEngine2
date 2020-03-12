@@ -112,12 +112,14 @@ namespace DialogGenerator.UI.ViewModels
         }
 
         private async void _editPhrase_Execute(PhraseEntry _phraseEntry)
-        {
-            EditPhraseViewModel _editPhraseViewModel = new EditPhraseViewModel(Character, _phraseEntry, mCharacterDataProvider);
+        {            
+            EditPhraseViewModel _editPhraseViewModel = new EditPhraseViewModel(Character, _phraseEntry, mCharacterDataProvider, mMessageDialogService, mEventAggregator);
             EditPhraseView _editPhraseView = new EditPhraseView();
             _editPhraseView.DataContext = _editPhraseViewModel;
 
-            await mMessageDialogService.ShowDedicatedDialogAsync<int?>(_editPhraseView);
+            await mMessageDialogService.ShowDedicatedDialogAsync<int?>(_editPhraseView, "ContentDialogHost");
+            _editPhraseView = null;
+
             mPhrasesCollectionViewSource.View?.Refresh();
         }
 

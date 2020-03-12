@@ -250,18 +250,22 @@ namespace DialogGenerator.UI.ViewModels
             mEventAggregator.GetEvent<RequestTranslationEvent>().Subscribe(_onTranslationRequired);
         }
 
-        private async void _onTranslationRequired(string obj)
+        private async void _onTranslationRequired(string _Caller)
         {            
-            if (!string.IsNullOrEmpty(DialogStr))
+            if(_Caller.Equals("VoiceRecorderControlViewModel"))
             {
-                _generateSpeech(mDialogStr);
-                await mMessageDialogService.ShowMessage("Notification", "The sound was generated from the text box");
-                SaveAndNext.RaiseCanExecuteChanged();
-                
-            } else
-            {
-                await mMessageDialogService.ShowMessage("Error", "Since the recording was disabled, the text box should contain some meaningfull text which will be converted to speech and must not be empty!");
-            }
+                if (!string.IsNullOrEmpty(DialogStr))
+                {
+                    _generateSpeech(mDialogStr);
+                    await mMessageDialogService.ShowMessage("Notification", "The sound was generated from the text box");
+                    SaveAndNext.RaiseCanExecuteChanged();
+
+                }
+                else
+                {
+                    await mMessageDialogService.ShowMessage("Error", "Since the recording was disabled, the text box should contain some meaningfull text which will be converted to speech and must not be empty!");
+                }
+            }            
         }
 
         private bool _stopPlayingDialogLineInContext_CanExecute()

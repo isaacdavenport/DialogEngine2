@@ -1,9 +1,12 @@
 ﻿using DialogGenerator.Core;
 using DialogGenerator.DataAccess.Helper;
+using DialogGenerator.Events;
 using DialogGenerator.Model;
 using DialogGenerator.UI.Data;
+using DialogGenerator.Utilities;
 using Newtonsoft.Json;
 using Prism.Commands;
+using Prism.Events;
 using Prism.Mvvm;
 using System;
 using System.Collections.ObjectModel;
@@ -25,6 +28,8 @@ namespace DialogGenerator.UI.ViewModels
         private string mEditFileName;
         private string mPhraseWeights = string.Empty;
         private ICharacterDataProvider mCharacterDataProvider;
+        private IEventAggregator mEventAggregator;
+        private IMessageDialogService mMessageDialogService;
         private Character mCharacter;
         private CollectionViewSource mPhraseWeightsCollection;
         private ObservableCollection<PhraseWeight> mWeights = new ObservableCollection<PhraseWeight>();
@@ -36,12 +41,22 @@ namespace DialogGenerator.UI.ViewModels
         private bool mIsRecording = false;
         private bool mCanCloseDialog = true;
 
-        public EditPhraseViewModel(Character _Character, PhraseEntry _PhraseEntry, ICharacterDataProvider _CharacterDataProvider)
+        public EditPhraseViewModel(Character _Character
+            , PhraseEntry _PhraseEntry
+            , ICharacterDataProvider _CharacterDataProvider
+            , IMessageDialogService _MessageDialogService 
+            , IEventAggregator _EventAggregator)
         {
             mPhraseEntry = _PhraseEntry;
             DialogLineText = mPhraseEntry.DialogStr;
             mCharacterDataProvider = _CharacterDataProvider;
             mCharacter = _Character;
+            mMessageDialogService = _MessageDialogService;
+            mEventAggregator = _EventAggregator;
+
+            MediaRecorderControlViewModel = new MediaRecorderControlViewModel(NAudioEngine.Instance, _MessageDialogService, _EventAggregator);
+            MediaRecorderControlViewModel.PropertyChanged += MediaRecorderControlViewModel_PropertyChanged;
+            MediaRecorderControlViewModel.RecordingEnabled = !_Character.HasNoVoice;
 
             FileName = Path.Combine(ApplicationData.Instance.AudioDirectory, _Character.CharacterPrefix + "_" + mPhraseEntry.FileName + ".mp3");
             EditFileName = Path.Combine(ApplicationData.Instance.AudioDirectory, _Character.CharacterPrefix + "_" + mPhraseEntry.FileName + "_edit.mp3");
@@ -89,14 +104,15 @@ namespace DialogGenerator.UI.ViewModels
 
             mPhraseTypesCollection = new CollectionViewSource();
             mPhraseValuesCollection = new CollectionViewSource();
-            
+
+            _bindEvents();
             _bindCommands();
 
-        }
-
-
+        }        
 
         #region Properties
+
+        public MediaRecorderControlViewModel MediaRecorderControlViewModel { get; set; }
 
         public bool CanCloseDialog
         {
@@ -318,13 +334,6 @@ namespace DialogGenerator.UI.ViewModels
             }
         }
         
-        private void _bindCommands()
-        {
-            CloseCommand = new DelegateCommand(_viewClose_Execute, _viewClose_CanExecute);
-            AddPhraseWeightCommand = new DelegateCommand(_addPhraseWeight_Execute, _addPhraseWeight_CanExecute);
-            RemovePhraseWeightCommand = new DelegateCommand<PhraseWeight>(_removePhraseWeight_Execute, _removePhraseWeight_CanExecute);
-        }
-
         private bool _viewClose_CanExecute()
         {
             return (!mIsPlaying && !mIsRecording);
@@ -350,15 +359,7 @@ namespace DialogGenerator.UI.ViewModels
             mPhraseWeightsCollection.View?.Refresh();
             AddPhraseWeightCommand.RaiseCanExecuteChanged();
             RemovePhraseWeightCommand.RaiseCanExecuteChanged();
-        }
-
-        private void _phraseWeight_PropertyChanged(object sender, PropertyChangedEventArgs e)
-        {
-            if(e.PropertyName.Equals("Key"))
-            {
-                AddPhraseWeightCommand.RaiseCanExecuteChanged();
-            }
-        }
+        }        
 
         private void _removePhraseWeight_Execute(PhraseWeight _phraseWeight)
         {
@@ -370,9 +371,93 @@ namespace DialogGenerator.UI.ViewModels
 
         #endregion
 
-        #region Private methods
+        #region Private methods and event handlers
 
-       
+        private void _bindCommands()
+        {
+            CloseCommand = new DelegateCommand(_viewClose_Execute, _viewClose_CanExecute);
+            AddPhraseWeightCommand = new DelegateCommand(_addPhraseWeight_Execute, _addPhraseWeight_CanExecute);
+            RemovePhraseWeightCommand = new DelegateCommand<PhraseWeight>(_removePhraseWeight_Execute, _removePhraseWeight_CanExecute);
+        }
+
+        private void _bindEvents()
+        {
+            mEventAggregator.GetEvent<RequestTranslationEvent>().Subscribe(_onTranslationRequired);
+        }
+
+        public void UnbindEvents()
+        {
+            mEventAggregator.GetEvent<RequestTranslationEvent>().Unsubscribe(_onTranslationRequired);
+        }
+
+        private void MediaRecorderControlViewModel_PropertyChanged(object sender, PropertyChangedEventArgs e)
+        {
+            if (e.PropertyName.Equals("IsPlaying") || e.PropertyName.Equals("IsRecording"))
+            {
+                CanCloseDialog = !MediaRecorderControlViewModel.IsPlaying && !MediaRecorderControlViewModel.IsRecording;
+            }
+        }
+
+        private void _onTranslationRequired(string _Caller)
+        {
+            if(_Caller.Equals("MediaRecorderControlViewModel"))
+            {
+                if (!string.IsNullOrEmpty(DialogLineText))
+                {
+                    _generateSpeech(DialogLineText);
+                    mMessageDialogService.ShowMessage("Notification", "The sound was generated from the text box");
+                }
+                else
+                {
+                    mMessageDialogService.ShowMessage("Error"
+                        , "Since the recording was disabled, the text box should contain some meaningfull text which will be converted to speech and must not be empty!");
+
+
+                }
+            }
+            
+        }
+
+        private void _phraseWeight_PropertyChanged(object sender, PropertyChangedEventArgs e)
+        {
+            if (e.PropertyName.Equals("Key"))
+            {
+                AddPhraseWeightCommand.RaiseCanExecuteChanged();
+            }
+        }
+
+        private void _generateSpeech(string value)
+        {
+            string _outfile = string.Empty;
+
+            using (SpeechSynthesizer _synth = new SpeechSynthesizer())
+            {
+                _synth.Volume = 100;
+                _synth.Rate = mCharacter.SpeechRate;
+                if (_synth.GetInstalledVoices().Count() == 0)
+                {
+                    return;
+                }
+
+                if (_synth.GetInstalledVoices().Where(iv => iv.VoiceInfo.Name.Equals(mCharacter.Voice)).Count() > 0)
+                {
+                    _synth.SelectVoice(mCharacter.Voice);
+                }
+
+                string _outfile_original = MediaRecorderControlViewModel.FilePath;
+                _outfile = _outfile_original.Replace(".mp3", ".wav");
+                _synth.SetOutputToWaveFile(_outfile);
+                _synth.Speak(value);
+                cs_ffmpeg_mp3_converter.FFMpeg.Convert2Mp3(_outfile, _outfile_original);
+                MediaRecorderControlViewModel.StartPlayingFileCommand.RaiseCanExecuteChanged();
+                
+            }
+
+            if (!string.IsNullOrEmpty(_outfile) && File.Exists(_outfile))
+            {
+                File.Delete(_outfile);
+            }
+        }
 
         #endregion
     }

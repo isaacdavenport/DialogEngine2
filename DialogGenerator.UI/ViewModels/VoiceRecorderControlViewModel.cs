@@ -59,7 +59,7 @@ namespace DialogGenerator.UI.ViewModels
 
         #endregion
 
-        #region Properties
+        #region - properties -
 
         public bool EnableRecording
         {
@@ -71,6 +71,40 @@ namespace DialogGenerator.UI.ViewModels
             set
             {
                 mEnableRecording = value;
+                RaisePropertyChanged();
+            }
+        }
+
+        public MP3RecorderStateMachine StateMachine { get; set; }
+
+        public WizardWorkflow WizardWorkflow
+        {
+            get { return mWizardWorkflow; }
+            set
+            {
+                mWizardWorkflow = value;
+            }
+        }
+
+        public NAudioEngine SoundPlayer
+        {
+            get { return mSoundPlayer; }
+            set
+            {
+                mSoundPlayer = value;
+                RaisePropertyChanged();
+            }
+        }
+
+        /// <summary>
+        /// Path of last recorded .mp3 file
+        /// </summary>
+        public string CurrentFilePath
+        {
+            get { return mCurrentFilePath; }
+            set
+            {
+                mCurrentFilePath = value;
                 RaisePropertyChanged();
             }
         }
@@ -291,7 +325,7 @@ namespace DialogGenerator.UI.ViewModels
                 StateMachine.Fire(Triggers.Record);
             } else
             {
-                mEventAggregator.GetEvent<RequestTranslationEvent>().Publish(string.Empty);
+                mEventAggregator.GetEvent<RequestTranslationEvent>().Publish(this.GetType().Name);
             }
             
         }
@@ -328,42 +362,6 @@ namespace DialogGenerator.UI.ViewModels
 
         #endregion
 
-        #region - properties -
-
-        public MP3RecorderStateMachine StateMachine { get; set; }
-
-        public WizardWorkflow WizardWorkflow
-        {
-            get { return mWizardWorkflow; }
-            set
-            {
-                mWizardWorkflow = value;
-            }
-        }
-
-        public NAudioEngine SoundPlayer
-        {
-            get { return mSoundPlayer; }
-            set
-            {
-                mSoundPlayer = value;
-                RaisePropertyChanged();
-            }
-        }
-
-        /// <summary>
-        /// Path of last recorded .mp3 file
-        /// </summary>
-        public string CurrentFilePath
-        {
-            get { return mCurrentFilePath; }
-            set
-            {
-                mCurrentFilePath = value;
-                RaisePropertyChanged();
-            }
-        }
-
-        #endregion
+        
     }
 }
