@@ -19,6 +19,7 @@ using System.ComponentModel;
 using System.Diagnostics;
 using System.IO;
 using System.Linq;
+using System.Speech.Synthesis;
 using System.Text.RegularExpressions;
 using System.Threading;
 using System.Threading.Tasks;
@@ -52,6 +53,7 @@ namespace DialogGenerator.UI.ViewModels
         private IBLEDataProviderFactory mBLEDataProviderFactory;
         private IBLEDataProvider mCurrentDataProvider;
         private CancellationTokenSource mCancellationTokenSource;
+
         #endregion
 
         #region -constructor-
@@ -76,6 +78,14 @@ namespace DialogGenerator.UI.ViewModels
             mEventAggregator.GetEvent<OpenCharacterDetailViewEvent>().Subscribe(_onOpenCharacterDetailView);
             mEventAggregator.GetEvent<CharacterSelectionActionChangedEvent>().Subscribe(_onCharacterSelectionActionChanged);
             mEventAggregator.GetEvent<CharacterStructureChangedEvent>().Subscribe(_onCharacterStructureChanged);
+
+            using (var _synth = new SpeechSynthesizer())
+            {
+                foreach(var _voice in _synth.GetInstalledVoices())
+                {
+                    VoicesCollection.Add(_voice.VoiceInfo.Name);
+                }
+            }
 
             _bindCommands();
         }       
@@ -653,6 +663,8 @@ namespace DialogGenerator.UI.ViewModels
                 RaisePropertyChanged();
             }
         }
+
+        public List<string> VoicesCollection { get; set; } = new List<string>();
 
         public List<int> AgeValues { get; set; } = new List<int>(Enumerable.Range(2, 100));
 

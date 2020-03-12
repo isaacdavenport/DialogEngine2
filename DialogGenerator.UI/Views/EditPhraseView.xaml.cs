@@ -17,11 +17,14 @@ namespace DialogGenerator.UI.Views
         public EditPhraseView()
         {
             InitializeComponent();
-            this.DataContextChanged += EditPhraseView_DataContextChanged;            
+            this.DataContextChanged += EditPhraseView_DataContextChanged;
         }
+
+
 
         private void EditPhraseView_DataContextChanged(object sender, DependencyPropertyChangedEventArgs e)
         {
+            ((EditPhraseViewModel)this.DataContext).PropertyChanged -= EditPhraseView_PropertyChanged;
             ((EditPhraseViewModel)this.DataContext).PropertyChanged += EditPhraseView_PropertyChanged;          
             SoundRecorder.FilePath = ((EditPhraseViewModel)this.DataContext).EditFileName;
         }

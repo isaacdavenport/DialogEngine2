@@ -133,5 +133,16 @@ namespace DialogGenerator.UI.Wrapper
                 validateProperty(nameof(Voice));
             }
         }
+
+        public int SpeechRate
+        {
+            get { return getValue<int>(); }
+            set
+            {
+                setValue(value);
+                validateProperty(nameof(SpeechRate));
+            }
+        }
+        
     }
 }

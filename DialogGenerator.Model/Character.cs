@@ -23,6 +23,7 @@ namespace DialogGenerator.Model
         private string mAuthor = String.Empty;
         private bool mHasNoVoice = false;
         private string mVoice = string.Empty;
+        private int mSpeechRate = -1;
 
         #endregion
 
@@ -175,6 +176,20 @@ namespace DialogGenerator.Model
             {
                 mVoice = value;
                 OnPropertyChanged("Voice");
+            }
+        }
+
+        [JsonProperty("SpeechRate", NullValueHandling = NullValueHandling.Ignore)]
+        public int SpeechRate { 
+            get
+            {
+                return mSpeechRate;
+            }
+
+            set
+            {
+                mSpeechRate = value;
+                OnPropertyChanged("SpeechRate");
             }
         }
 

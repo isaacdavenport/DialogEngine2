@@ -33,6 +33,7 @@ namespace DialogGenerator.UI.Controls
         public static readonly DependencyProperty StopRecordingBtnVisibilityProperty = DependencyProperty.Register("StopRecordingBtnVisibility", typeof(Visibility), typeof(MediaRecorderControl), new UIPropertyMetadata(Visibility.Collapsed));
         public static readonly DependencyProperty IsPlayingProperty = DependencyProperty.Register("IsPlaying", typeof(bool), typeof(MediaRecorderControl), new UIPropertyMetadata(false));
         public static readonly DependencyProperty IsRecordingProperty = DependencyProperty.Register("IsRecording", typeof(bool), typeof(MediaRecorderControl), new UIPropertyMetadata(false));
+        public static readonly DependencyProperty RecordingEnabledProperty = DependencyProperty.Register("RecordingEnabled", typeof(bool), typeof(MediaRecorderControl), new UIPropertyMetadata(true));
 
         public event PropertyChangedEventHandler PropertyChanged;
 
@@ -103,6 +104,15 @@ namespace DialogGenerator.UI.Controls
         {
             get { return (bool)GetValue(IsRecordingProperty); }
             set { SetValue(IsRecordingProperty, value); }
+        }
+
+        public bool RecordingEnabled
+        {
+            get { return (bool)GetValue(RecordingEnabledProperty); }
+            set
+            {
+                SetValue(RecordingEnabledProperty, value);
+            }
         }
 
         public bool HasFileName
@@ -193,7 +203,11 @@ namespace DialogGenerator.UI.Controls
 
         private void _startRecording_Execute()
         {
-            SoundPlayer.StartRecording(FilePath);
+            if(RecordingEnabled)
+            {
+                SoundPlayer.StartRecording(FilePath);
+            }
+            
         }
 
         #endregion
