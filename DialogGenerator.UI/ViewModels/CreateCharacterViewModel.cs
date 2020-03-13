@@ -57,6 +57,7 @@ namespace DialogGenerator.UI.ViewModels
         private string mSelectRadioTitle = Properties.Resources.ShakeRadio;
         private bool mHasNoVoice = false;
         private string mVoice = string.Empty;
+        private int mSpeechRate = -1;
         
 
         internal void SetCurrentStep(int index)
@@ -334,6 +335,20 @@ namespace DialogGenerator.UI.ViewModels
             set
             {
                 mVoice = value;
+                RaisePropertyChanged();
+            }
+        }
+
+        public int CharacterSpeechRate
+        {
+            get
+            {
+                return mSpeechRate;
+            }
+
+            set
+            {
+                mSpeechRate = value;
                 RaisePropertyChanged();
             }
         }
@@ -760,6 +775,7 @@ namespace DialogGenerator.UI.ViewModels
                         Character.Voice = CharacterVoice;
                     }
 
+                    Character.SpeechRate = CharacterSpeechRate;
                     break;
                 case "Initials":
                     Character.CharacterPrefix = CharacterPrefix;
@@ -806,6 +822,8 @@ namespace DialogGenerator.UI.ViewModels
                     {
                         CharacterVoice = CharacterVoice;
                     }
+
+                    CharacterSpeechRate = Character.SpeechRate;
 
                     break;
                 case "Initials":

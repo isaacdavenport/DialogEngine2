@@ -39,7 +39,7 @@
                     Command="{Binding StopPlayingFileCommand}" Visibility="{Binding StopBtnVisibility}" >
                 <materialDesign:PackIcon Kind="Stop" />
             </Button>
-            <Button x:Name="RecordBtn" Margin="10,10,10,10" Command="{Binding StartRecordingCommand}" Width="25" Height="25" Visibility="{Binding StartRecordingBtnVisibility}">
+            <Button x:Name="RecordBtn" Margin="10,10,10,10" Command="{Binding StartRecordingCommand}" Width="25" Height="25" Visibility="{Binding StartRecordingBtnVisibility}" Foreground="Red">
                 <materialDesign:PackIcon Kind="RecordRec" />
             </Button>
             <Button x:Name="StopRecordingBtn" Margin="10,10,10,10" Width="25" Height="25"                     
