@@ -53,10 +53,10 @@ namespace DialogGenerator.UI.Views
                     ArenaAvatarViewModel _model = (ArenaAvatarViewModel)sender;
                     if (e.PropertyName.Equals("Left"))
                     {
-                        if (_model.Left + this.Width > Session.Get<double>(Constants.ARENA_WIDTH))
+                        if (_model.Left + this.ActualWidth > Session.Get<double>(Constants.ARENA_WIDTH))
                         {
-                            double _difference = _model.Left + this.Width - Session.Get<double>(Constants.ARENA_WIDTH);
-                            _model.Left -= (int)_difference;
+                            double _difference = _model.Left + this.ActualWidth - Session.Get<double>(Constants.ARENA_WIDTH);
+                            _model.Left -= ((int)_difference + 5);
                         }
 
                         if (_model.Left < 0)
@@ -68,10 +68,10 @@ namespace DialogGenerator.UI.Views
 
                     if (e.PropertyName.Equals("Top"))
                     {
-                        if (_model.Top + this.Height > Session.Get<double>(Constants.ARENA_HEIGHT))
+                        if (_model.Top + this.ActualHeight > Session.Get<double>(Constants.ARENA_HEIGHT))
                         {
-                            double _difference = _model.Top + this.Height - Session.Get<double>(Constants.ARENA_HEIGHT);
-                            _model.Top -= (int)_difference;
+                            double _difference = _model.Top + this.ActualHeight - Session.Get<double>(Constants.ARENA_HEIGHT);
+                            _model.Top -= ((int)_difference + 5);
                         }
 
                         if (_model.Top < 0)

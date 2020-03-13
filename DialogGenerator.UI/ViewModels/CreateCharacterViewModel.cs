@@ -610,7 +610,7 @@ namespace DialogGenerator.UI.ViewModels
             using (var _synth = new SpeechSynthesizer())
             {
                 _synth.SelectVoice(CharacterVoice);
-                _synth.Rate = ApplicationData.Instance.SpeechRate;
+                _synth.Rate = -1;
                 _synth.Volume = 100;
                 _synth.Speak(CharacterVoice);
             }

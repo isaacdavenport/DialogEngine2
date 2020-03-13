@@ -108,19 +108,6 @@ namespace DialogGenerator.Core
         public bool TextDialogsOn { get; set; } = true;
 
         [Editable(true)]
-        [Description("Enables text to speech.")]
-        [DisplayName("Enable text to speech:")]
-        public bool Text2SpeechEnabled { get; set; } = false;
-
-        [Editable(true)]
-        [DisplayName("Speech rate:")]
-        public int SpeechRate { get; set; } = -1;
-
-        [Editable(true)]
-        [DisplayName("Voice type:")]
-        public string VoiceType { get; set; } = "Microsoft Hazel Desktop";
-
-        [Editable(true)]
         [Description("Override radio signal checking")]
         [DisplayName("Ignore radio signals:")]
         public bool IgnoreRadioSignals { get; set; } = false;

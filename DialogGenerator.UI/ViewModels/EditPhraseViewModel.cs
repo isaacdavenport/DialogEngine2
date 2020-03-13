@@ -332,6 +332,8 @@ namespace DialogGenerator.UI.ViewModels
             {
                 File.Delete(EditFileName);
             }
+
+            mEventAggregator.GetEvent<RequestTranslationEvent>().Unsubscribe(_onTranslationRequired);
         }
         
         private bool _viewClose_CanExecute()
@@ -385,10 +387,10 @@ namespace DialogGenerator.UI.ViewModels
             mEventAggregator.GetEvent<RequestTranslationEvent>().Subscribe(_onTranslationRequired);
         }
 
-        public void UnbindEvents()
-        {
-            mEventAggregator.GetEvent<RequestTranslationEvent>().Unsubscribe(_onTranslationRequired);
-        }
+        //public void UnbindEvents()
+        //{
+        //    mEventAggregator.GetEvent<RequestTranslationEvent>().Unsubscribe(_onTranslationRequired);
+        //}
 
         private void MediaRecorderControlViewModel_PropertyChanged(object sender, PropertyChangedEventArgs e)
         {

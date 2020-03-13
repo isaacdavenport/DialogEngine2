@@ -41,6 +41,11 @@ namespace DialogGenerator.UI.ViewModels
             IsPlaying = false;
             IsRecording = false;
 
+            PlayBtnVisibility = Visibility.Visible;
+            StopBtnVisibility = Visibility.Collapsed;
+            StartRecordingBtnVisibility = Visibility.Visible;
+            StopRecordingBtnVisibility = Visibility.Collapsed;
+
             _bindCommands();
         }        
 
@@ -213,7 +218,7 @@ namespace DialogGenerator.UI.ViewModels
             StopRecordingCommand = new DelegateCommand(_stopRecordingCommand_Execute);
         }
 
-        
+
         private bool _startPlayingCommand_CanExecute()
         {
             return !string.IsNullOrEmpty(FilePath) && File.Exists(FilePath);

@@ -543,6 +543,9 @@ namespace DialogGenerator.UI.ViewModels
                 mLogger.Error("_saveCommand_Execute " + ex.Message);
                 await mMessageDialogService.ShowMessage("Error", "Error occured during saving character. Please try again.");
             }
+
+            await mMessageDialogService.ShowMessage("INFO", "The character data has been saved. The speech settings are not " +
+                "transfered automatically to the existing dialog lines. They will be applied only in the moment when the new dialog lines will be recorded.");
         }
 
         private void _onOpenCharacterDetailView(string _characterPrefix)
