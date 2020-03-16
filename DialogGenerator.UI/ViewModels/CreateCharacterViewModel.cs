@@ -1217,6 +1217,7 @@ namespace DialogGenerator.UI.ViewModels
 
                 System.Windows.Forms.OpenFileDialog _openFileDialog = new System.Windows.Forms.OpenFileDialog();
                 _openFileDialog.Filter = "Image files (*.jpg, *.jpeg, *.jpe, *.jfif, *.png) | *.jpg; *.jpeg; *.jpe; *.jfif; *.png";
+                _openFileDialog.InitialDirectory = ApplicationData.Instance.ImagesDirectory;
 
                 if (_openFileDialog.ShowDialog() != System.Windows.Forms.DialogResult.OK)
                     return;

@@ -13,6 +13,7 @@ using Prism.Events;
 using Prism.Mvvm;
 using Prism.Regions;
 using System;
+using System.Collections.Generic;
 using System.ComponentModel;
 using System.IO;
 using System.Linq;
@@ -617,9 +618,15 @@ namespace DialogGenerator.UI.ViewModels
             {
                 PhraseRating = CurrentTutorialStep.PhraseRating,
                 DialogStr = DialogStr,
-                PhraseWeights = CurrentTutorialStep.PhraseWeights, 
+                PhraseWeights = new Dictionary<string,double>(), 
                 FileName = $"{_fileNameParts[_fileNameParts.Length-2]}_{_fileNameParts.Last()}"
             };
+
+            foreach(KeyValuePair<string, double> entry in CurrentTutorialStep.PhraseWeights)
+            {
+                _phraseEntry.PhraseWeights.Add(entry.Key, entry.Value);
+            }
+
 
             //by adding the mp3 filename for a phrase as a phraseweight we can access an exact phrase
             // from an existing character without editing that character, for instance a built in character
