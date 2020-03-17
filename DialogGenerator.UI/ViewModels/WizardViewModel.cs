@@ -283,6 +283,9 @@ namespace DialogGenerator.UI.ViewModels
         {
             try
             {
+                if (CurrentTutorialStep == null)
+                    return false;
+
                 var dialogs = CurrentTutorialStep.PlayUserRecordedAudioInContext;
 
                 foreach (var dialog in dialogs)
