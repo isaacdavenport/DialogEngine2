@@ -307,7 +307,7 @@ namespace DialogGenerator.UI.ViewModels
         {
             try
             {
-                return (CurrentStepIndex < CurrentWizard.TutorialSteps.Count - 1)
+                return (CurrentWizard != null && CurrentStepIndex < CurrentWizard.TutorialSteps.Count - 1)
                         && Workflow.State == WizardStates.WaitingForUserAction;
             }
             catch (Exception) { }
