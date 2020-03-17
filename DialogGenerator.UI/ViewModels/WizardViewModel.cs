@@ -249,6 +249,15 @@ namespace DialogGenerator.UI.ViewModels
         private void _bindEvents()
         {
             mEventAggregator.GetEvent<RequestTranslationEvent>().Subscribe(_onTranslationRequired);
+            mEventAggregator.GetEvent<SpeechConvertedEvent>().Subscribe(_onSpeechRecognized);
+        }
+
+        private void _onSpeechRecognized(string _recognizedText)
+        {
+            if(string.IsNullOrEmpty(DialogStr))
+            {
+                DialogStr = _recognizedText;
+            }
         }
 
         private async void _onTranslationRequired(string _Caller)

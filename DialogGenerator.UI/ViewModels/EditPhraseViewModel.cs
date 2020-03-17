@@ -334,6 +334,7 @@ namespace DialogGenerator.UI.ViewModels
             }
 
             mEventAggregator.GetEvent<RequestTranslationEvent>().Unsubscribe(_onTranslationRequired);
+            mEventAggregator.GetEvent<SpeechConvertedEvent>().Unsubscribe(_onSpeechRecognized);
         }
         
         private bool _viewClose_CanExecute()
@@ -385,6 +386,15 @@ namespace DialogGenerator.UI.ViewModels
         private void _bindEvents()
         {
             mEventAggregator.GetEvent<RequestTranslationEvent>().Subscribe(_onTranslationRequired);
+            mEventAggregator.GetEvent<SpeechConvertedEvent>().Subscribe(_onSpeechRecognized);
+        }
+
+        private void _onSpeechRecognized(string _recognizedText)
+        {
+            if(string.IsNullOrEmpty(DialogLineText))
+            {
+                DialogLineText = _recognizedText;
+            }
         }
 
         //public void UnbindEvents()

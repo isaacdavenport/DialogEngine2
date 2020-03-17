@@ -74,6 +74,7 @@
     <Compile Include="RadioAssignedEvent.cs" />
     <Compile Include="RequestTranslationEvent.cs" />
     <Compile Include="SelectedCharactersPairChangedEvent.cs" />
+    <Compile Include="SpeechConvertedEvent.cs" />
     <Compile Include="StopImmediatelyPlayingCurrentDialogLIne.cs" />
     <Compile Include="StopPlayingCurrentDialogLineEvent.cs" />
     <Compile Include="ViewRequestEvent.cs" />

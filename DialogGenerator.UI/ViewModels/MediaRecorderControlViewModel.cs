@@ -7,6 +7,7 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using System.Speech.Recognition;
 using System.Text;
 using System.Threading.Tasks;
 using System.Windows;
@@ -26,6 +27,7 @@ namespace DialogGenerator.UI.ViewModels
         Visibility mStopBtnVisibility;
         Visibility mStartRecordingBtnVisibility;
         Visibility mStopRecordingBtnVisibility;
+        SpeechRecognitionEngine mSpeechRecognizer;
 
 
         public MediaRecorderControlViewModel(NAudioEngine _Player
@@ -187,6 +189,8 @@ namespace DialogGenerator.UI.ViewModels
         public DelegateCommand StopPlayingFileCommand { get; set; }
         public DelegateCommand StartRecordingCommand { get; set; }
         public DelegateCommand StopRecordingCommand { get; set; }
+        public DelegateCommand LoadedCommand { get; set; }
+        public DelegateCommand UnloadedCommand { get; set; }
 
         #endregion
 
@@ -216,8 +220,27 @@ namespace DialogGenerator.UI.ViewModels
             StopPlayingFileCommand = new DelegateCommand(_stopPlayingCommand_Execute);
             StartRecordingCommand = new DelegateCommand(_startRecordingCommand_Execute, _startRecordingCommand_CanExecute);
             StopRecordingCommand = new DelegateCommand(_stopRecordingCommand_Execute);
+            LoadedCommand = new DelegateCommand(_onLoaded_Execute);
+            UnloadedCommand = new DelegateCommand(_onUnloadedExecute);
         }
 
+        private void _onUnloadedExecute()
+        {
+            mSpeechRecognizer.SpeechRecognized -= MSpeechRecognizer_SpeechRecognized;
+        }
+
+        private void _onLoaded_Execute()
+        {
+            mSpeechRecognizer = new SpeechRecognitionEngine(System.Globalization.CultureInfo.GetCultureInfo("en-US"));
+            mSpeechRecognizer.LoadGrammar(new DictationGrammar());
+            mSpeechRecognizer.SetInputToDefaultAudioDevice();
+            mSpeechRecognizer.SpeechRecognized += MSpeechRecognizer_SpeechRecognized;
+        }
+
+        private void MSpeechRecognizer_SpeechRecognized(object sender, SpeechRecognizedEventArgs e)
+        {
+            mEventAggregator.GetEvent<SpeechConvertedEvent>().Publish(e.Result.Text);
+        }
 
         private bool _startPlayingCommand_CanExecute()
         {
@@ -240,6 +263,7 @@ namespace DialogGenerator.UI.ViewModels
         {
             if (RecordingEnabled)
             {
+                mSpeechRecognizer.RecognizeAsync(RecognizeMode.Multiple);
                 SoundPlayer.StartRecording(FilePath);
             } else
             {
@@ -255,6 +279,7 @@ namespace DialogGenerator.UI.ViewModels
         private void _stopRecordingCommand_Execute()
         {
             SoundPlayer.StopRecording();
+            mSpeechRecognizer.RecognizeAsyncStop();
         }
 
 

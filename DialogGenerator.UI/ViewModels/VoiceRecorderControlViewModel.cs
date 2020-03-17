@@ -9,6 +9,7 @@ using Prism.Mvvm;
 using System;
 using System.ComponentModel;
 using System.IO;
+using System.Speech.Recognition;
 using System.Threading;
 using System.Windows;
 using System.Windows.Input;
@@ -28,6 +29,7 @@ namespace DialogGenerator.UI.ViewModels
         private readonly Timer mTimer;
         private bool mEnableRecording = true;
         private IEventAggregator mEventAggregator;
+        private SpeechRecognitionEngine mSoundRecognizer;
 
         #endregion
 
@@ -224,6 +226,24 @@ namespace DialogGenerator.UI.ViewModels
 
         #region - private functions -
 
+        private void _loadSoundEngine()
+        {
+            mSoundRecognizer = new SpeechRecognitionEngine(System.Globalization.CultureInfo.GetCultureInfo("en-US"));
+            mSoundRecognizer.LoadGrammar(new DictationGrammar());
+            mSoundRecognizer.SetInputToDefaultAudioDevice();
+            mSoundRecognizer.SpeechRecognized += MSoundRecognizer_SpeechRecognized;
+        }
+
+        private void _unloadSoundEngine()
+        {
+            mSoundRecognizer.SpeechRecognized -= MSoundRecognizer_SpeechRecognized;
+        }
+
+        private void MSoundRecognizer_SpeechRecognized(object sender, SpeechRecognizedEventArgs e)
+        {
+            mEventAggregator.GetEvent<SpeechConvertedEvent>().Publish(e.Result.Text);
+        }
+       
         private void _configureStateMachine()
         {
             StateMachine.Configure(States.Idle)
@@ -260,11 +280,12 @@ namespace DialogGenerator.UI.ViewModels
 
         private void _unloaded_Execute()
         {
-            mSoundPlayer.PropertyChanged -= _soundPlayer_PropertyChanged;
+            _unloadSoundEngine();
         }
 
         private void _loaded_Execute()
         {
+            _loadSoundEngine();
             mSoundPlayer.PropertyChanged += _soundPlayer_PropertyChanged;
         }
 
@@ -322,6 +343,7 @@ namespace DialogGenerator.UI.ViewModels
         { 
             if(EnableRecording)
             {
+                mSoundRecognizer.RecognizeAsync(RecognizeMode.Multiple);
                 StateMachine.Fire(Triggers.Record);
             } else
             {
@@ -346,6 +368,7 @@ namespace DialogGenerator.UI.ViewModels
                         mTimer.Change(Timeout.Infinite, Timeout.Infinite);
                         mSoundPlayer.StopRecording();                                                    
                         StateMachine.Fire(Triggers.On);
+                        mSoundRecognizer.RecognizeAsyncStop();
                         break;
                     }
                 case States.Playing:
