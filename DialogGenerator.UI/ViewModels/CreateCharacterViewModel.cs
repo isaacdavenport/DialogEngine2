@@ -577,19 +577,29 @@ namespace DialogGenerator.UI.ViewModels
 
         private string _getCharacterInitials()
         {
-            if (String.IsNullOrEmpty(mCharacterName))
+            if (String.IsNullOrEmpty(mCharacterName) || mCharacterName.Length <= 3)
                 return String.Empty;
 
-            String[] tokens = mCharacterName.Split(' ');
+            String[] _tokens = mCharacterName.Split(' ');
+            List<string> _nonEmptyTokens = _tokens.Where(t => !string.IsNullOrEmpty(t)).ToList();
             String result = String.Empty;
-            for(int i = 0; i < tokens.Length; i++)
+            switch(_nonEmptyTokens.Count)
             {
-                if(!string.IsNullOrEmpty(tokens[i]))
-                {
-                    result += tokens[i].First();
-                }
-                
-            }
+                case 1:
+                    result = _nonEmptyTokens[0].Substring(0, 3);
+                    break;
+                case 2:
+                    result = _nonEmptyTokens[0].Substring(0, 2);
+                    result += _nonEmptyTokens[1].Substring(0,1);
+                    break;
+                case 3:
+                    foreach(var _token in _nonEmptyTokens)
+                    {
+                        result += _token.Substring(0, 1);
+                    }
+
+                    break;
+            }           
 
             return result.ToUpper();
         }
@@ -633,7 +643,7 @@ namespace DialogGenerator.UI.ViewModels
 
         private bool _nextStep_CanExecute()
         {
-            return !string.IsNullOrEmpty(CharacterName);
+            return !string.IsNullOrEmpty(CharacterName) && CharacterName.Length > 3;
         }
 
         private void _nextStep_Execute()

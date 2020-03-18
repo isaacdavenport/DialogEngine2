@@ -235,6 +235,12 @@ namespace DialogGenerator.UI.ViewModels
             mSpeechRecognizer.LoadGrammar(new DictationGrammar());
             mSpeechRecognizer.SetInputToDefaultAudioDevice();
             mSpeechRecognizer.SpeechRecognized += MSpeechRecognizer_SpeechRecognized;
+            //mSpeechRecognizer.AudioLevelUpdated += MSpeechRecognizer_AudioLevelUpdated;
+        }
+
+        private void MSpeechRecognizer_AudioLevelUpdated(object sender, AudioLevelUpdatedEventArgs e)
+        {            
+            Console.WriteLine("Audio level is {0}", e.AudioLevel);
         }
 
         private void MSpeechRecognizer_SpeechRecognized(object sender, SpeechRecognizedEventArgs e)
