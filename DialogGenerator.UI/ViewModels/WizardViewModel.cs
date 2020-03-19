@@ -8,6 +8,8 @@ using DialogGenerator.UI.Views.Dialogs;
 using DialogGenerator.UI.Workflow.CreateCharacterWorkflow;
 using DialogGenerator.UI.Workflow.WizardWorkflow;
 using DialogGenerator.Utilities;
+using NAudio.Lame;
+using NAudio.Wave;
 using Prism.Commands;
 using Prism.Events;
 using Prism.Mvvm;
@@ -266,7 +268,7 @@ namespace DialogGenerator.UI.ViewModels
             {
                 if (!string.IsNullOrEmpty(DialogStr))
                 {
-                    _generateSpeech(mDialogStr);
+                    GenerateSpeech(mDialogStr);
                     await mMessageDialogService.ShowMessage("Notification", "The sound was generated from the text box");
                     SaveAndNext.RaiseCanExecuteChanged();
 
@@ -793,12 +795,13 @@ namespace DialogGenerator.UI.ViewModels
 
         #region Private methods
 
-        private void _generateSpeech(string value)
+        private void GenerateSpeech(string value)
         {
             string _outfile = string.Empty;
+            string _outFileOriginal = string.Empty;
 
             using (SpeechSynthesizer _synth = new SpeechSynthesizer())
-            {
+            {                
                 _synth.Volume = 100;
                 _synth.Rate = Character.SpeechRate;
                 if (_synth.GetInstalledVoices().Count() == 0)
@@ -811,18 +814,47 @@ namespace DialogGenerator.UI.ViewModels
                     _synth.SelectVoice(Character.Voice);
                 }
 
-                string _outfile_original = ApplicationData.Instance.AudioDirectory + "\\" + VoiceRecorderControlViewModel.CurrentFilePath + ".mp3";
-                _outfile = _outfile_original.Replace(".mp3", ".wav");
+                _outFileOriginal = ApplicationData.Instance.AudioDirectory + "\\" + VoiceRecorderControlViewModel.CurrentFilePath + ".mp3";
+                _outfile = _outFileOriginal.Replace(".mp3", ".wav");
+                if(!File.Exists(_outFileOriginal))
+                {
+                    var _fs = File.Create(_outFileOriginal);
+                    _fs.Close();
+                }
+
                 _synth.SetOutputToWaveFile(_outfile);
-                _synth.Speak(value);
-                cs_ffmpeg_mp3_converter.FFMpeg.Convert2Mp3(_outfile, _outfile_original);
-                VoiceRecorderControlViewModel.StartPlayingCommand.RaiseCanExecuteChanged();
-                PlayInContext.RaiseCanExecuteChanged();
+                _synth.Speak(value);                
             }
+
+            //Thread.Sleep(2000);
+
+            using (var _fs = File.OpenRead(_outfile))
+            using (var _rdr = new WaveFileReader(_fs))            
+            using (var _outFileStream = File.OpenWrite(_outFileOriginal))                
+            using (var _wtr = new LameMP3FileWriter(_outFileStream, _rdr.WaveFormat, 128))
+            {
+                _rdr.CopyTo(_wtr);
+            }
+
+            VoiceRecorderControlViewModel.StartPlayingCommand.RaiseCanExecuteChanged();
+            PlayInContext.RaiseCanExecuteChanged();
 
             if (!string.IsNullOrEmpty(_outfile) && File.Exists(_outfile))
             {
                 File.Delete(_outfile);
+            }
+        }
+
+        public static byte[] ConvertWavToMp3(byte[] wavFile)
+        {
+
+            using (var retMs = new MemoryStream())
+            using (var ms = new MemoryStream(wavFile))
+            using (var rdr = new WaveFileReader(ms))
+            using (var wtr = new LameMP3FileWriter(retMs, rdr.WaveFormat, 128))
+            {
+                rdr.CopyTo(wtr);
+                return retMs.ToArray();
             }
         }
 
