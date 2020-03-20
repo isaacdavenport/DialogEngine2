@@ -33,6 +33,9 @@
         <i:EventTrigger EventName="Loaded">
             <i:InvokeCommandAction Command="{Binding DialogHostLoaded}" />
         </i:EventTrigger>
+        <i:EventTrigger EventName="Unloaded">
+            <i:InvokeCommandAction Command="{Binding DialogHostUnloaded}" />
+        </i:EventTrigger>
     </i:Interaction.Triggers>
 
     <materialDesign:DialogHost Identifier="WizardPageDialogHost">
