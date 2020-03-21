@@ -210,12 +210,13 @@ namespace DialogGenerator.UI.ViewModels
             set
             {
                 mCharacterName = value;
-                mCharacterInitials = _getCharacterInitials();
                 RaisePropertyChanged("CharacterName");
-                RaisePropertyChanged("CharacterInitials");
-                NextStepCommand.RaiseCanExecuteChanged();
+                //mCharacterInitials = _getCharacterInitials();                
+                //RaisePropertyChanged("CharacterInitials");
                 CharacterInitials = _getCharacterInitials();
                 CharacterIdentifier = _getCharacterIdentifier();
+                NextStepCommand.RaiseCanExecuteChanged();
+                
             }
         }
 
@@ -577,7 +578,7 @@ namespace DialogGenerator.UI.ViewModels
 
         private string _getCharacterInitials()
         {
-            if (String.IsNullOrEmpty(mCharacterName) || mCharacterName.Length <= 3)
+            if (String.IsNullOrEmpty(mCharacterName) || mCharacterName.Length <= 2)
                 return String.Empty;
 
             String[] _tokens = mCharacterName.Split(' ');
@@ -585,6 +586,8 @@ namespace DialogGenerator.UI.ViewModels
             String result = String.Empty;
             switch(_nonEmptyTokens.Count)
             {
+                case 0:
+                    return result;
                 case 1:
                     result = _nonEmptyTokens[0].Substring(0, 3);
                     break;
@@ -592,7 +595,7 @@ namespace DialogGenerator.UI.ViewModels
                     result = _nonEmptyTokens[0].Substring(0, 2);
                     result += _nonEmptyTokens[1].Substring(0,1);
                     break;
-                case 3:
+                default:
                     foreach(var _token in _nonEmptyTokens)
                     {
                         result += _token.Substring(0, 1);
@@ -643,7 +646,7 @@ namespace DialogGenerator.UI.ViewModels
 
         private bool _nextStep_CanExecute()
         {
-            return !string.IsNullOrEmpty(CharacterName) && CharacterName.Length > 3;
+            return !string.IsNullOrEmpty(CharacterName) && CharacterName.Length >= 3;
         }
 
         private void _nextStep_Execute()
