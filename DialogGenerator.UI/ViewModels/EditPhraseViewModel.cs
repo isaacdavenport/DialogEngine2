@@ -4,6 +4,8 @@ using DialogGenerator.Events;
 using DialogGenerator.Model;
 using DialogGenerator.UI.Data;
 using DialogGenerator.Utilities;
+using NAudio.Lame;
+using NAudio.Wave;
 using Newtonsoft.Json;
 using Prism.Commands;
 using Prism.Events;
@@ -457,18 +459,25 @@ namespace DialogGenerator.UI.ViewModels
                 }
 
                 string _outfile_original = MediaRecorderControlViewModel.FilePath;
-                _outfile = _outfile_original.Replace(".mp3", ".wav");
-                _synth.SetOutputToWaveFile(_outfile);
+                
+                MemoryStream _ms = new MemoryStream();
+                _synth.SetOutputToWaveStream(_ms);
                 _synth.Speak(value);
-                cs_ffmpeg_mp3_converter.FFMpeg.Convert2Mp3(_outfile, _outfile_original);
+                _synth.SetOutputToNull();
+
+                _ms.Position = 0;
+
+                using (var _rdr = new WaveFileReader(_ms))
+                using (var _outFileStream = File.OpenWrite(_outfile_original))
+                using (var _wtr = new LameMP3FileWriter(_outFileStream, _rdr.WaveFormat, 128))
+                {
+                    _rdr.CopyTo(_wtr);
+                }
+
                 MediaRecorderControlViewModel.StartPlayingFileCommand.RaiseCanExecuteChanged();
                 
             }
 
-            if (!string.IsNullOrEmpty(_outfile) && File.Exists(_outfile))
-            {
-                File.Delete(_outfile);
-            }
         }
 
         #endregion
