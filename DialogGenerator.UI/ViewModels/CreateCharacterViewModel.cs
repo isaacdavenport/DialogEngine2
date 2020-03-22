@@ -58,6 +58,9 @@ namespace DialogGenerator.UI.ViewModels
         private bool mHasNoVoice = false;
         private string mVoice = string.Empty;
         private int mSpeechRate = -1;
+
+        private string mCharacterNameValidationError = string.Empty;
+        private bool mCharacterNameHasError = false;
         
 
         internal void SetCurrentStep(int index)
@@ -116,8 +119,7 @@ namespace DialogGenerator.UI.ViewModels
             Character = new Character();   
 
             _initDialogWizards();
-            _initVoiceCollection();
-            
+            _initVoiceCollection();            
 
             _bindCommands();
         }
@@ -211,12 +213,54 @@ namespace DialogGenerator.UI.ViewModels
             {
                 mCharacterName = value;
                 RaisePropertyChanged("CharacterName");
-                //mCharacterInitials = _getCharacterInitials();                
-                //RaisePropertyChanged("CharacterInitials");
                 CharacterInitials = _getCharacterInitials();
                 CharacterIdentifier = _getCharacterIdentifier();
-                NextStepCommand.RaiseCanExecuteChanged();
-                
+                NextStepCommand.RaiseCanExecuteChanged();     
+                if((mCharacterName != null && mCharacterName.Length > 0) && (mCharacterName.Length <= 2 || char.IsDigit(mCharacterName.Substring(0,1).ToCharArray()[0])))
+                {
+                    if(mCharacterName.Length <= 2 && !char.IsDigit(mCharacterName.Substring(0, 1).ToCharArray()[0]))
+                    {
+                        CharacterNameValidationError = "The name must consist of at least 3 characters!";
+                        CharacterNameHasError = true;
+                    } else
+                    {
+                        CharacterNameValidationError = "The first character of the name must be a letter!";
+                        CharacterNameHasError = true;
+                    }
+                    
+                } else
+                {
+                    CharacterNameValidationError = string.Empty;
+                    CharacterNameHasError = false;
+                }
+            }
+        }
+
+        public string CharacterNameValidationError
+        {
+            get
+            {
+                return mCharacterNameValidationError;
+            }
+
+            set
+            {
+                mCharacterNameValidationError = value;
+                RaisePropertyChanged();
+            }
+        }
+
+        public bool CharacterNameHasError
+        {
+            get
+            {
+                return mCharacterNameHasError;
+            }
+
+            set
+            {
+                mCharacterNameHasError = value;
+                RaisePropertyChanged();
             }
         }
 
