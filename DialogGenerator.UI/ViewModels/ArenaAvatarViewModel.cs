@@ -19,8 +19,7 @@ namespace DialogGenerator.UI.ViewModels
         private bool mInPlayground = false;
         private CancellationTokenSource mCancellationTokenSource;
         private const int mMaxIterationsCount = 3;
-        private int mCurrentIteration = mMaxIterationsCount;
-        private const int mStep = 1;        
+        private const int mStep = 3;        
         private int mDecision = 1;
         private int mSleepInterval = 50;
 
@@ -110,40 +109,53 @@ namespace DialogGenerator.UI.ViewModels
 
         public async Task StartAnimation()
         {
-            mCurrentIteration = mMaxIterationsCount;
             mCancellationTokenSource = new CancellationTokenSource();
+            Random random = new Random();
+            mDecision = random.Next(1, 10000) % 4;            
+
             await Task.Run(() =>
             {
                 do
                 {
-                    if(mCurrentIteration == mMaxIterationsCount)
+                    if(mDecision == 4)
                     {
-                        Random random = new Random();
-                        mDecision = random.Next(1, 8);
-                        mCurrentIteration = 1;
+                        mDecision = 0;
                     }
-                    
+
                     switch(mDecision)
                     {
-                        case 1: // up
-                        case 5:
-                            Top -= mStep;
+                        case 0: // up
+                            for (int i = 0; i < mStep; i++)
+                            {
+                                Top--;
+                                Thread.Sleep(50);
+                            }
                             break;
-                        case 2: // right
-                        case 6:
-                            Left += mStep;
+                        case 1: // right
+                            for (int i = 0; i < mStep; i++)
+                            {
+                                Left++;
+                                Thread.Sleep(50);
+                            }
                             break;
-                        case 3: // bottom
-                        case 7:
-                            Top += mStep;
+                        case 2: // bottom
+                            for (int i = 0; i < mStep; i++)
+                            {
+                                Top++;
+                                Thread.Sleep(50);
+                            }
                             break;
-                        case 4: // left
-                        case 8:
-                            Left -= mStep;
+                        case 3: // left
+                            for(int i = 0; i < mStep; i++)
+                            {
+                                Left--;
+                                Thread.Sleep(50);
+                            }
+                            
                             break;
                     }
 
-                    mCurrentIteration++;
+                    mDecision++;
 
                     Thread.Sleep(mSleepInterval);
 
