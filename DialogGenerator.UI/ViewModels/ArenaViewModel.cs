@@ -9,8 +9,6 @@ using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using System.Windows;
 
 namespace DialogGenerator.UI.ViewModels
@@ -31,23 +29,7 @@ namespace DialogGenerator.UI.ViewModels
 
             mEventAggregator.GetEvent<CharacterCollectionLoadedEvent>().Subscribe(_onCharacterCollectionLoaded);
             mEventAggregator.GetEvent<CharactersInConversationEvent>().Subscribe(_onCharactersInConversation);
-        }
-
-        private void _onCharactersInConversation(SelectedCharactersPairEventArgs obj)
-        {
-            foreach (ArenaAvatarViewModel _am in PlaygroundAvatars)
-            {
-                int _characterIndex = mCharacterRepository.IndexOf(_am.Character);
-                if(_characterIndex == obj.Character1Index ||
-                   _characterIndex == obj.Character2Index)
-                {
-                    _am.Active = true;
-                } else
-                {
-                    _am.Active = false;
-                }                                
-            }
-        }
+        }        
 
         public ObservableCollection<ArenaAvatarViewModel> AvatarGalleryItems { get; } = new ObservableCollection<ArenaAvatarViewModel>();
 
@@ -78,16 +60,6 @@ namespace DialogGenerator.UI.ViewModels
             {
                 // Send event.
             }
-        }
-
-        public void RemoveAvatarFromPlayground(ArenaAvatarViewModel avatar)
-        {
-
-        }
-
-        public ArenaAvatarViewModel GetAvatarOnPosition(long x, long y)
-        {
-            return null;
         }
 
         public AvatarPair FindClosestAvatarPair(bool _Create = false)
@@ -130,22 +102,34 @@ namespace DialogGenerator.UI.ViewModels
                 }
 
                 if(_characterIndex1 != -1 && _characterIndex2 != -1)
-                {                    
-                    Session.Set(Constants.NEXT_CH_1, _characterIndex1);
-                    Session.Set(Constants.NEXT_CH_2, _characterIndex2);
+                {
+                    Random random = new Random();
+                    int _choice = random.Next();
+                    _choice = _choice % 2;
+                    Session.Set(Constants.NEXT_CH_1, _choice == 0 ?_characterIndex1 : _characterIndex2);
+                    Session.Set(Constants.NEXT_CH_2, _choice == 0 ?_characterIndex2 : _characterIndex1);
                 }
             }
 
             return _closestPair;
         }
 
-        private struct PlaygroundEntry
+        private void _onCharactersInConversation(SelectedCharactersPairEventArgs obj)
         {
-            public int Index { get; set; }
-            public int Left { get; set; }
-            public int Top { get; set; }
-
-        };
+            foreach (ArenaAvatarViewModel _am in PlaygroundAvatars)
+            {
+                int _characterIndex = mCharacterRepository.IndexOf(_am.Character);
+                if (_characterIndex == obj.Character1Index ||
+                   _characterIndex == obj.Character2Index)
+                {
+                    _am.Active = true;
+                }
+                else
+                {
+                    _am.Active = false;
+                }
+            }
+        }
 
         private void _onCharacterCollectionLoaded()
         {
@@ -239,11 +223,14 @@ namespace DialogGenerator.UI.ViewModels
                 _selIndex2 != Session.Get<int>(Constants.NEXT_CH_2)) &&
                (_selIndex1 != Session.Get<int>(Constants.NEXT_CH_2) || 
                 _selIndex2 != Session.Get<int>(Constants.NEXT_CH_1))) {
+                Random random = new Random();
+                int _choice = random.Next();
+                _choice = _choice % 2;
                 mEventAggregator.GetEvent<SelectedCharactersPairChangedEvent>().Publish(new SelectedCharactersPairEventArgs
                 {
-                    Character1Index = _selIndex1,
-                    Character2Index = _selIndex2
-                });
+                    Character1Index = _choice == 0 ? _selIndex1 : _selIndex2,
+                    Character2Index = _choice == 0 ? _selIndex2 : _selIndex1
+                }); ;
             }
             
         }
@@ -258,24 +245,6 @@ namespace DialogGenerator.UI.ViewModels
             }
 
             return i;
-        }
-
-        private int _firstIndexNotInList1(List<int> _Lista, int _Limit = 50) 
-        {
-            int _counter = 0;
-            int _retval = -1;
-
-            while(_retval == -1 && _counter != _Limit)
-            {
-                if(!_Lista.Contains(_counter))
-                {
-                    _retval = _counter;
-                }
-
-                _counter++;
-            }
-
-            return _retval;
         }
 
         private void _createAvatarPairs()
@@ -298,7 +267,6 @@ namespace DialogGenerator.UI.ViewModels
             }
         }
 
-
     }
 
     public class AvatarPair
@@ -319,19 +287,5 @@ namespace DialogGenerator.UI.ViewModels
             }
         }
 
-        public bool Contains(ArenaAvatarViewModel _Am)
-        {
-            if(FirstAvatar.Equals(_Am))
-            {
-                return true;
-            }
-
-            if(SecondAvatar.Equals(_Am))
-            {
-                return true;
-            }
-
-            return false;
-        }
     }
 }
