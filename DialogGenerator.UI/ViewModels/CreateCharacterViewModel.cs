@@ -633,18 +633,35 @@ namespace DialogGenerator.UI.ViewModels
                 case 0:
                     return result;
                 case 1:
-                    result = _nonEmptyTokens[0].Substring(0, 3);
-                    break;
-                case 2:
-                    result = _nonEmptyTokens[0].Substring(0, 2);
-                    result += _nonEmptyTokens[1].Substring(0,1);
-                    break;
-                default:
-                    foreach(var _token in _nonEmptyTokens)
                     {
-                        result += _token.Substring(0, 1);
+                        int _range = Math.Min(3, _nonEmptyTokens[0].Length);
+                        result = _nonEmptyTokens[0].Substring(0, _range);
                     }
 
+                    break;
+                case 2:
+                    {
+                        int _range = Math.Min(_nonEmptyTokens[0].Length, 2);
+                        result = _nonEmptyTokens[0].Substring(0, _range);
+                        int _leftover = 3 - _range;
+                        _range = Math.Min(_leftover, _nonEmptyTokens[1].Length);
+                        result += _nonEmptyTokens[1].Substring(0, _range);
+                    }
+                    
+                    break;
+                default:
+                    {
+                        int _max = 5;
+                        int _counter = 1;
+                        foreach (var _token in _nonEmptyTokens)
+                        {
+                            result += _token.Substring(0, 1);
+                            if (_counter == _max)
+                                break;
+                            _counter++;
+                        }
+                    }
+                    
                     break;
             }           
 

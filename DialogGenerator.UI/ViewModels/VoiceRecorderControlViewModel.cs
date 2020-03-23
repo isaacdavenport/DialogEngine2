@@ -279,8 +279,9 @@ namespace DialogGenerator.UI.ViewModels
         }
 
         private void _unloaded_Execute()
-        {
+        {            
             _unloadSoundEngine();
+            mSoundPlayer.PropertyChanged -= _soundPlayer_PropertyChanged;
         }
 
         private void _loaded_Execute()

@@ -83,11 +83,6 @@ namespace DialogGenerator.UI.Views
                     {
                         Point pos = e.GetPosition(sender as IInputElement);
                         ArenaAvatarView _aView = new ArenaAvatarView();
-                        string[] _tokens = _am.Character.CharacterName.Split(' ', '\'');
-                        foreach(var _token in _tokens)
-                        {
-                            _aView.Name += _token;
-                        }
 
                         _am = _am.Clone();
                         _aView.DataContext = _am;
