@@ -1,4 +1,5 @@
 ﻿using DialogGenerator.Model;
+using Prism.Commands;
 using Prism.Mvvm;
 using System;
 using System.Collections.Generic;
@@ -21,7 +22,7 @@ namespace DialogGenerator.UI.ViewModels
         private const int mMaxIterationsCount = 3;
         private const int mStep = 3;        
         private int mDecision = 1;
-        private int mSleepInterval = 50;
+        private int mSleepInterval = 50;   
 
         public Character Character
         {
@@ -167,5 +168,6 @@ namespace DialogGenerator.UI.ViewModels
         {
             mCancellationTokenSource.Cancel();
         }
+
     }
 }

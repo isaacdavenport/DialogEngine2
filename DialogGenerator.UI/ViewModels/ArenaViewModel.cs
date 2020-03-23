@@ -183,7 +183,7 @@ namespace DialogGenerator.UI.ViewModels
                         _selIndex1 = _firstIndexNotInList(new List<int> { _selIndex2 });
                     } else
                     {
-                        _selIndex1 = 0;
+                        _selIndex1 = /* 0 */ _firstIndexNotInList(new List<int>());
                     }
 
                     _c = mCharacterRepository.GetAll()[_selIndex1];
@@ -218,7 +218,7 @@ namespace DialogGenerator.UI.ViewModels
                     }
                     else
                     {
-                        _selIndex2 = 0;
+                        _selIndex2 = /* 0 */ _firstIndexNotInList(new List<int>());
                     }
 
                     _c = mCharacterRepository.GetAll()[_selIndex2];
@@ -248,7 +248,19 @@ namespace DialogGenerator.UI.ViewModels
             
         }
 
-        private int _firstIndexNotInList(List<int> _Lista, int _Limit = 50) 
+        private int _firstIndexNotInList(List<int> _Lista)
+        {
+            Random random = new Random();
+            int i = random.Next(mCharacterRepository.GetAll().Count());
+
+            while (_Lista.Contains(i)) {
+                i = random.Next(mCharacterRepository.GetAll().Count());
+            }
+
+            return i;
+        }
+
+        private int _firstIndexNotInList1(List<int> _Lista, int _Limit = 50) 
         {
             int _counter = 0;
             int _retval = -1;

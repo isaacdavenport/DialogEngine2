@@ -156,16 +156,5 @@ namespace DialogGenerator.UI.Views
             return true;
         }
 
-        private async void UserControl_Loaded(object sender, RoutedEventArgs e)
-        {
-            ArenaAvatarViewModel _model = this.DataContext as ArenaAvatarViewModel;
-            await _model.StartAnimation();
-        }
-
-        private void UserControl_Unloaded(object sender, RoutedEventArgs e)
-        {
-            ArenaAvatarViewModel _model = this.DataContext as ArenaAvatarViewModel;
-            _model.StopAnimation();
-        }
     }
 }

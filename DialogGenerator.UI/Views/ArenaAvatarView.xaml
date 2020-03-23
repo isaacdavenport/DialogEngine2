@@ -4,7 +4,6 @@
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
              xmlns:prism ="http://prismlibrary.com/"
-             xmlns:local="clr-namespace:DialogGenerator.UI.Views"
              xmlns:converters="clr-namespace:DialogGenerator.UI.Converters"
              prism:ViewModelLocator.AutoWireViewModel="True"
              mc:Ignorable="d" 
@@ -12,11 +11,12 @@
              d:DesignWidth="100" 
              MouseDown="UserControl_MouseDown" 
              MouseUp="UserControl_MouseUp" 
-             MouseMove="UserControl_MouseMove" Canvas.Left="{Binding Left}" Canvas.Top="{Binding Top}" Loaded="UserControl_Loaded" Unloaded="UserControl_Unloaded">
+             MouseMove="UserControl_MouseMove" Canvas.Left="{Binding Left}" Canvas.Top="{Binding Top}">
     <UserControl.Resources>
         <converters:ImageToFullPathValueConverter x:Key="ImageToFullPathValueConverter"/>
         <converters:BoolToColorConverter x:Key="BoolToColorConverter" />
     </UserControl.Resources>
+
     <Grid>
         <Border Background="LightGray" BorderBrush="{Binding Active, Converter={StaticResource BoolToColorConverter}, ConverterParameter=LightGreen}" CornerRadius="10" BorderThickness="2" Padding="5">
             <Grid>
