@@ -355,32 +355,6 @@ namespace DialogGenerator.CharacterSelection
         }
 
 
-        private bool _calculateRssiStablity(int _Ch1, int _Ch2, long _milliseconds = 250, double _HitPercent = 0.70)
-        {
-            if (ApplicationData.Instance.RadioMovesTimeSensitivity > 0 &&
-                     ApplicationData.Instance.RadioMovesTimeSensitivity < 1.0)
-            { 
-                _milliseconds = (long)(_milliseconds * ApplicationData.Instance.RadioMovesTimeSensitivity * 10.0);
-            }
-
-            if ((_Ch1 != mStableRadioIndex1 || _Ch2 != mStableRadioIndex2) &&
-                (_Ch1 != mStableRadioIndex2 || _Ch2 != mStableRadioIndex1))
-            {
-                mLastStableTime = _toMilliseconds(DateTime.Now);
-                mStableRadioIndex1 = _Ch1;
-                mStableRadioIndex2 = _Ch2;
-                return false;
-            }
-
-            long _currentTime = _toMilliseconds(DateTime.Now);
-            if (_currentTime - mLastStableTime >= _milliseconds)
-            {
-                return true;
-            }
-
-            return false;
-        }
-
         private int _getCharacterMappedIndex(int _radioNum)
         {
             try
