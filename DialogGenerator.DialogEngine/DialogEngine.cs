@@ -172,8 +172,9 @@ namespace DialogGenerator.DialogEngine
 
             if(obj != null)
             {
-                mLogger.Debug($"_onSelectedCharactersPairChanged- c_ch1 - {mCharacterPairSelectionDataCached?.Character1Index} c_ch2-{mCharacterPairSelectionDataCached?.Character2Index} " +
-                $"- ch1:{obj.Character1Index} ch2: {obj.Character2Index} ", ApplicationData.Instance.DialogLoggerKey);
+                mLogger.Debug($"_onSelectedCharactersPairChanged- cached_ch1 - " +
+                    $"{mCharacterPairSelectionDataCached?.Character1Index} cached_ch2-{mCharacterPairSelectionDataCached?.Character2Index} " +
+                    $"- ch1:{obj.Character1Index} ch2: {obj.Character2Index} ", ApplicationData.Instance.DialogLoggerKey);
             }
             
         }

@@ -211,7 +211,7 @@ namespace DialogGenerator.CharacterSelection
         /// a set number of milliseconds in the case the user is holding one or more of the toys they wish to speak.
         /// </summary>
         /// <returns></returns>
-        private bool _calculateIfInMotionWindow()
+        private bool _inMotionThenStillnessWindow()
         {
             try
             {
@@ -488,9 +488,9 @@ namespace DialogGenerator.CharacterSelection
                 mPossibleSpeakingCh1RadioNum = finalRow;
                 mPossibleSpeakingCh2RadioNum = finalColumn;
 
-                // TODO, _calculateRssiStableAfterChange and _calculateIfInMotionWindow should be their own states
+                // TODO, _calculateRssiStableAfterChange and _inMotionThenStillnessWindow should be their own states
                 _rssiStable = _calculateRssiStablity2(mPossibleSpeakingCh1RadioNum, mPossibleSpeakingCh2RadioNum);
-                var _inMovementWindow = _calculateIfInMotionWindow();
+                var _inMovementWindow = _inMotionThenStillnessWindow();
 
                 if ( _rssiStable && (_inMovementWindow || mFreshStart))
                 {
@@ -502,7 +502,7 @@ namespace DialogGenerator.CharacterSelection
                         }                        
                     }
 
-                    mLogger.Info("Select Next Characters Called");
+                    mLogger.Info("in _shouldCharactersChange() SelectNextCharacters triggered");
                     return Triggers.SelectNextCharacters;
                 }
                 else
