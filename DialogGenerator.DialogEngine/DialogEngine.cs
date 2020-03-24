@@ -36,7 +36,7 @@ namespace DialogGenerator.DialogEngine
         private DialogModelsManager mDialogModelsManager;
         private CharactersManager mCharactersManager;
         private DialogEngineWorkflow mWorkflow;
-        private SelectedCharactersPairEventArgs mRandomSelectionDataCached;
+        private SelectedCharactersPairEventArgs mCharacterPairSelectionDataCached;
         private CancellationTokenSource mCancellationTokenSource;
         private CancellationTokenSource mStateMachineTaskTokenSource = new CancellationTokenSource();
 
@@ -117,7 +117,7 @@ namespace DialogGenerator.DialogEngine
 
         private void _onChangedCharacterState()
         {
-            mRandomSelectionDataCached = null;
+            mCharacterPairSelectionDataCached = null;
 
             mEventAggregator.GetEvent<StopPlayingCurrentDialogLineEvent>().Publish();
             mEventAggregator.GetEvent<SelectedCharactersPairChangedEvent>().Unsubscribe(_onSelectedCharactersPairChanged);
@@ -144,7 +144,7 @@ namespace DialogGenerator.DialogEngine
                             mEventAggregator.GetEvent<SelectedCharactersPairChangedEvent>().Unsubscribe(_onSelectedCharactersPairChanged);
                         }
                         
-                        mRandomSelectionDataCached = null;
+                        mCharacterPairSelectionDataCached = null;
                         mStateMachineTaskTokenSource.Cancel();
                         break;
                     }
@@ -161,7 +161,7 @@ namespace DialogGenerator.DialogEngine
 
         private void _onSelectedCharactersPairChanged(SelectedCharactersPairEventArgs obj)
         {
-            mRandomSelectionDataCached = obj;
+            mCharacterPairSelectionDataCached = obj;
             Session.Set(Constants.COMPLETED_DLG_MODELS, 0);
 
             if (Session.Get<bool>(Constants.BLE_MODE_ON) && mCurrentState != States.PreparingDialogParameters)
@@ -172,7 +172,7 @@ namespace DialogGenerator.DialogEngine
 
             if(obj != null)
             {
-                mLogger.Debug($"_onSelectedCharactersPairChanged- c_ch1 - {mRandomSelectionDataCached?.Character1Index} c_ch2-{mRandomSelectionDataCached?.Character2Index} " +
+                mLogger.Debug($"_onSelectedCharactersPairChanged- c_ch1 - {mCharacterPairSelectionDataCached?.Character1Index} c_ch2-{mCharacterPairSelectionDataCached?.Character2Index} " +
                 $"- ch1:{obj.Character1Index} ch2: {obj.Character2Index} ", ApplicationData.Instance.DialogLoggerKey);
             }
             
@@ -256,7 +256,7 @@ namespace DialogGenerator.DialogEngine
 
         private bool _setNextCharacters()
         {
-            SelectedCharactersPairEventArgs args = mRandomSelectionDataCached;
+            SelectedCharactersPairEventArgs args = mCharacterPairSelectionDataCached;
             if (args == null || args.Character1Index < 0 || args.Character1Index >= mContext.CharactersList.Count
                 || args.Character2Index < 0 || args.Character2Index >= mContext.CharactersList.Count /* ||
                 args.Character1Index == args.Character2Index *//* Sinisa 02/05/2020 - DLGEN-438 */)
@@ -311,7 +311,7 @@ namespace DialogGenerator.DialogEngine
 
                 token.ThrowIfCancellationRequested();
 
-                if (mRandomSelectionDataCached == null)
+                if (mCharacterPairSelectionDataCached == null)
                     return Triggers.PrepareDialogParameters;
 
                 if (!_setNextCharacters())
@@ -650,7 +650,7 @@ namespace DialogGenerator.DialogEngine
             mIsDialogCancelled = true;
             mStateMachineTaskTokenSource.Cancel();
             mCharacterSelection.StopCharacterSelection();
-            mRandomSelectionDataCached = null;
+            mCharacterPairSelectionDataCached = null;
             Session.Set(Constants.COMPLETED_DLG_MODELS, 0);
 
             if (mCurrentState != States.DialogFinished)
