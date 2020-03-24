@@ -106,12 +106,12 @@ namespace DialogGenerator.UI.ViewModels
 
             int _radioIndex1 = -1;
             int _radioIndex2 = -1;
-            if (obj.Character1Index != -1)
+            if (obj.Character1Index >= 0)
             {
                 _radioIndex1 = mCharacterRepository.GetAll()[obj.Character1Index].RadioNum;
             }
 
-            if(obj.Character2Index != -1)
+            if(obj.Character2Index >= 0)
             {
                 _radioIndex2 = mCharacterRepository.GetAll()[obj.Character2Index].RadioNum;
             }
@@ -123,7 +123,7 @@ namespace DialogGenerator.UI.ViewModels
                     _ch.Active = false;
                 }
 
-                if(_radioIndex1 != -1)
+                if(_radioIndex1 >= 0)
                 {
                     if(RadioCharacters.Where(rc => rc.Character.RadioNum == _radioIndex1).ToList().Count > 0)
                     {
@@ -136,7 +136,7 @@ namespace DialogGenerator.UI.ViewModels
                                                             
                 }
                     
-                if(_radioIndex2 != -1)
+                if(_radioIndex2 >= 0)
                 {
                     if (RadioCharacters.Where(rc => rc.Character.RadioNum == _radioIndex2).ToList().Count > 0)
                     {

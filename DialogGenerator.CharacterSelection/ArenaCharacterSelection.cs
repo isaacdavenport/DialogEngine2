@@ -68,7 +68,7 @@ namespace DialogGenerator.CharacterSelection
 
                         if (_bChanged)
                         {
-                            System.Console.WriteLine("Will send event");
+                            System.Console.WriteLine("Will send arena selection event");
 
                             mEventAggregator.GetEvent<StopPlayingCurrentDialogLineEvent>().Publish();
 
