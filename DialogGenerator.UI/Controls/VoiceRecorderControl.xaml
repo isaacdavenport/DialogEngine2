@@ -49,7 +49,7 @@
 
         <StackPanel Grid.Row="1" HorizontalAlignment="Stretch" VerticalAlignment="Center"  Orientation="Horizontal">
             <Button x:Name="RecordBtn" Margin="10,10,10,10" Command="{Binding StartRecordingCommand}" Width="25" Height="25"
-                Visibility="{Binding Path=Visibility, ElementName=StopRecordingBtn,Converter={StaticResource InvertVisibilityValueConverter}}">    
+                Visibility="{Binding Path=Visibility, ElementName=StopRecordingBtn,Converter={StaticResource InvertVisibilityValueConverter}}" Foreground="Red">    
                 <materialDesign:PackIcon  Kind="Microphone" />
             </Button>
             <Button x:Name="StopRecordingBtn" Margin="10,10,10,10" Command="{Binding StopRecorderCommand}" Width="25" Height="25"
@@ -57,6 +57,13 @@
                 ,ConverterParameter={x:Static state:States.Recording}}" >
                 <materialDesign:PackIcon Kind="Stop" />
             </Button>
+            <Button x:Name="PlayInContextBtn" Content="Conversation" Height="25" Margin="10,10,10,10"  Padding="4,0,4,0" Width="auto"
+                Visibility="{Binding Path=Visibility, ElementName=StopPlayingInContextBtn,Converter={StaticResource InvertVisibilityValueConverter}}"    
+                Command="{Binding DataContext.PlayInContext, RelativeSource={RelativeSource Mode=FindAncestor, AncestorType=view:WizardView}}"/>
+            <Button x:Name="StopPlayingInContextBtn" Content="Stop" Height="25" Margin="10,10,10,10" Padding="4,0,4,0" Width="auto"
+                Visibility="{Binding WizardWorkflow.State,Converter={StaticResource WizardStateToBtnVisibilityValueConverter}
+                ,ConverterParameter={x:Static wizardState:WizardStates.PlayingInContext}}"
+                Command="{Binding DataContext.StopPlayingInContext, RelativeSource={RelativeSource Mode=FindAncestor, AncestorType=view:WizardView}}"/>
             <Button x:Name="PlayBtn" Margin="10,10,10,10" Command="{Binding StartPlayingCommand}" Width="25" Height="25"  
                 Visibility="{Binding Path=Visibility, ElementName=StopPlayingBtn,Converter={StaticResource InvertVisibilityValueConverter}}">
                 <materialDesign:PackIcon  Kind="Play" />
@@ -70,13 +77,7 @@
                 </Button.Visibility>
                 <materialDesign:PackIcon Kind="Stop" />
             </Button>
-            <Button x:Name="PlayInContextBtn" Content="Conversation" Height="25" Margin="10,10,10,10"  Padding="4,0,4,0" Width="auto"
-                Visibility="{Binding Path=Visibility, ElementName=StopPlayingInContextBtn,Converter={StaticResource InvertVisibilityValueConverter}}"    
-                Command="{Binding DataContext.PlayInContext, RelativeSource={RelativeSource Mode=FindAncestor, AncestorType=view:WizardView}}"/>
-            <Button x:Name="StopPlayingInContextBtn" Content="Stop" Height="25" Margin="10,10,10,10" Padding="4,0,4,0" Width="auto"
-                Visibility="{Binding WizardWorkflow.State,Converter={StaticResource WizardStateToBtnVisibilityValueConverter}
-                ,ConverterParameter={x:Static wizardState:WizardStates.PlayingInContext}}"
-                Command="{Binding DataContext.StopPlayingInContext, RelativeSource={RelativeSource Mode=FindAncestor, AncestorType=view:WizardView}}"/>
+            
         </StackPanel>
     </Grid>
 </UserControl>

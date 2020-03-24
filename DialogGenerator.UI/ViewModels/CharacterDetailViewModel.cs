@@ -19,6 +19,7 @@ using System.ComponentModel;
 using System.Diagnostics;
 using System.IO;
 using System.Linq;
+using System.Speech.Synthesis;
 using System.Text.RegularExpressions;
 using System.Threading;
 using System.Threading.Tasks;
@@ -52,6 +53,7 @@ namespace DialogGenerator.UI.ViewModels
         private IBLEDataProviderFactory mBLEDataProviderFactory;
         private IBLEDataProvider mCurrentDataProvider;
         private CancellationTokenSource mCancellationTokenSource;
+
         #endregion
 
         #region -constructor-
@@ -76,6 +78,14 @@ namespace DialogGenerator.UI.ViewModels
             mEventAggregator.GetEvent<OpenCharacterDetailViewEvent>().Subscribe(_onOpenCharacterDetailView);
             mEventAggregator.GetEvent<CharacterSelectionActionChangedEvent>().Subscribe(_onCharacterSelectionActionChanged);
             mEventAggregator.GetEvent<CharacterStructureChangedEvent>().Subscribe(_onCharacterStructureChanged);
+
+            using (var _synth = new SpeechSynthesizer())
+            {
+                foreach(var _voice in _synth.GetInstalledVoices())
+                {
+                    VoicesCollection.Add(_voice.VoiceInfo.Name);
+                }
+            }
 
             _bindCommands();
         }       
@@ -322,6 +332,7 @@ namespace DialogGenerator.UI.ViewModels
 
                 System.Windows.Forms.OpenFileDialog _openFileDialog = new System.Windows.Forms.OpenFileDialog();
                 _openFileDialog.Filter = "Image files (*.jpg, *.jpeg, *.jpe, *.jfif, *.png) | *.jpg; *.jpeg; *.jpe; *.jfif; *.png";
+                _openFileDialog.InitialDirectory = ApplicationData.Instance.ImagesDirectory;
 
                 if (_openFileDialog.ShowDialog() != System.Windows.Forms.DialogResult.OK)
                     return;
@@ -533,6 +544,9 @@ namespace DialogGenerator.UI.ViewModels
                 mLogger.Error("_saveCommand_Execute " + ex.Message);
                 await mMessageDialogService.ShowMessage("Error", "Error occured during saving character. Please try again.");
             }
+
+            await mMessageDialogService.ShowMessage("INFO", "The character data has been saved. The speech settings are not " +
+                "transfered automatically to the existing dialog lines. They will be applied only in the moment when the new dialog lines will be recorded.");
         }
 
         private void _onOpenCharacterDetailView(string _characterPrefix)
@@ -653,6 +667,8 @@ namespace DialogGenerator.UI.ViewModels
                 RaisePropertyChanged();
             }
         }
+
+        public List<string> VoicesCollection { get; set; } = new List<string>();
 
         public List<int> AgeValues { get; set; } = new List<int>(Enumerable.Range(2, 100));
 

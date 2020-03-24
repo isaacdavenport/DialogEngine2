@@ -20,6 +20,7 @@ using System.Collections.ObjectModel;
 using System.ComponentModel;
 using System.IO;
 using System.Linq;
+using System.Speech.Synthesis;
 using System.Threading;
 using System.Threading.Tasks;
 using System.Windows.Input;
@@ -50,11 +51,17 @@ namespace DialogGenerator.UI.ViewModels
         private string mCurrentDialogWizard = String.Empty;
         private string mNextButtonText = "Next";
         private bool mIsFinished = false;
-
         private IBLEDataProviderFactory mBLEDataProviderFactory;
         private IBLEDataProvider mCurrentDataProvider;
         private CancellationTokenSource mCancellationTokenSource;
-        private string mSelectRadioTitle = Properties.Resources.ShakeRadio;       
+        private string mSelectRadioTitle = Properties.Resources.ShakeRadio;
+        private bool mHasNoVoice = false;
+        private string mVoice = string.Empty;
+        private int mSpeechRate = -1;
+
+        private string mCharacterNameValidationError = string.Empty;
+        private bool mCharacterNameHasError = false;
+        
 
         internal void SetCurrentStep(int index)
         {
@@ -81,7 +88,7 @@ namespace DialogGenerator.UI.ViewModels
             mWizardDataProvider = _WizardDataProvider;
 
             mWizard = new CreateCharacterWizard();
-            mCurrentStep = mWizard.Steps[mCurrentStepIndex];
+            CurrentStep = mWizard.Steps[mCurrentStepIndex];            
 
             for (int i = 5; i < 100; i++)
             {
@@ -109,14 +116,15 @@ namespace DialogGenerator.UI.ViewModels
             Workflow.PropertyChanged += _workflow_PropertyChanged;
             _configureWorkflow();
 
-            Character = new Character();
+            Character = new Character();   
 
             _initDialogWizards();
+            _initVoiceCollection();            
 
-            //_openCreateSession();
             _bindCommands();
         }
         
+
         public List<ToyEntry> RadiosCollection
         {
             get
@@ -161,38 +169,7 @@ namespace DialogGenerator.UI.ViewModels
                 mSelectRadioTitle = value;
                 RaisePropertyChanged();
             }
-        }
-
-        private async void _selectToyToCharacter(int oldVal = -1)
-        {
-            if (mSelectedRadio.Key == -1)
-                return;
-
-            var _oldChars = mCharacterDataProvider.GetAll().Where(c => c.RadioNum == mSelectedRadio.Key);
-            if(_oldChars.Count() > 0)
-            {
-                var _oldChar = _oldChars.First();
-                _oldChar = mCharacterDataProvider.GetAll().Where(c => c.RadioNum == mSelectedRadio.Key).First();
-                if (_oldChar != null)
-                {
-                    // izbaci message box
-                    MessageDialogResult result = await mMessageDialogService.ShowOKCancelDialogAsync(String.Format("The toy with index {0} is assigned to character {1}. Are You sure that you want to re-asign it?", mSelectedRadio.Key, _oldChar.CharacterName), "Check");
-                    if (result == MessageDialogResult.OK)
-                    {
-                        // settuj na Unassigned ako je Yes
-                        _oldChar.RadioNum = -1;
-                        await mCharacterDataProvider.SaveAsync(_oldChar);
-                    } else
-                    {
-                        mSelectedRadio = mRadiosCollection.First(p => p.Key == oldVal);
-                        RaisePropertyChanged("SelectedRadio");
-                        SelectRadioTitle = Properties.Resources.ShakeRadio;
-                    }
-                }
-            }
-            
-            Character.RadioNum = mSelectedRadio.Key;
-        }
+        }       
 
         public int WizardPassthroughIndex
         {
@@ -209,7 +186,9 @@ namespace DialogGenerator.UI.ViewModels
         }
 
         public CreateCharacterWorkflow Workflow { get; set; }
-        public Character Character {get;set;}
+
+        public Character Character { get; set; }
+
         public string CurrentDialogWizard
         {
             get
@@ -233,11 +212,55 @@ namespace DialogGenerator.UI.ViewModels
             set
             {
                 mCharacterName = value;
-                mCharacterInitials = _getCharacterInitials();
                 RaisePropertyChanged("CharacterName");
-                RaisePropertyChanged("CharacterInitials");
                 CharacterInitials = _getCharacterInitials();
                 CharacterIdentifier = _getCharacterIdentifier();
+                NextStepCommand.RaiseCanExecuteChanged();     
+                if((mCharacterName != null && mCharacterName.Length > 0) && (mCharacterName.Length <= 2 || char.IsDigit(mCharacterName.Substring(0,1).ToCharArray()[0])))
+                {
+                    if(mCharacterName.Length <= 2 && !char.IsDigit(mCharacterName.Substring(0, 1).ToCharArray()[0]))
+                    {
+                        CharacterNameValidationError = "The name must consist of at least 3 characters!";
+                        CharacterNameHasError = true;
+                    } else
+                    {
+                        CharacterNameValidationError = "The first character of the name must be a letter!";
+                        CharacterNameHasError = true;
+                    }
+                    
+                } else
+                {
+                    CharacterNameValidationError = string.Empty;
+                    CharacterNameHasError = false;
+                }
+            }
+        }
+
+        public string CharacterNameValidationError
+        {
+            get
+            {
+                return mCharacterNameValidationError;
+            }
+
+            set
+            {
+                mCharacterNameValidationError = value;
+                RaisePropertyChanged();
+            }
+        }
+
+        public bool CharacterNameHasError
+        {
+            get
+            {
+                return mCharacterNameHasError;
+            }
+
+            set
+            {
+                mCharacterNameHasError = value;
+                RaisePropertyChanged();
             }
         }
 
@@ -333,6 +356,51 @@ namespace DialogGenerator.UI.ViewModels
             }
         }
 
+        public bool CharacterHasNoVoice
+        {
+            get
+            {
+                return mHasNoVoice;
+            }
+
+            set
+            {
+                mHasNoVoice = value;
+                RaisePropertyChanged();
+            }
+        }
+
+        public string CharacterVoice
+        {
+            get
+            {
+                return mVoice;
+            }
+
+            set
+            {
+                mVoice = value;
+                RaisePropertyChanged();
+            }
+        }
+
+        public int CharacterSpeechRate
+        {
+            get
+            {
+                return mSpeechRate;
+            }
+
+            set
+            {
+                mSpeechRate = value;
+                RaisePropertyChanged();
+            }
+        }
+
+        public List<string> VoiceCollection { get; set; } = new List<string>();
+
+
         public List<int> AgesCollection
         {
             get
@@ -425,6 +493,14 @@ namespace DialogGenerator.UI.ViewModels
             }
         }
 
+        public bool NextEnabled
+        {
+            get
+            {
+                return !string.IsNullOrEmpty(CharacterName);
+            }
+        }
+
         public ICommand ChooseImageCommand { get; set; }
         public ICommand HomeCommand { get; set; }
         public ICommand CreateCommand { get; set; }
@@ -433,6 +509,8 @@ namespace DialogGenerator.UI.ViewModels
         public ICommand PlayCommand { get; set; }
         public ICommand ViewLoadedCommand { get; set; }
         public ICommand ViewUnloadedCommand { get; set; }
+        public DelegateCommand NextStepCommand { get; set; }
+        public DelegateCommand PreviewPlayCommand { get; set; }
 
         public void nextStep()
         {
@@ -466,6 +544,57 @@ namespace DialogGenerator.UI.ViewModels
                         
         }
 
+        private async void _selectToyToCharacter(int oldVal = -1)
+        {
+            if (mSelectedRadio.Key == -1)
+                return;
+
+            var _oldChars = mCharacterDataProvider.GetAll().Where(c => c.RadioNum == mSelectedRadio.Key);
+            if (_oldChars.Count() > 0)
+            {
+                var _oldChar = _oldChars.First();
+                _oldChar = mCharacterDataProvider.GetAll().Where(c => c.RadioNum == mSelectedRadio.Key).First();
+                if (_oldChar != null)
+                {
+                    // izbaci message box
+                    MessageDialogResult result = await mMessageDialogService.ShowOKCancelDialogAsync(String.Format("The toy with index {0} is assigned to character {1}. Are You sure that you want to re-asign it?", mSelectedRadio.Key, _oldChar.CharacterName), "Check");
+                    if (result == MessageDialogResult.OK)
+                    {
+                        // settuj na Unassigned ako je Yes
+                        _oldChar.RadioNum = -1;
+                        await mCharacterDataProvider.SaveAsync(_oldChar);
+                    }
+                    else
+                    {
+                        mSelectedRadio = mRadiosCollection.First(p => p.Key == oldVal);
+                        RaisePropertyChanged("SelectedRadio");
+                        SelectRadioTitle = Properties.Resources.ShakeRadio;
+                    }
+                }
+            }
+
+            Character.RadioNum = mSelectedRadio.Key;
+        }
+
+        private void _initVoiceCollection()
+        {
+
+            using (var _synth = new SpeechSynthesizer())
+            {
+                foreach (var _installedVoice in _synth.GetInstalledVoices())
+                {
+                    VoiceCollection.Add(_installedVoice.VoiceInfo.Name);
+                }
+
+                if (VoiceCollection.Count > 0)
+                {
+                    CharacterVoice = VoiceCollection[0];
+                }
+
+            }
+
+        }
+
         private void _initEntries()
         {
             CharacterName = String.Empty;
@@ -474,26 +603,67 @@ namespace DialogGenerator.UI.ViewModels
             CharacterAge = 10;
             CharacterGender = "Male";
             CharacterImage = "Avatar.png";
+            CharacterHasNoVoice = false;
+            if(VoiceCollection.Count > 0)
+            {
+                CharacterVoice = VoiceCollection[0];
+            }
+            
             CurrentStepIndex = 0;
             NextButtonText = "Next";
             WizardPassthroughIndex = 0;
             mIsFinished = false;
             SelectedRadio = RadiosCollection[0];
+
+            Character = new Character();
             
             _closeCreateSession();
         }
 
         private string _getCharacterInitials()
         {
-            if (String.IsNullOrEmpty(mCharacterName))
+            if (String.IsNullOrEmpty(mCharacterName) || mCharacterName.Length <= 2)
                 return String.Empty;
 
-            String[] tokens = mCharacterName.Split(' ');
+            String[] _tokens = mCharacterName.Split(' ');
+            List<string> _nonEmptyTokens = _tokens.Where(t => !string.IsNullOrEmpty(t)).ToList();
             String result = String.Empty;
-            for(int i = 0; i < tokens.Length; i++)
+            switch(_nonEmptyTokens.Count)
             {
-                result += tokens[i].First();
-            }
+                case 0:
+                    return result;
+                case 1:
+                    {
+                        int _range = Math.Min(3, _nonEmptyTokens[0].Length);
+                        result = _nonEmptyTokens[0].Substring(0, _range);
+                    }
+
+                    break;
+                case 2:
+                    {
+                        int _range = Math.Min(_nonEmptyTokens[0].Length, 2);
+                        result = _nonEmptyTokens[0].Substring(0, _range);
+                        int _leftover = 3 - _range;
+                        _range = Math.Min(_leftover, _nonEmptyTokens[1].Length);
+                        result += _nonEmptyTokens[1].Substring(0, _range);
+                    }
+                    
+                    break;
+                default:
+                    {
+                        int _max = 5;
+                        int _counter = 1;
+                        foreach (var _token in _nonEmptyTokens)
+                        {
+                            result += _token.Substring(0, 1);
+                            if (_counter == _max)
+                                break;
+                            _counter++;
+                        }
+                    }
+                    
+                    break;
+            }           
 
             return result.ToUpper();
         }
@@ -520,12 +690,37 @@ namespace DialogGenerator.UI.ViewModels
             PlayCommand = new DelegateCommand(_onPlayCommand_execute);
             ViewLoadedCommand = new DelegateCommand(_viewLoaded_execute);
             ViewUnloadedCommand = new DelegateCommand(_viewUnloaded_execute);
+            NextStepCommand = new DelegateCommand(_nextStep_Execute, _nextStep_CanExecute);
+            PreviewPlayCommand = new DelegateCommand(_previewPlayCommand);
+        }
+
+        private void _previewPlayCommand()
+        {
+            using (var _synth = new SpeechSynthesizer())
+            {
+                _synth.SelectVoice(CharacterVoice);
+                _synth.Rate = -1;
+                _synth.Volume = 100;
+                _synth.Speak(CharacterVoice);
+            }
+        }
+
+        private bool _nextStep_CanExecute()
+        {
+            return !string.IsNullOrEmpty(CharacterName) && CharacterName.Length >= 3;
+        }
+
+        private void _nextStep_Execute()
+        {
+            nextStep();
         }
 
         private async void _viewLoaded_execute()
         {
             await _checkWizardConfiguration();
+            Workflow.Fire(Triggers.SetName);
         }
+
         private void _viewUnloaded_execute()
         {
             
@@ -648,6 +843,13 @@ namespace DialogGenerator.UI.ViewModels
             {
                 case "Name":
                     Character.CharacterName = CharacterName;
+                    Character.HasNoVoice = CharacterHasNoVoice;
+                    if(CharacterHasNoVoice)
+                    {
+                        Character.Voice = CharacterVoice;
+                    }
+
+                    Character.SpeechRate = CharacterSpeechRate;
                     break;
                 case "Initials":
                     Character.CharacterPrefix = CharacterPrefix;
@@ -689,6 +891,14 @@ namespace DialogGenerator.UI.ViewModels
                 case "Name":
                     CurrentStepIndex = 0;                    
                     CharacterName = Character.CharacterName;
+                    CharacterHasNoVoice = Character.HasNoVoice;
+                    if(!string.IsNullOrEmpty(Character.Voice))
+                    {
+                        CharacterVoice = CharacterVoice;
+                    }
+
+                    CharacterSpeechRate = Character.SpeechRate;
+
                     break;
                 case "Initials":
                     CurrentStepIndex = 1;
@@ -1081,6 +1291,7 @@ namespace DialogGenerator.UI.ViewModels
 
                 System.Windows.Forms.OpenFileDialog _openFileDialog = new System.Windows.Forms.OpenFileDialog();
                 _openFileDialog.Filter = "Image files (*.jpg, *.jpeg, *.jpe, *.jfif, *.png) | *.jpg; *.jpeg; *.jpe; *.jfif; *.png";
+                _openFileDialog.InitialDirectory = ApplicationData.Instance.ImagesDirectory;
 
                 if (_openFileDialog.ShowDialog() != System.Windows.Forms.DialogResult.OK)
                     return;

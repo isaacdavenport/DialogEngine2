@@ -1,12 +1,15 @@
 ﻿using DialogGenerator.Core;
+using DialogGenerator.Events;
 using DialogGenerator.UI.Workflow.MP3RecorderStateMachine;
 using DialogGenerator.UI.Workflow.WizardWorkflow;
 using DialogGenerator.Utilities;
 using Prism.Commands;
+using Prism.Events;
 using Prism.Mvvm;
 using System;
 using System.ComponentModel;
 using System.IO;
+using System.Speech.Recognition;
 using System.Threading;
 using System.Windows;
 using System.Windows.Input;
@@ -24,6 +27,9 @@ namespace DialogGenerator.UI.ViewModels
         private NAudioEngine mSoundPlayer;
         private WizardWorkflow mWizardWorkflow;
         private readonly Timer mTimer;
+        private bool mEnableRecording = true;
+        private IEventAggregator mEventAggregator;
+        private SpeechRecognitionEngine mSoundRecognizer;
 
         #endregion
 
@@ -33,12 +39,16 @@ namespace DialogGenerator.UI.ViewModels
         /// Constructor
         /// </summary>
         /// <param name="player">Instance of <see cref="ISoundPlayer"/></param>
-        public VoiceRecorderControlViewModel(NAudioEngine player, WizardWorkflow _wizardWorkflow,IMessageDialogService _messageDialogService)
+        public VoiceRecorderControlViewModel(NAudioEngine player
+                                            , WizardWorkflow _wizardWorkflow
+                                            ,IMessageDialogService _messageDialogService
+                                            ,IEventAggregator _EventAggregator)
         {
             SoundPlayer = player;
             StateMachine = new MP3RecorderStateMachine(() => { });
             WizardWorkflow = _wizardWorkflow;
             mMessageDialogService = _messageDialogService;
+            mEventAggregator = _EventAggregator;
             mTimer = new Timer(_timer_Elapsed, null, Timeout.Infinite, Timeout.Infinite);
 
             StateMachine.PropertyChanged += _stateMachine_PropertyChanged;
@@ -51,15 +61,67 @@ namespace DialogGenerator.UI.ViewModels
 
         #endregion
 
+        #region - properties -
+
+        public bool EnableRecording
+        {
+            get
+            {
+                return mEnableRecording;
+            }
+
+            set
+            {
+                mEnableRecording = value;
+                RaisePropertyChanged();
+            }
+        }
+
+        public MP3RecorderStateMachine StateMachine { get; set; }
+
+        public WizardWorkflow WizardWorkflow
+        {
+            get { return mWizardWorkflow; }
+            set
+            {
+                mWizardWorkflow = value;
+            }
+        }
+
+        public NAudioEngine SoundPlayer
+        {
+            get { return mSoundPlayer; }
+            set
+            {
+                mSoundPlayer = value;
+                RaisePropertyChanged();
+            }
+        }
+
+        /// <summary>
+        /// Path of last recorded .mp3 file
+        /// </summary>
+        public string CurrentFilePath
+        {
+            get { return mCurrentFilePath; }
+            set
+            {
+                mCurrentFilePath = value;
+                RaisePropertyChanged();
+            }
+        }
+
+        #endregion
+
         #region - commands -State
 
-        public ICommand StartRecordingCommand { get; set; }
-        public ICommand StopRecorderCommand { get; set; }
-        public ICommand StartPlayingCommand { get; set; }
-        public ICommand PlayInContextCommand { get; set; }
-        public ICommand StopPlayingInContextCommand { get; set; }
-        public ICommand LoadedCommand { get; set; }
-        public ICommand UnloadedCommand { get; set; }
+        public DelegateCommand StartRecordingCommand { get; set; }
+        public DelegateCommand StopRecorderCommand { get; set; }
+        public DelegateCommand StartPlayingCommand { get; set; }
+        public DelegateCommand PlayInContextCommand { get; set; }
+        public DelegateCommand StopPlayingInContextCommand { get; set; }
+        public DelegateCommand LoadedCommand { get; set; }
+        public DelegateCommand UnloadedCommand { get; set; }
 
         #endregion
 
@@ -164,6 +226,24 @@ namespace DialogGenerator.UI.ViewModels
 
         #region - private functions -
 
+        private void _loadSoundEngine()
+        {
+            mSoundRecognizer = new SpeechRecognitionEngine(System.Globalization.CultureInfo.GetCultureInfo("en-US"));
+            mSoundRecognizer.LoadGrammar(new DictationGrammar());
+            mSoundRecognizer.SetInputToDefaultAudioDevice();
+            mSoundRecognizer.SpeechRecognized += MSoundRecognizer_SpeechRecognized;
+        }
+
+        private void _unloadSoundEngine()
+        {
+            mSoundRecognizer.SpeechRecognized -= MSoundRecognizer_SpeechRecognized;
+        }
+
+        private void MSoundRecognizer_SpeechRecognized(object sender, SpeechRecognizedEventArgs e)
+        {
+            mEventAggregator.GetEvent<SpeechConvertedEvent>().Publish(e.Result.Text);
+        }
+       
         private void _configureStateMachine()
         {
             StateMachine.Configure(States.Idle)
@@ -199,12 +279,14 @@ namespace DialogGenerator.UI.ViewModels
         }
 
         private void _unloaded_Execute()
-        {
+        {            
+            _unloadSoundEngine();
             mSoundPlayer.PropertyChanged -= _soundPlayer_PropertyChanged;
         }
 
         private void _loaded_Execute()
         {
+            _loadSoundEngine();
             mSoundPlayer.PropertyChanged += _soundPlayer_PropertyChanged;
         }
 
@@ -242,7 +324,7 @@ namespace DialogGenerator.UI.ViewModels
         {
             mSoundPlayer.StartRecording(Path.Combine(ApplicationData.Instance.AudioDirectory, CurrentFilePath + ".mp3"));
             mRecordingStartedTime = DateTime.Now;
-            mTimer.Change(0, 1000);
+            mTimer.Change(0, 1000);           
         }
 
         private void _startPlaying_Execute()
@@ -260,7 +342,15 @@ namespace DialogGenerator.UI.ViewModels
 
         private void _startRecording_Execute()
         { 
-            StateMachine.Fire(Triggers.Record);
+            if(EnableRecording)
+            {
+                mSoundRecognizer.RecognizeAsync(RecognizeMode.Multiple);
+                StateMachine.Fire(Triggers.Record);
+            } else
+            {
+                mEventAggregator.GetEvent<RequestTranslationEvent>().Publish(this.GetType().Name);
+            }
+            
         }
 
         private bool _startRecording_CanExecute()
@@ -277,8 +367,9 @@ namespace DialogGenerator.UI.ViewModels
                 case States.Recording:
                     {
                         mTimer.Change(Timeout.Infinite, Timeout.Infinite);
-                        mSoundPlayer.StopRecording();
+                        mSoundPlayer.StopRecording();                                                    
                         StateMachine.Fire(Triggers.On);
+                        mSoundRecognizer.RecognizeAsyncStop();
                         break;
                     }
                 case States.Playing:
@@ -295,42 +386,6 @@ namespace DialogGenerator.UI.ViewModels
 
         #endregion
 
-        #region - properties -
-
-        public MP3RecorderStateMachine StateMachine { get; set; }
-
-        public WizardWorkflow WizardWorkflow
-        {
-            get { return mWizardWorkflow; }
-            set
-            {
-                mWizardWorkflow = value;
-            }
-        }
-
-        public NAudioEngine SoundPlayer
-        {
-            get { return mSoundPlayer; }
-            set
-            {
-                mSoundPlayer = value;
-                RaisePropertyChanged();
-            }
-        }
-
-        /// <summary>
-        /// Path of last recorded .mp3 file
-        /// </summary>
-        public string CurrentFilePath
-        {
-            get { return mCurrentFilePath; }
-            set
-            {
-                mCurrentFilePath = value;
-                RaisePropertyChanged();
-            }
-        }
-
-        #endregion
+        
     }
 }

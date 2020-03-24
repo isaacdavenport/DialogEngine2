@@ -33,6 +33,9 @@
         <i:EventTrigger EventName="Loaded">
             <i:InvokeCommandAction Command="{Binding DialogHostLoaded}" />
         </i:EventTrigger>
+        <i:EventTrigger EventName="Unloaded">
+            <i:InvokeCommandAction Command="{Binding DialogHostUnloaded}" />
+        </i:EventTrigger>
     </i:Interaction.Triggers>
 
     <materialDesign:DialogHost Identifier="WizardPageDialogHost">
@@ -136,7 +139,9 @@
                                 TextWrapping="Wrap"
                                 BorderThickness="2"
                                 VerticalScrollBarVisibility="Auto" 
-                                materialDesign:HintAssist.Hint="Write text for this tag..." />
+                                materialDesign:HintAssist.Hint="Write text for this tag..." 
+                                SpellCheck.IsEnabled="True" 
+                                Visibility="{Binding CurrentTutorialStep.CollectUserInput, Converter={StaticResource BooleanToVisibilityConverter}}" />
                     </Grid>
 
                         <Grid x:Name="MediaGrid" Grid.Column="2" HorizontalAlignment="Center" 
@@ -156,7 +161,8 @@
                             <!-- Recorder -->
                             <Border x:Name="RecorderBrd" Grid.Row="1" BorderThickness="1"
                                     HorizontalAlignment="Stretch" VerticalAlignment="Stretch"
-                                    CornerRadius="2,2,2,2" BorderBrush="#FF595959">
+                                    CornerRadius="2,2,2,2" BorderBrush="#FF595959" 
+                                    Visibility="{Binding CurrentTutorialStep.CollectUserInput, Converter={StaticResource BooleanToVisibilityConverter}}">
 
                                 <!--<controls:VoiceRecorderControl x:Name="voiceRecorder" HorizontalAlignment="Stretch" VerticalAlignment="Stretch"
                                         DataContext="{Binding DataContext.VoiceRecorderControlViewModel, RelativeSource={RelativeSource 

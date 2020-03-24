@@ -11,8 +11,10 @@ namespace DialogGenerator.UI.Converters
         {
             try
             {
-                string identifier = value.ToString();
+                if (value == null)
+                    return Visibility.Collapsed;
 
+                string identifier = value.ToString();
                 return string.IsNullOrEmpty(identifier) ? Visibility.Collapsed : Visibility.Visible;
             }
             catch { }

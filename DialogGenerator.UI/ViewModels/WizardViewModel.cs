@@ -8,14 +8,18 @@ using DialogGenerator.UI.Views.Dialogs;
 using DialogGenerator.UI.Workflow.CreateCharacterWorkflow;
 using DialogGenerator.UI.Workflow.WizardWorkflow;
 using DialogGenerator.Utilities;
+using NAudio.Lame;
+using NAudio.Wave;
 using Prism.Commands;
 using Prism.Events;
 using Prism.Mvvm;
 using Prism.Regions;
 using System;
+using System.Collections.Generic;
 using System.ComponentModel;
 using System.IO;
 using System.Linq;
+using System.Speech.Synthesis;
 using System.Threading;
 using System.Threading.Tasks;
 using System.Windows;
@@ -54,6 +58,9 @@ namespace DialogGenerator.UI.ViewModels
         private TutorialStep mCurrentTutorialStep;
         private CancellationTokenSource mCancellationTokenSource;
         private bool mIsFinished = false;
+        private string mOutMp3File = string.Empty;
+        private string mOutWavFile = string.Empty;
+        private SpeechSynthesizer mSpeechSyntesizer;
 
         #endregion
 
@@ -78,22 +85,28 @@ namespace DialogGenerator.UI.ViewModels
 
             Workflow = new WizardWorkflow(action: () => { });
             MediaPlayerControlViewModel = new MediaPlayerControlViewModel(Workflow);
-            VoiceRecorderControlViewModel = new VoiceRecorderControlViewModel(NAudioEngine.Instance,Workflow,mMessageDialogService);
+            VoiceRecorderControlViewModel = new VoiceRecorderControlViewModel(NAudioEngine.Instance,Workflow,mMessageDialogService, _eventAggregator);
+
+            mSpeechSyntesizer = new SpeechSynthesizer();
 
             Workflow.PropertyChanged += _workflow_PropertyChanged;
             this.PropertyChanged += _wizardViewModel_PropertyChanged;
             _configureWorkflow();
+            _bindEvents();
             _bindCommands();
         }
+
+
 
         #endregion
 
         #region - commands -
 
         public ICommand DialogHostLoaded { get; set; }
-        public ICommand SaveAndNext { get; set; }
+        public ICommand DialogHostUnloaded { get; set; }
+        public DelegateCommand SaveAndNext { get; set; }
         public ICommand SkipStep { get; set; }
-        public ICommand PlayInContext { get; set; }
+        public DelegateCommand PlayInContext { get; set; }
         public ICommand StopPlayingInContext { get; set; }
         public ICommand Cancel { get; set; }
 
@@ -234,11 +247,46 @@ namespace DialogGenerator.UI.ViewModels
         private void _bindCommands()
         {
             DialogHostLoaded = new DelegateCommand(() => { Workflow.Fire(WizardTriggers.ShowChooseWizardDialog);});
+            DialogHostUnloaded = new DelegateCommand(_view_Unloaded);
             SaveAndNext = new DelegateCommand(() => { Workflow.Fire(WizardTriggers.SaveAndLoadNextStep); },_saveAndNext_CanExecute);
             SkipStep = new DelegateCommand(() => { Workflow.Fire(WizardTriggers.LoadNextStep); },_skipStep_CanExecute);
             PlayInContext = new DelegateCommand(_playDialogLineInContext_Execute,_playInContext_CanExecute);
             StopPlayingInContext = new DelegateCommand(_stopPlayingDialogLineInContext_Execute, _stopPlayingDialogLineInContext_CanExecute);
             Cancel = new DelegateCommand(() => { Workflow.Fire(WizardTriggers.LeaveWizard); },_cancel_CanExecute);
+        }
+
+
+
+        private void _bindEvents()
+        {
+            mEventAggregator.GetEvent<RequestTranslationEvent>().Subscribe(_onTranslationRequired);
+            mEventAggregator.GetEvent<SpeechConvertedEvent>().Subscribe(_onSpeechRecognized);
+        }
+
+        private void _onSpeechRecognized(string _recognizedText)
+        {
+            if(string.IsNullOrEmpty(DialogStr))
+            {
+                DialogStr = _recognizedText;
+            }
+        }
+
+        private async void _onTranslationRequired(string _Caller)
+        {            
+            if(_Caller.Equals("VoiceRecorderControlViewModel"))
+            {
+                if (!string.IsNullOrEmpty(DialogStr))
+                {
+                    GenerateSpeech(mDialogStr);
+                    await mMessageDialogService.ShowMessage("Notification", "The sound was generated from the text box");
+                    SaveAndNext.RaiseCanExecuteChanged();
+
+                }
+                else
+                {
+                    await mMessageDialogService.ShowMessage("Error", "Since the recording was disabled, the text box should contain some meaningfull text which will be converted to speech and must not be empty!");
+                }
+            }            
         }
 
         private bool _stopPlayingDialogLineInContext_CanExecute()
@@ -255,6 +303,9 @@ namespace DialogGenerator.UI.ViewModels
         {
             try
             {
+                if (CurrentTutorialStep == null)
+                    return false;
+
                 var dialogs = CurrentTutorialStep.PlayUserRecordedAudioInContext;
 
                 foreach (var dialog in dialogs)
@@ -269,7 +320,7 @@ namespace DialogGenerator.UI.ViewModels
                 }
 
                 return Workflow.State == WizardStates.WaitingForUserAction
-                       && VoiceRecorderControlViewModel.StartPlayingCommand.CanExecute(null);
+                       && VoiceRecorderControlViewModel.StartPlayingCommand.CanExecute();
             }
             catch (Exception){}
             return false;
@@ -279,7 +330,7 @@ namespace DialogGenerator.UI.ViewModels
         {
             try
             {
-                return (CurrentStepIndex < CurrentWizard.TutorialSteps.Count - 1)
+                return (CurrentWizard != null && CurrentStepIndex < CurrentWizard.TutorialSteps.Count - 1)
                         && Workflow.State == WizardStates.WaitingForUserAction;
             }
             catch (Exception) { }
@@ -304,9 +355,9 @@ namespace DialogGenerator.UI.ViewModels
         {
             mCancellationTokenSource.Cancel();
 
-            if (VoiceRecorderControlViewModel.StopPlayingInContextCommand.CanExecute(null))
+            if (VoiceRecorderControlViewModel.StopPlayingInContextCommand.CanExecute())
             {
-                VoiceRecorderControlViewModel.StopPlayingInContextCommand.Execute(null);
+                VoiceRecorderControlViewModel.StopPlayingInContextCommand.Execute();
             }
             else if (MediaPlayerControlViewModel.StopPlayingInContextCommand.CanExecute(null))
             {
@@ -337,8 +388,8 @@ namespace DialogGenerator.UI.ViewModels
                             {
                                 Application.Current.Dispatcher.Invoke(() =>
                                 {
-                                    if (VoiceRecorderControlViewModel.PlayInContextCommand.CanExecute(null))
-                                        VoiceRecorderControlViewModel.PlayInContextCommand.Execute(null);
+                                    if (VoiceRecorderControlViewModel.PlayInContextCommand.CanExecute())
+                                        VoiceRecorderControlViewModel.PlayInContextCommand.Execute();
                                 });
                             }
                             else
@@ -346,13 +397,20 @@ namespace DialogGenerator.UI.ViewModels
 
                                 if (Path.HasExtension(_dialogLine))
                                 {
-                                    MediaPlayerControlViewModel.CurrentVideoFilePath = 
+                                    Application.Current.Dispatcher.Invoke(() =>
+                                    {
+                                        MediaPlayerControlViewModel.CurrentVideoFilePath =
                                        Path.Combine(ApplicationData.Instance.VideoDirectory, _dialogLine);
+                                    });
+                                    
                                 }
                                 else
-                                {                                    
-                                    MediaPlayerControlViewModel.CurrentVideoFilePath =
-                                       Path.Combine(ApplicationData.Instance.VideoDirectory, _dialogLine + ".avi");
+                                {
+                                    Application.Current.Dispatcher.Invoke(() => {
+                                        MediaPlayerControlViewModel.CurrentVideoFilePath =
+                                           Path.Combine(ApplicationData.Instance.VideoDirectory, _dialogLine + ".avi");
+                                    });
+                                    
                                 }
                                 Application.Current.Dispatcher.Invoke(() =>
                                 {
@@ -452,6 +510,7 @@ namespace DialogGenerator.UI.ViewModels
             CurrentWizard = null;
             CurrentStepIndex = 0;
             DialogStr = "";
+            VoiceRecorderControlViewModel.EnableRecording = true;
         }
 
         private void _leaveWizard()
@@ -537,7 +596,14 @@ namespace DialogGenerator.UI.ViewModels
                     Workflow.Fire(WizardTriggers.LeaveWizard);
                 }
             }
-            
+
+            mSpeechSyntesizer.SpeakCompleted += _synth_SpeakCompleted;
+
+        }
+
+        private void _view_Unloaded()
+        {
+            mSpeechSyntesizer.SpeakCompleted -= _synth_SpeakCompleted;
         }
 
         private void _nextStep()
@@ -582,9 +648,15 @@ namespace DialogGenerator.UI.ViewModels
             {
                 PhraseRating = CurrentTutorialStep.PhraseRating,
                 DialogStr = DialogStr,
-                PhraseWeights = CurrentTutorialStep.PhraseWeights, 
+                PhraseWeights = new Dictionary<string,double>(), 
                 FileName = $"{_fileNameParts[_fileNameParts.Length-2]}_{_fileNameParts.Last()}"
             };
+
+            foreach(KeyValuePair<string, double> entry in CurrentTutorialStep.PhraseWeights)
+            {
+                _phraseEntry.PhraseWeights.Add(entry.Key, entry.Value);
+            }
+
 
             //by adding the mp3 filename for a phrase as a phraseweight we can access an exact phrase
             // from an existing character without editing that character, for instance a built in character
@@ -693,6 +765,7 @@ namespace DialogGenerator.UI.ViewModels
             set
             {
                 mCharacter = value;
+                VoiceRecorderControlViewModel.EnableRecording = !mCharacter.HasNoVoice;
                 RaisePropertyChanged();
             }
         }
@@ -703,9 +776,16 @@ namespace DialogGenerator.UI.ViewModels
             set
             {
                 mDialogStr = value;
+                //if(!string.IsNullOrEmpty(mDialogStr) && ApplicationData.Instance.Text2SpeechEnabled)
+                //{
+                //    _generateSpeech(mDialogStr);
+                //}
+                
                 RaisePropertyChanged();
             }
         }
+
+        
 
         public MediaPlayerControlViewModel MediaPlayerControlViewModel
         {
@@ -724,6 +804,110 @@ namespace DialogGenerator.UI.ViewModels
             {
                 mVoiceRecorderControlViewModel = value;
                 RaisePropertyChanged();
+            }
+        }
+
+        #endregion
+
+        #region Private methods
+
+        private void GenerateSpeech(string value)
+        {
+            string _outfile = string.Empty;
+            string _outFileOriginal = string.Empty;
+
+            try
+            {
+                mSpeechSyntesizer.Volume = 100;
+                mSpeechSyntesizer.Rate = Character.SpeechRate;
+                if (mSpeechSyntesizer.GetInstalledVoices().Count() == 0)
+                {
+                    return;
+                }
+
+                if (mSpeechSyntesizer.GetInstalledVoices().Where(iv => iv.VoiceInfo.Name.Equals(Character.Voice)).Count() > 0)
+                {
+                    mSpeechSyntesizer.SelectVoice(Character.Voice);
+                }
+
+                mOutMp3File = ApplicationData.Instance.AudioDirectory + "\\" + VoiceRecorderControlViewModel.CurrentFilePath + ".mp3";
+                mOutWavFile = mOutMp3File.Replace(".mp3", ".wav");
+
+                MemoryStream _ms = new MemoryStream();
+                mSpeechSyntesizer.SetOutputToWaveStream(_ms);
+                mSpeechSyntesizer.Speak(value);
+                mSpeechSyntesizer.SetOutputToNull();
+
+                _ms.Position = 0;
+
+                using (var _rdr = new WaveFileReader(_ms))
+                using (var _outFileStream = File.OpenWrite(mOutMp3File))
+                using (var _wtr = new LameMP3FileWriter(_outFileStream, _rdr.WaveFormat, 128))
+                {
+                    _rdr.CopyTo(_wtr);
+                }
+                    
+                VoiceRecorderControlViewModel.StartPlayingCommand.RaiseCanExecuteChanged();
+                PlayInContext.RaiseCanExecuteChanged();
+            } catch (Exception exp)
+            {
+                mLogger.Info(exp.Message);
+                mLogger.Error(exp.Message);
+            }
+            
+
+        }
+
+        private void _synth_SpeakCompleted(object sender, SpeakCompletedEventArgs e)
+        {
+            try
+            {
+                mLogger.Info("Entered handler");
+                mLogger.Debug("Entered handler");
+
+                mSpeechSyntesizer.SetOutputToNull();
+
+                var _fs = File.OpenRead(mOutWavFile);
+
+                //using (var _fs = File.OpenRead(mOutWavFile))
+                //using (var _rdr = new WaveFileReader(_fs))
+                //using (var _outFileStream = File.OpenWrite(mOutMp3File))
+                //using (var _wtr = new LameMP3FileWriter(_outFileStream, _rdr.WaveFormat, 128))
+                //{
+                //    _rdr.CopyTo(_wtr);
+                //}
+
+                mLogger.Info("Conversion is done");
+                mLogger.Debug("Conversion is done");
+
+                if (!string.IsNullOrEmpty(mOutWavFile) && File.Exists(mOutWavFile))
+                {
+                    File.Delete(mOutWavFile);
+                }
+
+                mLogger.Info("File deleted");
+                mLogger.Debug("File deleted");
+
+                VoiceRecorderControlViewModel.StartPlayingCommand.RaiseCanExecuteChanged();
+                PlayInContext.RaiseCanExecuteChanged();
+            } catch (Exception excep)
+            {
+                mLogger.Error(excep.Message);
+                mLogger.Error(excep.Message);
+            }
+            
+        }
+
+        public static byte[] ConvertWavToMp3(byte[] wavFile)
+        {
+
+            using (var retMs = new MemoryStream())
+            using (var ms = new MemoryStream(wavFile))
+            using (var rdr = new WaveFileReader(ms))
+            using (var wtr = new LameMP3FileWriter(retMs, rdr.WaveFormat, 128))
+            {
+                rdr.CopyTo(wtr);
+                return retMs.ToArray();
             }
         }
 

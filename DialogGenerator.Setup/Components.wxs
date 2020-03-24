@@ -30,11 +30,20 @@
       <Component Id="NAudio.dll" Guid="65690e72-0d36-4d90-ac9e-e9595ca8541d">
         <File Id="NAudio.dll" Name="NAudio.dll" Source="$(var.DialogGenerator_TargetDir)NAudio.dll" />
       </Component>
+      <Component Id="NAudio.Lame.dll" Guid="00343B47-8DB8-477B-92E4-50815E418564">
+        <File Id="Naudio.Lame.dll" Source="$(var.DialogGenerator_TargetDir)NAudio.Lame.dll" />
+      </Component>
       <Component Id="Newtonsoft.Json.dll" Guid="2133648c-3e9d-44cf-ad63-9200f2b0edc0">
         <File Id="Newtonsoft.Json.dll" Name="Newtonsoft.Json.dll" Source="$(var.DialogGenerator_TargetDir)Newtonsoft.Json.dll" />
       </Component>
       <Component Id="log4net.dll" Guid="0f54981e-e65e-403d-9ee9-6d3a22c395b1">
         <File Id="log4net.dll" Name="log4net.dll" Source="$(var.DialogGenerator_TargetDir)log4net.dll" />
+      </Component>
+      <Component Id="libmp3lame.32.dll" Guid="6FCA8238-90EB-41AA-B291-48263B32266B">
+        <File Id="libmp3lame.32.dll" Name="libmp3lame.32.dll" Source="$(var.DialogGenerator_TargetDir)libmp3lame.32.dll" />
+      </Component>
+      <Component Id="libmp3lame.64.dll" Guid="356693C5-CB0F-4D0C-BDAA-E892E58B3BFC">
+        <File Id="libmp3lame.64.dll" Name="libmp3lame.64.dll" Source="$(var.DialogGenerator_TargetDir)libmp3lame.64.dll" />
       </Component>
       <Component Id="MaterialDesignColors.dll" Guid="f4bdaa7f-d1e0-414f-bc43-705d03dcdea6">
         <File Id="MaterialDesignColors.dll" Name="MaterialDesignColors.dll" Source="$(var.DialogGenerator_TargetDir)MaterialDesignColors.dll" />

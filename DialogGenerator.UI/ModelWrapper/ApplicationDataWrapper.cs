@@ -183,5 +183,6 @@ namespace DialogGenerator.UI.Wrapper
                 validateProperty(nameof(MsMotionWindow));
             }
         }
+        
     }
 }

@@ -10,6 +10,7 @@
              xmlns:inf="clr-namespace:DialogGenerator.Core;assembly=DialogGenerator.Core"
              xmlns:view="clr-namespace:DialogGenerator.UI.Views"
              xmlns:converters="clr-namespace:DialogGenerator.UI.Converters"
+             xmlns:toolkit="http://schemas.xceed.com/wpf/xaml/toolkit"
              mc:Ignorable="d" 
              d:DesignHeight="450" d:DesignWidth="800">
     <UserControl.Resources>
@@ -93,6 +94,9 @@
                                     <RowDefinition Height="auto"/>
                                     <RowDefinition Height="auto"/>
                                     <RowDefinition Height="auto"/>
+                                    <RowDefinition Height="auto" />
+                                    <RowDefinition Height="auto" />
+                                    <RowDefinition Height="auto" />
                                     <RowDefinition Height="auto" />
                                     <RowDefinition Height="auto" />
                                     <RowDefinition Height="auto" />
@@ -192,8 +196,18 @@
                                                  materialDesign:ValidationAssist.UsePopup="True"
                                                  Text="{Binding Character.Author,Mode=TwoWay,UpdateSourceTrigger=PropertyChanged}"/>
                                 </StackPanel>
+                                <CheckBox Content="Enable text to speech" IsChecked="{Binding Character.HasNoVoice}" Grid.Row="6" Grid.Column="1" Margin="0,20,0,0" />
+                                <StackPanel Grid.Row="7" Grid.Column="1" Margin="0,20,0,0" Visibility="{Binding Character.HasNoVoice, Converter={StaticResource BooleanToVisibilityConverter}}">
+                                    <Label Content="Voices:" HorizontalAlignment="Left"/>
+                                    <ComboBox ItemsSource="{Binding VoicesCollection}" 
+                                              SelectedItem="{Binding Character.Voice}"/>
+                                </StackPanel>
+                                <StackPanel Grid.Row="8" Grid.Column="1" Margin="0,20,0,0" Visibility="{Binding Character.HasNoVoice, Converter={StaticResource BooleanToVisibilityConverter}}">
+                                    <Label Content="Speech rate:" HorizontalAlignment="Left"/>
+                                    <TextBox Text="{Binding Character.SpeechRate}" />
+                                </StackPanel>
 
-                                <StackPanel HorizontalAlignment="Center" Margin="0,20,0,0" Orientation="Horizontal" Grid.Row="7" Grid.ColumnSpan="2">
+                                <StackPanel HorizontalAlignment="Center" Margin="0,20,0,0" Orientation="Horizontal" Grid.Row="9" Grid.ColumnSpan="2">
                                     <Button Style="{StaticResource MaterialDesignFlatButton}" Content="Delete" Command="{Binding DeleteCommand}" />
                                     <Button Content="Save" Command="{Binding SaveCommand}" Background="#51cb8c" 
                                                 BorderBrush="#51cb8c" Style="{DynamicResource MaterialDesignRaisedButton}"  Margin="10,0,0,0" />

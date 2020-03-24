@@ -3,9 +3,12 @@ using DialogGenerator.UI.Wrapper;
 using MaterialDesignThemes.Wpf;
 using Prism.Commands;
 using System;
+using System.Collections.Generic;
+using System.Collections.ObjectModel;
 using System.ComponentModel;
 using System.Diagnostics;
 using System.IO;
+using System.Speech.Synthesis;
 using System.Windows.Controls;
 using System.Windows.Input;
 
@@ -28,6 +31,13 @@ namespace DialogGenerator.UI.Views.Dialogs
             InitializeComponent();
 
             Settings = new ApplicationDataWrapper(ApplicationData.Instance);
+            using(SpeechSynthesizer _speech = new SpeechSynthesizer())
+            {
+                foreach(var _voiceType in _speech.GetInstalledVoices())
+                {
+                    VoiceTypesCollection.Add(_voiceType.VoiceInfo.Name);
+                }
+            }
         }
 
         public ICommand WebsiteCommand { get; set; }
@@ -58,6 +68,8 @@ namespace DialogGenerator.UI.Views.Dialogs
                 OnPropertyChanged("Settings");
             }
         }
+
+        public ObservableCollection<string> VoiceTypesCollection { get; set; } = new ObservableCollection<string>();
 
         public string Website
         {

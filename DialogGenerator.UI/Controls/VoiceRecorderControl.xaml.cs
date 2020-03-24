@@ -1,4 +1,5 @@
-﻿using System.Windows.Controls;
+﻿using System.Windows;
+using System.Windows.Controls;
 
 namespace DialogGenerator.UI.Controls
 {
@@ -7,9 +8,20 @@ namespace DialogGenerator.UI.Controls
     /// </summary>
     public partial class VoiceRecorderControl : UserControl
     {
+        public static readonly DependencyProperty EnableRecordingProperty = DependencyProperty.Register("EnableRecording", typeof(bool), typeof(VoiceRecorderControl), new UIPropertyMetadata(false));
+
         public VoiceRecorderControl()
         {
             InitializeComponent();
+        }
+
+        public bool EnableRecording
+        {
+            get { return (bool)GetValue(EnableRecordingProperty); }
+            set
+            {
+                SetValue(EnableRecordingProperty, value);
+            }
         }
     }
 }

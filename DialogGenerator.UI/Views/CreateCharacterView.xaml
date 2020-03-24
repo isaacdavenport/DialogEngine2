@@ -4,12 +4,12 @@
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
              xmlns:prism="http://prismlibrary.com/"            
-            prism:ViewModelLocator.AutoWireViewModel="True"
-            xmlns:enums ="clr-namespace:DialogGenerator.Model.Enum;assembly=DialogGenerator.Model"
-            xmlns:materialDesign="http://materialdesigninxaml.net/winfx/xaml/themes"
-            xmlns:inf="clr-namespace:DialogGenerator.Core;assembly=DialogGenerator.Core"
-            xmlns:view="clr-namespace:DialogGenerator.UI.Views"
-            xmlns:converters="clr-namespace:DialogGenerator.UI.Converters"
+             prism:ViewModelLocator.AutoWireViewModel="True"
+             xmlns:enums ="clr-namespace:DialogGenerator.Model.Enum;assembly=DialogGenerator.Model"
+             xmlns:materialDesign="http://materialdesigninxaml.net/winfx/xaml/themes"
+             xmlns:inf="clr-namespace:DialogGenerator.Core;assembly=DialogGenerator.Core"
+             xmlns:view="clr-namespace:DialogGenerator.UI.Views"
+             xmlns:converters="clr-namespace:DialogGenerator.UI.Converters"
              xmlns:i="clr-namespace:System.Windows.Interactivity;assembly=System.Windows.Interactivity"    
              mc:Ignorable="d" 
              d:DesignHeight="450" d:DesignWidth="800">
@@ -32,8 +32,73 @@
                                 <ColumnDefinition Width="*"/>
                                 <ColumnDefinition Width="2*"/>
                             </Grid.ColumnDefinitions>
-                            <Label Grid.Column="1" Height="30" Margin="0, 8, 20, 0" HorizontalAlignment="Right">Name:</Label>
-                            <TextBox x:Name="FirstName" Grid.Column="2" Height="30" Text="{Binding CharacterName}"/>
+                            <Grid.RowDefinitions>
+                                <RowDefinition Height="*" />
+                                <RowDefinition Height="Auto" />
+                                <RowDefinition Height="Auto" />
+                                <RowDefinition Height="Auto" />
+                                <RowDefinition Height="Auto" />
+                                <RowDefinition Height="Auto" />
+                                <RowDefinition Height="*" />
+                            </Grid.RowDefinitions>
+                            <Label Grid.Column="1" Grid.Row="1" Height="30" Margin="0, 8, 20, 0" HorizontalAlignment="Right">Name:</Label>
+                            <TextBox x:Name="FirstName" 
+                                     Grid.Column="2" 
+                                     Grid.Row="1" 
+                                     Height="30"                                      
+                                     Text="{Binding CharacterName, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}" />
+                            <TextBlock x:Name="ValidationError" 
+                                       Grid.Column="2" 
+                                       Grid.ColumnSpan="2" 
+                                       Grid.Row="2"
+                                       Text="{Binding CharacterNameValidationError}" 
+                                       Visibility="{Binding CharacterNameHasError, Converter={StaticResource BooleanToVisibilityConverter}}"
+                                       Foreground="Red"/>
+                            <CheckBox x:Name="ChkHasVoices" 
+                                      Grid.Row="3" 
+                                      Grid.Column="2" 
+                                      Grid.ColumnSpan="3"  
+                                      Content="Use text to speech generator" 
+                                      IsChecked="{Binding CharacterHasNoVoice, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}" 
+                                      Margin="0,20,0,0" />
+                            <Label Grid.Column="1" Grid.Row="4" Height="30" 
+                                   Margin="0, 27, 20, 0" 
+                                   HorizontalAlignment="Right" 
+                                   Visibility="{Binding CharacterHasNoVoice, Converter={StaticResource BooleanToVisibilityConverter}}">Selected voice:</Label>
+                            <StackPanel Orientation="Horizontal" Grid.Row="4" Grid.Column="2">
+                                <ComboBox x:Name="CmbVoices" 
+                                          ItemsSource="{Binding VoiceCollection}" 
+                                          SelectedItem="{Binding CharacterVoice}" 
+                                          Visibility="{Binding CharacterHasNoVoice, 
+                                                               Converter={StaticResource BooleanToVisibilityConverter}}" 
+                                          Margin="0,20,0,0" />
+                                <Button Grid.Column="3" 
+                                        x:Name="PlayBtn" 
+                                        Margin="20,20,0,0" 
+                                        Width="25" 
+                                        Height="25" 
+                                        Visibility="{Binding CharacterHasNoVoice, 
+                                                     Converter={StaticResource BooleanToVisibilityConverter}}" 
+                                        Command="{Binding PreviewPlayCommand}"
+                                        ToolTip="Click to test the sound">
+                                    <Button.Resources>
+                                        <ResourceDictionary Source="pack://application:,,,/DialogGenerator.UI;component/Themes/VoiceRecorderStyle.xaml" />
+                                    </Button.Resources>
+                                    <materialDesign:PackIcon  Kind="Play" Foreground="LightGreen"/>
+                                </Button>
+                            </StackPanel>
+                            <Label Grid.Column="1" Grid.Row="5" Height="30"
+                                   Margin="0,27,20,0"
+                                   HorizontalAlignment="Right"
+                                   Visibility="{Binding CharacterHasNoVoice, 
+                                    Converter={StaticResource BooleanToVisibilityConverter}}">Speech rate:</Label>
+                            <TextBox 
+                                Text="{Binding CharacterSpeechRate}" 
+                                Grid.Column="2" 
+                                Grid.Row="5" 
+                                Visibility="{Binding CharacterHasNoVoice, 
+                                    Converter={StaticResource BooleanToVisibilityConverter}}" HorizontalContentAlignment="Center" HorizontalAlignment="Left" Width="50"/>
+
                         </Grid>
                     </ControlTemplate>
                     <ControlTemplate x:Key="InitialsControl">
@@ -155,7 +220,7 @@
                             </ComboBox>
                         </Grid>
                     </ControlTemplate>
-                    
+
                     <ControlTemplate x:Key="WizardControl">
                         <Grid Background="White">
                             <Grid.ColumnDefinitions>
@@ -284,7 +349,7 @@
                         <TextBlock Grid.Row="1" FontSize="14" HorizontalAlignment="Center" Text="{Binding CurrentStep.StepDescription}" Margin="0,10,0,10" Foreground="White"></TextBlock>
                     </Grid>
                 </Border>
-                <ContentControl Name="ContentControl" Grid.Row="1" Margin="5,5,5,5" Template="{StaticResource NameControl}"/>
+                <ContentControl Name="ContentControl" Grid.Row="1" Margin="5,5,5,5" />
             </Grid>
         </Grid>
         <Border Grid.Row="1" BorderBrush="Gray" BorderThickness="1">
@@ -306,7 +371,7 @@
                     </Button.InputBindings>-->
                 </Button>
                 <Button Grid.Column="0" HorizontalAlignment="Right" Content="Previous" Margin="0,0,10,0" Width="120" Click="ButtonPrev_Click"/>
-                <Button Grid.Column="1" HorizontalAlignment="Left" Content="{Binding NextButtonText}" Margin="10, 0, 0, 0" Width="120" Click="ButtonNext_Click"/>
+                <Button Grid.Column="1" HorizontalAlignment="Left" Content="{Binding NextButtonText}" Margin="10, 0, 0, 0" Width="120" Command="{Binding NextStepCommand}" />
                 <Button Grid.Column="1" HorizontalAlignment="Right" Content="Cancel" Width="120" Margin="0,0,10,0" Command="{Binding HomeCommand}">
                     <!--<Button.InputBindings>
                         <MouseBinding MouseAction="LeftClick" Command="NavigationCommands.GoToPage">

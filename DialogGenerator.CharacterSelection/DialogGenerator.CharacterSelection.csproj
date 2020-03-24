@@ -100,7 +100,6 @@
     <Compile Include="Model\ReceivedMessage.cs" />
     <Compile Include="Model\BLEDataProviderType.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="RandomSelectionService.cs" />
     <Compile Include="BLESelectionService.cs" />
     <Compile Include="Workflow\SerialSelectionWorkflow.cs" />
   </ItemGroup>
