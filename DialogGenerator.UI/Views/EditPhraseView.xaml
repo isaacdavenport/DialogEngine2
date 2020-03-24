@@ -73,7 +73,7 @@
         </Grid>
         
         <Label Grid.Row="3" Content="Phrase Text" HorizontalContentAlignment="Center" Margin="0,20,0,0" FontWeight="Bold" />
-        <TextBox Grid.Row="4" Text="{Binding DialogLineText}" HorizontalAlignment="Stretch" Height="50" VerticalContentAlignment="Top" Margin="5,0,5,0" TextWrapping="Wrap"/>
+        <TextBox Grid.Row="4" Text="{Binding DialogLineText}" HorizontalAlignment="Stretch" Height="50" VerticalContentAlignment="Top" Margin="5,0,5,0" TextWrapping="Wrap" SpellCheck.IsEnabled="True"/>
         <Label Grid.Row="5" Content="Audio" HorizontalContentAlignment="Center" Margin="0,20,0,0" FontWeight="Bold" />
         <Border x:Name="VoiceRcrdBorder" Grid.Row="6" BorderThickness="2" HorizontalAlignment="Stretch" 
                 VerticalAlignment="Stretch" Background="#FF333333" CornerRadius="3,3,3,3">
