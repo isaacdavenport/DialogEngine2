@@ -211,7 +211,7 @@ namespace DialogGenerator.CharacterSelection
         /// a set number of milliseconds in the case the user is holding one or more of the toys they wish to speak.
         /// </summary>
         /// <returns></returns>
-        private bool _calculateIfInMotionWindow()
+        private bool _inMotionThenStillnessWindow()
         {
             try
             {
@@ -355,32 +355,6 @@ namespace DialogGenerator.CharacterSelection
         }
 
 
-        private bool _calculateRssiStablity(int _Ch1, int _Ch2, long _milliseconds = 250, double _HitPercent = 0.70)
-        {
-            if (ApplicationData.Instance.RadioMovesTimeSensitivity > 0 &&
-                     ApplicationData.Instance.RadioMovesTimeSensitivity < 1.0)
-            { 
-                _milliseconds = (long)(_milliseconds * ApplicationData.Instance.RadioMovesTimeSensitivity * 10.0);
-            }
-
-            if ((_Ch1 != mStableRadioIndex1 || _Ch2 != mStableRadioIndex2) &&
-                (_Ch1 != mStableRadioIndex2 || _Ch2 != mStableRadioIndex1))
-            {
-                mLastStableTime = _toMilliseconds(DateTime.Now);
-                mStableRadioIndex1 = _Ch1;
-                mStableRadioIndex2 = _Ch2;
-                return false;
-            }
-
-            long _currentTime = _toMilliseconds(DateTime.Now);
-            if (_currentTime - mLastStableTime >= _milliseconds)
-            {
-                return true;
-            }
-
-            return false;
-        }
-
         private int _getCharacterMappedIndex(int _radioNum)
         {
             try
@@ -514,9 +488,9 @@ namespace DialogGenerator.CharacterSelection
                 mPossibleSpeakingCh1RadioNum = finalRow;
                 mPossibleSpeakingCh2RadioNum = finalColumn;
 
-                // TODO, _calculateRssiStableAfterChange and _calculateIfInMotionWindow should be their own states
+                // TODO, _calculateRssiStableAfterChange and _inMotionThenStillnessWindow should be their own states
                 _rssiStable = _calculateRssiStablity2(mPossibleSpeakingCh1RadioNum, mPossibleSpeakingCh2RadioNum);
-                var _inMovementWindow = _calculateIfInMotionWindow();
+                var _inMovementWindow = _inMotionThenStillnessWindow();
 
                 if ( _rssiStable && (_inMovementWindow || mFreshStart))
                 {
@@ -528,7 +502,7 @@ namespace DialogGenerator.CharacterSelection
                         }                        
                     }
 
-                    mLogger.Info("Select Next Characters Called");
+                    mLogger.Info("in _shouldCharactersChange() SelectNextCharacters triggered");
                     return Triggers.SelectNextCharacters;
                 }
                 else

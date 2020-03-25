@@ -21,7 +21,6 @@
                     <converters:CloneValuesConverter x:Key="CloneValuesConverter" />
                     <converters:ImageToFullPathValueConverter x:Key="ImageToFullPathValueConverter" />
                     <converters:ImageContentValueConverter x:Key="ImageContentValueConverter" />
-                    <converters:CharaccterStateToNameValueConverter x:Key="CharaccterStateToNameValueConverter" />
                     <converters:IsChangeCharacterStateBtnEnabledValueConverter x:Key="IsChangeCharacterStateBtnEnabledValueConverter" />
 
                     <DataTemplate x:Key="RegularCharacterTemplate">
@@ -37,7 +36,6 @@
                                 <StackPanel Grid.Row="1" Margin="8 15 8 15" HorizontalAlignment="Center" Orientation="Vertical" >
                                     <TextBlock FontSize="16" FontWeight="Bold" Text="{Binding CharacterName}" HorizontalAlignment="Center"></TextBlock>
                                     <StackPanel Orientation="Horizontal">
-                                        <TextBlock Margin="0,6,0,0" FontWeight="Bold" Text="{Binding State,Converter={StaticResource CharaccterStateToNameValueConverter}}" />
                                         <materialDesign:PopupBox Width="25"
                                                      Margin="0,0,0,0"
                                                      HorizontalAlignment="Center"
