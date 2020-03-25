@@ -13,11 +13,11 @@ namespace DialogGenerator.UI.Converters
         public object Convert(object value, Type targetType, object parameter, CultureInfo culture)
         {
             bool _active = (bool)value;
-            string color = parameter.ToString();
+            string[] _colors = parameter.ToString().Split('|');
             if (_active)
-                return color;
+                return _colors[1];
 
-            return "DarkGray";
+            return _colors[0];
         }
 
         public object ConvertBack(object value, Type targetType, object parameter, CultureInfo culture)

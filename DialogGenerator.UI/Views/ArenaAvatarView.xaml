@@ -18,15 +18,43 @@
     </UserControl.Resources>
 
     <Grid>
-        <Border Background="LightGray" BorderBrush="{Binding Active, Converter={StaticResource BoolToColorConverter}, ConverterParameter=LightGreen}" CornerRadius="10" BorderThickness="2" Padding="5">
+        <Border Background="{Binding Active, Converter={StaticResource BoolToColorConverter}, ConverterParameter=#ffffaa|White}" 
+                BorderBrush="{Binding Active, Converter={StaticResource BoolToColorConverter}, ConverterParameter=DarkGray|LightGreen}" 
+                CornerRadius="10" 
+                BorderThickness="2" >
             <Grid>
                 <Grid.RowDefinitions>
+                    <RowDefinition Height="20"/>
                     <RowDefinition Height="50"/>
                     <RowDefinition Height="20"/>
                     <RowDefinition Height="*"/>
                 </Grid.RowDefinitions>
-                <Image Width="50" Grid.Row="0" Source="{Binding Character.CharacterImage, Converter={StaticResource ImageToFullPathValueConverter}}"/>
-                <TextBlock Grid.Row="1" Text="{Binding Character.CharacterName}" HorizontalAlignment="Center" TextWrapping="Wrap"/>
+                <Border Grid.Row="0" 
+                        BorderBrush="Transparent" 
+                        CornerRadius="10,10,0,0" 
+                        Background="#51cb8c" Padding="5,0,5,0">
+                    <TextBlock 
+                           Text="{Binding Character.CharacterName}" 
+                           HorizontalAlignment="Center" 
+                           TextWrapping="Wrap" 
+                           FontWeight="Black" 
+                           Foreground="White" />
+                </Border>
+                
+                <Image Width="50" 
+                       Grid.Row="1" 
+                       Source="{Binding Character.CharacterImage, Converter={StaticResource ImageToFullPathValueConverter}}" Margin="5"/>
+                <StackPanel Orientation="Horizontal" Grid.Row="2" HorizontalAlignment="Center">
+                    <TextBlock Text="{Binding Character.Phrases.Count}" 
+                               HorizontalAlignment="Center" 
+                               TextWrapping="Wrap" 
+                               Foreground="#51cb8c" 
+                               FontWeight="DemiBold"/>
+                    <TextBlock Text="Lines" 
+                               HorizontalAlignment="Center" 
+                               TextWrapping="Wrap" 
+                               Margin="5,0,0,0" />
+                </StackPanel>
             </Grid>
         </Border>
     </Grid>

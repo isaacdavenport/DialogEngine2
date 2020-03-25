@@ -33,7 +33,7 @@ namespace DialogGenerator.UI.ViewModels
 
             set
             {
-                mCharacter = value;
+                mCharacter = value;              
                 RaisePropertyChanged();
             }
         }
