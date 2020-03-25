@@ -20,12 +20,17 @@ namespace DialogGenerator.UI.ViewModels
         private ICharacterRepository mCharacterRepository;
         private ArenaAvatarViewModel mSelectedAvatar = null;
         private List<AvatarPair> mAvatarPairs = new List<AvatarPair>();
+        private Random mRandom;
         
-        public ArenaViewModel(ILogger _Logger, IEventAggregator _EventAggregator, ICharacterRepository _CharacterRepository)
+        public ArenaViewModel(ILogger _Logger
+            , IEventAggregator _EventAggregator
+            , ICharacterRepository _CharacterRepository
+            , Random _Random)
         {
             mLogger = _Logger;
             mEventAggregator = _EventAggregator;
             mCharacterRepository = _CharacterRepository;
+            mRandom = _Random;
 
             mEventAggregator.GetEvent<CharacterCollectionLoadedEvent>().Subscribe(_onCharacterCollectionLoaded);
             mEventAggregator.GetEvent<CharactersInConversationEvent>().Subscribe(_onCharactersInConversation);
@@ -103,8 +108,7 @@ namespace DialogGenerator.UI.ViewModels
 
                 if(_characterIndex1 != -1 && _characterIndex2 != -1)
                 {
-                    Random random = new Random();
-                    int _choice = random.Next();
+                    int _choice = mRandom.Next();
                     _choice = _choice % 2;
                     Session.Set(Constants.NEXT_CH_1, _choice == 0 ?_characterIndex1 : _characterIndex2);
                     Session.Set(Constants.NEXT_CH_2, _choice == 0 ?_characterIndex2 : _characterIndex1);
@@ -146,7 +150,8 @@ namespace DialogGenerator.UI.ViewModels
                     Active = false,
                     InPlayground = false,
                     Left = 0,
-                    Top = 0
+                    Top = 0, 
+                    Random = mRandom
                 };
 
                 AvatarGalleryItems.Add(_am);                
@@ -223,8 +228,7 @@ namespace DialogGenerator.UI.ViewModels
                 _selIndex2 != Session.Get<int>(Constants.NEXT_CH_2)) &&
                (_selIndex1 != Session.Get<int>(Constants.NEXT_CH_2) || 
                 _selIndex2 != Session.Get<int>(Constants.NEXT_CH_1))) {
-                Random random = new Random();
-                int _choice = random.Next();
+                int _choice = mRandom.Next();
                 _choice = _choice % 2;
                 mEventAggregator.GetEvent<SelectedCharactersPairChangedEvent>().Publish(new SelectedCharactersPairEventArgs
                 {
@@ -236,12 +240,11 @@ namespace DialogGenerator.UI.ViewModels
         }
 
         private int _firstIndexNotInList(List<int> _Lista)
-        {
-            Random random = new Random();
-            int i = random.Next(mCharacterRepository.GetAll().Count());
+        {           
+            int i = mRandom.Next(mCharacterRepository.GetAll().Count());
 
             while (_Lista.Contains(i)) {
-                i = random.Next(mCharacterRepository.GetAll().Count());
+                i = mRandom.Next(mCharacterRepository.GetAll().Count());
             }
 
             return i;

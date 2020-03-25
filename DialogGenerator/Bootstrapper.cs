@@ -39,6 +39,10 @@ namespace DialogGenerator
             Container.RegisterType<Shell>(new ContainerControlledLifetimeManager());
             Container.RegisterType<FileChangesHandler>(new ContainerControlledLifetimeManager());
             Container.RegisterType<UpdatesHandler>(new ContainerControlledLifetimeManager());
+            Container.RegisterType<Random>(new ContainerControlledLifetimeManager());
+            
+            Random _random = new Random();
+            Container.RegisterInstance<Random>(_random);
         }
 
         protected override void ConfigureModuleCatalog()

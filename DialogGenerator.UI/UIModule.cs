@@ -6,6 +6,7 @@ using DialogGenerator.UI.Views.Dialogs;
 using Microsoft.Practices.Unity;
 using Prism.Modularity;
 using Prism.Regions;
+using System;
 
 namespace DialogGenerator.UI
 {
@@ -56,9 +57,7 @@ namespace DialogGenerator.UI
             mContainer.RegisterType<ArenaViewModel>(new ContainerControlledLifetimeManager());
             mContainer.RegisterType<AssignedRadiosViewModel>(new ContainerControlledLifetimeManager());
             mRegionManager.RegisterViewWithRegion(Constants.ContentRegion, typeof(CreateCharacterView));
-            mContainer.RegisterType<CharacterDialogLinesViewModel>(new ContainerControlledLifetimeManager());
-            
-
+            mContainer.RegisterType<CharacterDialogLinesViewModel>(new ContainerControlledLifetimeManager());            
         }
     }
 }

@@ -1,13 +1,8 @@
 ﻿using DialogGenerator.Model;
-using Prism.Commands;
 using Prism.Mvvm;
 using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
-using System.Windows;
 
 namespace DialogGenerator.UI.ViewModels
 {
@@ -22,7 +17,7 @@ namespace DialogGenerator.UI.ViewModels
         private const int mMaxIterationsCount = 3;
         private const int mStep = 3;        
         private int mDecision = 1;
-        private int mSleepInterval = 50;   
+        private int mSleepInterval = 50;        
 
         public Character Character
         {
@@ -93,6 +88,8 @@ namespace DialogGenerator.UI.ViewModels
                 RaisePropertyChanged();
             }
         }
+
+        public Random Random { get;set; }
         
         public ArenaAvatarViewModel Clone()
         {
@@ -102,7 +99,9 @@ namespace DialogGenerator.UI.ViewModels
                 Left = this.Left,
                 Top = this.Top,
                 Active = this.Active,
-                InPlayground = this.InPlayground
+                InPlayground = this.InPlayground,
+                Random = this.Random
+
             };
 
             return _clone;
@@ -110,9 +109,8 @@ namespace DialogGenerator.UI.ViewModels
 
         public async Task StartAnimation()
         {
-            mCancellationTokenSource = new CancellationTokenSource();
-            Random random = new Random();
-            mDecision = random.Next(1, 10000) % 4;            
+            mCancellationTokenSource = new CancellationTokenSource();            
+            mDecision = Random.Next() % 4;            
 
             await Task.Run(() =>
             {

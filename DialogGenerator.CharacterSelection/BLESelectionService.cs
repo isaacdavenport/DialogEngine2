@@ -30,7 +30,7 @@ namespace DialogGenerator.CharacterSelection
         private CancellationTokenSource mCancellationTokenSource;
         private BLESelectionWorkflow mWorkflow;
         private Timer mcHeatMapUpdateTimer;
-        private Random mRandom = new Random();
+        private Random mRandom /* = new Random() */;
         private States mCurrentState;
         private int mFailedBLEMessageAttempts = 0;
         private long mIdleTime = 0;
@@ -50,19 +50,20 @@ namespace DialogGenerator.CharacterSelection
 
         public int mStableRadioIndex1 = -1;
         public int mStableRadioIndex2 = -1;
-        public long mLastStableTime = 0;
+        public long mLastStableTime = 0;       
 
         #endregion
 
         #region - constructor -
 
         public BLESelectionService(ILogger logger, IEventAggregator _eventAggregator,
-            ICharacterRepository _characterRepository, IBLEDataProviderFactory _BLEDataProviderFactory)
+            ICharacterRepository _characterRepository, IBLEDataProviderFactory _BLEDataProviderFactory, Random _Random)
         {
             mLogger = logger;
             mEventAggregator = _eventAggregator;
             mCharacterRepository =  _characterRepository ;
             mBLEDataProviderFactory = _BLEDataProviderFactory;
+            mRandom = _Random;
 
             mWorkflow = new BLESelectionWorkflow(() => { });
             mWorkflow.PropertyChanged += _mWorkflow_PropertyChanged;

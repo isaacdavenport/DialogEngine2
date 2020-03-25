@@ -21,7 +21,7 @@ namespace DialogGenerator.DialogEngine
         private IDialogModelRepository mDialogModelRepository;
         private double mDialogModelPopularitySum;
         private DialogContext mContext;
-        private Random mRandom = new Random();
+        private Random mRandom;
 
         #endregion
 
@@ -29,12 +29,13 @@ namespace DialogGenerator.DialogEngine
 
         public DialogModelsManager(ILogger logger,IEventAggregator _eventAggregator
             ,IDialogModelRepository _dialogModelRepository
-            ,DialogContext context)
+            ,DialogContext context, Random _Random)
         {
             mLogger = logger;
             mEventAggregator = _eventAggregator;
             mDialogModelRepository = _dialogModelRepository;
             mContext = context;
+            mRandom = _Random;
 
             mEventAggregator.GetEvent<InitializeDialogModelEvent>().Subscribe(_onInitializeDialogModel);
         }
