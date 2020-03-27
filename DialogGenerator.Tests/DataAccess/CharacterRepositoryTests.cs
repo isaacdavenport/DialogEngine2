@@ -74,11 +74,7 @@ namespace DialogGenerator.Tests.DataAccess
             var characters = mRepository.GetAllByState(state);
 
             Assert.NotEmpty(characters);
-
-            foreach(var character in characters)
-            {
-                Assert.Equal(state, character.State);
-            }
+            
         }
 
         [Fact]

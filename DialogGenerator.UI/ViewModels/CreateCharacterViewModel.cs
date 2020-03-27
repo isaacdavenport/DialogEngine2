@@ -980,7 +980,6 @@ namespace DialogGenerator.UI.ViewModels
                             }
                         }
 
-                        Character.State = Model.Enum.CharacterState.On;
 
                         // Add the character to the collection.
                         await mCharacterDataProvider.AddAsync(Character);

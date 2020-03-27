@@ -237,17 +237,7 @@ namespace DialogGenerator.Handlers
             }
 
             if (_existingCharacter != null)
-            {
-                if (character.State == CharacterState.On && _existingCharacter.State != character.State)
-                {
-                    int _forcedCharacters = Session.Get<int>(Constants.FORCED_CH_COUNT);
-                    if (_forcedCharacters == 2)
-                    {
-                        errors.Add($"Application already has 2 forced characters in dialog. " +
-                            $"Please change state for character '{character.CharacterName}'.");
-                    }
-                }
-
+            {                
                 if (character.RadioNum != _existingCharacter.RadioNum)
                 {
                     var _assignedCharacter = mCharacterRepository.GetByAssignedRadio(character.RadioNum);

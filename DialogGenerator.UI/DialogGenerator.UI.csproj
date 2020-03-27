@@ -185,7 +185,6 @@
     <Compile Include="ViewModels\AssignedRadiosViewModel.cs" />
     <Compile Include="ViewModels\CharacterDetailViewModel.cs" />
     <Compile Include="ViewModels\CharacterDialogLinesViewModel.cs" />
-    <Compile Include="ViewModels\ComputerSelectsViewModel.cs" />
     <Compile Include="ViewModels\CreateCharacterViewModel.cs" />
     <Compile Include="ViewModels\CreateViewModel.cs" />
     <Compile Include="ViewModels\DebugViewModel.cs" />
@@ -224,14 +223,8 @@
       <DependentUpon>CharacterDialogLinesView.xaml</DependentUpon>
     </Compile>
     <Compile Include="Views\CharactersDataTemplateSelector.cs" />
-    <Compile Include="Views\CharacterSelectionView.xaml.cs">
-      <DependentUpon>CharacterSelectionView.xaml</DependentUpon>
-    </Compile>
     <Compile Include="Views\CharactersNavigationView.xaml.cs">
       <DependentUpon>CharactersNavigationView.xaml</DependentUpon>
-    </Compile>
-    <Compile Include="Views\ComputerSelectsView.xaml.cs">
-      <DependentUpon>ComputerSelectsView.xaml</DependentUpon>
     </Compile>
     <Compile Include="Views\CreateCharacterView.xaml.cs">
       <DependentUpon>CreateCharacterView.xaml</DependentUpon>
@@ -348,15 +341,7 @@
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
-    <Page Include="Views\CharacterSelectionView.xaml">
-      <SubType>Designer</SubType>
-      <Generator>MSBuild:Compile</Generator>
-    </Page>
     <Page Include="Views\CharactersNavigationView.xaml">
-      <SubType>Designer</SubType>
-      <Generator>MSBuild:Compile</Generator>
-    </Page>
-    <Page Include="Views\ComputerSelectsView.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>

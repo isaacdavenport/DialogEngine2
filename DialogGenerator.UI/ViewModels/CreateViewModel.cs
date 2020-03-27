@@ -186,7 +186,6 @@ namespace DialogGenerator.UI.ViewModels
                         }
 
                         _importedCharacter.RadioNum = -1;
-                        _importedCharacter.State = CharacterState.Available;
                         _importedCharacter.Editable = true;
                         mCharacterDataProvider.GetAll().Add(_importedCharacter);
                     }
