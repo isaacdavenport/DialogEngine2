@@ -17,7 +17,8 @@ namespace DialogGenerator.UI.ViewModels
         private const int mMaxIterationsCount = 3;
         private const int mStep = 3;        
         private int mDecision = 1;
-        private int mSleepInterval = 50;        
+        private int mSleepInterval = 50;
+        private string mCharacterName;
 
         public Character Character
         {
@@ -27,8 +28,30 @@ namespace DialogGenerator.UI.ViewModels
             }
 
             set
+            {                
+                mCharacter = value;                          
+                RaisePropertyChanged();
+                CharacterName = mCharacter.CharacterName;
+            }
+        }
+
+        public string CharacterName
+        {
+            get
             {
-                mCharacter = value;              
+                return mCharacterName;
+            }
+
+            set
+            {
+                if(value.Length > 30)
+                {
+                    mCharacterName = value.Substring(0, 30);
+                } else
+                {
+                    mCharacterName = value;
+                }
+                
                 RaisePropertyChanged();
             }
         }

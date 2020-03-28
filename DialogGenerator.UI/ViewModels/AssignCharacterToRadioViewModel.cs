@@ -164,9 +164,6 @@ namespace DialogGenerator.UI.ViewModels
         private void _viewUnloaded_Execute()
         {
             _stopRadioScanning();
-
-            
-            
         }
 
         private async Task _startRadioScanning()

@@ -24,6 +24,7 @@ namespace DialogGenerator.Model
         private bool mHasNoVoice = false;
         private string mVoice = string.Empty;
         private int mSpeechRate = -1;
+        private bool mEditable = false;
 
         #endregion
 
@@ -54,7 +55,7 @@ namespace DialogGenerator.Model
         public string CharacterGender { get; set; } = "M";
 
         [RegularExpression(Constants.FILENAME_CHECK_REGEX)]
-        [StringLength(30,MinimumLength =3)]
+        [StringLength(50,MinimumLength =3)]
         [JsonProperty("CharacterName"),Required(ErrorMessage ="Character name is required.")]
         public string CharacterName
         {
@@ -193,6 +194,21 @@ namespace DialogGenerator.Model
             }
         }
 
+        [JsonProperty("Editable", NullValueHandling = NullValueHandling.Ignore)]
+        public bool Editable
+        {
+            get
+            {
+                return mEditable;
+            }
+
+            set
+            {
+                mEditable = value;
+                OnPropertyChanged("Editable");
+            }
+        }
+
         // json ignore properties
 
         [JsonIgnore]
@@ -206,10 +222,7 @@ namespace DialogGenerator.Model
 
         [JsonIgnore]
         public bool Unassigned { get; set; }
-
-        [JsonIgnore]
-        public bool Editable { get; set; } = true;
-
+        
         public event PropertyChangedEventHandler PropertyChanged;
         #endregion
 

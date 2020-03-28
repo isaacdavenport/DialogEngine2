@@ -290,14 +290,8 @@ namespace DialogGenerator.UI.ViewModels
 
         public void Load()
         {
-            var characters = new ObservableCollection<Character>(mCharacterDataProvider.GetAll());
-
-            // S.Ristic 12/11/2019
-            // DLGEN-365 - Create New Character is removed from expert mode. Therefore thee is no need for the 
-            // insertion of the empty character at the beginning.
-
-            //characters.Insert(0, new Character { CharacterName = "", State = CharacterState.Off, FileName = $"{Guid.NewGuid()}.json" });
-
+            /* S.Ristic - This way we show only the editable characters */
+            var characters = new ObservableCollection<Character>(mCharacterDataProvider.GetAll().Where(c => c.Editable == true));
             mCharactersCollectionViewSource.Source =  characters;
             RaisePropertyChanged(nameof(CharactersViewSource));
         }

@@ -216,13 +216,17 @@ namespace DialogGenerator.UI.ViewModels
                 CharacterInitials = _getCharacterInitials();
                 CharacterIdentifier = _getCharacterIdentifier();
                 NextStepCommand.RaiseCanExecuteChanged();     
-                if((mCharacterName != null && mCharacterName.Length > 0) && (mCharacterName.Length <= 2 || char.IsDigit(mCharacterName.Substring(0,1).ToCharArray()[0])))
+                if((mCharacterName != null && mCharacterName.Length > 0) && (mCharacterName.Length <= 2 || mCharacterName.Length > 50 || char.IsDigit(mCharacterName.Substring(0,1).ToCharArray()[0])))
                 {
-                    if(mCharacterName.Length <= 2 && !char.IsDigit(mCharacterName.Substring(0, 1).ToCharArray()[0]))
+                    if (mCharacterName.Length <= 2 && !char.IsDigit(mCharacterName.Substring(0, 1).ToCharArray()[0]))
                     {
                         CharacterNameValidationError = "The name must consist of at least 3 characters!";
                         CharacterNameHasError = true;
-                    } else
+                    } else if (mCharacterName.Length > 50 ) {
+                        CharacterNameValidationError = "The name must not have more than 50 characters!";
+                        CharacterNameHasError = true;
+                    }
+                    else
                     {
                         CharacterNameValidationError = "The first character of the name must be a letter!";
                         CharacterNameHasError = true;

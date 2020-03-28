@@ -28,7 +28,7 @@
                     </Grid.RowDefinitions>
                     <Border BorderBrush="Transparent" Background="#51cb8c" Grid.Row="0" Padding="2">
                         <TextBlock Grid.Row="0" 
-                               Text="{Binding Character.CharacterName}" 
+                               Text="{Binding CharacterName}" 
                                HorizontalAlignment="Center" 
                                TextWrapping="Wrap" 
                                FontSize="10" 
