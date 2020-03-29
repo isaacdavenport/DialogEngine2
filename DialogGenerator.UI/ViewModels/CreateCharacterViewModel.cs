@@ -216,7 +216,7 @@ namespace DialogGenerator.UI.ViewModels
                 CharacterInitials = _getCharacterInitials();
                 CharacterIdentifier = _getCharacterIdentifier();
                 NextStepCommand.RaiseCanExecuteChanged();     
-                if((mCharacterName != null && mCharacterName.Length > 0) && (mCharacterName.Length <= 2 || mCharacterName.Length > 50 || char.IsDigit(mCharacterName.Substring(0,1).ToCharArray()[0])))
+                if((mCharacterName != null && mCharacterName.Length > 0) && (mCharacterName.Length <= 2 || mCharacterName.Length > 30 || char.IsDigit(mCharacterName.Substring(0,1).ToCharArray()[0])))
                 {
                     if (mCharacterName.Length <= 2 && !char.IsDigit(mCharacterName.Substring(0, 1).ToCharArray()[0]))
                     {

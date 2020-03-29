@@ -57,7 +57,8 @@ namespace DialogGenerator.DataAccess
             {
                 Wizards = mWizardRepository.GetAll(_fileName),
                 DialogModels = mDialogModelRepository.GetAll(_fileName),
-                Characters = _getAll(_fileName)
+                Characters = _getAll(_fileName), 
+                Editable = true
             };
 
             return _jsonObjectsTypesList;

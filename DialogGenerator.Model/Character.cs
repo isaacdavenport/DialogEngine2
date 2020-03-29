@@ -177,23 +177,8 @@ namespace DialogGenerator.Model
             }
         }
 
-        [JsonProperty("Editable", NullValueHandling = NullValueHandling.Ignore)]
-        public bool Editable
-        {
-            get
-            {
-                return mEditable;
-            }
-
-            set
-            {
-                mEditable = value;
-                OnPropertyChanged("Editable");
-            }
-        }
-
         // json ignore properties
-
+        
         [JsonIgnore]
         public Queue<PhraseEntry> RecentPhrases = new Queue<PhraseEntry>();
         [JsonIgnore]
@@ -205,7 +190,9 @@ namespace DialogGenerator.Model
 
         [JsonIgnore]
         public bool Unassigned { get; set; }
-        
+        [JsonIgnore]
+        public bool Editable { get; set; }
+
         public event PropertyChangedEventHandler PropertyChanged;
         #endregion
 
