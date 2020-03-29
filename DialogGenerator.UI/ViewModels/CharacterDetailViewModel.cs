@@ -473,32 +473,7 @@ namespace DialogGenerator.UI.ViewModels
                 // This should notify the gallery of arena view that the collection has changed.
                 mEventAggregator.GetEvent<CharacterCollectionLoadedEvent>().Publish();
 
-                // S.Ristic 10/12/2019
-                // Find out if the deleted character has participated in the conversation and 
-                // if it had, remove it's index from the forced character indices and decrease the 
-                // count of forced characters for 1. 
-                if (Character.Model.State == Model.Enum.CharacterState.On)
-                {
-                    int _forcedCharactersCount = Session.Get<int>(Constants.FORCED_CH_COUNT);
-                    
-                    if (Session.Get<int>(Constants.FORCED_CH_1) == _characterIndex)
-                    {
-                        Session.Set(Constants.FORCED_CH_1, -1);
-                        Session.Set(Constants.FORCED_CH_COUNT, _forcedCharactersCount - 1);
 
-                        if (Session.Get<int>(Constants.FORCED_CH_COUNT) == 1)
-                        {
-                            Session.Set(Constants.FORCED_CH_1, Session.Get<int>(Constants.FORCED_CH_2));
-                            Session.Set(Constants.FORCED_CH_2, -1);
-                        }
-                    }
-
-                    if (Session.Get<int>(Constants.FORCED_CH_2) == _characterIndex)
-                    {
-                        Session.Set(Constants.FORCED_CH_2, -1);
-                        Session.Set(Constants.FORCED_CH_COUNT, _forcedCharactersCount - 1);
-                    }
-                }
 
                 Load("");
             }

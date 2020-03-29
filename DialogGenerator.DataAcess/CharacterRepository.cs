@@ -296,15 +296,7 @@ namespace DialogGenerator.DataAccess
 
             return character;
         }
-        public List<Character> GetAllByState(CharacterState state)
-        {
-            var characters = Session.Get<ObservableCollection<Character>>(Constants.CHARACTERS)
-                .Where(c => c.State == state)
-                .ToList();
-
-            return characters;
-        }
-
+        
 
         public Character GetByAssignedRadio(int _radioNum)
         {

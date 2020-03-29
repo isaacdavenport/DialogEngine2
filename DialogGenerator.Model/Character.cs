@@ -99,24 +99,7 @@ namespace DialogGenerator.Model
             }
         }
 
-        /// <summary>
-        /// Represents state of character
-        /// Default state is Available
-        /// Enum States are [Avaialble,On,Off]
-        /// Available - character can be random selected
-        /// On - character is forced in selection
-        /// Off - character can't be selected
-        /// </summary>
-        [JsonProperty("State")]
-        public CharacterState State
-        {
-            get { return mState; }
-            set
-            {
-                mState = value;
-                OnPropertyChanged("State");
-            }
-        }
+
 
         [JsonProperty("Phrases")]
         public ObservableCollection<PhraseEntry> Phrases

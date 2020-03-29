@@ -222,8 +222,8 @@ namespace DialogGenerator.UI.ViewModels
                     {
                         CharacterNameValidationError = "The name must consist of at least 3 characters!";
                         CharacterNameHasError = true;
-                    } else if (mCharacterName.Length > 50 ) {
-                        CharacterNameValidationError = "The name must not have more than 50 characters!";
+                    } else if (mCharacterName.Length > 30 ) {
+                        CharacterNameValidationError = "The name must not have more than 30 characters!";
                         CharacterNameHasError = true;
                     }
                     else
@@ -975,14 +975,14 @@ namespace DialogGenerator.UI.ViewModels
                     int _idx = mCharacterDataProvider.IndexOf(Character);
                     if (_idx == -1)
                     {
-                        // First remove all that have state on
-                        foreach(var _charMember in mCharacterDataProvider.GetAll())
-                        {
-                            if(_charMember.State == Model.Enum.CharacterState.On)
-                            {
-                                _charMember.State = Model.Enum.CharacterState.Available;
-                            }
-                        }
+                        //// First remove all that have state on
+                        //foreach(var _charMember in mCharacterDataProvider.GetAll())
+                        //{
+                        //    if(_charMember.State == Model.Enum.CharacterState.On)
+                        //    {
+                        //        _charMember.State = Model.Enum.CharacterState.Available;
+                        //    }
+                        //}
 
 
                         // Add the character to the collection.

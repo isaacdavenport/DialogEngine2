@@ -186,31 +186,7 @@ namespace DialogGenerator
         {
             var characters = mCharacterRepository.GetAll();
 
-            var _forcedCharacters = mCharacterRepository.GetAllByState(CharacterState.On);
-
-            switch (_forcedCharacters.Count)
-            {
-                case 1:
-                    {
-                        Session.Set(Constants.FORCED_CH_1, characters.IndexOf(_forcedCharacters[0]));
-                        Session.Set(Constants.FORCED_CH_2, -1);
-                        break;
-                    }
-                case 2:
-                    {
-                        Session.Set(Constants.FORCED_CH_1, characters.IndexOf(_forcedCharacters[0]));
-                        Session.Set(Constants.FORCED_CH_2, characters.IndexOf(_forcedCharacters[1]));
-                        break;
-                    }
-                default:
-                    {
-                        Session.Set(Constants.FORCED_CH_1, -1);
-                        Session.Set(Constants.FORCED_CH_2, -1);
-                        break;
-                    }
-            }
-
-            Session.Set(Constants.FORCED_CH_COUNT, _forcedCharacters.Count);
+            
             Session.Set(Constants.NEXT_CH_1, -1);
             Session.Set(Constants.NEXT_CH_2, -1);
             Session.Set(Constants.DIALOG_SPEED, 1000); // ms

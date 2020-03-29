@@ -50,7 +50,6 @@ namespace DialogGenerator.Tests.DataAccess
                 CharacterName = "Test character1",
                 CharacterPrefix = "tc1",
                 RadioNum = 0,
-                State = CharacterState.Available
             };
 
             var character2 = new Character
@@ -58,7 +57,6 @@ namespace DialogGenerator.Tests.DataAccess
                 CharacterName = "Test character2",
                 CharacterPrefix = "tc2",
                 RadioNum = 1,
-                State = CharacterState.On
             };
 
             characters.Add(character1);
