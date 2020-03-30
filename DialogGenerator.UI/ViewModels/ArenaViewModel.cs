@@ -3,6 +3,7 @@ using DialogGenerator.DataAccess;
 using DialogGenerator.Events;
 using DialogGenerator.Events.EventArgs;
 using DialogGenerator.Model;
+using DialogGenerator.Utilities;
 using Prism.Events;
 using Prism.Mvvm;
 using System;
@@ -21,16 +22,19 @@ namespace DialogGenerator.UI.ViewModels
         private ArenaAvatarViewModel mSelectedAvatar = null;
         private List<AvatarPair> mAvatarPairs = new List<AvatarPair>();
         private Random mRandom;
+        private IMessageDialogService mMessageDialogService;
         
         public ArenaViewModel(ILogger _Logger
             , IEventAggregator _EventAggregator
             , ICharacterRepository _CharacterRepository
-            , Random _Random)
+            , Random _Random
+            , IMessageDialogService _MessageDialogService)
         {
             mLogger = _Logger;
             mEventAggregator = _EventAggregator;
             mCharacterRepository = _CharacterRepository;
             mRandom = _Random;
+            mMessageDialogService = _MessageDialogService;
 
             mEventAggregator.GetEvent<CharacterCollectionLoadedEvent>().Subscribe(_onCharacterCollectionLoaded);
             mEventAggregator.GetEvent<CharactersInConversationEvent>().Subscribe(_onCharactersInConversation);
@@ -137,7 +141,12 @@ namespace DialogGenerator.UI.ViewModels
 
         private void _onCharacterCollectionLoaded()
         {
-            ObservableCollection<Character> _characters = mCharacterRepository.GetAll();                                   
+            ObservableCollection<Character> _characters = mCharacterRepository.GetAll();             
+            if(_characters.Count == 0)
+            {
+                mLogger.Error("No characters! The data folder is probably empty!");
+                return;
+            }
 
             // Clear collections.
             PlaygroundAvatars.Clear();

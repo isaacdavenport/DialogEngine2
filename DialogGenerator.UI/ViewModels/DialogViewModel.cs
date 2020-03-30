@@ -36,6 +36,8 @@ namespace DialogGenerator.UI.ViewModels
         private Visibility mIsDebugViewVisible = Visibility.Collapsed;
         private bool mCanGoBackToWizard = false;
         private ICharacterRepository mCharacterRepository;
+        private IWizardRepository mWizardRepository;
+        private IDialogModelRepository mDialogModelRepository;
         private Character mFirstSelectedCharacter;
         private Character mSecondSelectedCharacter;
         private Character mListSelectedCharacter;
@@ -57,13 +59,17 @@ namespace DialogGenerator.UI.ViewModels
             ,ICharacterRepository _characterRepository
             ,IRegionManager _regionManager
             ,ArenaViewModel _ArenaViewModel
-            ,AssignedRadiosViewModel _AssignedRadiosViewModel)
+            ,AssignedRadiosViewModel _AssignedRadiosViewModel
+            ,IDialogModelRepository _DialogModelRepository
+            ,IWizardRepository _WizardRepository)
         {
             mLogger = logger;
             mEventAggregator = _eventAggregator;
             mMessageDialogService = _messageDialogService;
             mDialogEngine = _dialogEngine;
             mCharacterRepository = _characterRepository;
+            mDialogModelRepository = _DialogModelRepository;
+            mWizardRepository = _WizardRepository;
             mRegionManager = _regionManager;
             mArenaViewModel = _ArenaViewModel;
             mAssignedRadiosViewModel = _AssignedRadiosViewModel;
@@ -86,21 +92,6 @@ namespace DialogGenerator.UI.ViewModels
         private void _onCharacterSelectionModelChanged()
         {
             RadioModeOn = Session.Get<bool>(Constants.BLE_MODE_ON);
-
-            if (!RadioModeOn)
-            {
-                int startIndex = 1;
-                //if (FirstSelectedCharacter == null)
-                //{
-                //    FirstSelectedCharacter = mCharacterRepository.GetAll()[startIndex++];
-                //}
-
-                //if (SecondSelectedCharacter == null)
-                //{
-                //    SecondSelectedCharacter = mCharacterRepository.GetAll()[startIndex];
-                //}
-
-            }
         }
 
         private void _onGuidedCharacterCreationModeChanged(bool obj)
@@ -334,13 +325,18 @@ namespace DialogGenerator.UI.ViewModels
             GoBackToWizardCommand = new DelegateCommand(_goBackToWizard_Execute, _goBackToWizard_CanExecute);
             SelectFirstCharacterCommand = new DelegateCommand(_SelectFirstCharacter_Execute, _selectFirstCharacter_CanExecute);
             SelectSecondCharacterCommand = new DelegateCommand(_SelectSecondCharacter_Execute, _selectSecondCharacter_CanExecute);
-            ExpertModeCommand = new DelegateCommand(_expertModeExecute);
+            ExpertModeCommand = new DelegateCommand(_expertModeExecute, _expertMode_CanExecute);
             ToggleAssignedRadiosCommand = new DelegateCommand(_toggleAssignedRadios_Execute);
-        }
+        }        
 
         private void _toggleAssignedRadios_Execute()
         {
             mMessageDialogService.ShowDedicatedDialogAsync<int?>(new AssignCharacterToRadioView(), "ContentDialogHost");            
+        }
+
+        private bool _expertMode_CanExecute()
+        {
+            return mWizardRepository.GetAll().Count > 0;
         }
 
         private async void _expertModeExecute()
@@ -435,6 +431,12 @@ namespace DialogGenerator.UI.ViewModels
             try
             {
                 CanGoBackToWizard = GoBackToWizardCommand.CanExecute();
+                if(mWizardRepository.GetAll().Count == 0 || mDialogModelRepository.GetAll().Count == 0)
+                {
+                    await mMessageDialogService.ShowMessage("Error", "There has to be a problem with your installation. Your data folder is empty. Please close the application and re-install it properly!");
+                    return;                    
+                }
+
                 await mDialogEngine.StartDialogEngine();
                 
             }
