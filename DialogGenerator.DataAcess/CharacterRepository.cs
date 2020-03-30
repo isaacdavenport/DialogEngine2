@@ -45,6 +45,8 @@ namespace DialogGenerator.DataAccess
             character.FileName = _fileName;
 
             var _jsonObjectsTypesList = _findDataForFile(_fileName);
+            _jsonObjectsTypesList.Editable = character.Editable;
+            _jsonObjectsTypesList.Version = "1.2";
 
             Serializer.Serialize(_jsonObjectsTypesList, Path.Combine(ApplicationData.Instance.DataDirectory, _fileName));
             mLogger.Info("serializing JSON output for: " + character.CharacterName);

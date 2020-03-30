@@ -191,7 +191,7 @@ namespace DialogGenerator.Model
         [JsonIgnore]
         public bool Unassigned { get; set; }
         [JsonIgnore]
-        public bool Editable { get; set; }
+        public bool Editable { get; set; } = true;
 
         public event PropertyChangedEventHandler PropertyChanged;
         #endregion
