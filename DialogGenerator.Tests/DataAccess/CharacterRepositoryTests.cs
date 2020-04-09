@@ -11,7 +11,7 @@ namespace DialogGenerator.Tests.DataAccess
 
         public CharacterRepositoryTests()
         {
-            mRepository = new CharacterRepository(loggerMock.Object, wizardRepositoryMock.Object, dialogModelRepositoryMock.Object);
+            mRepository = new CharacterRepository(loggerMock.Object, wizardRepositoryMock.Object, dialogModelRepositoryMock.Object, eventAggregatorMock.Object);
 
             testSetup();
         }

@@ -88,7 +88,8 @@ namespace DialogGenerator.Model
         /// Default value is unassigned ( -1 )
         /// </summary>
         [RadioNumRange]
-        [JsonProperty("RadioNum")]
+        //[JsonProperty("RadioNum")]
+        [JsonIgnore]
         public int RadioNum
         {
             get { return mRadioNum; }

@@ -4,6 +4,7 @@ using DialogGenerator.Model;
 using DialogGenerator.Model.Enum;
 using DialogGenerator.Utilities;
 using Moq;
+using Prism.Events;
 using System.Collections.ObjectModel;
 
 namespace DialogGenerator.Tests.DataAccess
@@ -14,6 +15,7 @@ namespace DialogGenerator.Tests.DataAccess
         protected Mock<IUserLogger> userLoggerMock = new Mock<IUserLogger>();
         protected Mock<IWizardRepository> wizardRepositoryMock = new Mock<IWizardRepository>();
         protected Mock<IDialogModelRepository> dialogModelRepositoryMock = new Mock<IDialogModelRepository>();
+        protected Mock<IEventAggregator> eventAggregatorMock = new Mock<IEventAggregator>();
         protected readonly ObservableCollection<Character> characters;
         protected readonly ObservableCollection<ModelDialogInfo> dialogModels;
 

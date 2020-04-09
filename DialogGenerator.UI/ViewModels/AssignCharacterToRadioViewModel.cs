@@ -14,10 +14,8 @@ using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Linq;
-using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
-using System.Windows.Threading;
 
 namespace DialogGenerator.UI.ViewModels
 {
@@ -34,13 +32,15 @@ namespace DialogGenerator.UI.ViewModels
         private IMessageDialogService mMessageDialogService;
         private int mAssignedRadio = -1;
         private string mAssignedRadioText = string.Empty;
+        private ICharacterRadioBindingRepository mCharacterRadioBindingRepository;
 
         public AssignCharacterToRadioViewModel(ILogger _Logger
             , IEventAggregator _EventAggregator
             , ICharacterRepository _CharacterRepository
             , IBLEDataProviderFactory _BLEDataProviderFactory
             , ICharacterDataProvider _CharacterDataProvider
-            , IMessageDialogService _MessageDialogService)
+            , IMessageDialogService _MessageDialogService
+            , ICharacterRadioBindingRepository _CharacterRadioBindingRepository)
         {
             mLogger = _Logger;
             mEventAggregator = _EventAggregator;
@@ -48,6 +48,7 @@ namespace DialogGenerator.UI.ViewModels
             mBLEDataProviderFactory = _BLEDataProviderFactory;
             mCharacterDataProvider = _CharacterDataProvider;
             mMessageDialogService = _MessageDialogService;
+            mCharacterRadioBindingRepository = _CharacterRadioBindingRepository;
             AssignedRadioText = "Shake radio in order to attach it to character";
 
             _bindCommands();
@@ -198,7 +199,6 @@ namespace DialogGenerator.UI.ViewModels
                         {
                             if (_radioIndex != _oldIndex)
                             {
-                                //await _selectToyToCharacter(_radioIndex);
                                 AssignedRadio = _radioIndex;
                                 _oldIndex = _radioIndex;
                             }
@@ -222,33 +222,27 @@ namespace DialogGenerator.UI.ViewModels
 
         private async Task<bool> _selectToyToCharacter(int newVal)
         {
-            var _oldChars = mCharacterDataProvider.GetAll().Where(c => c.RadioNum == newVal);
-            if (_oldChars.Count() > 0)
+            if(mCharacterDataProvider.GetAll().Where(c => c.RadioNum == newVal).Count() > 0)
             {
-                var _oldChar = _oldChars.First();
-                _oldChar = mCharacterDataProvider.GetAll().Where(c => c.RadioNum == newVal).First();
+                var _oldChar = mCharacterDataProvider.GetAll().Where(c => c.RadioNum == newVal).First();
                 if (_oldChar != null)
                 {
-                    // Show message box.
                     MessageDialogResult result = await mMessageDialogService.ShowOKCancelDialogAsync(String.Format("The toy with index {0} is assigned to character {1}. Are You sure that you want to re-asign it?", newVal, _oldChar.CharacterName), "Check");
                     if (result == MessageDialogResult.OK)
                     {
-                        // Set to Unassigned if Yes
-                        _oldChar.RadioNum = -1;
-                        await mCharacterDataProvider.SaveAsync(_oldChar);
-                        SelectedCharacter.RadioNum = newVal;
-                        await mCharacterDataProvider.SaveAsync(SelectedCharacter);
-
+                        mCharacterRadioBindingRepository.AttachRadioToCharacter(newVal, SelectedCharacter.CharacterPrefix);
+                        await mCharacterRadioBindingRepository.SaveAsync();
                         return true;
-                    } else
+                    }
+                    else
                     {
                         return false;
                     }
                 }
-            } 
-
-            SelectedCharacter.RadioNum = newVal;
-            await mCharacterDataProvider.SaveAsync(SelectedCharacter);
+            }
+                        
+            mCharacterRadioBindingRepository.AttachRadioToCharacter(newVal, SelectedCharacter.CharacterPrefix);
+            await mCharacterRadioBindingRepository.SaveAsync();
             await mMessageDialogService.ShowMessage("Success", string.Format("The radio {0} was successfully attached to character '{1}'", newVal, SelectedCharacter.CharacterName));
 
             return true;
