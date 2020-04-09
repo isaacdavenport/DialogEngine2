@@ -2,6 +2,7 @@
 using DialogGenerator.CharacterSelection.Data;
 using DialogGenerator.CharacterSelection.Model;
 using DialogGenerator.Core;
+using DialogGenerator.DataAccess;
 using DialogGenerator.DataAccess.Helper;
 using DialogGenerator.Events;
 using DialogGenerator.Events.EventArgs;
@@ -61,7 +62,7 @@ namespace DialogGenerator.UI.ViewModels
 
         private string mCharacterNameValidationError = string.Empty;
         private bool mCharacterNameHasError = false;
-        
+        private ICharacterRadioBindingRepository mCharacterRadionBindingRepository;
 
         internal void SetCurrentStep(int index)
         {
@@ -77,7 +78,8 @@ namespace DialogGenerator.UI.ViewModels
             IRegionManager _regionManager,
             IMessageDialogService _messageDialogService,
             IBLEDataProviderFactory _BLEDataProviderFactory,
-            IWizardDataProvider _WizardDataProvider)
+            IWizardDataProvider _WizardDataProvider,
+            ICharacterRadioBindingRepository _CharacterRadioBindingRepository)
         {
             mLogger = _logger;
             mEventAgregator = _eventAggregator;
@@ -86,6 +88,7 @@ namespace DialogGenerator.UI.ViewModels
             mMessageDialogService = _messageDialogService;
             mBLEDataProviderFactory = _BLEDataProviderFactory;
             mWizardDataProvider = _WizardDataProvider;
+            mCharacterRadionBindingRepository = _CharacterRadioBindingRepository;
 
             mWizard = new CreateCharacterWizard();
             CurrentStep = mWizard.Steps[mCurrentStepIndex];            
@@ -875,6 +878,7 @@ namespace DialogGenerator.UI.ViewModels
                     if(Session.Get<bool>(Constants.BLE_MODE_ON))
                     {
                         Character.RadioNum = SelectedRadio.Key;
+                        mCharacterRadionBindingRepository.AttachRadioToCharacter(SelectedRadio.Key, Character.CharacterPrefix);
                         _stopScanForRadios();
                     }                    
                     

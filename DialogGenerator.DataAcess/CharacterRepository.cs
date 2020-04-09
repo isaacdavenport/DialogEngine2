@@ -8,9 +8,11 @@ using System.Threading.Tasks;
 using System.Windows;
 using DialogGenerator.Core;
 using DialogGenerator.DataAccess.Helper;
+using DialogGenerator.Events;
 using DialogGenerator.Model;
 using DialogGenerator.Model.Enum;
 using Microsoft.VisualBasic.FileIO;
+using Prism.Events;
 
 namespace DialogGenerator.DataAccess
 {
@@ -19,12 +21,17 @@ namespace DialogGenerator.DataAccess
         private ILogger mLogger;
         private IWizardRepository mWizardRepository;
         private IDialogModelRepository mDialogModelRepository;
+        private IEventAggregator mEventAggregator;
 
-        public CharacterRepository(ILogger logger,IWizardRepository _wizardRepository,IDialogModelRepository _dialogModelRepository)
+        public CharacterRepository(ILogger logger
+            ,IWizardRepository _wizardRepository
+            ,IDialogModelRepository _dialogModelRepository
+            ,IEventAggregator _EventAggregator)
         {
             mLogger = logger;
             mWizardRepository = _wizardRepository;
             mDialogModelRepository = _dialogModelRepository;
+            mEventAggregator = _EventAggregator;
         }
 
         private ObservableCollection<Character> _getAll(string _fileName)
@@ -50,7 +57,7 @@ namespace DialogGenerator.DataAccess
 
             Serializer.Serialize(_jsonObjectsTypesList, Path.Combine(ApplicationData.Instance.DataDirectory, _fileName));
             mLogger.Info("serializing JSON output for: " + character.CharacterName);
-
+            mEventAggregator.GetEvent<CharacterSavedEvent>().Publish(character.CharacterPrefix);
         }
 
         private JSONObjectsTypesList _findDataForFile(string _fileName)
