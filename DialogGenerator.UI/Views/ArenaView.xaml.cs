@@ -78,6 +78,7 @@ namespace DialogGenerator.UI.Views
             Binding topBinding = new Binding("Top");
             topBinding.Source = _am;
             _avatarView.SetBinding(Canvas.TopProperty, topBinding);
+
         }
 
         private void PlaygroundAvatars_CollectionChanged(object sender, System.Collections.Specialized.NotifyCollectionChangedEventArgs e)

@@ -156,5 +156,12 @@ namespace DialogGenerator.UI.Views
             return true;
         }
 
+        private void UserControl_Loaded(object sender, RoutedEventArgs e)
+        {
+            ArenaAvatarViewModel _model = ((ArenaAvatarViewModel)this.DataContext);
+
+            _model.Width = this.ActualWidth;
+            _model.Height = this.ActualHeight;
+        }
     }
 }

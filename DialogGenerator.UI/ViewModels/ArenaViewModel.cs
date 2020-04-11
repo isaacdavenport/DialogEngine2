@@ -83,9 +83,9 @@ namespace DialogGenerator.UI.ViewModels
 
             foreach (AvatarPair _ap in mAvatarPairs)
             {
-                if (_ap.Distance < _distance)
+                if (_ap.RealDistance < _distance)
                 {
-                    _distance = _ap.Distance;
+                    _distance = _ap.RealDistance;
                     _closestPair = _ap;
                 }
             }
@@ -292,10 +292,109 @@ namespace DialogGenerator.UI.ViewModels
                 if (FirstAvatar == null || SecondAvatar == null)
                     return -1;
 
-                double _xDistance = Math.Abs(FirstAvatar.Left - SecondAvatar.Left);
-                double _yDistance = Math.Abs(FirstAvatar.Top - SecondAvatar.Top);
+                Point _ptFirst = new Point(FirstAvatar.Left + FirstAvatar.Width / 2, FirstAvatar.Top + FirstAvatar.Height / 2);
+                Point _ptSecond = new Point(SecondAvatar.Left + SecondAvatar.Width / 2, SecondAvatar.Top + SecondAvatar.Height / 2);
 
-                return Math.Sqrt(Math.Pow(_xDistance, 2) + Math.Pow(_yDistance, 2));
+                return (_ptSecond - _ptFirst).Length;
+            }
+        }
+
+        public enum AvatarRectRelativePosition
+        {
+            Left, 
+            TopLeft,
+            Top,
+            TopRight,
+            Right,
+            BottomRight,
+            Bottom,
+            BottomLeft
+        }
+
+        public double RealDistance
+        {
+            get
+            {
+                Rect _rc1 = new Rect(new Point(FirstAvatar.Left, FirstAvatar.Top), new Size(FirstAvatar.Width, FirstAvatar.Height));
+                Rect _rc2 = new Rect(new Point(SecondAvatar.Left, SecondAvatar.Top), new Size(SecondAvatar.Width, SecondAvatar.Height));
+
+                if(_rc2.IntersectsWith(_rc1))
+                {
+                    Point _rcCenter1 = new Point(_rc1.Left + _rc1.Width / 2, _rc1.Top + _rc1.Height / 2);
+                    Point _rcCenter2 = new Point(_rc2.Left + _rc2.Width / 2, _rc2.Top + _rc2.Height / 2);
+                    return (_rcCenter2 - _rcCenter1).Length * 0.01;
+                }
+
+                // Find position now. 
+                AvatarRectRelativePosition _relativePosition;
+                if(_rc2.Bottom < _rc1.Top)
+                {
+                    if(_rc2.Left + _rc2.Width < _rc1.Left)
+                    {
+                        _relativePosition = AvatarRectRelativePosition.TopLeft;
+                    } else if(_rc2.Left > _rc1.Left + _rc1.Width)
+                    {
+                        _relativePosition = AvatarRectRelativePosition.TopRight;
+                    } else
+                    {
+                        _relativePosition = AvatarRectRelativePosition.Top;
+                    }
+                } else if(_rc2.Top > _rc1.Bottom)
+                {
+                    if (_rc2.Left + _rc2.Width < _rc1.Left)
+                    {
+                        _relativePosition = AvatarRectRelativePosition.BottomLeft;
+                    }
+                    else if (_rc2.Left > _rc1.Left + _rc1.Width)
+                    {
+                        _relativePosition = AvatarRectRelativePosition.BottomRight;
+                    }
+                    else
+                    {
+                        _relativePosition = AvatarRectRelativePosition.Bottom;
+                    }
+                } else
+                {
+                    if (_rc2.Left + _rc2.Width < _rc1.Left)
+                    {
+                        _relativePosition = AvatarRectRelativePosition.Left;
+                    }
+                    else 
+                    {
+                        _relativePosition = AvatarRectRelativePosition.Right;
+                    }
+                }
+
+                double _distance;
+                switch(_relativePosition)
+                {
+                    case AvatarRectRelativePosition.Top:
+                        _distance = _rc1.Top - _rc2.Bottom;
+                        break;
+                    case AvatarRectRelativePosition.TopLeft:
+                        _distance = (_rc1.TopLeft - _rc2.BottomRight).Length;
+                        break;
+                    case AvatarRectRelativePosition.TopRight:
+                        _distance = (_rc2.BottomLeft - _rc1.TopRight).Length;
+                        break;
+                    case AvatarRectRelativePosition.Right:
+                        _distance = _rc2.Left - _rc1.Right;
+                        break;
+                    case AvatarRectRelativePosition.BottomRight:
+                        _distance = (_rc2.TopLeft - _rc1.BottomRight).Length;
+                        break;
+                    case AvatarRectRelativePosition.Bottom:
+                        _distance = _rc2.Top - _rc1.Bottom;
+                        break;
+                    case AvatarRectRelativePosition.BottomLeft:
+                        _distance = (_rc1.BottomLeft - _rc2.TopRight).Length;
+                        break;
+                    default: // Left
+                        _distance = _rc1.Left - _rc2.Right;
+                        break;
+                }
+
+                return _distance;
             }
         }
 

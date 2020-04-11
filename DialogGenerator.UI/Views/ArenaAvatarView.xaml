@@ -11,7 +11,7 @@
              d:DesignWidth="100" 
              MouseDown="UserControl_MouseDown" 
              MouseUp="UserControl_MouseUp" 
-             MouseMove="UserControl_MouseMove" Canvas.Left="{Binding Left}" Canvas.Top="{Binding Top}">
+             MouseMove="UserControl_MouseMove" Canvas.Left="{Binding Left}" Canvas.Top="{Binding Top}" Loaded="UserControl_Loaded">
     <UserControl.Resources>
         <converters:ImageToFullPathValueConverter x:Key="ImageToFullPathValueConverter"/>
         <converters:BoolToColorConverter x:Key="BoolToColorConverter" />
@@ -21,7 +21,7 @@
         <Border Background="{Binding Active, Converter={StaticResource BoolToColorConverter}, ConverterParameter=#ffffaa|White}" 
                 BorderBrush="{Binding Active, Converter={StaticResource BoolToColorConverter}, ConverterParameter=DarkGray|LightGreen}" 
                 CornerRadius="10" 
-                BorderThickness="2" >
+                BorderThickness="2">
             <Grid>
                 <Grid.RowDefinitions>
                     <RowDefinition Height="20"/>
