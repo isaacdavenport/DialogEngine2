@@ -11,7 +11,8 @@
              xmlns:converters="clr-namespace:DialogGenerator.UI.Converters"
              xmlns:controls="clr-namespace:DialogGenerator.UI.Controls"
              mc:Ignorable="d" 
-             d:DesignHeight="450" d:DesignWidth="800">
+             d:DesignHeight="450" 
+             d:DesignWidth="800">
     <UserControl.Resources>
         <ResourceDictionary>
             <ResourceDictionary.MergedDictionaries>
@@ -76,7 +77,7 @@
                 </DockPanel>
             </materialDesign:DrawerHost.LeftDrawerContent>
 
-            <Grid HorizontalAlignment="Stretch" VerticalAlignment="Stretch">
+            <Grid >
                 <Grid.ColumnDefinitions>
                     <ColumnDefinition Width="auto" />
                     <ColumnDefinition Width="*" />
@@ -96,38 +97,38 @@
                         </StackPanel>
                     </Grid>
                 </materialDesign:ColorZone>
-
-                    <Grid x:Name="WizardMainGrid" Grid.Column="1" Margin="20"  Background="Transparent">
+                
+                    <Grid x:Name="WizardMainGrid" Margin="20" Grid.Column="1" >
                         <Grid.ColumnDefinitions>
-                            <ColumnDefinition Width="*" />
-                            <ColumnDefinition Width="Auto"/>
-                            <ColumnDefinition Width="*"/>
+                            <ColumnDefinition Width="*" MinWidth="300"  />
+                            <ColumnDefinition Width="5"/>
+                            <ColumnDefinition Width="*" MinWidth="400"/>
                         </Grid.ColumnDefinitions>
-                        
+
                         <Grid.RowDefinitions>
                             <RowDefinition Height="*"/>
                             <RowDefinition Height="*" />
-                            <RowDefinition Height="auto" />
+                            <RowDefinition Height="Auto" />
                         </Grid.RowDefinitions>
 
-                        <Grid x:Name="LeftGrid" Grid.Column="0" Grid.RowSpan="2" Margin="10,10,0,0">
+                        <Grid x:Name="LeftGrid" Grid.Column="0" Grid.RowSpan="2" Margin="0,0,0,0">
                             <Grid.RowDefinitions>
                                 <RowDefinition Height="3*"/>
                                 <RowDefinition Height="*" />
                             </Grid.RowDefinitions>
 
-                            <Border BorderThickness="2" CornerRadius="3,3,3,3">
+                            <Border BorderThickness="2" CornerRadius="3,3,3,3" Margin="0,0,0,0">
                                 <GroupBox Header="Tag description" Style="{DynamicResource MaterialDesignGroupBox}"   
                                           BorderBrush="Black" BorderThickness="1" Padding="0" Margin="0,0,0,40" >
                                     <ScrollViewer>
-                                            <TextBlock Margin="0" Padding="6" TextWrapping="Wrap" TextAlignment="Justify"
+                                        <TextBlock Margin="0" Padding="6" TextWrapping="Wrap" TextAlignment="Justify"
                                                        Text="{Binding CurrentTutorialStep.InstructionalText }" ScrollViewer.VerticalScrollBarVisibility="Auto"
                                                        ScrollViewer.CanContentScroll="True"/>
-                                        </ScrollViewer>
-                                    </GroupBox>
+                                    </ScrollViewer>
+                                </GroupBox>
                             </Border>
 
-                        <TextBox x:Name="dialogStrTb"
+                            <TextBox x:Name="dialogStrTb"
                                 Style="{DynamicResource MaterialDesignTextAreaTextBox}" 
                                 Grid.Row="1"
                                 Background="White"
@@ -142,24 +143,27 @@
                                 materialDesign:HintAssist.Hint="Write text for this tag..." 
                                 SpellCheck.IsEnabled="True" 
                                 Visibility="{Binding CurrentTutorialStep.CollectUserInput, Converter={StaticResource BooleanToVisibilityConverter}}" />
-                    </Grid>
+                        </Grid>
 
-                        <Grid x:Name="MediaGrid" Grid.Column="2" HorizontalAlignment="Center" 
-                                VerticalAlignment="Stretch" Grid.Row="0" Margin="0,10,0,0" Grid.RowSpan="2">
+                    <!--<Border BorderBrush="Aqua" BorderThickness="1" Background="AliceBlue" CornerRadius="2" Grid.Column="1" Grid.RowSpan="3" HorizontalAlignment="Stretch"/>-->
+                    <Grid x:Name="MediaGrid" Grid.Column="2" Grid.Row="0" Margin="0,0,0,0" Grid.RowSpan="2" >
 
                             <Grid.RowDefinitions>
-                                <RowDefinition Height="3*"/>
+                                <RowDefinition Height="3*" />
                                 <RowDefinition Height="*" />
+                                <RowDefinition Height="Auto" />
                             </Grid.RowDefinitions>
 
                             <!-- Video player-->
-                            <Border x:Name="VideoBrd" Margin="0,0,0,40" BorderBrush="#FF595959" 
-                                    Grid.Row="0" BorderThickness="1" CornerRadius="2,2,2,2">
-                                <controls:MediaPlayerControl  x:Name="mediaPlayer" DataContext="{Binding MediaPlayerControlViewModel}"/>
+                            <Border x:Name="VideoBrd" Margin="0,0,10,40" BorderBrush="#FF595959" 
+                                    Grid.Row="0" BorderThickness="1" CornerRadius="2,2,2,2" 
+                                    HorizontalAlignment="Stretch" 
+                                    VerticalAlignment="Stretch" >
+                                <controls:MediaPlayerControl  x:Name="mediaPlayer" DataContext="{Binding MediaPlayerControlViewModel}" />
                             </Border>
 
                             <!-- Recorder -->
-                            <Border x:Name="RecorderBrd" Grid.Row="1" BorderThickness="1"
+                            <Border x:Name="RecorderBrd" Grid.Row="1" BorderThickness="1" Margin="0,0,10,0"
                                     HorizontalAlignment="Stretch" VerticalAlignment="Stretch"
                                     CornerRadius="2,2,2,2" BorderBrush="#FF595959" 
                                     Visibility="{Binding CurrentTutorialStep.CollectUserInput, Converter={StaticResource BooleanToVisibilityConverter}}">
@@ -167,43 +171,45 @@
                                 <!--<controls:VoiceRecorderControl x:Name="voiceRecorder" HorizontalAlignment="Stretch" VerticalAlignment="Stretch"
                                         DataContext="{Binding DataContext.VoiceRecorderControlViewModel, RelativeSource={RelativeSource 
                                                               Mode=FindAncestor, AncestorType=local:WizardView}}" />-->
-                                <controls:VoiceRecorderControl x:Name="voiceRecorder" HorizontalAlignment="Stretch" VerticalAlignment="Stretch"
-                                        DataContext="{Binding VoiceRecorderControlViewModel}" />
-                        </Border>
+                                <controls:VoiceRecorderControl x:Name="voiceRecorder" DataContext="{Binding VoiceRecorderControlViewModel}"  />
+                            </Border>
 
                         </Grid>
 
                         <!-- Steps counter -->
-                        
-                        <StackPanel Grid.Row="2" Grid.Column="1" Orientation="Horizontal"
+                    <Grid Grid.Row="2" Grid.Column="0" Grid.ColumnSpan="3">
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="*" />
+                            <ColumnDefinition Width=".5*" />
+                            <ColumnDefinition Width="*" />
+                        </Grid.ColumnDefinitions>
+                        <StackPanel Grid.Column="1" Orientation="Horizontal"
                                     VerticalAlignment="Bottom" HorizontalAlignment="Center" >
-                        <TextBlock Text="{Binding CurrentWizard.WizardName}" FontSize="16" FontWeight="Bold" Foreground="{DynamicResource PrimaryHueMidBrush}" Margin="0,0,10,0"/>
-                        <TextBlock Text="{Binding CurrentStepIndex,Converter={StaticResource IncrementValueConverter}}"
+                            <TextBlock Text="{Binding CurrentWizard.WizardName}" FontSize="16" FontWeight="Bold" Foreground="{DynamicResource PrimaryHueMidBrush}" Margin="0,0,10,0"/>
+                            <TextBlock Text="{Binding CurrentStepIndex,Converter={StaticResource IncrementValueConverter}}"
                                        FontSize="16" FontWeight="Bold" Foreground="{DynamicResource PrimaryHueMidBrush}" />
                             <TextBlock Text="of" FontSize="16" Margin="7,0,7,0" Foreground="#FF595959" />
                             <TextBlock Text="{Binding CurrentWizard.TutorialSteps.Count}" FontSize="16" FontWeight="Bold"
                                        Foreground="{DynamicResource PrimaryHueMidBrush}" />
                         </StackPanel>
-
-                        <!-- Toolbar -->
-                        <StackPanel Orientation="Horizontal" Grid.Row="2" Grid.Column="2" 
+                        <StackPanel Orientation="Horizontal" Grid.Column="2" 
                                     Margin="0,40,0,0" VerticalAlignment="Center" HorizontalAlignment="Center">
 
-                            <Button Content="End Wizard" Command="{Binding Cancel}" Style="{DynamicResource MaterialDesignRaisedButton}" Margin="20,0,0,0">
-                              <Button.Visibility>
-                                <MultiBinding Converter="{StaticResource EndWizardBtnVisibilityConverter}">
-                                  <Binding Path="CurrentStepIndex" />
-                                  <Binding Path="CurrentWizard.TutorialSteps.Count" />
-                                </MultiBinding>
-                              </Button.Visibility>
+                            <Button Content="End Wizard" Command="{Binding Cancel}" Style="{DynamicResource MaterialDesignRaisedButton}" Margin="10,0,0,0">
+                                <Button.Visibility>
+                                    <MultiBinding Converter="{StaticResource EndWizardBtnVisibilityConverter}">
+                                        <Binding Path="CurrentStepIndex" />
+                                        <Binding Path="CurrentWizard.TutorialSteps.Count" />
+                                    </MultiBinding>
+                                </Button.Visibility>
                             </Button>
 
                             <Button Command="{Binding SkipStep}"
-                                    Style="{DynamicResource MaterialDesignRaisedButton}" Margin="20,0,0,0"
+                                    Style="{DynamicResource MaterialDesignRaisedButton}" Margin="10,0,0,0"
                                     Content="{Binding CurrentTutorialStep.CollectUserInput,
                                                            Converter={StaticResource SkipBtnContentConverter}}" />
 
-                            <Button Command="{Binding SaveAndNext}" Style="{DynamicResource MaterialDesignRaisedButton}" Margin="20,0,0,0">
+                            <Button Command="{Binding SaveAndNext}" Style="{DynamicResource MaterialDesignRaisedButton}" Margin="10,0,0,0">
                                 <Button.Content>
                                     <MultiBinding Converter="{StaticResource SaveAndNextBtnContentConverter}">
                                         <Binding Path="CurrentStepIndex" />
@@ -213,6 +219,14 @@
                             </Button>
                         </StackPanel>
                     </Grid>
+
+                        
+
+                        <!-- Toolbar -->
+
+                    </Grid>
+                
+                    
             </Grid>
 
         </materialDesign:DrawerHost>

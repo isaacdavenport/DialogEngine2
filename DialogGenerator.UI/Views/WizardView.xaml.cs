@@ -15,24 +15,9 @@ namespace DialogGenerator.UI.Views
         public WizardView(IRegionManager _regionManager)
         {
             mRegionManager = _regionManager;
-            Loaded += _wizardView_Loaded;
-            SizeChanged += _wizardView_SizeChanged;
 
             InitializeComponent();
         }
 
-        private void _wizardView_SizeChanged(object sender, SizeChangedEventArgs e)
-        {
-            MediaGrid.Width = (LeftGrid.ActualHeight - dialogStrTb.ActualHeight - 40 - 45) * 4 / 3;
-
-            LeftGrid.Margin = new Thickness((WizardMainGrid.ColumnDefinitions[2].ActualWidth - MediaGrid.Width) / 2, 10.0, 0.0, 0.0);
-        }
-
-        private void _wizardView_Loaded(object sender, RoutedEventArgs e)
-        {
-            MediaGrid.Width = (LeftGrid.ActualHeight - dialogStrTb.ActualHeight - 40 - 45) * 4 / 3;
-
-            LeftGrid.Margin = new Thickness((WizardMainGrid.ColumnDefinitions[2].ActualWidth - MediaGrid.Width) / 2, 10.0, 0.0, 0.0);
-        }
     }
 }

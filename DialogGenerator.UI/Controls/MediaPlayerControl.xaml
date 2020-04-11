@@ -17,7 +17,7 @@
         </Grid.RowDefinitions>
 
         <Border Grid.Row="0" Background="#FF333333" CornerRadius="2,2,2,2" BorderThickness="0" Margin="2,2,2,2">
-            <MediaElement   x:Name="VideoPlayer" Stretch="Fill" LoadedBehavior="Manual" ScrubbingEnabled="True"
+            <MediaElement   x:Name="VideoPlayer" Stretch="Uniform" LoadedBehavior="Manual" ScrubbingEnabled="True"
                             Source="{Binding CurrentVideoFilePath}"
                             HorizontalAlignment="Stretch" VerticalAlignment="Stretch" LayoutUpdated="VideoPlayer_LayoutUpdated"/>
         </Border>
