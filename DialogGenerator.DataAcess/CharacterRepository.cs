@@ -322,7 +322,6 @@ namespace DialogGenerator.DataAccess
 
         public  Task Remove(Character character,string _imageFileName)
         {
-            //TODO change array index for rest of characters after deleting 
             return Task.Run(() =>
             {
                 string _fileName = character.FileName;

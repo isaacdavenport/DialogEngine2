@@ -40,7 +40,6 @@ namespace DialogGenerator
             bootstrapper.Run();
 
             bootstrapper.Container.Resolve<CharacterDetailViewModel>();
-            bootstrapper.Container.Resolve<DialogModelDetailViewModel>();
             mFileChangesHandler = bootstrapper.Container.Resolve<FileChangesHandler>();
             mUpdatesHandler = bootstrapper.Container.Resolve<UpdatesHandler>();
             bootstrapper.Container.Resolve<Shell>().MessageDialogService = bootstrapper.Container.Resolve<IMessageDialogService>();

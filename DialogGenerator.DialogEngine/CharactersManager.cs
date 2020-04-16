@@ -41,7 +41,7 @@ namespace DialogGenerator.DialogEngine
             }
             else if (e.OldItems != null)
             {
-                //TODO
+                //TODO S.Ristic - Do we need to remove the related History dialogs here?
             }
         }
 

@@ -28,24 +28,14 @@ namespace DialogGenerator.UI
 
             mContainer.RegisterType<object, CreateView>(typeof(CreateView).FullName);
             mContainer.RegisterType<object, CharacterDetailView>(typeof(CharacterDetailView).FullName);
-            mContainer.RegisterType<object, DialogModelsView>(typeof(DialogModelsView).FullName);
-            mContainer.RegisterType<object, DialogModelDetailView>(typeof(DialogModelDetailView).FullName);
-            mContainer.RegisterType<object, DialogModelsNavigationView>(typeof(DialogModelsNavigationView).FullName);
             mContainer.RegisterType<object, DialogView>(typeof(DialogView).FullName);
-            mContainer.RegisterType<object, AssignCharactersToToysView>(typeof(AssignCharactersToToysView).FullName,new TransientLifetimeManager());
             mContainer.RegisterType<object, WizardView>(typeof(WizardView).FullName,new ContainerControlledLifetimeManager());
-            mContainer.RegisterType<object, HomeView>(typeof(HomeView).FullName, new ContainerControlledLifetimeManager());                        
 
             mContainer.RegisterType<WizardViewModel>(new ContainerControlledLifetimeManager());
             mContainer.RegisterType<CharacterDetailViewModel>(new ContainerControlledLifetimeManager());
-            mContainer.RegisterType<DialogModelsViewModel>(new ContainerControlledLifetimeManager());
-            mContainer.RegisterType<DialogModelDetailViewModel>(new ContainerControlledLifetimeManager());
-            mContainer.RegisterType<DialogModelsNavigationViewModel>(new ContainerControlledLifetimeManager())
-                .Resolve(typeof(DialogModelsNavigationViewModel));
 
             //mRegionManager.RegisterViewWithRegion(Constants.MenuRegion, typeof(MenuView));
             mRegionManager.RegisterViewWithRegion(Constants.ContentRegion, typeof(DialogView));
-            mRegionManager.RegisterViewWithRegion(Constants.ContentRegion, typeof(HomeView));
             mRegionManager.RegisterViewWithRegion(Constants.ContentRegion, typeof(CreateView));
             mRegionManager.RegisterViewWithRegion(Constants.ContentRegion, typeof(WizardView));
             mRegionManager.RegisterViewWithRegion(Constants.ContentRegion, typeof(CharacterDialogLinesView));

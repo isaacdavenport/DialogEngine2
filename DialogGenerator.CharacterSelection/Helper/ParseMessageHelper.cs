@@ -33,13 +33,6 @@ namespace DialogGenerator.CharacterSelection.Helper
                     return;
                 }
 
-                // S.Ristic 2/13/2020 - Commented because the above condition has replaced this.
-                //// TODO Isaac why do we test that the radio index is less than the number of characters in the character list?
-                //if (_radioIndex > Session.Get<ObservableCollection<Character>>(Constants.CHARACTERS).Count - 1)  
-                //{
-                //    return;
-                //}
-
                 ReceivedMessages.Add(new ReceivedMessage()
                 {
                     ReceivedTime = _timeStamp,

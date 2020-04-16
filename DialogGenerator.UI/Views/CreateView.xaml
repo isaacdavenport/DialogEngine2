@@ -17,7 +17,6 @@
         <ResourceDictionary>
             <ResourceDictionary.MergedDictionaries>
                 <ResourceDictionary>
-                    <converters:CharacterStateToColorValueConverter x:Key="CharacterStateToColorValueConverter" />
                     <converters:CloneValuesConverter x:Key="CloneValuesConverter" />
                     <converters:ImageToFullPathValueConverter x:Key="ImageToFullPathValueConverter" />
                     <converters:ImageContentValueConverter x:Key="ImageContentValueConverter" />
