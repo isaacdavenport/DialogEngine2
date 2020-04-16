@@ -29,7 +29,7 @@ using System.Windows.Input;
 
 namespace DialogGenerator.UI.ViewModels
 {
-    public class CharacterDetailViewModel : BindableBase, IDetailViewModel
+    public class CharacterDetailViewModel : BindableBase
     {
         #region - fields-
         private ILogger mLogger;

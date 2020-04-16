@@ -22,7 +22,7 @@ using System.Windows.Data;
 
 namespace DialogGenerator.UI.ViewModels
 {
-    public class CreateViewModel : BindableBase, INavigationViewModel
+    public class CreateViewModel : BindableBase
     {
         #region - fields -
 

@@ -133,7 +133,6 @@
     <Compile Include="Converters\CharacterDataTemplateSelectorValueConverter.cs" />
     <Compile Include="Converters\CharacterGenderValueConverter.cs" />
     <Compile Include="Converters\CharacterRadioNumberToTextValueConverter.cs" />
-    <Compile Include="Converters\CharacterStateToColorValueConverter.cs" />
     <Compile Include="Converters\CloneValuesConverter.cs" />
     <Compile Include="Converters\DivideBy2ValueConverter.cs" />
     <Compile Include="Converters\IdentifierConverter.cs" />
@@ -152,7 +151,6 @@
     <Compile Include="Converters\InvertValueConverter.cs" />
     <Compile Include="Converters\InvertVisibilityValueConverter.cs" />
     <Compile Include="Converters\IsActiveModelDialogValueConverter.cs" />
-    <Compile Include="Converters\IsChangeCharacterStateBtnEnabledValueConverter.cs" />
     <Compile Include="Converters\IsDialogBtnVisibleValueConverter.cs" />
     <Compile Include="Converters\IsRunOverWizardBtnEnabledValueConverter.cs" />
     <Compile Include="Converters\IsStatesEqualValueConverter.cs" />
@@ -189,8 +187,6 @@
     <Compile Include="ViewModels\DebugViewModel.cs" />
     <Compile Include="ViewModels\DialogViewModel.cs" />
     <Compile Include="ViewModels\EditPhraseViewModel.cs" />
-    <Compile Include="ViewModels\IDetailViewModel.cs" />
-    <Compile Include="ViewModels\INavigationViewModel.cs" />
     <Compile Include="ViewModels\MediaPlayerControlViewModel.cs" />
     <Compile Include="ViewModels\MediaRecorderControlViewModel.cs" />
     <Compile Include="ViewModels\VoiceRecorderControlViewModel.cs" />

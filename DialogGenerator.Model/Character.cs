@@ -15,7 +15,6 @@ namespace DialogGenerator.Model
         #region - fields -
 
         private string mCharacterName;
-        private CharacterState mState;
         private ObservableCollection<PhraseEntry> mPhrases;
         private int mRadioNum =-1;
         private PhraseEntry mPhraseTotals;
@@ -24,7 +23,6 @@ namespace DialogGenerator.Model
         private bool mHasNoVoice = false;
         private string mVoice = string.Empty;
         private int mSpeechRate = -1;
-        private bool mEditable = false;
 
         #endregion
 

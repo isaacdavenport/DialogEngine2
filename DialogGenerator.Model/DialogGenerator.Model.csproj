@@ -65,7 +65,6 @@
     <Compile Include="CharacterRadioBinding.cs" />
     <Compile Include="CreateCharacterWizard.cs" />
     <Compile Include="CreateCharacterWizardStep.cs" />
-    <Compile Include="Enum\CharacterState.cs" />
     <Compile Include="Enum\ModelDialogState.cs" />
     <Compile Include="Enum\SelectionMode.cs" />
     <Compile Include="FileItem.cs" />
