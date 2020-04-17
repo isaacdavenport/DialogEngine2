@@ -125,24 +125,15 @@
     <Compile Include="Controls\VoiceRecorderControl.xaml.cs">
       <DependentUpon>VoiceRecorderControl.xaml</DependentUpon>
     </Compile>
-    <Compile Include="Converters\ActiveDialogModelBtnVisibilityValueConverter.cs" />
-    <Compile Include="Converters\AssignedCharacter2NameValueConverter.cs" />
     <Compile Include="Converters\BoolToColorConverter.cs" />
     <Compile Include="Converters\BoolToRowHeightConverter.cs" />
     <Compile Include="Converters\BoolToVisibilityConverter.cs" />
-    <Compile Include="Converters\CharacterDataTemplateSelectorValueConverter.cs" />
     <Compile Include="Converters\CharacterGenderValueConverter.cs" />
     <Compile Include="Converters\CharacterRadioNumberToTextValueConverter.cs" />
     <Compile Include="Converters\CloneValuesConverter.cs" />
     <Compile Include="Converters\DivideBy2ValueConverter.cs" />
     <Compile Include="Converters\IdentifierConverter.cs" />
     <Compile Include="Converters\NotBoolToVisibilityConverter.cs" />
-    <Compile Include="Converters\ToyNumberToAssignedCharacterImageValueConverter.cs" />
-    <Compile Include="Converters\ToyNumberToAssignedCharacterValueConverter.cs" />
-    <Compile Include="Converters\ToyNumberToAssignedChForegroundValueConverter.cs" />
-    <Compile Include="Converters\ToyStatusColorValueConverter.cs" />
-    <Compile Include="Converters\ToyStatusValueConverter.cs" />
-    <Compile Include="Converters\ToyToAssignedCharacterValueConverter.cs" />
     <Compile Include="Converters\EndWizardBtnVisibilityConverter.cs" />
     <Compile Include="Converters\ImageContentSmallSizeValueConverter.cs" />
     <Compile Include="Converters\ImageContentValueConverter.cs" />
@@ -150,17 +141,12 @@
     <Compile Include="Converters\IncrementValueConverter.cs" />
     <Compile Include="Converters\InvertValueConverter.cs" />
     <Compile Include="Converters\InvertVisibilityValueConverter.cs" />
-    <Compile Include="Converters\IsActiveModelDialogValueConverter.cs" />
     <Compile Include="Converters\IsDialogBtnVisibleValueConverter.cs" />
     <Compile Include="Converters\IsRunOverWizardBtnEnabledValueConverter.cs" />
-    <Compile Include="Converters\IsStatesEqualValueConverter.cs" />
     <Compile Include="Converters\ListBoxItemTextAndIndexValueConverter.cs" />
     <Compile Include="Converters\MatrixCellValueToBackgroundColorConverter.cs" />
     <Compile Include="Converters\MatrixToDataViewConverter.cs" />
-    <Compile Include="Converters\ModelDialogStateToColorValueConverter.cs" />
     <Compile Include="Converters\MP3RecorderStateToBtnVisibilityValueConverter.cs" />
-    <Compile Include="Converters\PlayInContextBtnContentValueConverter.cs" />
-    <Compile Include="Converters\RadioNumberToDisplayNameValueConverter.cs" />
     <Compile Include="Converters\SaveAndNextBtnContentConverter.cs" />
     <Compile Include="Converters\SkipBtnContentConverter.cs" />
     <Compile Include="Converters\StarWidthConverter.cs" />
