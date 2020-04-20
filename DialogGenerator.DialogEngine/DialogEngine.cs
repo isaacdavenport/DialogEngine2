@@ -425,12 +425,12 @@ namespace DialogGenerator.DialogEngine
                                                mContext.CharactersList[_speakingCharacter].CharacterPrefix
                                               + "_" + _selectedPhrase.FileName + ".mp3");
 
-                        _playAudio(_pathAndFileName); // vb: code stops here so commented out for debugging purpose
+                        _playAudio(_pathAndFileName); 
 
                         if (!_dialogTrackerAndBLESelectedCharactersSame() && Session.Get<bool>(Constants.BLE_MODE_ON))
                         {
                             mContext.SameCharactersAsLast = false;
-                            return Triggers.PrepareDialogParameters; // the characters have moved  TODO break into charactersSame() and use also with prior
+                            return Triggers.PrepareDialogParameters; 
                         }
                         //Toggle character
                         if (_speakingCharacter == mContext.Character1Num) //toggle which character is speaking next
@@ -550,7 +550,7 @@ namespace DialogGenerator.DialogEngine
 
 
                 _characterSelectionTask = mCharacterSelection.StartCharacterSelection();
-                mCharactersManager.Initialize();  //TODO Isaac added so that character updates recalculate phraseweights
+                mCharactersManager.Initialize();  
                 do
                 {
                     if(Session.Contains(Constants.NEEDS_RESTART) && Session.Get<bool>(Constants.NEEDS_RESTART))

@@ -25,7 +25,7 @@
                    Height="15" Maximum="{Binding ElementName=VideoPlayer, 
                    Path=NaturalDuration.TimeSpan.TotalMilliseconds, Mode=OneTime}" 
                    Minimum="0" 
-                   PreviewMouseLeftButtonUp="VideoPositionScroll_PreviewMouseLeftButtonUp"/>
+                   PreviewMouseLeftButtonUp="VideoPositionScroll_PreviewMouseLeftButtonUp" PreviewMouseLeftButtonDown="VideoPositionScroll_PreviewMouseLeftButtonDown"/>
                 
         <StackPanel x:Name="ToolbarSP" Grid.Row="2" Orientation="Horizontal"
             Background="#FF595959" HorizontalAlignment="Stretch" VerticalAlignment="Bottom">

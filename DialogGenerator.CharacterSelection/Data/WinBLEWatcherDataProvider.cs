@@ -38,8 +38,7 @@ namespace DialogGenerator.CharacterSelection.Data
 
         private void _mWatcher_Received(BluetoothLEAdvertisementWatcher sender, BluetoothLEAdvertisementReceivedEventArgs args)
         {
-            // TODO rip out support for shorter, old radio data format with 0xA5 key and no Manf ID
-            // We now use the manufacturer ID for the first two bytes after the FF as per BLE spec, 
+            // We use the manufacturer ID for the first two bytes after the FF as per BLE spec, 
             // once we have packet format size check, look for FF Manf Type data field
             // current format example 0x0201040AFF00FF000000D5FF0036
             // first segment len 2, type 1, value of flags 0x04
@@ -59,18 +58,13 @@ namespace DialogGenerator.CharacterSelection.Data
                 uint length = sections[1].Data.Length;
                 var _numRadios = ApplicationData.Instance.NumberOfRadios;
 
-                if (!(length == _numRadios + 4 || length == _numRadios + 2))
-                    return;   // the old original CSR radio format was length 8, six radios, A5 key, and seq num.  
-                              // New format loses 0xA5 key and adds 2 byte 0x00FF manf ID and 1 byte filtered recent motion value
-
+                if (!(length == _numRadios + 4))
+                    return;   // New format adds 2 byte 0x00FF manf ID and 1 byte filtered recent motion value
 
                 using (var _dataReader = DataReader.FromBuffer(sections[1].Data))
                 {
                     var input = new byte[_dataReader.UnconsumedBufferLength];
                     _dataReader.ReadBytes(input);
-
-                    if (length == _numRadios + 2 && input[6] != 0xA5)
-                        return;
 
                     if (length == _numRadios + 4 && (input[0] != 0x00 || input[1] != 0xFF))  // manf ID no good
                         return;
@@ -78,17 +72,8 @@ namespace DialogGenerator.CharacterSelection.Data
                     //string message;
                     BLE_Message strippedInput = new BLE_Message();  // just RSSIs and seq number
 
-                    if (length == _numRadios + 4)
-                    {
-                        // remove the manufacturer ID since it has been checked
-                        Array.Copy(input, 2, strippedInput.msgArray, 0, strippedInput.msgArray.Length);
-                    }
-                    else
-                    {
-                        // remove the 0xA5 key since it has been checked
-                        Array.Copy(input, 0, strippedInput.msgArray, 0, strippedInput.msgArray.Length);
-                        strippedInput.msgArray[_numRadios] = input[_numRadios + 1];  //grab sequence number overwrite 0xA5
-                    }
+                    // remove the manufacturer ID since it has been checked
+                    Array.Copy(input, 2, strippedInput.msgArray, 0, strippedInput.msgArray.Length);                    
 
                     mMessage = strippedInput.DeepCopy();
                     mBLETotalMessageCount++;

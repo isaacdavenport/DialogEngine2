@@ -232,8 +232,7 @@ namespace DialogGenerator.UI.ViewModels
             {
                 mLogger.Error("_import_Click " + ex.Message);
                 mMessageDialogService.CloseBusyDialog();
-                await mMessageDialogService.ShowMessage("Error", "Error during importing character.");
-                //TODO add support for rollback files if exception occured
+                await mMessageDialogService.ShowMessage("Error", "Error during importing character.");                
             }
             finally
             {

@@ -41,7 +41,8 @@ namespace DialogGenerator.DialogEngine
             }
             else if (e.OldItems != null)
             {
-                //TODO S.Ristic - Do we need to remove the related History dialogs here?
+                //Nothing is needed to be done. 
+                //The history dialogs collection will be reset the next time the arena starts.
             }
         }
 

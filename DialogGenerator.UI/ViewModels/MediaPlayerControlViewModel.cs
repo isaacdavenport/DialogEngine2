@@ -15,19 +15,22 @@ namespace DialogGenerator.UI.ViewModels
         #region - fields -
 
         private string mCurrentVideoFilePath;
+        private ILogger mLogger;
         private WizardWorkflow mWizardWorkflow;
         public event EventHandler PlayRequested;
         public event EventHandler PauseRequested;
         public event EventHandler StopRequested;
 
+
         #endregion
 
         #region - constructor -
 
-        public MediaPlayerControlViewModel(WizardWorkflow _wizardWorkflow)
+        public MediaPlayerControlViewModel(WizardWorkflow _wizardWorkflow, ILogger _Logger)
         {
             StateMachine = new VideoPlayerStateMachine(() => { });
             mWizardWorkflow = _wizardWorkflow;
+            mLogger = _Logger;
 
             this.PropertyChanged += _mediaPlayerControlViewModel_PropertyChanged;
             mWizardWorkflow.PropertyChanged += _mWizardWorkflow_PropertyChanged;
@@ -38,6 +41,22 @@ namespace DialogGenerator.UI.ViewModels
         }
 
         #endregion
+        
+        public void LogMessage(int _MessageType, string _Message)
+        {
+            switch(_MessageType)
+            {
+                case 0:
+                    mLogger.Error(_Message);
+                    break;
+                case 1:
+                    mLogger.Info(_Message);
+                    break;
+                default:
+                    mLogger.Debug(_Message);
+                    break;
+            }
+        }
 
         #region - event handlers -
 

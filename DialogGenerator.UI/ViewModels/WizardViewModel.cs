@@ -84,7 +84,7 @@ namespace DialogGenerator.UI.ViewModels
             mEventAggregator = _eventAggregator;
 
             Workflow = new WizardWorkflow(action: () => { });
-            MediaPlayerControlViewModel = new MediaPlayerControlViewModel(Workflow);
+            MediaPlayerControlViewModel = new MediaPlayerControlViewModel(Workflow, mLogger);
 
             mLogger.Info("Before creating of VoiceRecorderControlViewModel");
             VoiceRecorderControlViewModel = new VoiceRecorderControlViewModel(NAudioEngine.Instance,Workflow,mMessageDialogService, _eventAggregator);

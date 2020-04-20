@@ -86,6 +86,7 @@ namespace DialogGenerator.UI.Controls
 
         private void _mediaElement_MediaFailed(object sender, ExceptionRoutedEventArgs e)
         {
+            ((MediaPlayerControlViewModel)this.DataContext).LogMessage(0, e.ErrorException.Message);
         }
 
         private void _mediaElement_Loaded(object sender, RoutedEventArgs e)
@@ -123,7 +124,24 @@ namespace DialogGenerator.UI.Controls
 
         private void VideoPositionScroll_PreviewMouseLeftButtonUp(object sender, System.Windows.Input.MouseButtonEventArgs e)
         {
-            VideoPlayer.Position = new TimeSpan(0, 0, 0, 0, (int)VideoPositionScroll.Value);
+            try
+            {
+                if ((DataContext as MediaPlayerControlViewModel).StateMachine.CanFire(Workflow.VideoPlayerStateMachine.Triggers.On))
+                {
+                    VideoPlayer.Position = new TimeSpan(0, 0, 0, 0, (int)VideoPositionScroll.Value);
+
+                    mUpdateTimer.Start();
+                    VideoPlayer.Play();
+                }
+                else
+                {
+                    VideoPlayer.Position = new TimeSpan(0, 0, 0, 0, (int)VideoPositionScroll.Value);
+                }
+            } catch (Exception exp)
+            {
+                ((MediaPlayerControlViewModel)this.DataContext).LogMessage(0, exp.Message);
+            }
+                        
         }
 
         private void VideoPlayer_LayoutUpdated(object sender, EventArgs e)
@@ -132,6 +150,16 @@ namespace DialogGenerator.UI.Controls
             {
                 VideoPositionScroll.Maximum = VideoPlayer.NaturalDuration.TimeSpan.TotalMilliseconds;
             }
+        }
+
+        private void VideoPositionScroll_PreviewMouseLeftButtonDown(object sender, System.Windows.Input.MouseButtonEventArgs e)
+        {
+            if ((DataContext as MediaPlayerControlViewModel).StateMachine.CanFire(Workflow.VideoPlayerStateMachine.Triggers.On))
+            {
+                VideoPlayer.Pause();
+                mUpdateTimer.Stop();
+            }
+                
         }
     }
 }

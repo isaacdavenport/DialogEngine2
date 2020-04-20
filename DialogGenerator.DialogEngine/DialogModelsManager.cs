@@ -229,7 +229,6 @@ namespace DialogGenerator.DialogEngine
 
         public int PickAWeightedDialog()
         {
-            //TODO check that all characters/phrasetypes required for adventure are included before starting adventure?
             var _dialogModel = 0;
             var _dialogWeightIndex = 0.0;
             var _attempts = 0;
