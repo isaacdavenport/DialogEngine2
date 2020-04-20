@@ -126,9 +126,23 @@ namespace DialogGenerator.UI.Controls
         {
             try
             {
-                if ((DataContext as MediaPlayerControlViewModel).StateMachine.CanFire(Workflow.VideoPlayerStateMachine.Triggers.On))
+                MediaPlayerControlViewModel _model = DataContext as MediaPlayerControlViewModel;
+                if (_model.StateMachine.CanFire(Workflow.VideoPlayerStateMachine.Triggers.On))
                 {
+                    if(VideoPlayer.NaturalDuration.HasTimeSpan)
+                    {
+                        _model.LogMessage(1, string.Format("Video duration is : {0}", VideoPlayer.NaturalDuration.TimeSpan.ToString("c")));
+                    } else
+                    {
+                        _model.LogMessage(1, string.Format("Video has no duration set"));
+                    }
+
+                    _model.LogMessage(1, string.Format("Scroll bar position is : {0}", (int)VideoPositionScroll.Value));
+
                     VideoPlayer.Position = new TimeSpan(0, 0, 0, 0, (int)VideoPositionScroll.Value);
+
+                    _model.LogMessage(1, string.Format("Video position is : {0}", VideoPlayer.Position.ToString("c")));
+
 
                     mUpdateTimer.Start();
                     VideoPlayer.Play();
@@ -156,8 +170,8 @@ namespace DialogGenerator.UI.Controls
         {
             if ((DataContext as MediaPlayerControlViewModel).StateMachine.CanFire(Workflow.VideoPlayerStateMachine.Triggers.On))
             {
-                VideoPlayer.Pause();
                 mUpdateTimer.Stop();
+                VideoPlayer.Pause();                
             }
                 
         }

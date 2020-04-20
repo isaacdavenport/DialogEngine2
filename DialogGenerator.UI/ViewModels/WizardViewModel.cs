@@ -327,7 +327,10 @@ namespace DialogGenerator.UI.ViewModels
                 return Workflow.State == WizardStates.WaitingForUserAction
                        && VoiceRecorderControlViewModel.StartPlayingCommand.CanExecute();
             }
-            catch (Exception){}
+            catch (Exception exp){
+                mLogger.Error("Playing in context can execute exception - " + exp.Message);
+            }
+
             return false;
         }
 
@@ -338,7 +341,9 @@ namespace DialogGenerator.UI.ViewModels
                 return (CurrentWizard != null && CurrentStepIndex < CurrentWizard.TutorialSteps.Count - 1)
                         && Workflow.State == WizardStates.WaitingForUserAction;
             }
-            catch (Exception) { }
+            catch (Exception exp) {
+                mLogger.Error("Skip step can exception - " + exp.Message);
+            }
 
             return false;
         }
@@ -351,7 +356,10 @@ namespace DialogGenerator.UI.ViewModels
                        && (File.Exists(Path.Combine(ApplicationData.Instance.AudioDirectory, VoiceRecorderControlViewModel.CurrentFilePath + ".mp3"))
                        || CurrentStepIndex == CurrentWizard.TutorialSteps.Count - 1);
             }
-            catch (Exception) { }
+            catch (Exception exp)
+            {
+                mLogger.Error("SaveAndNext can execute exception - " + exp.Message);
+            }
 
             return false;
         }
