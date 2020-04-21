@@ -16,6 +16,7 @@ namespace DialogGenerator.UI.Controls
     public partial class MediaPlayerControl : UserControl
     {
         private DispatcherTimer mUpdateTimer;
+        private const int INTERVAL = 5000;
 
         public MediaPlayerControl()
         {
@@ -36,10 +37,39 @@ namespace DialogGenerator.UI.Controls
             (DataContext as MediaPlayerControlViewModel).PauseRequested += _mediaPlayerControl_PauseRequested;
             (DataContext as MediaPlayerControlViewModel).StopRequested += _mediaPlayerControl_StopRequested;
             (DataContext as MediaPlayerControlViewModel).PropertyChanged += MediaPlayerControl_PropertyChanged;
+            (DataContext as MediaPlayerControlViewModel).ShiftForwardRequested += MediaPlayerControl_ShiftForwardRequested;
+            (DataContext as MediaPlayerControlViewModel).ShiftBackwardsRequested += MediaPlayerControl_ShiftBackwardsRequested;
             
             mUpdateTimer = new DispatcherTimer();
             mUpdateTimer.Interval = TimeSpan.FromSeconds(0.1);
             mUpdateTimer.Tick += MUpdateTimer_Tick;                          
+        }
+
+        private void MediaPlayerControl_ShiftBackwardsRequested(object sender, EventArgs e)
+        {
+            double _totalMilliseconds = VideoPlayer.Position.TotalMilliseconds;
+            if(_totalMilliseconds - INTERVAL >= 0)
+            {
+                _totalMilliseconds -= INTERVAL;
+                VideoPlayer.Position = new TimeSpan(0, 0, 0, 0, (int)_totalMilliseconds);
+            } else
+            {
+                VideoPlayer.Position = new TimeSpan(0, 0, 0, 0, 0);
+            }
+        }
+
+        private void MediaPlayerControl_ShiftForwardRequested(object sender, EventArgs e)
+        {
+            double _totalMilliseconds = VideoPlayer.Position.TotalMilliseconds;
+            if (_totalMilliseconds + INTERVAL <= VideoPlayer.NaturalDuration.TimeSpan.TotalMilliseconds)
+            {
+                _totalMilliseconds += INTERVAL;
+                VideoPlayer.Position = new TimeSpan(0, 0, 0, 0, (int)_totalMilliseconds);
+            }
+            else 
+            {
+                VideoPlayer.Position = new TimeSpan(0, 0, 0, 0, (int)VideoPlayer.NaturalDuration.TimeSpan.TotalMilliseconds);
+            }
         }
 
         private void MediaPlayerControl_PropertyChanged(object sender, System.ComponentModel.PropertyChangedEventArgs e)
@@ -126,60 +156,7 @@ namespace DialogGenerator.UI.Controls
 
         private void VideoPositionScroll_PreviewMouseLeftButtonUp(object sender, System.Windows.Input.MouseButtonEventArgs e)
         {
-            try
-            {
-                MediaPlayerControlViewModel _model = DataContext as MediaPlayerControlViewModel;
-                if (_model.StateMachine.CanFire(Workflow.VideoPlayerStateMachine.Triggers.On))
-                {
-                    if(VideoPlayer.NaturalDuration.HasTimeSpan)
-                    {
-                        _model.LogMessage(1, string.Format("Video duration is : {0}", VideoPlayer.NaturalDuration.TimeSpan.ToString("c")));
-                    } else
-                    {
-                        _model.LogMessage(1, string.Format("Video has no duration set"));
-                    }
-
-                    _model.LogMessage(1, string.Format("Scroll bar position is : {0}", (int)VideoPositionScroll.Value));
-
-                    VideoPlayer.Position = new TimeSpan(0, 0, 0, 0, (int)VideoPositionScroll.Value);
-
-                    _model.LogMessage(1, string.Format("Video position is : {0}", VideoPlayer.Position.ToString("c")));
-
-
-                    mUpdateTimer.Start();
-                    VideoPlayer.Play();
-                }
-                else
-                {
-                    VideoPlayer.Position = new TimeSpan(0, 0, 0, 0, (int)VideoPositionScroll.Value);
-                }
-            } catch (Exception exp)
-            {
-                MediaPlayerControlViewModel _model = DataContext as MediaPlayerControlViewModel;
-                if(_model.StateMachine != null)
-                {
-                    if(_model.StateMachine.CanFire(Workflow.VideoPlayerStateMachine.Triggers.On))
-                    {
-                        if(VideoPlayer != null && VideoPlayer.NaturalDuration != null && VideoPlayer.NaturalDuration.HasTimeSpan)
-                        {
-                            _model.LogMessage(1, string.Format("Exception raised - Video duration is : {0}", VideoPlayer.NaturalDuration.TimeSpan.ToString("c")));
-                            _model.LogMessage(1, string.Format("Exception raised - Video position is : {0}", VideoPlayer.Position.ToString("c")));
-                        } else
-                        {
-                            if(VideoPlayer != null)
-                            {
-                                _model.LogMessage(0, string.Format("Exception raised - Video has no duration set"));
-                            } else
-                            {
-                                _model.LogMessage(0, string.Format("Exception raised - VideoPlayerControl is null"));
-                            }                            
-                        }                      
-                    }
-                }
-
-                _model.LogMessage(0, exp.Message);
-            }
-                        
+            e.Handled = true;             
         }
 
         private void VideoPlayer_LayoutUpdated(object sender, EventArgs e)
@@ -192,11 +169,7 @@ namespace DialogGenerator.UI.Controls
 
         private void VideoPositionScroll_PreviewMouseLeftButtonDown(object sender, System.Windows.Input.MouseButtonEventArgs e)
         {
-            if ((DataContext as MediaPlayerControlViewModel).StateMachine.CanFire(Workflow.VideoPlayerStateMachine.Triggers.On))
-            {
-                mUpdateTimer.Stop();
-                VideoPlayer.Pause();                
-            }                
+            e.Handled = true;                           
         }
 
     }
