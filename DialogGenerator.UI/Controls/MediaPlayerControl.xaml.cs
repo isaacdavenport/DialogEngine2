@@ -1,6 +1,7 @@
 ﻿using DialogGenerator.Core;
 using DialogGenerator.UI.ViewModels;
 using System;
+using System.IO;
 using System.Threading;
 using System.Threading.Tasks;
 using System.Windows;
@@ -24,9 +25,8 @@ namespace DialogGenerator.UI.Controls
             Unloaded += MediaPlayerControl_Unloaded;
             VideoPlayer.MediaEnded += _mediaElement_MediaEnded;
             VideoPlayer.MediaFailed += _mediaElement_MediaFailed;
-            VideoPlayer.Loaded += _mediaElement_Loaded;
-            
-        }
+            VideoPlayer.Loaded += _mediaElement_Loaded;                        
+        }       
 
         #region - event handlers -
 
@@ -89,17 +89,19 @@ namespace DialogGenerator.UI.Controls
             ((MediaPlayerControlViewModel)this.DataContext).LogMessage(0, e.ErrorException.Message);
         }
 
-        private void _mediaElement_Loaded(object sender, RoutedEventArgs e)
+        private async void _mediaElement_Loaded(object sender, RoutedEventArgs e)
         {
-            VideoPlayer.Play();
-            VideoPlayer.Stop();
-
-            Thread.Sleep(1000);
-
-            if(VideoPlayer.NaturalDuration.HasTimeSpan)
+            if(VideoPlayer.Source.IsFile && File.Exists(VideoPlayer.Source.LocalPath))
             {
-                VideoPositionScroll.Maximum = VideoPlayer.NaturalDuration.TimeSpan.TotalMilliseconds;
-            }
+                VideoPlayer.Play();
+                await Task.Run(() =>
+                {
+                    Dispatcher.Invoke(() =>
+                    {
+                        VideoPlayer.Stop();
+                    });                    
+                });                
+            }           
         }
 
         private void _mediaElement_MediaEnded(object sender, RoutedEventArgs e)
@@ -153,7 +155,29 @@ namespace DialogGenerator.UI.Controls
                 }
             } catch (Exception exp)
             {
-                ((MediaPlayerControlViewModel)this.DataContext).LogMessage(0, exp.Message);
+                MediaPlayerControlViewModel _model = DataContext as MediaPlayerControlViewModel;
+                if(_model.StateMachine != null)
+                {
+                    if(_model.StateMachine.CanFire(Workflow.VideoPlayerStateMachine.Triggers.On))
+                    {
+                        if(VideoPlayer != null && VideoPlayer.NaturalDuration != null && VideoPlayer.NaturalDuration.HasTimeSpan)
+                        {
+                            _model.LogMessage(1, string.Format("Exception raised - Video duration is : {0}", VideoPlayer.NaturalDuration.TimeSpan.ToString("c")));
+                            _model.LogMessage(1, string.Format("Exception raised - Video position is : {0}", VideoPlayer.Position.ToString("c")));
+                        } else
+                        {
+                            if(VideoPlayer != null)
+                            {
+                                _model.LogMessage(0, string.Format("Exception raised - Video has no duration set"));
+                            } else
+                            {
+                                _model.LogMessage(0, string.Format("Exception raised - VideoPlayerControl is null"));
+                            }                            
+                        }                      
+                    }
+                }
+
+                _model.LogMessage(0, exp.Message);
             }
                         
         }
@@ -172,8 +196,8 @@ namespace DialogGenerator.UI.Controls
             {
                 mUpdateTimer.Stop();
                 VideoPlayer.Pause();                
-            }
-                
+            }                
         }
+
     }
 }
