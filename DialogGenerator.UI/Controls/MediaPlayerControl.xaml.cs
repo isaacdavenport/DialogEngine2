@@ -50,11 +50,22 @@ namespace DialogGenerator.UI.Controls
             double _totalMilliseconds = VideoPlayer.Position.TotalMilliseconds;
             if(_totalMilliseconds - INTERVAL >= 0)
             {
-                _totalMilliseconds -= INTERVAL;
-                VideoPlayer.Position = new TimeSpan(0, 0, 0, 0, (int)_totalMilliseconds);
+                if(VideoPlayer.CanPause)
+                {
+                    VideoPlayer.Pause();
+                    VideoPlayer.Position = VideoPlayer.Position.Subtract(new TimeSpan(0, 0, 0, 0, INTERVAL));
+                    VideoPlayer.Play();
+                }
+                
             } else
             {
-                VideoPlayer.Position = new TimeSpan(0, 0, 0, 0, 0);
+                if(VideoPlayer.CanPause)
+                {
+                    VideoPlayer.Pause();
+                    VideoPlayer.Position = new TimeSpan(0, 0, 0, 0, 0);
+                    VideoPlayer.Play();
+                }
+                
             }
         }
 
@@ -63,12 +74,22 @@ namespace DialogGenerator.UI.Controls
             double _totalMilliseconds = VideoPlayer.Position.TotalMilliseconds;
             if (_totalMilliseconds + INTERVAL <= VideoPlayer.NaturalDuration.TimeSpan.TotalMilliseconds)
             {
-                _totalMilliseconds += INTERVAL;
-                VideoPlayer.Position = new TimeSpan(0, 0, 0, 0, (int)_totalMilliseconds);
+                if(VideoPlayer.CanPause)
+                {
+                    VideoPlayer.Pause();
+                    VideoPlayer.Position = VideoPlayer.Position.Add(new TimeSpan(0, 0, 0, 0, INTERVAL));
+                    VideoPlayer.Play();
+                }                
             }
             else 
             {
-                VideoPlayer.Position = new TimeSpan(0, 0, 0, 0, (int)VideoPlayer.NaturalDuration.TimeSpan.TotalMilliseconds);
+                if(VideoPlayer.CanPause)
+                {
+                    VideoPlayer.Pause();
+                    VideoPlayer.Position = new TimeSpan(0, 0, 0, 0, (int)VideoPlayer.NaturalDuration.TimeSpan.TotalMilliseconds);
+                    VideoPlayer.Play();
+                }
+                
             }
         }
 
@@ -141,6 +162,9 @@ namespace DialogGenerator.UI.Controls
             {
                 (DataContext as MediaPlayerControlViewModel).StateMachine.Fire(Workflow.VideoPlayerStateMachine.Triggers.On);
             }
+
+            (DataContext as MediaPlayerControlViewModel).ShiftBackwardCommand.RaiseCanExecuteChanged();
+            (DataContext as MediaPlayerControlViewModel).ShiftForwardCommand.RaiseCanExecuteChanged();
         }
 
         #endregion
