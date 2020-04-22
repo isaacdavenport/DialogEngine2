@@ -56,10 +56,21 @@ namespace DialogGenerator.UI.Controls
             double _totalMilliseconds = VideoPlayer.Position.TotalMilliseconds;
             if(_totalMilliseconds - INTERVAL >= 0)
             {                
-                VideoPlayer.Position = VideoPlayer.Position.Subtract(new TimeSpan(0, 0, 0, 0, INTERVAL));                                    
+                if(VideoPlayer.CanPause)
+                {
+                    VideoPlayer.Pause();
+                    VideoPlayer.Position -= new TimeSpan(0, 0, 0, 0, INTERVAL);
+                    VideoPlayer.Play();
+                }
+                                                    
             } else
             {
-                VideoPlayer.Position = new TimeSpan(0, 0, 0, 0, 0);
+                if (VideoPlayer.CanPause)
+                {
+                    VideoPlayer.Pause();
+                    VideoPlayer.Position = new TimeSpan(0, 0, 0, 0, 0);
+                    VideoPlayer.Play();
+                }
             }
         }
 
@@ -67,12 +78,22 @@ namespace DialogGenerator.UI.Controls
         {
             double _totalMilliseconds = VideoPlayer.Position.TotalMilliseconds;
             if (_totalMilliseconds + INTERVAL <= VideoPlayer.NaturalDuration.TimeSpan.TotalMilliseconds)
-            {                
-                VideoPlayer.Position = VideoPlayer.Position.Add(new TimeSpan(0, 0, 0, 0, INTERVAL));                               
+            {
+                if (VideoPlayer.CanPause)
+                {
+                    VideoPlayer.Pause();
+                    VideoPlayer.Position += new TimeSpan(0, 0, 0, 0, INTERVAL);
+                    VideoPlayer.Play();
+                }
             }
             else 
             {
-                VideoPlayer.Position = new TimeSpan(0, 0, 0, 0, (int)VideoPlayer.NaturalDuration.TimeSpan.TotalMilliseconds);                                
+                if (VideoPlayer.CanPause)
+                {
+                    VideoPlayer.Pause();
+                    VideoPlayer.Position = new TimeSpan(0, 0, 0, 0, (int)VideoPlayer.NaturalDuration.TimeSpan.TotalMilliseconds);
+                    VideoPlayer.Play();
+                }
             }
         }
 
