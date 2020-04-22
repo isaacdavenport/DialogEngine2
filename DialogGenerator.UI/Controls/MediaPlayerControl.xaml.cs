@@ -26,8 +26,14 @@ namespace DialogGenerator.UI.Controls
             Unloaded += MediaPlayerControl_Unloaded;
             VideoPlayer.MediaEnded += _mediaElement_MediaEnded;
             VideoPlayer.MediaFailed += _mediaElement_MediaFailed;
-            VideoPlayer.Loaded += _mediaElement_Loaded;                        
-        }       
+            VideoPlayer.Loaded += _mediaElement_Loaded;
+            VideoPlayer.MediaOpened += VideoPlayer_MediaOpened;
+        }
+
+        private void VideoPlayer_MediaOpened(object sender, RoutedEventArgs e)
+        {
+            _initVideo();
+        }
 
         #region - event handlers -
 
@@ -49,23 +55,11 @@ namespace DialogGenerator.UI.Controls
         {
             double _totalMilliseconds = VideoPlayer.Position.TotalMilliseconds;
             if(_totalMilliseconds - INTERVAL >= 0)
-            {
-                if(VideoPlayer.CanPause)
-                {
-                    VideoPlayer.Pause();
-                    VideoPlayer.Position = VideoPlayer.Position.Subtract(new TimeSpan(0, 0, 0, 0, INTERVAL));
-                    VideoPlayer.Play();
-                }
-                
+            {                
+                VideoPlayer.Position = VideoPlayer.Position.Subtract(new TimeSpan(0, 0, 0, 0, INTERVAL));                                    
             } else
             {
-                if(VideoPlayer.CanPause)
-                {
-                    VideoPlayer.Pause();
-                    VideoPlayer.Position = new TimeSpan(0, 0, 0, 0, 0);
-                    VideoPlayer.Play();
-                }
-                
+                VideoPlayer.Position = new TimeSpan(0, 0, 0, 0, 0);
             }
         }
 
@@ -73,23 +67,12 @@ namespace DialogGenerator.UI.Controls
         {
             double _totalMilliseconds = VideoPlayer.Position.TotalMilliseconds;
             if (_totalMilliseconds + INTERVAL <= VideoPlayer.NaturalDuration.TimeSpan.TotalMilliseconds)
-            {
-                if(VideoPlayer.CanPause)
-                {
-                    VideoPlayer.Pause();
-                    VideoPlayer.Position = VideoPlayer.Position.Add(new TimeSpan(0, 0, 0, 0, INTERVAL));
-                    VideoPlayer.Play();
-                }                
+            {                
+                VideoPlayer.Position = VideoPlayer.Position.Add(new TimeSpan(0, 0, 0, 0, INTERVAL));                               
             }
             else 
             {
-                if(VideoPlayer.CanPause)
-                {
-                    VideoPlayer.Pause();
-                    VideoPlayer.Position = new TimeSpan(0, 0, 0, 0, (int)VideoPlayer.NaturalDuration.TimeSpan.TotalMilliseconds);
-                    VideoPlayer.Play();
-                }
-                
+                VideoPlayer.Position = new TimeSpan(0, 0, 0, 0, (int)VideoPlayer.NaturalDuration.TimeSpan.TotalMilliseconds);                                
             }
         }
 
@@ -140,19 +123,9 @@ namespace DialogGenerator.UI.Controls
             ((MediaPlayerControlViewModel)this.DataContext).LogMessage(0, e.ErrorException.Message);
         }
 
-        private async void _mediaElement_Loaded(object sender, RoutedEventArgs e)
+        private void _mediaElement_Loaded(object sender, RoutedEventArgs e)
         {
-            if(VideoPlayer.Source.IsFile && File.Exists(VideoPlayer.Source.LocalPath))
-            {
-                VideoPlayer.Play();
-                await Task.Run(() =>
-                {
-                    Dispatcher.Invoke(() =>
-                    {
-                        VideoPlayer.Stop();
-                    });                    
-                });                
-            }           
+            _initVideo();     
         }
 
         private void _mediaElement_MediaEnded(object sender, RoutedEventArgs e)
@@ -194,6 +167,12 @@ namespace DialogGenerator.UI.Controls
         private void VideoPositionScroll_PreviewMouseLeftButtonDown(object sender, System.Windows.Input.MouseButtonEventArgs e)
         {
             e.Handled = true;                           
+        }
+
+        private void _initVideo()
+        {
+            VideoPlayer.Play();
+            VideoPlayer.Stop();
         }
 
     }
