@@ -27,10 +27,10 @@ namespace DialogGenerator.UI.Controls
             VideoPlayer.MediaEnded += _mediaElement_MediaEnded;
             VideoPlayer.MediaFailed += _mediaElement_MediaFailed;
             VideoPlayer.Loaded += _mediaElement_Loaded;
-            VideoPlayer.MediaOpened += VideoPlayer_MediaOpened;
+            VideoPlayer.SourceUpdated += VideoPlayer_SourceUpdated;
         }
 
-        private void VideoPlayer_MediaOpened(object sender, RoutedEventArgs e)
+        private void VideoPlayer_SourceUpdated(object sender, System.Windows.Data.DataTransferEventArgs e)
         {
             _initVideo();
         }
