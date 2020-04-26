@@ -407,7 +407,7 @@ namespace DialogGenerator.UI.ViewModels
                             }
                             else
                             {
-
+                                mLogger.Info(string.Format("Playing in context - Character ({0}), about to play in context the dialog line - {1}", Character.CharacterName, _dialogLine));
                                 if (Path.HasExtension(_dialogLine))
                                 {
                                     Application.Current.Dispatcher.Invoke(() =>
@@ -427,8 +427,14 @@ namespace DialogGenerator.UI.ViewModels
                                 }
                                 Application.Current.Dispatcher.Invoke(() =>
                                 {
+                                    mLogger.Info(string.Format("Playing in context - {0} is about to be played!", MediaPlayerControlViewModel.CurrentVideoFilePath));
+
                                     if (MediaPlayerControlViewModel.PlayInContextCommand.CanExecute(null))
+                                    {
                                         MediaPlayerControlViewModel.PlayInContextCommand.Execute(null);
+                                        mLogger.Info(string.Format("Playing in context - {0} playing!", MediaPlayerControlViewModel.CurrentVideoFilePath));
+                                    }
+                                        
                                 });
                             }
 

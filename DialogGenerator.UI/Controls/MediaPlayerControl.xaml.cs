@@ -32,7 +32,7 @@ namespace DialogGenerator.UI.Controls
 
         private void VideoPlayer_SourceUpdated(object sender, System.Windows.Data.DataTransferEventArgs e)
         {
-            _initVideo();
+            //_initVideo();
         }
 
         #region - event handlers -
