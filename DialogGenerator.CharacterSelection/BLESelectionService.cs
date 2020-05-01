@@ -115,6 +115,11 @@ namespace DialogGenerator.CharacterSelection
 
             mWorkflow.Configure(States.CalculatingClosestPair)
                 .Permit(Triggers.ProcessMessage, States.ProcessingMessage)
+                .Permit(Triggers.CheckMovement, States.CheckMovement)
+                .Permit(Triggers.Finish, States.Finished);
+
+            mWorkflow.Configure(States.CheckMovement)
+                .Permit(Triggers.ProcessMessage, States.ProcessingMessage)
                 .Permit(Triggers.SelectNextCharacters, States.SelectingNextCharacters)
                 .Permit(Triggers.Finish, States.Finished);
 
@@ -472,35 +477,39 @@ namespace DialogGenerator.CharacterSelection
                 //only pick up new characters if bigRssi greater not ==
                 int priorLargestRssiPair = HeatMap[mPossibleSpeakingCh1RadioNum, mPossibleSpeakingCh2RadioNum] + HeatMap[mPossibleSpeakingCh2RadioNum, mPossibleSpeakingCh1RadioNum];
                 _findBiggestRssiPair(out int finalRow, out int finalColumn, out int newLargestRssiPair, in HeatMap);
-                // S. Ristic - This condition will prevent the character selection
-                // while entering the play mode in guided character creation mode.
-
-                //if (newLargestRssiPair > priorLargestRssiPair && 
-                //      _areRadioPairsDifferent(mPossibleSpeakingCh1RadioNum, mPossibleSpeakingCh2RadioNum, finalRow, finalColumn))
-                //{
-                //    mPossibleSpeakingCh1RadioNum = finalRow;
-                //    mPossibleSpeakingCh2RadioNum = finalColumn;
-                //}
-                //else
-                //{  // only consider changing characters when new RSSI is larger so back to start of state machine
-                //    return Triggers.ProcessMessage;
-                //}
 
                 mPossibleSpeakingCh1RadioNum = finalRow;
                 mPossibleSpeakingCh2RadioNum = finalColumn;
 
-                // TODO, _calculateRssiStableAfterChange and _inMotionThenStillnessWindow should be their own states
                 _rssiStable = _calculateRssiStablity2(mPossibleSpeakingCh1RadioNum, mPossibleSpeakingCh2RadioNum);
+                if (_rssiStable)
+                    return Triggers.CheckMovement;
+                else
+                    return Triggers.ProcessMessage;
+
+
+            }
+            catch (Exception ex)
+            {
+                mLogger.Error("_shouldCharactersChange " + ex.Message);
+                return Triggers.ProcessMessage;
+            }
+        }
+
+        private Triggers _checkMovement()
+        {
+            try
+            {
                 var _inMovementWindow = _inMotionThenStillnessWindow();
 
-                if ( _rssiStable && (_inMovementWindow || mFreshStart))
+                if (_inMovementWindow || mFreshStart)
                 {
-                    if(mFreshStart)
+                    if (mFreshStart)
                     {
-                        if(_calculateRssiStablity2(mPossibleSpeakingCh1RadioNum, mPossibleSpeakingCh2RadioNum, 1000, 0.95))
+                        if (_calculateRssiStablity2(mPossibleSpeakingCh1RadioNum, mPossibleSpeakingCh2RadioNum, 1000, 0.95))
                         {
                             mFreshStart = false;
-                        }                        
+                        }
                     }
 
                     mLogger.Info("in _shouldCharactersChange() SelectNextCharacters triggered");
@@ -510,10 +519,9 @@ namespace DialogGenerator.CharacterSelection
                 {
                     return Triggers.ProcessMessage;
                 }
-            }
-            catch (Exception ex)
+            } catch (Exception ex)
             {
-                mLogger.Error("_shouldCharactersChange " + ex.Message);
+                mLogger.Error("_checkMovement exception -  " + ex.Message);
                 return Triggers.ProcessMessage;
             }
         }
@@ -701,6 +709,11 @@ namespace DialogGenerator.CharacterSelection
                                 next = _shouldCharactersChange();
                                 break;
                             }
+                        case Triggers.CheckMovement:
+                            {
+                                next = _checkMovement();
+                                break;
+                            }
                         case Triggers.SelectNextCharacters:
                             {
                                 next = _selectNextCharacters();
@@ -731,6 +744,8 @@ namespace DialogGenerator.CharacterSelection
                 mWorkflow.Fire(Triggers.Finish);
             });          
         }
+
+
 
         public void StopCharacterSelection()
         {

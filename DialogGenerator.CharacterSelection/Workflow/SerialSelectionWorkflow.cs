@@ -11,6 +11,7 @@ namespace DialogGenerator.CharacterSelection.Workflow
         Initializing,
         ProcessingMessage,
         CalculatingClosestPair,
+        CheckMovement,
         SelectingNextCharacters,
         Finished
     }
@@ -21,6 +22,7 @@ namespace DialogGenerator.CharacterSelection.Workflow
         Initialize,
         ProcessMessage,
         CalculateClosestPair,
+        CheckMovement,
         SelectNextCharacters,
         Finish
     }

@@ -447,8 +447,6 @@ namespace DialogGenerator.DialogEngine
                     if (mContext.HistoricalPhrases.Count > 8000)
                         mContext.HistoricalPhrases.RemoveRange(0, 100);
 
-                    mContext.RecentDialogs.Dequeue(); //TODO move to use HistoricalDialogs
-                    mContext.RecentDialogs.Enqueue(mIndexOfCurrentDialogModel);
                 }
 
                 int _completedDlgModels = Session.Get<int>(Constants.COMPLETED_DLG_MODELS);

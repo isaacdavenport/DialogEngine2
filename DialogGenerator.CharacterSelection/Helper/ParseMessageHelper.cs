@@ -18,6 +18,8 @@ namespace DialogGenerator.CharacterSelection.Helper
         public static ILogger Logger;
         public static ICharacterRepository CharacterRepository;
 
+        private static object MessageCollectionLock = new object();
+
         #endregion
 
         #region - Private methods -
@@ -42,28 +44,31 @@ namespace DialogGenerator.CharacterSelection.Helper
                     CharacterPrefix = CharacterRepository.GetByAssignedRadio(_radioIndex).CharacterPrefix
                 });
 
-                //TODO add a lock around this
-                for (int _i = 0; _i < ApplicationData.Instance.NumberOfRadios; _i++)
+                lock(MessageCollectionLock)
                 {
-                    ReceivedMessages.Last().Rssi[_i] = _rw.msgArray[_i];
-                }
+                    for (int _i = 0; _i < ApplicationData.Instance.NumberOfRadios; _i++)
+                    {
+                        ReceivedMessages.Last().Rssi[_i] = _rw.msgArray[_i];
+                    }
 
-                string _debugString = ReceivedMessages[ReceivedMessages.Count - 1].CharacterPrefix + "  ";
+                    string _debugString = ReceivedMessages[ReceivedMessages.Count - 1].CharacterPrefix + "  ";
 
-                for (var j = 0; j < ApplicationData.Instance.NumberOfRadios; j++)
-                {
-                    _debugString += ReceivedMessages[ReceivedMessages.Count - 1].Rssi[j].ToString("D3");
-                    _debugString += " ";
-                }
+                    for (var j = 0; j < ApplicationData.Instance.NumberOfRadios; j++)
+                    {
+                        _debugString += ReceivedMessages[ReceivedMessages.Count - 1].Rssi[j].ToString("D3");
+                        _debugString += " ";
+                    }
 
-                _debugString += ReceivedMessages[ReceivedMessages.Count - 1].Motion.ToString("D3") + " ";
-                _debugString += ReceivedMessages[ReceivedMessages.Count - 1].SequenceNum.ToString("D3");
-                Logger.Info(_debugString, ApplicationData.Instance.BLEVectorsLoggerKey);
+                    _debugString += ReceivedMessages[ReceivedMessages.Count - 1].Motion.ToString("D3") + " ";
+                    _debugString += ReceivedMessages[ReceivedMessages.Count - 1].SequenceNum.ToString("D3");
+                    Logger.Info(_debugString, ApplicationData.Instance.BLEVectorsLoggerKey);
 
-                if (ReceivedMessages.Count > 30000)
-                {
-                    ReceivedMessages.RemoveRange(0, 100);
-                }
+                    if (ReceivedMessages.Count > 30000)
+                    {
+                        ReceivedMessages.RemoveRange(0, 100);
+                    }
+                }                
+                
             }
             catch (Exception ex)
             {
