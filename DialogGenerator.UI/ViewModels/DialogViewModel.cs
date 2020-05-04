@@ -15,6 +15,8 @@ using Prism.Regions;
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
+using System.Diagnostics;
+using System.IO;
 using System.Linq;
 using System.Windows;
 using System.Windows.Controls;
@@ -307,6 +309,8 @@ namespace DialogGenerator.UI.ViewModels
         public DelegateCommand SelectSecondCharacterCommand { get; set; }
         public DelegateCommand ExpertModeCommand { get; set; }
         public DelegateCommand ToggleAssignedRadiosCommand { get; set; }
+        public DelegateCommand ShowPDFHelpCommand { get; set; }
+
 
         #endregion
 
@@ -327,7 +331,20 @@ namespace DialogGenerator.UI.ViewModels
             SelectSecondCharacterCommand = new DelegateCommand(_SelectSecondCharacter_Execute, _selectSecondCharacter_CanExecute);
             ExpertModeCommand = new DelegateCommand(_expertModeExecute, _expertMode_CanExecute);
             ToggleAssignedRadiosCommand = new DelegateCommand(_toggleAssignedRadios_Execute);
-        }        
+            ShowPDFHelpCommand = new DelegateCommand(_showPDFHelpCommand_execute);
+        }
+
+        private void _showPDFHelpCommand_execute()
+        {
+            try
+            {
+                Process.Start(Path.Combine(ApplicationData.Instance.TutorialDirectory, ApplicationData.Instance.TutorialFileName));
+            }
+            catch (System.Exception ex)
+            {
+                mLogger.Error(ex.Message);
+            }
+        }
 
         private void _toggleAssignedRadios_Execute()
         {
