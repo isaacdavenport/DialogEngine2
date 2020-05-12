@@ -373,13 +373,13 @@ namespace DialogGenerator.DataAccess
             {
                 string _jsonString = reader.ReadToEnd();
 
-                //json string to Object.
                 _jsonObjectsTypesList = Serializer.Deserialize<JSONObjectsTypesList>(_jsonString);
                 if (_jsonObjectsTypesList != null)
-                {
+                {                    
                     foreach (var _dialogModel in _jsonObjectsTypesList.DialogModels)
                     {
                         _dialogModel.FileName = character.FileName;
+                        _dialogModel.ModelsCollectionName = character.CharacterPrefix + "_" + _dialogModel.ModelsCollectionName;
                         foreach (var _dialog in _dialogModel.ArrayOfDialogModels)
                         {
                             var _dialogName = _dialog.Name;
