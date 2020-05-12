@@ -55,6 +55,11 @@ namespace DialogGenerator.DataAccess
             _jsonObjectsTypesList.Editable = character.Editable;
             _jsonObjectsTypesList.Version = "1.2";
 
+            if(_jsonObjectsTypesList.DialogModels.Where(dm => dm.ModelsCollectionName.Equals("SampleDialogs")).Count() == 0)
+            {
+                _addSampleModelsToCharacter(character, ref _jsonObjectsTypesList);
+            }            
+
             Serializer.Serialize(_jsonObjectsTypesList, Path.Combine(ApplicationData.Instance.DataDirectory, _fileName));
             mLogger.Info("serializing JSON output for: " + character.CharacterName);
             mEventAggregator.GetEvent<CharacterSavedEvent>().Publish(character.CharacterPrefix);
@@ -278,9 +283,9 @@ namespace DialogGenerator.DataAccess
         }
 
         public async Task AddAsync(Character character)
-        {
+        {            
             // add character to list of characters, so we can grab its data to serialize to file
-            GetAll().Add(character);
+            GetAll().Add(character);            
 
             await Task.Run(() =>
             {
@@ -355,5 +360,39 @@ namespace DialogGenerator.DataAccess
             mLogger.Info("removing phrase: " + phrase.DialogStr);
 
         }
+
+        #region Private methods
+
+        private void _addSampleModelsToCharacter(Character character, ref JSONObjectsTypesList _list)
+        {
+            var _jsonObjectsTypesList = new JSONObjectsTypesList();
+            if (!File.Exists(ApplicationData.Instance.DataDirectory + "\\SampleDialogs.cfg"))
+                return;
+
+            using (var reader = new StreamReader(ApplicationData.Instance.DataDirectory + "\\SampleDialogs.cfg")) //creates new streamerader for fs stream. Could also construct with filename...
+            {
+                string _jsonString = reader.ReadToEnd();
+
+                //json string to Object.
+                _jsonObjectsTypesList = Serializer.Deserialize<JSONObjectsTypesList>(_jsonString);
+                if (_jsonObjectsTypesList != null)
+                {
+                    foreach (var _dialogModel in _jsonObjectsTypesList.DialogModels)
+                    {
+                        _dialogModel.FileName = character.FileName;
+                        foreach (var _dialog in _dialogModel.ArrayOfDialogModels)
+                        {
+                            var _dialogName = _dialog.Name;
+                            _dialogName = character.CharacterPrefix + "_" + _dialogName;
+                            _dialog.Name = _dialogName;
+                        }
+
+                        _list.DialogModels.Add(_dialogModel);
+                    }
+                }
+            }
+        }
+
+        #endregion
     }
 }
