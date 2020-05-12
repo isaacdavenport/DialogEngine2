@@ -196,22 +196,7 @@ namespace DialogGenerator.Handlers
             if (characters == null)
                 return;
 
-            int _forcedCharacters = Session.Get<int>(Constants.FORCED_CH_COUNT);
-            if(_forcedCharacters != 2)
-            {
-                var _forcedCharactersList = characters.Where(ch => ch.State == CharacterState.On).ToList();
-                if(_forcedCharacters == 0 && _forcedCharactersList.Count > 2)
-                {
-                    errors.Add($"Characters: '{string.Join(",", _forcedCharactersList.Select(ch => ch.CharacterName).ToArray())}' are in ON state." +
-                        $" Application allows maximum 2 characters in ON state.");
-                }
-
-                if(_forcedCharacters == 1 && _forcedCharactersList.Count > 1)
-                {
-                    errors.Add($"Charactes: '{string.Join(", ", _forcedCharactersList.Select(ch => ch.CharacterName).ToArray())}' are in ON state. " +
-                        $"Application has one character in ON state, and maximum is 2.");
-                }
-            }
+            
 
             //search characters to find is there radio number duplicates
             var duplicates =characters.GroupBy(ch => ch.RadioNum)
@@ -237,17 +222,7 @@ namespace DialogGenerator.Handlers
             }
 
             if (_existingCharacter != null)
-            {
-                if (character.State == CharacterState.On && _existingCharacter.State != character.State)
-                {
-                    int _forcedCharacters = Session.Get<int>(Constants.FORCED_CH_COUNT);
-                    if (_forcedCharacters == 2)
-                    {
-                        errors.Add($"Application already has 2 forced characters in dialog. " +
-                            $"Please change state for character '{character.CharacterName}'.");
-                    }
-                }
-
+            {                
                 if (character.RadioNum != _existingCharacter.RadioNum)
                 {
                     var _assignedCharacter = mCharacterRepository.GetByAssignedRadio(character.RadioNum);

@@ -38,15 +38,29 @@ namespace DialogGenerator.UI.Wrapper
                         break;
                     }
                 case nameof(RadioMovesTimeSensitivity):
-                    {   // TODO check that this and next are between 0-1.0
+                    {   
                         if (!_isDecimalFormat(RadioMovesTimeSensitivity.ToString()))
                             errors.Add("Decimal number required.");
+                        else
+                        {
+                            if(RadioMovesTimeSensitivity < 0.0 || RadioMovesTimeSensitivity > 1.0)
+                            {
+                                errors.Add("The value should be between 0.0 and 1.0");
+                            }
+                        }
                         break;
                     }
                 case nameof(RadioMovesSignalStrengthSensitivity):
                     {
                         if (!_isDecimalFormat(RadioMovesSignalStrengthSensitivity.ToString()))
                             errors.Add("Decimal number required.");
+                        else
+                        {
+                            if (RadioMovesTimeSensitivity < 0.0 || RadioMovesTimeSensitivity > 1.0)
+                            {
+                                errors.Add("The value should be between 0.0 and 1.0");
+                            }
+                        }
                         break;
                     }
             }

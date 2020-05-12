@@ -213,7 +213,7 @@ namespace DialogGenerator.Utilities
                 });
 
                 mStartedTime = DateTime.Now.TimeOfDay;
-                return 0;  //TODO add error handling    
+                return 0;     
             }
             catch (Exception ex)
             {

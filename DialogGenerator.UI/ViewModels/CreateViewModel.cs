@@ -22,7 +22,7 @@ using System.Windows.Data;
 
 namespace DialogGenerator.UI.ViewModels
 {
-    public class CreateViewModel : BindableBase, INavigationViewModel
+    public class CreateViewModel : BindableBase
     {
         #region - fields -
 
@@ -186,7 +186,6 @@ namespace DialogGenerator.UI.ViewModels
                         }
 
                         _importedCharacter.RadioNum = -1;
-                        _importedCharacter.State = CharacterState.Available;
                         _importedCharacter.Editable = true;
                         mCharacterDataProvider.GetAll().Add(_importedCharacter);
                     }
@@ -233,8 +232,7 @@ namespace DialogGenerator.UI.ViewModels
             {
                 mLogger.Error("_import_Click " + ex.Message);
                 mMessageDialogService.CloseBusyDialog();
-                await mMessageDialogService.ShowMessage("Error", "Error during importing character.");
-                //TODO add support for rollback files if exception occured
+                await mMessageDialogService.ShowMessage("Error", "Error during importing character.");                
             }
             finally
             {
@@ -291,14 +289,8 @@ namespace DialogGenerator.UI.ViewModels
 
         public void Load()
         {
-            var characters = new ObservableCollection<Character>(mCharacterDataProvider.GetAll());
-
-            // S.Ristic 12/11/2019
-            // DLGEN-365 - Create New Character is removed from expert mode. Therefore thee is no need for the 
-            // insertion of the empty character at the beginning.
-
-            //characters.Insert(0, new Character { CharacterName = "", State = CharacterState.Off, FileName = $"{Guid.NewGuid()}.json" });
-
+            /* S.Ristic - This way we show only the editable characters */
+            var characters = new ObservableCollection<Character>(mCharacterDataProvider.GetAll().Where(c => c.Editable == true));
             mCharactersCollectionViewSource.Source =  characters;
             RaisePropertyChanged(nameof(CharactersViewSource));
         }

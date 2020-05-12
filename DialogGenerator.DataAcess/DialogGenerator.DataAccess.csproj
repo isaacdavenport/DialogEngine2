@@ -74,12 +74,14 @@
     <Reference Include="WindowsBase" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="CharacterRadioBindingRepository.cs" />
     <Compile Include="CharacterRepository.cs" />
     <Compile Include="DataAccessModule.cs" />
     <Compile Include="DialogDataRepository.cs" />
     <Compile Include="DialogModelRepository.cs" />
     <Compile Include="Helper\Serializer.cs" />
     <Compile Include="Helper\ValidationHelper.cs" />
+    <Compile Include="ICharacterRadioBindingRepository.cs" />
     <Compile Include="ICharacterRepository.cs" />
     <Compile Include="IDialogDataRepository.cs" />
     <Compile Include="IDialogModelRepository.cs" />
@@ -91,6 +93,10 @@
     <ProjectReference Include="..\DialogGenerator.Core\DialogGenerator.Core.csproj">
       <Project>{DE5AB434-BC15-4A64-B275-3E7379D6FCFD}</Project>
       <Name>DialogGenerator.Core</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\DialogGenerator.Events\DialogGenerator.Events.csproj">
+      <Project>{A7052EA1-7219-4600-B0D9-0A8BF03C2FAA}</Project>
+      <Name>DialogGenerator.Events</Name>
     </ProjectReference>
     <ProjectReference Include="..\DialogGenerator.Model\DialogGenerator.Model.csproj">
       <Project>{8900af0a-e911-4e26-b60a-47453f1c1e36}</Project>

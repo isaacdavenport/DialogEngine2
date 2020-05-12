@@ -15,19 +15,23 @@ namespace DialogGenerator.UI.ViewModels
         #region - fields -
 
         private string mCurrentVideoFilePath;
+        private ILogger mLogger;
         private WizardWorkflow mWizardWorkflow;
         public event EventHandler PlayRequested;
         public event EventHandler PauseRequested;
         public event EventHandler StopRequested;
+        public event EventHandler ShiftForwardRequested;
+        public event EventHandler ShiftBackwardsRequested;
 
         #endregion
 
         #region - constructor -
 
-        public MediaPlayerControlViewModel(WizardWorkflow _wizardWorkflow)
+        public MediaPlayerControlViewModel(WizardWorkflow _wizardWorkflow, ILogger _Logger)
         {
             StateMachine = new VideoPlayerStateMachine(() => { });
             mWizardWorkflow = _wizardWorkflow;
+            mLogger = _Logger;
 
             this.PropertyChanged += _mediaPlayerControlViewModel_PropertyChanged;
             mWizardWorkflow.PropertyChanged += _mWizardWorkflow_PropertyChanged;
@@ -38,6 +42,22 @@ namespace DialogGenerator.UI.ViewModels
         }
 
         #endregion
+        
+        public void LogMessage(int _MessageType, string _Message)
+        {
+            switch(_MessageType)
+            {
+                case 0:
+                    mLogger.Error(_Message);
+                    break;
+                case 1:
+                    mLogger.Info(_Message);
+                    break;
+                default:
+                    mLogger.Debug(_Message);
+                    break;
+            }
+        }
 
         #region - event handlers -
 
@@ -107,6 +127,9 @@ namespace DialogGenerator.UI.ViewModels
 
         public ICommand StopPlayingInContextCommand { get; set; }
 
+        public DelegateCommand ShiftForwardCommand { get; set; }
+        public DelegateCommand ShiftBackwardCommand { get; set; }
+
         #endregion
 
         #region - private functions -
@@ -135,6 +158,28 @@ namespace DialogGenerator.UI.ViewModels
             PauseVideoCommand = new DelegateCommand(_pauseMediaPlayer_Execute,_pauseMediaPlayer_CanExecute);
             PlayInContextCommand = new DelegateCommand(_playInContext_Execute, _playInContext_CanExecute);
             StopPlayingInContextCommand = new DelegateCommand(_stopPlayingInContext_Execute, _stopPlayingInContext_CanExecute);
+            ShiftForwardCommand = new DelegateCommand(_shiftForwardCommand_Execute, _shiftForwardCommand_CanExecute);
+            ShiftBackwardCommand = new DelegateCommand(_shiftBackwardCommand_Execute, _shiftBackwardCommand_CanExecute);
+        }
+
+        private bool _shiftBackwardCommand_CanExecute()
+        {
+            return StateMachine.State == States.Playing;
+        }
+
+        private void _shiftBackwardCommand_Execute()
+        {
+            ShiftBackwardsRequested?.Invoke(this, EventArgs.Empty);
+        }
+
+        private bool _shiftForwardCommand_CanExecute()
+        {
+            return StateMachine.State == States.Playing;
+        }
+
+        private void _shiftForwardCommand_Execute()
+        {
+            ShiftForwardRequested?.Invoke(this, EventArgs.Empty);
         }
 
         private bool _stopPlayingInContext_CanExecute()
@@ -162,6 +207,8 @@ namespace DialogGenerator.UI.ViewModels
         {
             PlayRequested(this, EventArgs.Empty);
             StateMachine.Fire(Triggers.Play);
+            ShiftBackwardCommand.RaiseCanExecuteChanged();
+            ShiftForwardCommand.RaiseCanExecuteChanged();
         }
 
         private bool _startMediaPlayer_CanExecute()
@@ -182,6 +229,8 @@ namespace DialogGenerator.UI.ViewModels
         {
             PauseRequested(this, EventArgs.Empty);
             StateMachine.Fire(Triggers.On);
+            ShiftBackwardCommand.RaiseCanExecuteChanged();
+            ShiftForwardCommand.RaiseCanExecuteChanged();
         }
 
         #endregion

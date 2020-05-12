@@ -11,7 +11,7 @@ namespace DialogGenerator.Tests.DataAccess
 
         public CharacterRepositoryTests()
         {
-            mRepository = new CharacterRepository(loggerMock.Object, wizardRepositoryMock.Object, dialogModelRepositoryMock.Object);
+            mRepository = new CharacterRepository(loggerMock.Object, wizardRepositoryMock.Object, dialogModelRepositoryMock.Object, eventAggregatorMock.Object);
 
             testSetup();
         }
@@ -66,29 +66,6 @@ namespace DialogGenerator.Tests.DataAccess
             Assert.Null(character);
         }
 
-        [Theory]
-        [InlineData(CharacterState.Available)]
-        [InlineData(CharacterState.On)]
-        public void GetAllByState_ShouldFindCharacters(CharacterState state)
-        {
-            var characters = mRepository.GetAllByState(state);
 
-            Assert.NotEmpty(characters);
-
-            foreach(var character in characters)
-            {
-                Assert.Equal(state, character.State);
-            }
-        }
-
-        [Fact]
-        public void GetAllByState_ShouldReturnEmptyList()
-        {
-            CharacterState state = CharacterState.Off;
-
-            var characters = mRepository.GetAllByState(state);
-
-            Assert.Empty(characters);
-        }
     }
 }

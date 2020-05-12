@@ -21,7 +21,7 @@ namespace DialogGenerator.DialogEngine
         private IDialogModelRepository mDialogModelRepository;
         private double mDialogModelPopularitySum;
         private DialogContext mContext;
-        private Random mRandom = new Random();
+        private Random mRandom;
 
         #endregion
 
@@ -29,12 +29,13 @@ namespace DialogGenerator.DialogEngine
 
         public DialogModelsManager(ILogger logger,IEventAggregator _eventAggregator
             ,IDialogModelRepository _dialogModelRepository
-            ,DialogContext context)
+            ,DialogContext context, Random _Random)
         {
             mLogger = logger;
             mEventAggregator = _eventAggregator;
             mDialogModelRepository = _dialogModelRepository;
             mContext = context;
+            mRandom = _Random;
 
             mEventAggregator.GetEvent<InitializeDialogModelEvent>().Subscribe(_onInitializeDialogModel);
         }
@@ -91,44 +92,125 @@ namespace DialogGenerator.DialogEngine
         {
             var _ch1First = new bool();
             var _ch2First = new bool();
+            var _returnIndex = -1;
 
-            //if we have recently done adventures give priority to adventure dialogs check them first
-            foreach (var _recentAdventureIdx in _mostRecentAdventureDialogIndexes)
+            var _recentAdventureDialogs = mContext.DialogModelsList.Select((s, i) => new { i, s })
+                .Where(p => _mostRecentAdventureDialogIndexes.Contains(p.i))
+                .Select(p => p.s)
+                .ToList();
+
+            // S.Ristic - Semi linq approach
+            // Explanation: Code is nice, but the trade off is that all linq loops have to be finished, even if the value
+            //              was found in the first dialog, because the linq loops can't be broken. The way this is implemented
+            //              the root loop is not linq loop, so if the first dialog's Adventure property matches the Adventure 
+            //              property of some of the dialogs from the recent adventure dialogs collection, we will have to wait
+            //              only recent adventure dialogs loop to finish, which won't be long considering the fact that this 
+            //              loop can have max 6 dialogs.
+
+            for (int _i = 0; _i < mContext.DialogModelsList.Count; _i ++)
             {
-                //given recent adventures
-                foreach (var _possibleDialog in mContext.DialogModelsList) //TODO probably a cleaner way to do this with Linq and lamda expressions
+                var _dialog = mContext.DialogModelsList[_i];
+                _recentAdventureDialogs.Where(r => r.Adventure == _dialog.Adventure).ToList().ForEach(rad =>
                 {
-                    //look for follow on adventure possibilities
-                    var _possibleDialogIdx = mContext.DialogModelsList.IndexOf(_possibleDialog);
-
-                    if (mContext.DialogModelsList[_recentAdventureIdx].Adventure == _possibleDialog.Adventure)
+                    rad.Provides.ForEach(provides =>
                     {
-                        foreach (var _providedStringKey in mContext.DialogModelsList[_recentAdventureIdx].Provides)
+                        if (_dialog.Requires.Contains(provides))
                         {
-                            if (_possibleDialog.Requires.Contains(_providedStringKey))
+                            //if a the most recent adventure dialog in the adventure provides what we require we won't 
+                            //go backwards in adventures
+                            _ch1First = _checkIfCharactersHavePhrasesForDialog(_i, mContext.Character1Num, mContext.Character2Num);
+                            _ch2First = _checkIfCharactersHavePhrasesForDialog(_i, mContext.Character2Num, mContext.Character1Num);
+
+                            if (_ch1First || _ch2First)
                             {
-                                //if a the most recent adventure dialog in the adventure provides what we require we won't 
-                                //go backwards in adventures
-                                _ch1First = _checkIfCharactersHavePhrasesForDialog(_possibleDialogIdx, mContext.Character1Num, mContext.Character2Num);
+                                if (_ch2First)
+                                    _swapCharactersOneAndTwo();
 
-                                _ch2First = _checkIfCharactersHavePhrasesForDialog(_possibleDialogIdx, mContext.Character2Num, mContext.Character1Num);
-
-                                if (_ch1First || _ch2First)
+                                if(_returnIndex == -1)
                                 {
-                                    if (_ch2First)
-                                        _swapCharactersOneAndTwo();
-
-
-                                    return _possibleDialogIdx;
+                                    _returnIndex = _i;
                                 }
                             }
                         }
+                    });
+                });
 
-                    }
-                }
+                if(_returnIndex != -1)
+                    break;                
+
             }
 
-            return -1; // code for no next adventure continuance found
+            // S.Ristic - Full linq approach
+            // Explanation: Code is nice, but the trade off is that all loops have to be finished, even if the value
+            //              was found in the first dialog, because the linq loops can't be broken.
+
+            //mContext.DialogModelsList.Select((s,i) => new { i, s })
+            //    .ToList()
+            //    .ForEach(dmod => {
+            //        _recentAdventureDialogs.Where(r => r.Adventure == dmod.s.Adventure).ToList().ForEach(rad =>
+            //        {
+            //            rad.Provides.ForEach(provides =>
+            //            {
+            //                if (dmod.s.Requires.Contains(provides))
+            //                {
+            //                    //if a the most recent adventure dialog in the adventure provides what we require we won't 
+            //                    //go backwards in adventures
+            //                    _ch1First = _checkIfCharactersHavePhrasesForDialog(dmod.i, mContext.Character1Num, mContext.Character2Num);
+            //                    _ch2First = _checkIfCharactersHavePhrasesForDialog(dmod.i, mContext.Character2Num, mContext.Character1Num);
+
+            //                    if (_ch1First || _ch2First)
+            //                    {
+            //                        if (_ch2First)
+            //                            _swapCharactersOneAndTwo();
+
+            //                        if(_returnIndex == -1)
+            //                            _returnIndex = dmod.i;
+                                    
+            //                    }
+            //                }
+            //            });
+            //        });                    
+            //    });
+
+            // S.Ristic - the old approach without linq's
+
+            ////if we have recently done adventures give priority to adventure dialogs check them first
+            //foreach (var _recentAdventureIdx in _mostRecentAdventureDialogIndexes)
+            //{
+            //    //given recent adventures
+            //    foreach (var _possibleDialog in mContext.DialogModelsList) //TODO probably a cleaner way to do this with Linq and lamda expressions
+            //    {
+            //        //look for follow on adventure possibilities
+            //        var _possibleDialogIdx = mContext.DialogModelsList.IndexOf(_possibleDialog);
+
+            //        if (mContext.DialogModelsList[_recentAdventureIdx].Adventure == _possibleDialog.Adventure)
+            //        {
+            //            foreach (var _providedStringKey in mContext.DialogModelsList[_recentAdventureIdx].Provides)
+            //            {
+            //                if (_possibleDialog.Requires.Contains(_providedStringKey))
+            //                {
+            //                    //if a the most recent adventure dialog in the adventure provides what we require we won't 
+            //                    //go backwards in adventures
+            //                    _ch1First = _checkIfCharactersHavePhrasesForDialog(_possibleDialogIdx, mContext.Character1Num, mContext.Character2Num);
+
+            //                    _ch2First = _checkIfCharactersHavePhrasesForDialog(_possibleDialogIdx, mContext.Character2Num, mContext.Character1Num);
+
+            //                    if (_ch1First || _ch2First)
+            //                    {
+            //                        if (_ch2First)
+            //                            _swapCharactersOneAndTwo();
+
+
+            //                        return _possibleDialogIdx;
+            //                    }
+            //                }
+            //            }
+
+            //        }
+            //    }
+            //}
+
+            return _returnIndex; // code for no next adventure continuance found
         }
 
         public void _swapCharactersOneAndTwo()
@@ -141,11 +223,22 @@ namespace DialogGenerator.DialogEngine
 
         private bool _checkIfDialogModelUsedRecently(int _dialogModel)
         {
-            foreach (var _recentDialogQueueEntry in mContext.RecentDialogs) // try again if dialog model recentlyused{
+            if(mContext.HistoricalDialogs.Count > 0)
             {
-                if (_recentDialogQueueEntry == _dialogModel)
-                    return true;
+                int _depth = Math.Min(DialogEngineConstants.RecentDialogsQueSize, mContext.HistoricalDialogs.Count);
+                for (int _k = 0; _k < _depth; _k++)
+                {
+                    if (mContext.HistoricalDialogs[mContext.HistoricalDialogs.Count - 1 - _k].Completed)
+                    {
+                        int _dialogIndex = mContext.HistoricalDialogs[mContext.HistoricalDialogs.Count - 1 - _k].DialogIndex;
+                        if (_dialogIndex == _dialogModel)
+                        {
+                            return true;
+                        }
+                    }
+                }
             }
+            
 
             return false;
         }
@@ -228,7 +321,6 @@ namespace DialogGenerator.DialogEngine
 
         public int PickAWeightedDialog()
         {
-            //TODO check that all characters/phrasetypes required for adventure are included before starting adventure?
             var _dialogModel = 0;
             var _dialogWeightIndex = 0.0;
             var _attempts = 0;

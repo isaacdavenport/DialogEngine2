@@ -56,6 +56,7 @@
     <Compile Include="ChangedCharacterStateEvent.cs" />
     <Compile Include="ChangedDialogModelStateEvent.cs" />
     <Compile Include="CharacterCollectionLoadedEvent.cs" />
+    <Compile Include="CharacterSavedEvent.cs" />
     <Compile Include="CharacterSelectionActionChangedEvent.cs" />
     <Compile Include="CharacterSelectionModelChangedEvent.cs" />
     <Compile Include="CharactersInConversationEvent.cs" />
@@ -66,7 +67,6 @@
     <Compile Include="GuidedCharacterCreationModeChangedEvent.cs" />
     <Compile Include="HeatMapUpdateEvent.cs" />
     <Compile Include="InitializeDialogModelEvent.cs" />
-    <Compile Include="MediaPlayerStoppedEvent.cs" />
     <Compile Include="NewDialogLineEvent.cs" />
     <Compile Include="OpenCharacterDetailViewEvent.cs" />
     <Compile Include="OpenDialogModeldetailViewEvent.cs" />
@@ -77,7 +77,6 @@
     <Compile Include="SpeechConvertedEvent.cs" />
     <Compile Include="StopImmediatelyPlayingCurrentDialogLIne.cs" />
     <Compile Include="StopPlayingCurrentDialogLineEvent.cs" />
-    <Compile Include="ViewRequestEvent.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="packages.config" />

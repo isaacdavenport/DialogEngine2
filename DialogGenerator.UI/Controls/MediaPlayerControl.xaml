@@ -17,15 +17,14 @@
         </Grid.RowDefinitions>
 
         <Border Grid.Row="0" Background="#FF333333" CornerRadius="2,2,2,2" BorderThickness="0" Margin="2,2,2,2">
-            <MediaElement   x:Name="VideoPlayer" Stretch="Fill" LoadedBehavior="Manual" ScrubbingEnabled="True"
+            <MediaElement   x:Name="VideoPlayer" Stretch="Uniform" LoadedBehavior="Manual" UnloadedBehavior="Manual" ScrubbingEnabled="True"
                             Source="{Binding CurrentVideoFilePath}"
                             HorizontalAlignment="Stretch" VerticalAlignment="Stretch" LayoutUpdated="VideoPlayer_LayoutUpdated"/>
         </Border>
         <ScrollBar Grid.Row="1" x:Name="VideoPositionScroll" Orientation="Horizontal" 
                    Height="15" Maximum="{Binding ElementName=VideoPlayer, 
                    Path=NaturalDuration.TimeSpan.TotalMilliseconds, Mode=OneTime}" 
-                   Minimum="0" 
-                   PreviewMouseLeftButtonUp="VideoPositionScroll_PreviewMouseLeftButtonUp"/>
+                   Minimum="0" PreviewMouseLeftButtonDown="VideoPositionScroll_PreviewMouseLeftButtonDown" PreviewMouseLeftButtonUp="VideoPositionScroll_PreviewMouseLeftButtonUp"/>
                 
         <StackPanel x:Name="ToolbarSP" Grid.Row="2" Orientation="Horizontal"
             Background="#FF595959" HorizontalAlignment="Stretch" VerticalAlignment="Bottom">
@@ -37,6 +36,16 @@
             <Button Width="25" Height="25" Command="{Binding PauseVideoCommand}" Margin="10,10,10,10">
                 <Button.Content>
                     <materialDesign:PackIcon Kind="Pause" />
+                </Button.Content>
+            </Button>
+            <Button Width="25" Height="25" Command="{Binding ShiftBackwardCommand}" Margin="10,10,10,10">
+                <Button.Content>
+                    <materialDesign:PackIcon Kind="SkipBackward" />
+                </Button.Content>
+            </Button>
+            <Button Width="25" Height="25" Command="{Binding ShiftForwardCommand}" Margin="10,10,10,10">
+                <Button.Content>
+                    <materialDesign:PackIcon Kind="SkipForward" />
                 </Button.Content>
             </Button>
         </StackPanel>

@@ -94,10 +94,6 @@ namespace DialogGenerator.UI.Wrapper
             get { return base.Model; }
         }
 
-        public CharacterState State
-        {
-            get { return Model.State; }
-        }
 
         public int RadioNum
         {

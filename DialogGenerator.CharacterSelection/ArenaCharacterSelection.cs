@@ -28,10 +28,8 @@ namespace DialogGenerator.CharacterSelection
             mEventAggregator = _eventAggregator;
             mBLEDataProviderFactory = _dataProviderFactory;
             mCurrentDataProvider = mBLEDataProviderFactory.Create(BLEDataProviderType.WinBLEWatcher);
-            mLogger = _logger;
+            mLogger = _logger;            
         }
-
-
 
         public async Task StartCharacterSelection()
         {

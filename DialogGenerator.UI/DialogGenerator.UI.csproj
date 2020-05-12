@@ -25,6 +25,7 @@
     <DefineConstants>DEBUG;TRACE</DefineConstants>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
+    <CodeAnalysisRuleSet>..\..\downloads\unusedcode.ruleset</CodeAnalysisRuleSet>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
     <PlatformTarget>AnyCPU</PlatformTarget>
@@ -124,25 +125,15 @@
     <Compile Include="Controls\VoiceRecorderControl.xaml.cs">
       <DependentUpon>VoiceRecorderControl.xaml</DependentUpon>
     </Compile>
-    <Compile Include="Converters\ActiveDialogModelBtnVisibilityValueConverter.cs" />
-    <Compile Include="Converters\AssignedCharacter2NameValueConverter.cs" />
     <Compile Include="Converters\BoolToColorConverter.cs" />
     <Compile Include="Converters\BoolToRowHeightConverter.cs" />
     <Compile Include="Converters\BoolToVisibilityConverter.cs" />
-    <Compile Include="Converters\CharacterDataTemplateSelectorValueConverter.cs" />
     <Compile Include="Converters\CharacterGenderValueConverter.cs" />
     <Compile Include="Converters\CharacterRadioNumberToTextValueConverter.cs" />
-    <Compile Include="Converters\CharacterStateToColorValueConverter.cs" />
     <Compile Include="Converters\CloneValuesConverter.cs" />
     <Compile Include="Converters\DivideBy2ValueConverter.cs" />
     <Compile Include="Converters\IdentifierConverter.cs" />
     <Compile Include="Converters\NotBoolToVisibilityConverter.cs" />
-    <Compile Include="Converters\ToyNumberToAssignedCharacterImageValueConverter.cs" />
-    <Compile Include="Converters\ToyNumberToAssignedCharacterValueConverter.cs" />
-    <Compile Include="Converters\ToyNumberToAssignedChForegroundValueConverter.cs" />
-    <Compile Include="Converters\ToyStatusColorValueConverter.cs" />
-    <Compile Include="Converters\ToyStatusValueConverter.cs" />
-    <Compile Include="Converters\ToyToAssignedCharacterValueConverter.cs" />
     <Compile Include="Converters\EndWizardBtnVisibilityConverter.cs" />
     <Compile Include="Converters\ImageContentSmallSizeValueConverter.cs" />
     <Compile Include="Converters\ImageContentValueConverter.cs" />
@@ -150,18 +141,12 @@
     <Compile Include="Converters\IncrementValueConverter.cs" />
     <Compile Include="Converters\InvertValueConverter.cs" />
     <Compile Include="Converters\InvertVisibilityValueConverter.cs" />
-    <Compile Include="Converters\IsActiveModelDialogValueConverter.cs" />
-    <Compile Include="Converters\IsChangeCharacterStateBtnEnabledValueConverter.cs" />
     <Compile Include="Converters\IsDialogBtnVisibleValueConverter.cs" />
     <Compile Include="Converters\IsRunOverWizardBtnEnabledValueConverter.cs" />
-    <Compile Include="Converters\IsStatesEqualValueConverter.cs" />
     <Compile Include="Converters\ListBoxItemTextAndIndexValueConverter.cs" />
     <Compile Include="Converters\MatrixCellValueToBackgroundColorConverter.cs" />
     <Compile Include="Converters\MatrixToDataViewConverter.cs" />
-    <Compile Include="Converters\ModelDialogStateToColorValueConverter.cs" />
     <Compile Include="Converters\MP3RecorderStateToBtnVisibilityValueConverter.cs" />
-    <Compile Include="Converters\PlayInContextBtnContentValueConverter.cs" />
-    <Compile Include="Converters\RadioNumberToDisplayNameValueConverter.cs" />
     <Compile Include="Converters\SaveAndNextBtnContentConverter.cs" />
     <Compile Include="Converters\SkipBtnContentConverter.cs" />
     <Compile Include="Converters\StarWidthConverter.cs" />
@@ -179,25 +164,16 @@
     <Compile Include="UIModule.cs" />
     <Compile Include="ViewModels\ArenaAvatarViewModel.cs" />
     <Compile Include="ViewModels\ArenaViewModel.cs" />
-    <Compile Include="ViewModels\AssignCharactersToToysBindingProxy.cs" />
-    <Compile Include="ViewModels\AssignCharactersToToysViewModel.cs" />
     <Compile Include="ViewModels\AssignCharacterToRadioViewModel.cs" />
     <Compile Include="ViewModels\AssignedRadiosViewModel.cs" />
     <Compile Include="ViewModels\CharacterDetailViewModel.cs" />
     <Compile Include="ViewModels\CharacterDialogLinesViewModel.cs" />
-    <Compile Include="ViewModels\ComputerSelectsViewModel.cs" />
     <Compile Include="ViewModels\CreateCharacterViewModel.cs" />
     <Compile Include="ViewModels\CreateViewModel.cs" />
     <Compile Include="ViewModels\DebugViewModel.cs" />
-    <Compile Include="ViewModels\DialogModelDetailViewModel.cs" />
-    <Compile Include="ViewModels\DialogModelsNavigationViewModel.cs" />
-    <Compile Include="ViewModels\DialogModelsViewModel.cs" />
     <Compile Include="ViewModels\DialogViewModel.cs" />
     <Compile Include="ViewModels\EditPhraseViewModel.cs" />
-    <Compile Include="ViewModels\IDetailViewModel.cs" />
-    <Compile Include="ViewModels\INavigationViewModel.cs" />
     <Compile Include="ViewModels\MediaPlayerControlViewModel.cs" />
-    <Compile Include="ViewModels\HomeViewModel.cs" />
     <Compile Include="ViewModels\MediaRecorderControlViewModel.cs" />
     <Compile Include="ViewModels\VoiceRecorderControlViewModel.cs" />
     <Compile Include="ViewModels\WizardViewModel.cs" />
@@ -206,9 +182,6 @@
     </Compile>
     <Compile Include="Views\AssignCharacterToRadioView.xaml.cs">
       <DependentUpon>AssignCharacterToRadioView.xaml</DependentUpon>
-    </Compile>
-    <Compile Include="Views\AssignCharactersToToysView.xaml.cs">
-      <DependentUpon>AssignCharactersToToysView.xaml</DependentUpon>
     </Compile>
     <Compile Include="Views\ArenaView.xaml.cs">
       <DependentUpon>ArenaView.xaml</DependentUpon>
@@ -224,15 +197,6 @@
       <DependentUpon>CharacterDialogLinesView.xaml</DependentUpon>
     </Compile>
     <Compile Include="Views\CharactersDataTemplateSelector.cs" />
-    <Compile Include="Views\CharacterSelectionView.xaml.cs">
-      <DependentUpon>CharacterSelectionView.xaml</DependentUpon>
-    </Compile>
-    <Compile Include="Views\CharactersNavigationView.xaml.cs">
-      <DependentUpon>CharactersNavigationView.xaml</DependentUpon>
-    </Compile>
-    <Compile Include="Views\ComputerSelectsView.xaml.cs">
-      <DependentUpon>ComputerSelectsView.xaml</DependentUpon>
-    </Compile>
     <Compile Include="Views\CreateCharacterView.xaml.cs">
       <DependentUpon>CreateCharacterView.xaml</DependentUpon>
     </Compile>
@@ -241,15 +205,6 @@
     </Compile>
     <Compile Include="Views\DebugView.xaml.cs">
       <DependentUpon>DebugView.xaml</DependentUpon>
-    </Compile>
-    <Compile Include="Views\DialogModelDetailView.xaml.cs">
-      <DependentUpon>DialogModelDetailView.xaml</DependentUpon>
-    </Compile>
-    <Compile Include="Views\DialogModelsNavigationView.xaml.cs">
-      <DependentUpon>DialogModelsNavigationView.xaml</DependentUpon>
-    </Compile>
-    <Compile Include="Views\DialogModelsView.xaml.cs">
-      <DependentUpon>DialogModelsView.xaml</DependentUpon>
     </Compile>
     <Compile Include="Views\Dialogs\MP3PlayerDialog.xaml.cs">
       <DependentUpon>MP3PlayerDialog.xaml</DependentUpon>
@@ -265,15 +220,6 @@
     </Compile>
     <Compile Include="Views\EditPhraseView.xaml.cs">
       <DependentUpon>EditPhraseView.xaml</DependentUpon>
-    </Compile>
-    <Compile Include="Views\HomeView.xaml.cs">
-      <DependentUpon>HomeView.xaml</DependentUpon>
-    </Compile>
-    <Compile Include="Views\MenuView.xaml.cs">
-      <DependentUpon>MenuView.xaml</DependentUpon>
-    </Compile>
-    <Compile Include="Views\ToolbarView.xaml.cs">
-      <DependentUpon>ToolbarView.xaml</DependentUpon>
     </Compile>
     <Compile Include="Views\WizardView.xaml.cs">
       <DependentUpon>WizardView.xaml</DependentUpon>
@@ -328,10 +274,6 @@
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
-    <Page Include="Views\AssignCharactersToToysView.xaml">
-      <SubType>Designer</SubType>
-      <Generator>MSBuild:Compile</Generator>
-    </Page>
     <Page Include="Views\ArenaView.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
@@ -348,18 +290,6 @@
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
-    <Page Include="Views\CharacterSelectionView.xaml">
-      <SubType>Designer</SubType>
-      <Generator>MSBuild:Compile</Generator>
-    </Page>
-    <Page Include="Views\CharactersNavigationView.xaml">
-      <SubType>Designer</SubType>
-      <Generator>MSBuild:Compile</Generator>
-    </Page>
-    <Page Include="Views\ComputerSelectsView.xaml">
-      <SubType>Designer</SubType>
-      <Generator>MSBuild:Compile</Generator>
-    </Page>
     <Page Include="Views\CreateCharacterView.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
@@ -369,18 +299,6 @@
       <Generator>MSBuild:Compile</Generator>
     </Page>
     <Page Include="Views\DebugView.xaml">
-      <SubType>Designer</SubType>
-      <Generator>MSBuild:Compile</Generator>
-    </Page>
-    <Page Include="Views\DialogModelDetailView.xaml">
-      <SubType>Designer</SubType>
-      <Generator>MSBuild:Compile</Generator>
-    </Page>
-    <Page Include="Views\DialogModelsNavigationView.xaml">
-      <SubType>Designer</SubType>
-      <Generator>MSBuild:Compile</Generator>
-    </Page>
-    <Page Include="Views\DialogModelsView.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
@@ -401,18 +319,6 @@
       <Generator>MSBuild:Compile</Generator>
     </Page>
     <Page Include="Views\EditPhraseView.xaml">
-      <SubType>Designer</SubType>
-      <Generator>MSBuild:Compile</Generator>
-    </Page>
-    <Page Include="Views\HomeView.xaml">
-      <SubType>Designer</SubType>
-      <Generator>MSBuild:Compile</Generator>
-    </Page>
-    <Page Include="Views\MenuView.xaml">
-      <SubType>Designer</SubType>
-      <Generator>MSBuild:Compile</Generator>
-    </Page>
-    <Page Include="Views\ToolbarView.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>

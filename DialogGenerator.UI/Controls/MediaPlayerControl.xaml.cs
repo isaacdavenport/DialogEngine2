@@ -1,6 +1,7 @@
 ﻿using DialogGenerator.Core;
 using DialogGenerator.UI.ViewModels;
 using System;
+using System.IO;
 using System.Threading;
 using System.Threading.Tasks;
 using System.Windows;
@@ -15,6 +16,7 @@ namespace DialogGenerator.UI.Controls
     public partial class MediaPlayerControl : UserControl
     {
         private DispatcherTimer mUpdateTimer;
+        private const int INTERVAL = 5000;
 
         public MediaPlayerControl()
         {
@@ -25,7 +27,12 @@ namespace DialogGenerator.UI.Controls
             VideoPlayer.MediaEnded += _mediaElement_MediaEnded;
             VideoPlayer.MediaFailed += _mediaElement_MediaFailed;
             VideoPlayer.Loaded += _mediaElement_Loaded;
-            
+            VideoPlayer.SourceUpdated += VideoPlayer_SourceUpdated;
+        }
+
+        private void VideoPlayer_SourceUpdated(object sender, System.Windows.Data.DataTransferEventArgs e)
+        {
+            //_initVideo();
         }
 
         #region - event handlers -
@@ -36,10 +43,58 @@ namespace DialogGenerator.UI.Controls
             (DataContext as MediaPlayerControlViewModel).PauseRequested += _mediaPlayerControl_PauseRequested;
             (DataContext as MediaPlayerControlViewModel).StopRequested += _mediaPlayerControl_StopRequested;
             (DataContext as MediaPlayerControlViewModel).PropertyChanged += MediaPlayerControl_PropertyChanged;
+            (DataContext as MediaPlayerControlViewModel).ShiftForwardRequested += MediaPlayerControl_ShiftForwardRequested;
+            (DataContext as MediaPlayerControlViewModel).ShiftBackwardsRequested += MediaPlayerControl_ShiftBackwardsRequested;
             
             mUpdateTimer = new DispatcherTimer();
             mUpdateTimer.Interval = TimeSpan.FromSeconds(0.1);
             mUpdateTimer.Tick += MUpdateTimer_Tick;                          
+        }
+
+        private void MediaPlayerControl_ShiftBackwardsRequested(object sender, EventArgs e)
+        {
+            double _totalMilliseconds = VideoPlayer.Position.TotalMilliseconds;
+            if(_totalMilliseconds - INTERVAL >= 0)
+            {                
+                if(VideoPlayer.CanPause)
+                {
+                    VideoPlayer.Pause();
+                    VideoPlayer.Position -= new TimeSpan(0, 0, 0, 0, INTERVAL);
+                    VideoPlayer.Play();
+                }
+                                                    
+            } else
+            {
+                if (VideoPlayer.CanPause)
+                {
+                    VideoPlayer.Pause();
+                    VideoPlayer.Position = new TimeSpan(0, 0, 0, 0, 0);
+                    VideoPlayer.Play();
+                }
+            }
+        }
+
+        private void MediaPlayerControl_ShiftForwardRequested(object sender, EventArgs e)
+        {
+            double _totalMilliseconds = VideoPlayer.Position.TotalMilliseconds;
+            if (_totalMilliseconds + INTERVAL <= VideoPlayer.NaturalDuration.TimeSpan.TotalMilliseconds)
+            {
+                if (VideoPlayer.CanPause)
+                {
+                    VideoPlayer.Pause();
+                    VideoPlayer.Position += new TimeSpan(0, 0, 0, 0, INTERVAL);
+                    VideoPlayer.Play();
+                }
+            }
+            else 
+            {
+                if (VideoPlayer.CanPause)
+                {
+                    VideoPlayer.Pause();
+                    VideoPlayer.Position = new TimeSpan(0, 0, 0, 0, (int)VideoPlayer.NaturalDuration.TimeSpan.TotalMilliseconds);
+                    VideoPlayer.Play();
+                }
+            }
         }
 
         private void MediaPlayerControl_PropertyChanged(object sender, System.ComponentModel.PropertyChangedEventArgs e)
@@ -86,19 +141,12 @@ namespace DialogGenerator.UI.Controls
 
         private void _mediaElement_MediaFailed(object sender, ExceptionRoutedEventArgs e)
         {
+            ((MediaPlayerControlViewModel)this.DataContext).LogMessage(0, e.ErrorException.Message);
         }
 
         private void _mediaElement_Loaded(object sender, RoutedEventArgs e)
         {
-            VideoPlayer.Play();
-            VideoPlayer.Stop();
-
-            Thread.Sleep(1000);
-
-            if(VideoPlayer.NaturalDuration.HasTimeSpan)
-            {
-                VideoPositionScroll.Maximum = VideoPlayer.NaturalDuration.TimeSpan.TotalMilliseconds;
-            }
+            _initVideo();     
         }
 
         private void _mediaElement_MediaEnded(object sender, RoutedEventArgs e)
@@ -108,6 +156,9 @@ namespace DialogGenerator.UI.Controls
             {
                 (DataContext as MediaPlayerControlViewModel).StateMachine.Fire(Workflow.VideoPlayerStateMachine.Triggers.On);
             }
+
+            (DataContext as MediaPlayerControlViewModel).ShiftBackwardCommand.RaiseCanExecuteChanged();
+            (DataContext as MediaPlayerControlViewModel).ShiftForwardCommand.RaiseCanExecuteChanged();
         }
 
         #endregion
@@ -123,7 +174,7 @@ namespace DialogGenerator.UI.Controls
 
         private void VideoPositionScroll_PreviewMouseLeftButtonUp(object sender, System.Windows.Input.MouseButtonEventArgs e)
         {
-            VideoPlayer.Position = new TimeSpan(0, 0, 0, 0, (int)VideoPositionScroll.Value);
+            e.Handled = true;             
         }
 
         private void VideoPlayer_LayoutUpdated(object sender, EventArgs e)
@@ -133,5 +184,17 @@ namespace DialogGenerator.UI.Controls
                 VideoPositionScroll.Maximum = VideoPlayer.NaturalDuration.TimeSpan.TotalMilliseconds;
             }
         }
+
+        private void VideoPositionScroll_PreviewMouseLeftButtonDown(object sender, System.Windows.Input.MouseButtonEventArgs e)
+        {
+            e.Handled = true;                           
+        }
+
+        private void _initVideo()
+        {
+            VideoPlayer.Play();
+            VideoPlayer.Stop();
+        }
+
     }
 }

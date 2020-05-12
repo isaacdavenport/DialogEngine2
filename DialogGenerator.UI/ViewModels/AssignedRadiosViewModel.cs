@@ -10,10 +10,7 @@ using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using System.Windows;
-using System.Windows.Threading;
 
 namespace DialogGenerator.UI.ViewModels
 {
@@ -23,12 +20,14 @@ namespace DialogGenerator.UI.ViewModels
         private IEventAggregator mEventAggregator;
         private ICharacterRepository mCharacterRepository;
         private Visibility mVisible;
+        private Random mRandom;
         
-        public AssignedRadiosViewModel(ILogger _Logger, IEventAggregator _EventAggregator, ICharacterRepository _CharacterRepository)
+        public AssignedRadiosViewModel(ILogger _Logger, IEventAggregator _EventAggregator, ICharacterRepository _CharacterRepository, Random _Random)
         {
             mLogger = _Logger;
             mEventAggregator = _EventAggregator;
             mCharacterRepository = _CharacterRepository;
+            mRandom = _Random;
             Visible = Visibility.Collapsed;
 
             mEventAggregator.GetEvent<SelectedCharactersPairChangedEvent>().Subscribe(_characterPairChanged);
@@ -176,7 +175,8 @@ namespace DialogGenerator.UI.ViewModels
                     Active = false,
                     InPlayground = false,
                     Left = 0, 
-                    Top = 0
+                    Top = 0,
+                    Random = mRandom
                 });                
             }
             

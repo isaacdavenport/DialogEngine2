@@ -41,7 +41,8 @@ namespace DialogGenerator.DialogEngine
             }
             else if (e.OldItems != null)
             {
-                //TODO
+                //Nothing is needed to be done. 
+                //The history dialogs collection will be reset the next time the arena starts.
             }
         }
 
@@ -112,11 +113,6 @@ namespace DialogGenerator.DialogEngine
                 _initializeCharacter(character);
             }
 
-            // Fill the queue with greeting dialogs
-            for (var _i = 0; _i < DialogEngineConstants.RecentDialogsQueSize; _i++)
-            {
-                mContext.RecentDialogs.Enqueue(0); // Fill the que with greeting dialogs
-            }
         }
 
         #endregion

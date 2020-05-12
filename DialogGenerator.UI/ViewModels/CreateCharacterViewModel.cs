@@ -2,6 +2,7 @@
 using DialogGenerator.CharacterSelection.Data;
 using DialogGenerator.CharacterSelection.Model;
 using DialogGenerator.Core;
+using DialogGenerator.DataAccess;
 using DialogGenerator.DataAccess.Helper;
 using DialogGenerator.Events;
 using DialogGenerator.Events.EventArgs;
@@ -61,7 +62,7 @@ namespace DialogGenerator.UI.ViewModels
 
         private string mCharacterNameValidationError = string.Empty;
         private bool mCharacterNameHasError = false;
-        
+        private ICharacterRadioBindingRepository mCharacterRadionBindingRepository;
 
         internal void SetCurrentStep(int index)
         {
@@ -77,7 +78,8 @@ namespace DialogGenerator.UI.ViewModels
             IRegionManager _regionManager,
             IMessageDialogService _messageDialogService,
             IBLEDataProviderFactory _BLEDataProviderFactory,
-            IWizardDataProvider _WizardDataProvider)
+            IWizardDataProvider _WizardDataProvider,
+            ICharacterRadioBindingRepository _CharacterRadioBindingRepository)
         {
             mLogger = _logger;
             mEventAgregator = _eventAggregator;
@@ -86,6 +88,7 @@ namespace DialogGenerator.UI.ViewModels
             mMessageDialogService = _messageDialogService;
             mBLEDataProviderFactory = _BLEDataProviderFactory;
             mWizardDataProvider = _WizardDataProvider;
+            mCharacterRadionBindingRepository = _CharacterRadioBindingRepository;
 
             mWizard = new CreateCharacterWizard();
             CurrentStep = mWizard.Steps[mCurrentStepIndex];            
@@ -216,13 +219,17 @@ namespace DialogGenerator.UI.ViewModels
                 CharacterInitials = _getCharacterInitials();
                 CharacterIdentifier = _getCharacterIdentifier();
                 NextStepCommand.RaiseCanExecuteChanged();     
-                if((mCharacterName != null && mCharacterName.Length > 0) && (mCharacterName.Length <= 2 || char.IsDigit(mCharacterName.Substring(0,1).ToCharArray()[0])))
+                if((mCharacterName != null && mCharacterName.Length > 0) && (mCharacterName.Length <= 2 || mCharacterName.Length > 30 || char.IsDigit(mCharacterName.Substring(0,1).ToCharArray()[0])))
                 {
-                    if(mCharacterName.Length <= 2 && !char.IsDigit(mCharacterName.Substring(0, 1).ToCharArray()[0]))
+                    if (mCharacterName.Length <= 2 && !char.IsDigit(mCharacterName.Substring(0, 1).ToCharArray()[0]))
                     {
                         CharacterNameValidationError = "The name must consist of at least 3 characters!";
                         CharacterNameHasError = true;
-                    } else
+                    } else if (mCharacterName.Length > 30 ) {
+                        CharacterNameValidationError = "The name must not have more than 30 characters!";
+                        CharacterNameHasError = true;
+                    }
+                    else
                     {
                         CharacterNameValidationError = "The first character of the name must be a letter!";
                         CharacterNameHasError = true;
@@ -871,6 +878,7 @@ namespace DialogGenerator.UI.ViewModels
                     if(Session.Get<bool>(Constants.BLE_MODE_ON))
                     {
                         Character.RadioNum = SelectedRadio.Key;
+                        mCharacterRadionBindingRepository.AttachRadioToCharacter(SelectedRadio.Key, Character.CharacterPrefix);
                         _stopScanForRadios();
                     }                    
                     
@@ -971,16 +979,15 @@ namespace DialogGenerator.UI.ViewModels
                     int _idx = mCharacterDataProvider.IndexOf(Character);
                     if (_idx == -1)
                     {
-                        // First remove all that have state on
-                        foreach(var _charMember in mCharacterDataProvider.GetAll())
-                        {
-                            if(_charMember.State == Model.Enum.CharacterState.On)
-                            {
-                                _charMember.State = Model.Enum.CharacterState.Available;
-                            }
-                        }
+                        //// First remove all that have state on
+                        //foreach(var _charMember in mCharacterDataProvider.GetAll())
+                        //{
+                        //    if(_charMember.State == Model.Enum.CharacterState.On)
+                        //    {
+                        //        _charMember.State = Model.Enum.CharacterState.Available;
+                        //    }
+                        //}
 
-                        Character.State = Model.Enum.CharacterState.On;
 
                         // Add the character to the collection.
                         await mCharacterDataProvider.AddAsync(Character);

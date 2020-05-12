@@ -84,10 +84,15 @@ namespace DialogGenerator.UI.ViewModels
             mEventAggregator = _eventAggregator;
 
             Workflow = new WizardWorkflow(action: () => { });
-            MediaPlayerControlViewModel = new MediaPlayerControlViewModel(Workflow);
-            VoiceRecorderControlViewModel = new VoiceRecorderControlViewModel(NAudioEngine.Instance,Workflow,mMessageDialogService, _eventAggregator);
+            MediaPlayerControlViewModel = new MediaPlayerControlViewModel(Workflow, mLogger);
 
+            mLogger.Info("Before creating of VoiceRecorderControlViewModel");
+            VoiceRecorderControlViewModel = new VoiceRecorderControlViewModel(NAudioEngine.Instance,Workflow,mMessageDialogService, _eventAggregator);
+            mLogger.Info("After creating of VoiceRecorderControlViewModel");
+
+            mLogger.Info("Before calling of the speech synthesizer");
             mSpeechSyntesizer = new SpeechSynthesizer();
+            mLogger.Info("After calling of the speech synthesizer");
 
             Workflow.PropertyChanged += _workflow_PropertyChanged;
             this.PropertyChanged += _wizardViewModel_PropertyChanged;
@@ -322,7 +327,10 @@ namespace DialogGenerator.UI.ViewModels
                 return Workflow.State == WizardStates.WaitingForUserAction
                        && VoiceRecorderControlViewModel.StartPlayingCommand.CanExecute();
             }
-            catch (Exception){}
+            catch (Exception exp){
+                mLogger.Error("Playing in context can execute exception - " + exp.Message);
+            }
+
             return false;
         }
 
@@ -333,7 +341,9 @@ namespace DialogGenerator.UI.ViewModels
                 return (CurrentWizard != null && CurrentStepIndex < CurrentWizard.TutorialSteps.Count - 1)
                         && Workflow.State == WizardStates.WaitingForUserAction;
             }
-            catch (Exception) { }
+            catch (Exception exp) {
+                mLogger.Error("Skip step can exception - " + exp.Message);
+            }
 
             return false;
         }
@@ -346,7 +356,10 @@ namespace DialogGenerator.UI.ViewModels
                        && (File.Exists(Path.Combine(ApplicationData.Instance.AudioDirectory, VoiceRecorderControlViewModel.CurrentFilePath + ".mp3"))
                        || CurrentStepIndex == CurrentWizard.TutorialSteps.Count - 1);
             }
-            catch (Exception) { }
+            catch (Exception exp)
+            {
+                mLogger.Error("SaveAndNext can execute exception - " + exp.Message);
+            }
 
             return false;
         }
@@ -394,7 +407,7 @@ namespace DialogGenerator.UI.ViewModels
                             }
                             else
                             {
-
+                                mLogger.Info(string.Format("Playing in context - Character ({0}), about to play in context the dialog line - {1}", Character.CharacterName, _dialogLine));
                                 if (Path.HasExtension(_dialogLine))
                                 {
                                     Application.Current.Dispatcher.Invoke(() =>
@@ -414,8 +427,14 @@ namespace DialogGenerator.UI.ViewModels
                                 }
                                 Application.Current.Dispatcher.Invoke(() =>
                                 {
+                                    mLogger.Info(string.Format("Playing in context - {0} is about to be played!", MediaPlayerControlViewModel.CurrentVideoFilePath));
+
                                     if (MediaPlayerControlViewModel.PlayInContextCommand.CanExecute(null))
+                                    {
                                         MediaPlayerControlViewModel.PlayInContextCommand.Execute(null);
+                                        mLogger.Info(string.Format("Playing in context - {0} playing!", MediaPlayerControlViewModel.CurrentVideoFilePath));
+                                    }
+                                        
                                 });
                             }
 

@@ -98,7 +98,6 @@
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="TestHelper\ApplicationDataHelper.cs" />
     <Compile Include="TestHelper\STATaskHelper.cs" />
-    <Compile Include="UI\ViewModel\AssignCharactersToToysViewModelTests.cs" />
     <Compile Include="UI\ViewModel\CharacterDetailViewModelTests.cs" />
     <Compile Include="UI\ViewModel\CharactersNavigationViewModelTests.cs" />
     <Compile Include="UI\ViewModel\ViewModelTestBase.cs" />

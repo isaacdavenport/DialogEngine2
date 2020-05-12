@@ -15,7 +15,6 @@ namespace DialogGenerator.Model
         #region - fields -
 
         private string mCharacterName;
-        private CharacterState mState;
         private ObservableCollection<PhraseEntry> mPhrases;
         private int mRadioNum =-1;
         private PhraseEntry mPhraseTotals;
@@ -54,7 +53,7 @@ namespace DialogGenerator.Model
         public string CharacterGender { get; set; } = "M";
 
         [RegularExpression(Constants.FILENAME_CHECK_REGEX)]
-        [StringLength(30,MinimumLength =3)]
+        [StringLength(50,MinimumLength =3)]
         [JsonProperty("CharacterName"),Required(ErrorMessage ="Character name is required.")]
         public string CharacterName
         {
@@ -87,7 +86,8 @@ namespace DialogGenerator.Model
         /// Default value is unassigned ( -1 )
         /// </summary>
         [RadioNumRange]
-        [JsonProperty("RadioNum")]
+        //[JsonProperty("RadioNum")]
+        [JsonIgnore]
         public int RadioNum
         {
             get { return mRadioNum; }
@@ -98,24 +98,7 @@ namespace DialogGenerator.Model
             }
         }
 
-        /// <summary>
-        /// Represents state of character
-        /// Default state is Available
-        /// Enum States are [Avaialble,On,Off]
-        /// Available - character can be random selected
-        /// On - character is forced in selection
-        /// Off - character can't be selected
-        /// </summary>
-        [JsonProperty("State")]
-        public CharacterState State
-        {
-            get { return mState; }
-            set
-            {
-                mState = value;
-                OnPropertyChanged("State");
-            }
-        }
+
 
         [JsonProperty("Phrases")]
         public ObservableCollection<PhraseEntry> Phrases
@@ -194,7 +177,7 @@ namespace DialogGenerator.Model
         }
 
         // json ignore properties
-
+        
         [JsonIgnore]
         public Queue<PhraseEntry> RecentPhrases = new Queue<PhraseEntry>();
         [JsonIgnore]
@@ -206,7 +189,6 @@ namespace DialogGenerator.Model
 
         [JsonIgnore]
         public bool Unassigned { get; set; }
-
         [JsonIgnore]
         public bool Editable { get; set; } = true;
 
