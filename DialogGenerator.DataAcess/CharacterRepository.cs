@@ -249,7 +249,8 @@ namespace DialogGenerator.DataAccess
             
             var _jsonObjectsTypesList = new JSONObjectsTypesList
             {
-                Characters = characters,                
+                Characters = characters,         
+                Version = "1.2"
             };
 
             if(_matchedDialogInfos.Count > 0)
