@@ -55,7 +55,8 @@ namespace DialogGenerator.DataAccess
             _jsonObjectsTypesList.Editable = character.Editable;
             _jsonObjectsTypesList.Version = "1.2";
 
-            if(_jsonObjectsTypesList.DialogModels.Where(dm => dm.ModelsCollectionName.Equals("SampleDialogs")).Count() == 0)
+            var _collectionName = character.CharacterPrefix + "_" + "SampleDialogs";
+            if(_jsonObjectsTypesList.DialogModels.Where(dm => dm.ModelsCollectionName.Equals(_collectionName)).Count() == 0)
             {
                 _addSampleModelsToCharacter(character, ref _jsonObjectsTypesList);
             }            
@@ -250,7 +251,7 @@ namespace DialogGenerator.DataAccess
             var _jsonObjectsTypesList = new JSONObjectsTypesList
             {
                 Characters = characters,         
-                Version = "1.2",
+                //Version = "1.2",
             };
 
             if(_matchedDialogInfos.Count > 0)
