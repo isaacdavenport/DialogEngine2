@@ -8,7 +8,7 @@ namespace DialogGenerator.Model
     /// ModelDialog is a sequence of phrase  that represent an exchange between characters 
     /// the model dialog will be filled with randomly selected character phrases of the appropriate phrase type
     /// </summary>
-    public class ModelDialog
+    public class ModelDialog : IEquatable<ModelDialog>
     {
         private string mName;
 
@@ -57,6 +57,41 @@ namespace DialogGenerator.Model
         public override string ToString()
         {
             return Name;
+        }
+
+        public bool Equals(ModelDialog other)
+        {
+            if (!AddedOnDateTime.Equals(other.AddedOnDateTime))
+                return false;
+
+            if (!Adventure.Equals(other.Adventure))
+                return false;
+
+            //if (!Name.Equals(other.Name))
+            //    return false;
+
+            foreach (var _sequence in PhraseTypeSequence)
+            {
+                if (!other.PhraseTypeSequence.Contains(_sequence))
+                    return false;
+            }
+
+            if (Popularity != other.Popularity)
+                return false;
+
+            foreach(var _provideText in Provides)
+            {
+                if (!other.Provides.Contains(_provideText))
+                    return false;
+            }
+
+            foreach (var _requireText in Requires)
+            {
+                if (!other.Requires.Contains(_requireText))
+                    return false;
+            }
+
+            return true;
         }
     }
 }

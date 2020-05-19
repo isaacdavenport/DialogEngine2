@@ -89,7 +89,7 @@ namespace DialogGenerator
                 " -----------------------");
             _checkDirectories();
 
-            IList<string> errors;
+            IList<string> errors;            
             var _JSONObjectTypesList = mDialogDataRepository.LoadFromDirectory(ApplicationData.Instance.DataDirectory,out errors);
 
             foreach(var error in errors)

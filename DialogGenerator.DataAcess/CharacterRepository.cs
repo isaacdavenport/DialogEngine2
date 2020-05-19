@@ -53,7 +53,6 @@ namespace DialogGenerator.DataAccess
 
             var _jsonObjectsTypesList = _findDataForFile(_fileName);
             _jsonObjectsTypesList.Editable = character.Editable;
-            _jsonObjectsTypesList.Version = "1.2";
 
             var _collectionName = character.CharacterPrefix + "_" + "SampleDialogs";
             if(_jsonObjectsTypesList.DialogModels.Where(dm => dm.ModelsCollectionName.Equals(_collectionName)).Count() == 0)
@@ -82,11 +81,19 @@ namespace DialogGenerator.DataAccess
         private void _removeFile(string _fileName)
         {
             var _jsonObjectsTypesList = _findDataForFile(_fileName);
+            var _sampleDialogsList = new JSONObjectsTypesList();            
+
+            using (var reader = new StreamReader(ApplicationData.Instance.DataDirectory + "\\SampleDialogs.cfg"))
+            {
+                string _jsonString = reader.ReadToEnd();
+                _sampleDialogsList = Serializer.Deserialize<JSONObjectsTypesList>(_jsonString);
+            }
 
             if (!_isListNullOrEmpty(_jsonObjectsTypesList.Characters)
                 || !_isListNullOrEmpty(_jsonObjectsTypesList.Wizards)
                 || !_isListNullOrEmpty(_jsonObjectsTypesList.DialogModels))
             {
+
                 // S.Ristic 10/12/2019.
                 // For each of the custom dialog models and wizards
                 // create a separate json file.
@@ -94,10 +101,30 @@ namespace DialogGenerator.DataAccess
                 {
                     foreach(var _dialogModel in _jsonObjectsTypesList.DialogModels)
                     {
-                        var _jsonList = new JSONObjectsTypesList();
-                        _jsonList.DialogModels.Add(_dialogModel);
-                        var _separateFileName = _dialogModel.ModelsCollectionName + ".json";
-                        Serializer.Serialize(_jsonList, Path.Combine(ApplicationData.Instance.DataDirectory, _separateFileName));
+
+                        // S.Ristic 05/19/2020
+                        // Check sample dialogs collections for the dialogs other than ones
+                        // defined in the SampleDialogs.cfg
+                        if(_dialogModel.ModelsCollectionName.Contains("SampleDialogs"))
+                        {
+                            bool _exists = true;
+                            foreach(var _dialog in _dialogModel.ArrayOfDialogModels)
+                            {
+                                if (!_sampleDialogsList.DialogModels[0].ArrayOfDialogModels.Contains(_dialog))
+                                {
+                                    _exists = false;
+                                    break;
+                                }                                                                                                        
+                            }
+
+                            if(!_exists)
+                            {
+                                var _jsonList = new JSONObjectsTypesList();
+                                _jsonList.DialogModels.Add(_dialogModel);
+                                var _separateFileName = _dialogModel.ModelsCollectionName + ".json";
+                                Serializer.Serialize(_jsonList, Path.Combine(ApplicationData.Instance.DataDirectory, _separateFileName));
+                            }                            
+                        }                        
                     }
 
                     foreach( var _wizard in _jsonObjectsTypesList.Wizards)
@@ -251,7 +278,6 @@ namespace DialogGenerator.DataAccess
             var _jsonObjectsTypesList = new JSONObjectsTypesList
             {
                 Characters = characters,         
-                //Version = "1.2",
             };
 
             if(_matchedDialogInfos.Count > 0)

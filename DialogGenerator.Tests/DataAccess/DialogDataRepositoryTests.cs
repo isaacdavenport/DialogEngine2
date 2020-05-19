@@ -1,6 +1,11 @@
-﻿using DialogGenerator.DataAccess;
+﻿using DialogGenerator.Core;
+using DialogGenerator.DataAccess;
+using DialogGenerator.Model;
 using DialogGenerator.Tests.TestHelper;
+using System.Collections;
+using System.Collections.Generic;
 using System.Linq;
+using System.Windows;
 using Xunit;
 
 namespace DialogGenerator.Tests.DataAccess
@@ -15,30 +20,33 @@ namespace DialogGenerator.Tests.DataAccess
             mDialogDataRepository = new DialogDataRepository(loggerMock.Object, userLoggerMock.Object);
         }
 
-        //[Fact]
-        //public async void LoadAsync_ShouldLoadData()
-        //{
-        //    var _JSONObjectsTypesList = await mDialogDataRepository.LoadAsync(ApplicationDataHelper.DataDirectory);
+        [Fact]
+        public async void LoadAsync_ShouldLoadData()
+        {
+            //    var _JSONObjectsTypesList = await mDialogDataRepository.LoadAsync(ApplicationDataHelper.DataDirectory);
 
-        //    // test is data properly loaded
-        //    Assert.Equal(2,_JSONObjectsTypesList.Characters.Count);
-        //    Assert.NotEmpty(_JSONObjectsTypesList.DialogModels);
-        //    Assert.NotEmpty(_JSONObjectsTypesList.Wizards);
-            
-        //    var _character1 = _JSONObjectsTypesList.Characters.First();
-        //    var _character2 = _JSONObjectsTypesList.Characters[1];
+            IList<string> errors;
+            var _JSONObjectsTypesList = mDialogDataRepository.LoadFromDirectory(ApplicationDataHelper.DataDirectory, out errors);
 
-        //    // test is properly set property JsonArrayIndex
-        //    Assert.Equal(0, _character1.JsonArrayIndex);
-        //    Assert.Equal(1, _character2.JsonArrayIndex);
+            // test is data properly loaded
+            Assert.Equal(2, _JSONObjectsTypesList.Characters.Count);
+            Assert.NotEmpty(_JSONObjectsTypesList.DialogModels);
+            Assert.NotEmpty(_JSONObjectsTypesList.Wizards);
 
-        //    // test is file name properly set
-        //    Assert.Equal(mcValidFileName, _character1.FileName);
-        //    Assert.Equal(mcValidFileName, _character2.FileName);
+            var _character1 = _JSONObjectsTypesList.Characters.First();
+            var _character2 = _JSONObjectsTypesList.Characters[1];
 
-        //    // test for phrase correctly loaded
-        //    Assert.NotEmpty(_character1.Phrases);
-        //    Assert.NotEmpty(_character2.Phrases);
-        //}
+            // test is properly set property JsonArrayIndex
+            Assert.Equal(0, _character1.JsonArrayIndex);
+            Assert.Equal(1, _character2.JsonArrayIndex);
+
+            // test is file name properly set
+            Assert.Equal(mcValidFileName, _character1.FileName);
+            Assert.Equal(mcValidFileName, _character2.FileName);
+
+            // test for phrase correctly loaded
+            Assert.NotEmpty(_character1.Phrases);
+            Assert.NotEmpty(_character2.Phrases);
+        }
     }
 }

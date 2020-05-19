@@ -43,7 +43,7 @@ namespace DialogGenerator.Utilities
         public MP3Player(IEventAggregator _eventAggregator,ILogger logger)
         {
             mLogger = logger;
-            mEventAggregator = _eventAggregator;
+            mEventAggregator = _eventAggregator;            
 
             mEventAggregator.GetEvent<StopPlayingCurrentDialogLineEvent>().Subscribe(_stopPlayingCurrentDialogLine);
             mEventAggregator.GetEvent<StopImmediatelyPlayingCurrentDialogLIne>().Subscribe(_stopImmediatelyPlayingCurrentDialogLine);
