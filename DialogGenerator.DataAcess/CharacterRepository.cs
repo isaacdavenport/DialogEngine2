@@ -108,16 +108,27 @@ namespace DialogGenerator.DataAccess
                         if(_dialogModel.ModelsCollectionName.Contains("SampleDialogs"))
                         {
                             bool _exists = true;
-                            foreach(var _dialog in _dialogModel.ArrayOfDialogModels)
+                            List<int> indices = new List<int>();
+                            for(int i = 0; i < _dialogModel.ArrayOfDialogModels.Count; i++)
                             {
-                                if (!_sampleDialogsList.DialogModels[0].ArrayOfDialogModels.Contains(_dialog))
+                                if(_sampleDialogsList.DialogModels[0].ArrayOfDialogModels.Contains(_dialogModel.ArrayOfDialogModels[i]))
                                 {
-                                    _exists = false;
-                                    break;
-                                }                                                                                                        
+                                    indices.Add(i);
+                                }
                             }
 
-                            if(!_exists)
+                            _dialogModel.ArrayOfDialogModels.RemoveAll(el => indices.Contains(_dialogModel.ArrayOfDialogModels.IndexOf(el)) );
+
+                            //foreach(var _dialog in _dialogModel.ArrayOfDialogModels)
+                            //{
+                            //    if (!_sampleDialogsList.DialogModels[0].ArrayOfDialogModels.Contains(_dialog))
+                            //    {
+                            //        _exists = false;
+                            //        break;
+                            //    }                                                                                                        
+                            //}
+
+                            if(/* !_exists */ _dialogModel.ArrayOfDialogModels.Count > 0)
                             {
                                 var _jsonList = new JSONObjectsTypesList();
                                 _jsonList.DialogModels.Add(_dialogModel);
