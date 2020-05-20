@@ -34,7 +34,7 @@ namespace DialogGenerator.Tests.UI.ViewModel
         [Fact]
         public void Load_ShouldInitializeCharacter_WhenProvidedValidCharacterInitials()
         {
-            string initials = "ch1";
+            string initials = "tc1";
 
             mViewModel.Load(initials);
 

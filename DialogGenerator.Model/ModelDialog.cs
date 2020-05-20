@@ -70,25 +70,45 @@ namespace DialogGenerator.Model
             //if (!Name.Equals(other.Name))
             //    return false;
 
-            foreach (var _sequence in PhraseTypeSequence)
+            if(PhraseTypeSequence.Count != other.PhraseTypeSequence.Count)
             {
-                if (!other.PhraseTypeSequence.Contains(_sequence))
-                    return false;
+                return false;
+            } else
+            {
+                for(int i = 0; i < PhraseTypeSequence.Count; i++)
+                {
+                    if (!PhraseTypeSequence[i].Equals(other.PhraseTypeSequence[i]))
+                        return false;
+                }
             }
 
             if (Popularity != other.Popularity)
                 return false;
 
-            foreach(var _provideText in Provides)
+            if (Provides.Count != other.Provides.Count)
             {
-                if (!other.Provides.Contains(_provideText))
-                    return false;
+                return false;
+            }
+            else
+            {
+                for (int i = 0; i < Provides.Count; i++)
+                {
+                    if (!Provides[i].Equals(other.Provides[i]))
+                        return false;
+                }
             }
 
-            foreach (var _requireText in Requires)
+            if (Requires.Count != other.Requires.Count)
             {
-                if (!other.Requires.Contains(_requireText))
-                    return false;
+                return false;
+            }
+            else
+            {
+                for (int i = 0; i < Requires.Count; i++)
+                {
+                    if (!Requires[i].Equals(other.Requires[i]))
+                        return false;
+                }
             }
 
             return true;
