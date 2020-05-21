@@ -138,6 +138,14 @@ namespace DialogGenerator.Handlers
 
                 File.Copy(e.FullPath, Path.Combine(ApplicationData.Instance.DataDirectory, e.Name), true);
                 File.Delete(e.FullPath);
+
+                // S.Ristic - Fix of DLGEN-404
+                // Check if the character file is opened in JSONEditor
+                // and close it.
+                if (ProcessHandler.Contains(_selectedCharacter.FileName))
+                {
+                    ProcessHandler.Remove(_selectedCharacter.FileName);
+                }
             }
         }
 
@@ -159,14 +167,6 @@ namespace DialogGenerator.Handlers
                         int _idx = _existingCharacters.IndexOf(_existingCharacter);
                         _existingCharacters.Remove(_existingCharacter);
                         _existingCharacters.Insert(_idx, character);
-
-                        // S.Ristic - Fix of DLGEN-404
-                        // Check if the character file is opened in JSONEditor
-                        // and close it.
-                        if(ProcessHandler.Contains(character.FileName))
-                        {
-                            ProcessHandler.Remove(character.FileName);
-                        }
                     }
                     else
                     {
