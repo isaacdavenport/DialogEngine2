@@ -102,7 +102,7 @@ namespace DialogGenerator.Handlers
                 {
                     foreach (var character in _JSONObjectTypesList.Characters)
                     {
-                        _validateCharacter(character, errors);
+                        _validateCharacter(character, errors);                        
                     }
 
                     _validateAllCharacters(_JSONObjectTypesList.Characters, errors);
@@ -125,6 +125,17 @@ namespace DialogGenerator.Handlers
             else
             {
                 _addLoadedData(_JSONObjectTypesList);
+                Character _selectedCharacter = Session.Get<Character>(Constants.SELECTED_CHARACTER);
+                foreach(var _character in _JSONObjectTypesList.Characters)
+                {
+                    if(_selectedCharacter != null && _selectedCharacter.CharacterPrefix.Equals(_character.CharacterPrefix))
+                    {
+                        Session.Set(Constants.SELECTED_CHARACTER, _character);
+                        mEventAggregator.GetEvent<CharacterSavedEvent>().Publish(_character.CharacterPrefix);
+                    }
+                    
+                }
+
                 File.Copy(e.FullPath, Path.Combine(ApplicationData.Instance.DataDirectory, e.Name), true);
                 File.Delete(e.FullPath);
             }

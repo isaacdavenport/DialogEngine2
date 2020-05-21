@@ -15,7 +15,9 @@ using System.IO;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using System.Windows;
 using System.Windows.Data;
+using System.Windows.Threading;
 
 namespace DialogGenerator.UI.ViewModels
 {
@@ -45,11 +47,10 @@ namespace DialogGenerator.UI.ViewModels
             mPhrasesCollectionViewSource.Filter += _phrases_Filter;
 
             mEventAggregator.GetEvent<CharacterSelectionActionChangedEvent>().Subscribe(_onCharacterSelectionActionChanged);
+            mEventAggregator.GetEvent<CharacterSavedEvent>().Subscribe(_onCharacterSaved);
 
             _bindCommands();
-        }
-
-        
+        }        
 
         public Character Character
         {
@@ -104,6 +105,19 @@ namespace DialogGenerator.UI.ViewModels
             PlayDialogLineCommand = new DelegateCommand<string>(_playDialogLine_Execute, _playDialogLine_CanExecute);
             DeletePhraseCommand = new DelegateCommand<PhraseEntry>(_deletePhrase_Execute, _deletePrhase_CanExecute);
             EditPhraseCommand = new DelegateCommand<PhraseEntry>(_editPhrase_Execute, _editPhrase_CanExecute);
+        }
+
+        private void _onCharacterSaved(string _characterPrefix)
+        {
+            Character _char = mCharacterDataProvider.GetByInitials(_characterPrefix);
+            if (_char != null)
+            {
+                Application.Current.Dispatcher.Invoke(() =>
+                {
+                    Character = _char;
+                });
+                
+            }
         }
 
         private bool _editPhrase_CanExecute(PhraseEntry _phraseEntry)
