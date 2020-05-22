@@ -1,6 +1,8 @@
-﻿using DialogGenerator.UI.ViewModels;
+﻿using DialogGenerator.CharacterSelection;
+using DialogGenerator.UI.ViewModels;
 using DialogGenerator.Utilities;
 using Moq;
+using Prism.Regions;
 using Xunit;
 
 namespace DialogGenerator.Tests.UI.ViewModel
@@ -8,16 +10,21 @@ namespace DialogGenerator.Tests.UI.ViewModel
     public class CharacterDetailViewModelTests:ViewModelTestBase
     {
         private CharacterDetailViewModel mViewModel;
-        private Mock<IMP3Player> mMP3PlayerMock = new Mock<IMP3Player>();
+        private Mock<IMP3Player> mMP3PlayerMock = new Mock<IMP3Player>();        
+        private Mock<IRegionManager> regionManagerMock = new Mock<IRegionManager>();
+        private Mock<IBLEDataProviderFactory> bleDataProviderFactoryMock = new Mock<IBLEDataProviderFactory>();
 
         public CharacterDetailViewModelTests()
         {
+            testSetup();
+
             mViewModel = new CharacterDetailViewModel(loggerMock.Object, eventAggregatorMock.Object
                 , characterDataProviderMock.Object
                 , messageDialogServiceMock.Object
-                , mMP3PlayerMock.Object);
-
-            testSetup();
+                , mMP3PlayerMock.Object
+                , regionManagerMock.Object
+                , bleDataProviderFactoryMock.Object);
+            
         }
 
 
@@ -34,7 +41,7 @@ namespace DialogGenerator.Tests.UI.ViewModel
         [Fact]
         public void Load_ShouldInitializeCharacter_WhenProvidedValidCharacterInitials()
         {
-            string initials = "tc1";
+            string initials = "ch1";
 
             mViewModel.Load(initials);
 

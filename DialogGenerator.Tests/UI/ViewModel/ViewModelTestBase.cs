@@ -1,4 +1,5 @@
-﻿using DialogGenerator.Core;
+﻿using DialogGenerator.CharacterSelection;
+using DialogGenerator.Core;
 using DialogGenerator.DataAccess;
 using DialogGenerator.Events;
 using DialogGenerator.Model;
@@ -6,6 +7,8 @@ using DialogGenerator.UI.Data;
 using DialogGenerator.Utilities;
 using Moq;
 using Prism.Events;
+using Prism.Regions;
+using System;
 using System.Collections.ObjectModel;
 using System.Linq;
 using System.Threading.Tasks;
@@ -20,9 +23,11 @@ namespace DialogGenerator.Tests.UI.ViewModel
         protected Mock<ICharacterDataProvider> characterDataProviderMock = new Mock<ICharacterDataProvider>();
         protected Mock<IWizardDataProvider> wizardDataProviderMock = new Mock<IWizardDataProvider>();
         protected Mock<IDialogModelDataProvider> dialogModelDataProviderMock = new Mock<IDialogModelDataProvider>();
-        protected Mock<IDialogDataRepository> dialogDataRepositoryMock = new Mock<IDialogDataRepository>();
+        protected Mock<IDialogDataRepository> dialogDataRepositoryMock = new Mock<IDialogDataRepository>();        
 
         protected Mock<OpenCharacterDetailViewEvent> openCharacterDetailViewEventMock = new Mock<OpenCharacterDetailViewEvent>();
+        protected Mock<CharacterSelectionActionChangedEvent> characterSelectionActionChangedEvent = new Mock<CharacterSelectionActionChangedEvent>();
+        protected Mock<CharacterStructureChangedEvent> characterStructureChangedEvent = new Mock<CharacterStructureChangedEvent>();
 
         protected ObservableCollection<Character> characters;
 
@@ -37,6 +42,10 @@ namespace DialogGenerator.Tests.UI.ViewModel
         {
             eventAggregatorMock.Setup(x => x.GetEvent<OpenCharacterDetailViewEvent>())
                 .Returns(openCharacterDetailViewEventMock.Object);
+            eventAggregatorMock.Setup(x => x.GetEvent<CharacterSelectionActionChangedEvent>())
+                .Returns(characterSelectionActionChangedEvent.Object);
+            eventAggregatorMock.Setup(x => x.GetEvent<CharacterStructureChangedEvent>())
+                .Returns(characterStructureChangedEvent.Object);
         }
 
         private void _characterDataProviderSetup()
