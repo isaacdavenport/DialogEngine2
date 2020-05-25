@@ -289,6 +289,7 @@ namespace DialogGenerator.DataAccess
             var _jsonObjectsTypesList = new JSONObjectsTypesList
             {
                 Characters = characters,         
+                Editable = true,
             };
 
             if(_matchedDialogInfos.Count > 0)
