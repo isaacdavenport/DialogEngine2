@@ -95,11 +95,8 @@ namespace DialogGenerator.Core
         public string JSONEditorExeFileName { get; set; } = "JSONedit.exe"; 
         public string WebsiteUrl { get; set; } = "www.toys2life.org";
         public string TutorialFileName { get; set; } = "tutorial.pdf"; 
-        public string BLEVectorsLoggerKey { get; set; } = "BLEVectorsLog";
-        public string DialogLoggerKey { get; set; } = "LogDialog";
-        public string DefaultLoggerKey { get; set; } = "DefaultLog";
-        public string DefaultImage { get; set; } = "avatar.png";
-        public string JSONFilesVersion { get; set; } = "1.4";  // updated after removing of the default value for the JSONObjectsTypesList 'Editable' property.
+
+        public string DefaultImage { get; set; } = "avatar.png";        
         public int NumberOfRadios { get; set; } = 6;
         public string URLToUpdateFile { get; set; } = "http://drive.google.com/uc?export=download&id=1nkflu9P-y1gQMajnxv58BRU7TqrgBh9U";
         public int CheckForUpdateInterval { get; set; } = 30; // minutes
@@ -158,6 +155,15 @@ namespace DialogGenerator.Core
         [Editable(true)]
         [DisplayName("Motion window:")]
         public int MsMotionWindow { get; set; } = 1500;
+
+        [XmlIgnore]
+        public string DialogLoggerKey { get; set; } = "LogDialog";
+
+        [XmlIgnore]
+        public string BLEVectorsLoggerKey { get; set; } = "BLEVectorsLog";
+
+        [XmlIgnore]
+        public string JSONFilesVersion { get; set; } = "1.4";  // updated after removing of the default value for the JSONObjectsTypesList 'Editable' property.
 
         [XmlIgnore]
         public string RootDirectory

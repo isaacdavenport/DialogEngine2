@@ -8,7 +8,7 @@ namespace DialogGenerator.Core
 {
     public class Logger : ILogger
     {
-        private readonly ILog mcDefaultLog = LogManager.GetLogger(ApplicationData.Instance.DefaultLoggerKey);
+        private readonly ILog mcDefaultLog = LogManager.GetLogger(ApplicationData.Instance.DialogLoggerKey);
         private readonly ILog mcBLEVectorsLog = LogManager.GetLogger(ApplicationData.Instance.BLEVectorsLoggerKey);
 
         public Logger()
@@ -19,21 +19,13 @@ namespace DialogGenerator.Core
         // returns logger depends on type
         private ILog _getLogger(string type)
         {
-            if (string.IsNullOrEmpty(type))
-            {
-                return mcDefaultLog;
-            }
-            else if (string.Equals(type, ApplicationData.Instance.DialogLoggerKey, StringComparison.OrdinalIgnoreCase))
-            {
-                return mcDefaultLog;
-                //return mcLogDialog;  IKE got rid of second log file
-            }
-            else if (string.Equals(type, ApplicationData.Instance.BLEVectorsLoggerKey, StringComparison.OrdinalIgnoreCase))
+            if (!string.IsNullOrEmpty(type) && string.Equals(type, ApplicationData.Instance.BLEVectorsLoggerKey, StringComparison.OrdinalIgnoreCase))
             {
                 return mcBLEVectorsLog;
-            }
-
-            return null;
+            } else
+            {
+                return mcDefaultLog;
+            }         
         }
 
         public void Error(string message, string _loggerType = null, 

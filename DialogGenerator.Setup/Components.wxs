@@ -127,9 +127,10 @@
       </Component>
       <Component Id="AudioFiles" Guid="64d947da-8e22-4db1-898f-e9c7cd10c74b" KeyPath="yes">
         <CopyFile Id="AudioDir" SourceProperty="AUDIO_DIR" DestinationDirectory="Audio" SourceName="*" />
-      </Component>--><!--
+      </Component>-->
+        <!--
       <Component Id="Application.xml" Guid="fc31ce71-a5e6-4635-805a-c77dc388bca9">
-        <File Id="Application.xml" Name="Application.xml" Source="$(var.DialogGenerator_TargetDir)Application.xml" />
+        <File Id="Application.xml" Name="Application.xml" Source="$(var.DialogGenerator_TargetDir)Application.xml" PatchIgnore="no" PatchWholeFile="yes"/>
       </Component>
     </DirectoryRef> 
   </Fragment>-->

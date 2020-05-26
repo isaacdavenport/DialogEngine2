@@ -20,6 +20,8 @@
     <OutputPath>bin\$(Configuration)\</OutputPath>
     <IntermediateOutputPath>obj\$(Configuration)\</IntermediateOutputPath>
     <DefineConstants>HarvestPath=C:\Users\$(USERNAME)\Documents\DialogGenerator</DefineConstants>
+    <WixVariables>
+    </WixVariables>
   </PropertyGroup>
   <ItemGroup>
     <Compile Include="Components.wxs" />

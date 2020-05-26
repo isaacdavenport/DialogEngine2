@@ -8,7 +8,7 @@
         
 		<Package InstallerVersion="200" Compressed="yes" InstallScope="perMachine" />
 		<MajorUpgrade DowngradeErrorMessage="A newer version of [ProductName] is already installed." 
-      AllowSameVersionUpgrades="yes" AllowDowngrades="no" />
+      AllowSameVersionUpgrades="yes" AllowDowngrades="no" Schedule="afterInstallInitialize"/>
 		<MediaTemplate EmbedCab="yes" />
     
     <Icon Id="DialogGeneratorIcon" SourceFile="Resources\DialogGeneratorIcon.ico"/>
@@ -55,8 +55,8 @@
       <ComponentRef Id="Data" />
       <ComponentRef Id="Audio" />
       <ComponentRef Id="Images" />
-      <ComponentRef Id="Application.xml" />
-      <Condition Level="1">NOT Installed</Condition>-->
+      <ComponentRef Id="Application.xml" /> 
+      <Condition Level="1">NOT Installed</Condition> -->
     </Feature>
     
 	</Product>
