@@ -1,4 +1,4 @@
-﻿<UserControl x:Class="DialogGenerator.UI.Controls.MediaPlayerControl"
+﻿    <UserControl x:Class="DialogGenerator.UI.Controls.MediaPlayerControl"
              xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
@@ -17,9 +17,9 @@
         </Grid.RowDefinitions>
 
         <Border Grid.Row="0" Background="#FF333333" CornerRadius="2,2,2,2" BorderThickness="0" Margin="2,2,2,2">
-            <MediaElement   x:Name="VideoPlayer" Stretch="Uniform" LoadedBehavior="Manual" UnloadedBehavior="Manual" ScrubbingEnabled="True"
-                            Source="{Binding CurrentVideoFilePath}"
-                            HorizontalAlignment="Stretch" VerticalAlignment="Stretch" LayoutUpdated="VideoPlayer_LayoutUpdated"/>
+            <MediaElement   x:Name="VideoPlayer" Stretch="Uniform" LoadedBehavior="Manual"  UnloadedBehavior="Manual" ScrubbingEnabled="False"
+                            Source="{Binding CurrentVideoFilePath, Mode=TwoWay}"
+                            HorizontalAlignment="Stretch" VerticalAlignment="Stretch" LayoutUpdated="VideoPlayer_LayoutUpdated" SourceUpdated="VideoPlayer_SourceUpdated"/>
         </Border>
         <ScrollBar Grid.Row="1" x:Name="VideoPositionScroll" Orientation="Horizontal" 
                    Height="15" Maximum="{Binding ElementName=VideoPlayer, 

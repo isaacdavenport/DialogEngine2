@@ -103,7 +103,7 @@ namespace DialogGenerator.UI.ViewModels
             {
                 case nameof(CurrentVideoFilePath):
                     {
-                        ((DelegateCommand)StartVideoCommand).RaiseCanExecuteChanged();
+                        ((DelegateCommand)StartVideoCommand).RaiseCanExecuteChanged();                        
                         break;
                     }
             }
