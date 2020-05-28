@@ -1,11 +1,15 @@
 ﻿using DialogGenerator.Core;
 using DialogGenerator.DataAccess;
+using DialogGenerator.DataAccess.Helper;
+using DialogGenerator.Events;
 using DialogGenerator.Model;
 using DialogGenerator.Model.Enum;
+using DialogGenerator.Tests.TestHelper;
 using DialogGenerator.Utilities;
 using Moq;
 using Prism.Events;
 using System.Collections.ObjectModel;
+using System.IO;
 
 namespace DialogGenerator.Tests.DataAccess
 {
@@ -47,30 +51,36 @@ namespace DialogGenerator.Tests.DataAccess
 
         private void _initializeCharacters()
         {
-            var character1 = new Character
+            string _filePath = Path.Combine(ApplicationDataHelper.DataDirectory, "test.json");
+            using (var reader = new StreamReader(_filePath))
             {
-                CharacterName = "Test character1",
-                CharacterPrefix = "tc1",
-                RadioNum = 0,
-            };
+                var _jsonObjectData = reader.ReadToEnd();
+                JSONObjectsTypesList _jsonObjectsTypesList = Serializer.Deserialize<JSONObjectsTypesList>(_jsonObjectData);
+                if(_jsonObjectsTypesList != null && _jsonObjectsTypesList.Characters.Count > 0)
+                {
+                    foreach(var _character in _jsonObjectsTypesList.Characters)
+                    {
+                        _character.FileName = "test.json";
+                    }
 
-            var character2 = new Character
-            {
-                CharacterName = "Test character2",
-                CharacterPrefix = "tc2",
-                RadioNum = 1,
-            };
+                    Session.Set(Constants.CHARACTERS, _jsonObjectsTypesList.Characters);
+                    Session.Set(Constants.DIALOG_MODELS, _jsonObjectsTypesList.DialogModels);
+                    Session.Set(Constants.WIZARDS, _jsonObjectsTypesList.Wizards);
 
-            characters.Add(character1);
-            characters.Add(character2);
-
-            Session.Set(Constants.CHARACTERS, characters);
+                    characters.Clear();
+                    characters.AddRange(_jsonObjectsTypesList.Characters);
+                }
+                
+            }
+                        
         }
 
         protected void testSetup()
         {
             _initializeCharacters();
             _initializeDialogModels();
+
+            eventAggregatorMock.Setup(x => x.GetEvent<CharacterSavedEvent>()).Returns(new CharacterSavedEvent());
         }
     }
 }
