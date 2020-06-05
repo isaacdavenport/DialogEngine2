@@ -319,6 +319,24 @@ namespace DialogGenerator.DialogEngine
             }
         }
 
+        // PickAWeightedDialog and PickAWeightedPhrase use a statistical approach to randomly select DialogModels and 
+        // Phrases.  Each DialogModel has a popularity weighting factor and each phrase has a PhraseWeight number.  
+        // The larger these numbers are the more often that DialogModel or Phrase will come up.  Here is a sample calculation
+        // for phrases.  Say that Johny has three lines with a value for the PhraseWeight RequestAffirmation.
+        //  "Have you seen my mommy?" 0.4
+        //  "Mommy! Mommy!"  0.6
+        //  "I don't feel so good" 2.0
+        // The lines above will also have PhraseWeights for other PhraseWeight tags like Exclamation YesNoQuestion etc. but
+        // if the dialog model calls for a RequestAffirmation line we look for all the lines with a RequestAffirmation PhraseWeight
+        // tag and add them up 2+0.6+0.4=3.  We get a random number which comes back between 0-1, lets say it came up at .75
+        // We mutiply the random number by the sum of the weights  .75*3 = 2.25
+        // We now step through the lines (or DialogModels in the other method) to find our random selection by weight/poularity
+        //  Have you seen my mommy gets us to 0.4, not bigger than 2.25 yet
+        //  Now we addin 0.6 for the "Mommy! Mommy!" line .4+.6 = 1 and not larger than 2.25 yet
+        //  Now we add in the 2 weighting for the "I don't feel so good" line and .4+.6+2 = 3 is larger than 2.25 so we have found 
+        //  our randomly selected line.  You can see that if the random number were lower we would have selected one of the earlier 
+        //  lines.  You can also see that the weight of the last line at 2 is larger than the weight of the first line at 0.4 so
+        //  the last line is more likely to come up than both the previous two lines.
         public int PickAWeightedDialog()
         {
             var _dialogModel = 0;
@@ -335,7 +353,13 @@ namespace DialogGenerator.DialogEngine
                     return _nextAdventureDialogIdx; // we have an adventure dialog for these characters go with it
             }
 
-            int _max_attempts = 30000;
+            int _max_attempts = 30000;  //TODO eventually we want to get away from this check
+            // if we create a list of only dialog models that will work for the two characters and iterate through that
+            // smaller list, we won't have to worry about landing on dialog models the two characters can't use
+            // we can also throw and log a more definate error about how the two characters have no dialog models
+            // they can both participate in if or log that it is a low number (lower than the dozen or so models two 
+            // characters with just the basic wizard lines give them access to).
+
             while (!_dialogModelFits && _attempts < _max_attempts)
             {
                 _attempts++;
@@ -385,6 +409,7 @@ namespace DialogGenerator.DialogEngine
             return _dialogModel;
         }
 
+        //  See the comment above PickAWeightedDialog() above since PickAWeightedPhrase works the same way
         public PhraseEntry PickAWeightedPhrase(int _speakingCharacter, string _currentPhraseType)
         {
             PhraseEntry _selectedPhrase = null;
