@@ -25,7 +25,7 @@ namespace DialogGenerator.Tests.DataAccess
         [Fact]
         public void GetAll_ShouldReturnData_ByFileName()
         {
-            string _fileName = "file1";
+            string _fileName = "test.json";
             var _dialogModels = mRepository.GetAll(_fileName);
 
             Assert.NotEmpty(_dialogModels);

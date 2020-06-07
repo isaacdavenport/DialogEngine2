@@ -22,53 +22,58 @@ namespace DialogGenerator.Tests.DataAccess
         protected Mock<IEventAggregator> eventAggregatorMock = new Mock<IEventAggregator>();
         protected readonly ObservableCollection<Character> characters;
         protected readonly ObservableCollection<ModelDialogInfo> dialogModels;
+        protected readonly ObservableCollection<Wizard> wizards;
 
         public RepositoryTestBase()
         {
             characters = new ObservableCollection<Character>();
             dialogModels = new ObservableCollection<ModelDialogInfo>();
+            wizards = new ObservableCollection<Wizard>();
         }
 
-        private void _initializeDialogModels()
-        {
-            var dm1 = new ModelDialogInfo
-            {
-                FileName = "file1",
-                ModelsCollectionName = "dialogModelsCollection1"
-            };
-
-            var dm2 = new ModelDialogInfo
-            {
-                FileName = "file2",
-                ModelsCollectionName = "dialogModelsCollection2"
-            };
-
-            dialogModels.Add(dm1);
-            dialogModels.Add(dm2);
-
-            Session.Set(Constants.DIALOG_MODELS, dialogModels);
-        }
-
-        private void _initializeCharacters()
+        private void _initializeCharactersDialogModelsAndWizards()
         {
             string _filePath = Path.Combine(ApplicationDataHelper.DataDirectory, "test.json");
             using (var reader = new StreamReader(_filePath))
             {
                 var _jsonObjectData = reader.ReadToEnd();
                 JSONObjectsTypesList _jsonObjectsTypesList = Serializer.Deserialize<JSONObjectsTypesList>(_jsonObjectData);
-                if(_jsonObjectsTypesList != null && _jsonObjectsTypesList.Characters.Count > 0)
-                {
-                    foreach(var _character in _jsonObjectsTypesList.Characters)
+                if(_jsonObjectsTypesList != null) {
+                    if(_jsonObjectsTypesList.Characters.Count > 0)
                     {
-                        _character.FileName = "test.json";
+                        foreach (var _character in _jsonObjectsTypesList.Characters)
+                        {
+                            _character.FileName = "test.json";
+                        }
+
+                        Session.Set(Constants.CHARACTERS, _jsonObjectsTypesList.Characters);                                               
+                        characters.Clear();
+                        characters.AddRange(_jsonObjectsTypesList.Characters);                         
+                    } 
+                    
+                    if (_jsonObjectsTypesList.DialogModels.Count > 0)
+                    {
+                        foreach(var _dialog in _jsonObjectsTypesList.DialogModels)
+                        {
+                            _dialog.FileName = "test.json";
+                        }
+
+                        Session.Set(Constants.DIALOG_MODELS, _jsonObjectsTypesList.DialogModels);
+                        dialogModels.Clear();
+                        dialogModels.AddRange(_jsonObjectsTypesList.DialogModels);
                     }
+                
+                    if (_jsonObjectsTypesList.Wizards.Count > 0)
+                    {
+                        foreach (var _wizard in _jsonObjectsTypesList.Wizards)
+                        {
+                            _wizard.FileName = "test.json";
+                        }
 
-                    Session.Set(Constants.CHARACTERS, _jsonObjectsTypesList.Characters);
-                    Session.Set(Constants.DIALOG_MODELS, _jsonObjectsTypesList.DialogModels);
-                    Session.Set(Constants.WIZARDS, _jsonObjectsTypesList.Wizards);
-
-                    characters.Clear();
-                    characters.AddRange(_jsonObjectsTypesList.Characters);
+                        Session.Set(Constants.WIZARDS, _jsonObjectsTypesList.Wizards);
+                        wizards.Clear();
+                        wizards.AddRange(_jsonObjectsTypesList.Wizards);
+                    }
                 }
                 
             }
@@ -77,8 +82,7 @@ namespace DialogGenerator.Tests.DataAccess
 
         protected void testSetup()
         {
-            _initializeCharacters();
-            _initializeDialogModels();
+            _initializeCharactersDialogModelsAndWizards();
 
             eventAggregatorMock.Setup(x => x.GetEvent<CharacterSavedEvent>()).Returns(new CharacterSavedEvent());
         }
