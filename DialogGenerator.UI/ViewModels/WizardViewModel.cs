@@ -17,6 +17,7 @@ using Prism.Regions;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
+using System.Diagnostics;
 using System.IO;
 using System.Linq;
 using System.Speech.Synthesis;
@@ -46,6 +47,7 @@ namespace DialogGenerator.UI.ViewModels
         private IWizardDataProvider mWizardDataProvider;
         private IMessageDialogService mMessageDialogService;
         private ICharacterDataProvider mCharacterDataProvider;
+        private IDialogModelDataProvider mDialogModelDataProvider;
         private IRegionManager mRegionManager;
         private IEventAggregator mEventAggregator;
         private int mCurrentStepIndex;
@@ -70,6 +72,7 @@ namespace DialogGenerator.UI.ViewModels
             ,IEventAggregator _eventAggregator
             ,IWizardDataProvider _wizardDataProvider
             ,ICharacterDataProvider _characterDataProvider
+            ,IDialogModelDataProvider _dialogModelDataProvider
             ,IMessageDialogService _messageDialogService
             ,WizardFormDialog _wizardFormDialog
             ,IRegionManager _regionManager)
@@ -80,9 +83,10 @@ namespace DialogGenerator.UI.ViewModels
             mMessageDialogService = _messageDialogService;
             mWizardFormDialog = _wizardFormDialog;
             mCharacterDataProvider = _characterDataProvider;
+            mDialogModelDataProvider = _dialogModelDataProvider;
             mRegionManager = _regionManager;
             mEventAggregator = _eventAggregator;
-
+            
             Workflow = new WizardWorkflow(action: () => { });
             MediaPlayerControlViewModel = new MediaPlayerControlViewModel(Workflow, mLogger);
 
@@ -763,11 +767,11 @@ namespace DialogGenerator.UI.ViewModels
             get { return mCurrentWizard; }
             set
             {
-                mCurrentWizard = value;
+                mCurrentWizard = value;                
                 RaisePropertyChanged();
             }
         }
-
+        
         public int CurrentStepIndex
         {
             get { return mCurrentStepIndex; }
@@ -785,6 +789,11 @@ namespace DialogGenerator.UI.ViewModels
             {
                 mCharacter = value;
                 VoiceRecorderControlViewModel.EnableRecording = !mCharacter.HasNoVoice;
+                if(mCurrentWizard != null && mCharacter != null)
+                {
+                    _inspectForCommandWizardAndChangeCharacter();
+                }
+                
                 RaisePropertyChanged();
             }
         }
@@ -803,9 +812,7 @@ namespace DialogGenerator.UI.ViewModels
                 RaisePropertyChanged();
             }
         }
-
         
-
         public MediaPlayerControlViewModel MediaPlayerControlViewModel
         {
             get { return mMediaPlayerControlViewModel; }
@@ -927,6 +934,94 @@ namespace DialogGenerator.UI.ViewModels
             {
                 rdr.CopyTo(wtr);
                 return retMs.ToArray();
+            }
+        }
+
+        private void _inspectForCommandWizardAndChangeCharacter()
+        {
+            if (!string.IsNullOrEmpty(mCurrentWizard.Commands) && mCurrentWizard.Commands.Contains("ContextualDialog"))
+            {
+                // Make a copy of the wizard and change it
+
+                // We have to clone the wizard because we are going 
+                // to change it's phraseweights collections.
+                mCurrentWizard = (Wizard)mCurrentWizard.Clone();
+
+                // This is the list of phrases which fill be used later in the creation 
+                // of custom dialog.
+                List<string> _phrasesForDialog = new List<string>();
+
+                // Identifier used for the new phrases and the dialog.
+                string _identifier = Guid.NewGuid().ToString();
+                _identifier = _identifier.Substring(0, 4);
+
+                // Dialog popularity.
+                int _popularity = -1;
+
+                // Now change the PhraseWeights
+                string _wizardName = mCurrentWizard.WizardName;
+                string[] _tokens = mCurrentWizard.Commands.Split(' ');
+                int _counter = 0;
+                foreach (var _token in _tokens)
+                {
+                    var _phraseWeights = mCurrentWizard.TutorialSteps[_counter].PhraseWeights;
+
+                    if (_token.Equals("ContextualDialog"))
+                        continue;
+                    if (_token.Equals("{" + string.Format("{0}", _counter) + "}"))
+                    {
+                        if (_phraseWeights.Where(pw => pw.Key.Contains(_wizardName)).Count() > 0)
+                        {
+                            var _phraseWeight = _phraseWeights.Where(pw => pw.Key.Contains(_wizardName)).First();
+                            string _phraseWeightKey = _phraseWeight.Key;
+                            double _phraseWeightValue = _phraseWeight.Value;
+                            _phraseWeights.Remove(_phraseWeightKey);
+                            string _newKey = mCharacter.CharacterPrefix + "_" + _wizardName + "_" + _counter + "_" + _identifier;
+                            _phraseWeights.Add(_newKey, _phraseWeightValue);
+                            _phrasesForDialog.Add(_newKey);
+                            _counter++;
+                        }
+
+                    }
+                    else
+                    {
+                        if (!Int32.TryParse(_token, out _popularity))
+                        {
+                            _phrasesForDialog.Add(_token);
+                        }
+                    }
+                }
+
+                // Now, create the custom dialog.
+                ModelDialog _modelDialog = new ModelDialog
+                {
+                    Name = mCharacter.CharacterPrefix + "_" + _wizardName + "_" + _identifier,
+                    Popularity = 14,
+                };
+
+                _modelDialog.PhraseTypeSequence = new List<string>();
+                _modelDialog.PhraseTypeSequence.AddRange(_phrasesForDialog);
+
+                // Find or create the dialog collection
+                var _dialogsCollection = mDialogModelDataProvider.GetByName(_wizardName + "Dialogs");
+                if (_dialogsCollection == null)
+                {
+                    _dialogsCollection = new ModelDialogInfo
+                    {
+                        Editable = true,
+                        FileName = Character.FileName,
+                        ModelsCollectionName = _wizardName + "Dialogs",
+                    };
+
+                    _dialogsCollection.ArrayOfDialogModels = new List<ModelDialog>();
+                    mDialogModelDataProvider.GetAll().Add(_dialogsCollection);
+                }
+
+                if (!_dialogsCollection.ArrayOfDialogModels.Contains(_modelDialog))
+                {
+                    _dialogsCollection.ArrayOfDialogModels.Add(_modelDialog);
+                }
+
             }
         }
 
