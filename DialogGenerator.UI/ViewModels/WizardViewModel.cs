@@ -1003,14 +1003,14 @@ namespace DialogGenerator.UI.ViewModels
                 _modelDialog.PhraseTypeSequence.AddRange(_phrasesForDialog);
 
                 // Find or create the dialog collection
-                var _dialogsCollection = mDialogModelDataProvider.GetByName(_wizardName + "Dialogs");
+                var _dialogsCollection = mDialogModelDataProvider.GetByName(mCharacter.CharacterPrefix + "_" + _wizardName + "Dialogs");
                 if (_dialogsCollection == null)
                 {
                     _dialogsCollection = new ModelDialogInfo
                     {
                         Editable = true,
                         FileName = Character.FileName,
-                        ModelsCollectionName = _wizardName + "Dialogs",
+                        ModelsCollectionName = mCharacter.CharacterPrefix + "_" + _wizardName + "Dialogs",
                     };
 
                     _dialogsCollection.ArrayOfDialogModels = new List<ModelDialog>();
