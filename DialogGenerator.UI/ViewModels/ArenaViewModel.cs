@@ -226,8 +226,20 @@ namespace DialogGenerator.UI.ViewModels
                 {
                     ArenaAvatarViewModel _aavm = AvatarGalleryItems.Where(_am => _am.Character.CharacterPrefix.Equals(_c.CharacterPrefix)).First();
                     ArenaAvatarViewModel _pgvm = _aavm.Clone();
-                    _pgvm.Left = 250;
+                    _pgvm.Left = 200;
                     _pgvm.Top = 50;
+                    PlaygroundAvatars.Add(_pgvm);
+                }
+
+                // DLGEN-498 - Insert the third character
+                int _thirdIndex = _firstIndexNotInList(new List<int> { _selIndex1, _selIndex2 });
+                _c = mCharacterRepository.GetAll()[_thirdIndex];
+                if(_c != null)
+                {
+                    ArenaAvatarViewModel _aavm = AvatarGalleryItems.Where(_am => _am.Character.CharacterPrefix.Equals(_c.CharacterPrefix)).First();
+                    ArenaAvatarViewModel _pgvm = _aavm.Clone();
+                    _pgvm.Left = 150;
+                    _pgvm.Top = 150;
                     PlaygroundAvatars.Add(_pgvm);
                 }
             } 

@@ -315,6 +315,9 @@ namespace DialogGenerator.DialogEngine
                 if (mCharacterPairSelectionDataCached == null)
                     return Triggers.PrepareDialogParameters;
 
+                if (mCharacterPairSelectionDataCached.Character1Index == -1 || mCharacterPairSelectionDataCached.Character2Index == -1)
+                    return Triggers.PrepareDialogParameters;
+
                 if (!_setNextCharacters())
                     return Triggers.PrepareDialogParameters;
 

@@ -1,8 +1,10 @@
 ﻿using DialogGenerator.Core;
+using DialogGenerator.Model;
 using DialogGenerator.UI.ViewModels;
 using DialogGenerator.Utilities;
 using MaterialDesignThemes.Wpf;
 using System;
+using System.Collections.ObjectModel;
 using System.Linq;
 using System.Threading;
 using System.Windows;
@@ -214,6 +216,28 @@ namespace DialogGenerator.UI.Views
                 this.Playground.Children.Remove(_aaV);
                 ArenaViewModel _model = this.DataContext as ArenaViewModel;
                 _model.PlaygroundAvatars.Remove(_avModel);
+                
+                ObservableCollection<Character> _characters = Session.Get<ObservableCollection<Character>>(Constants.CHARACTERS);
+                var _result = _characters.Select((c, i) => new { i, c }).Where(r => r.c.Equals(_avModel.Character)).First();
+                int _firstSelected = Session.Get<int>(Constants.NEXT_CH_1);
+                int _secondSelected = Session.Get<int>(Constants.NEXT_CH_2);
+                if (_firstSelected == _result.i)
+                {
+                    // Check for the duplicate avatars
+                    if(_model.PlaygroundAvatars.Where(a => a.Character.Equals(_result.c)).Count() == 0 || (_firstSelected == _secondSelected))
+                    {
+                        Session.Set(Constants.NEXT_CH_1, -1);
+                    }                    
+                }
+
+                if (_secondSelected == _result.i)
+                {
+                    // Check for the duplicate avatars
+                    if (_model.PlaygroundAvatars.Where(a => a.Character.Equals(_result.c)).Count() == 0 || (_firstSelected == _secondSelected))
+                    {
+                        Session.Set(Constants.NEXT_CH_2, -1);
+                    }                        
+                }                
             }
         }
 
