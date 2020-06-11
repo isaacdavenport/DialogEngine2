@@ -666,13 +666,26 @@ namespace DialogGenerator.UI.ViewModels
                 }
             }
             string[] _fileNameParts = VoiceRecorderControlViewModel.CurrentFilePath.Split('_');
-            
+            string _fileName = string.Empty;
+            for(int i = 0; i < _fileNameParts.Length; i++)
+            {
+                if(i > 1)
+                {
+                    if(i != 2)
+                    {
+                        _fileName += "_";
+                    }
+
+                    _fileName += _fileNameParts[i];
+                }
+            }
+
             var _phraseEntry = new PhraseEntry
             {
                 PhraseRating = CurrentTutorialStep.PhraseRating,
                 DialogStr = DialogStr,
-                PhraseWeights = new Dictionary<string,double>(), 
-                FileName = $"{_fileNameParts[_fileNameParts.Length-2]}_{_fileNameParts.Last()}"
+                PhraseWeights = new Dictionary<string, double>(),
+                FileName = /* $"{_fileNameParts[_fileNameParts.Length-2]}_{_fileNameParts.Last()}" */ _fileName
             };
 
             foreach(KeyValuePair<string, double> entry in CurrentTutorialStep.PhraseWeights)
