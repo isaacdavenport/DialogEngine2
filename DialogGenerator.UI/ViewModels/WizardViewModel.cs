@@ -693,10 +693,13 @@ namespace DialogGenerator.UI.ViewModels
                 _phraseEntry.PhraseWeights.Add(entry.Key, entry.Value);
             }
 
-
             //by adding the mp3 filename for a phrase as a phraseweight we can access an exact phrase
             // from an existing character without editing that character, for instance a built in character
-            _phraseEntry.PhraseWeights.Add(mCharacter.CharacterPrefix + "_" + _phraseEntry.FileName, 1.0);
+            if(string.IsNullOrEmpty(mCurrentWizard.Commands))
+            {
+                _phraseEntry.PhraseWeights.Add(mCharacter.CharacterPrefix + "_" + _phraseEntry.FileName, 1.0);
+            }
+            
             mCharacter.Phrases.Add(_phraseEntry);
 
             await mCharacterDataProvider.SaveAsync(Character);
@@ -989,7 +992,7 @@ namespace DialogGenerator.UI.ViewModels
                             string _phraseWeightKey = _phraseWeight.Key;
                             double _phraseWeightValue = _phraseWeight.Value;
                             _phraseWeights.Remove(_phraseWeightKey);
-                            string _newKey = mCharacter.CharacterPrefix + "_" + _wizardName + "_" + _counter + "_" + _identifier;
+                            string _newKey = _wizardName + "_" + _counter + "_" + _identifier;
                             _phraseWeights.Add(_newKey, _phraseWeightValue);
                             _phrasesForDialog.Add(_newKey);
                             _counter++;
