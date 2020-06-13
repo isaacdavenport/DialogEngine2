@@ -627,6 +627,11 @@ namespace DialogGenerator.UI.ViewModels
         private void _view_Unloaded()
         {
             mSpeechSyntesizer.SpeakCompleted -= _synth_SpeakCompleted;
+            if(!Session.Get<bool>(Constants.CHARACTER_EDIT_MODE))
+            {
+                mEventAggregator.GetEvent<CharacterUpdatedEvent>().Publish();
+            }
+            
         }
 
         private void _nextStep()
