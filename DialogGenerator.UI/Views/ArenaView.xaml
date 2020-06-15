@@ -13,7 +13,7 @@
              d:DesignHeight="850" 
              d:DesignWidth="800" 
              Loaded="UserControl_Loaded" 
-             Unloaded="UserControl_Unloaded" >
+             Unloaded="UserControl_Unloaded" SizeChanged="UserControl_SizeChanged">
     <UserControl.Resources>
         <converters:ImageToFullPathValueConverter x:Key="ImageToFullPathValueConverter" />
         <converters:ImageContentValueConverter x:Key="ImageContentValueConverter" />
@@ -89,6 +89,7 @@
                 <ItemsControl.Resources>
                     <Style TargetType="materialDesign:Card">
                         <EventSetter Event="MouseMove" Handler="Card_MouseMove" />
+                        <EventSetter Event="MouseLeftButtonDown" Handler="Card_MouseLeftButtonDown" />
                     </Style>
                 </ItemsControl.Resources>
             </ItemsControl>

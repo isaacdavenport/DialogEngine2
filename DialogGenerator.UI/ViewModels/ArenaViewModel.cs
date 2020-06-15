@@ -9,8 +9,11 @@ using Prism.Mvvm;
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
+using System.Collections.Specialized;
 using System.Linq;
+using System.Threading;
 using System.Windows;
+using System.Windows.Forms;
 
 namespace DialogGenerator.UI.ViewModels
 {
@@ -23,6 +26,7 @@ namespace DialogGenerator.UI.ViewModels
         private List<AvatarPair> mAvatarPairs = new List<AvatarPair>();
         private Random mRandom;
         private IMessageDialogService mMessageDialogService;
+        public EventHandler<RemoveArenaAvatarViewEventArgs> RemoveAvatarRequested;
         
         public ArenaViewModel(ILogger _Logger
             , IEventAggregator _EventAggregator
@@ -38,7 +42,64 @@ namespace DialogGenerator.UI.ViewModels
 
             mEventAggregator.GetEvent<CharacterCollectionLoadedEvent>().Subscribe(_onCharacterCollectionLoaded);
             mEventAggregator.GetEvent<CharactersInConversationEvent>().Subscribe(_onCharactersInConversation);
-        }        
+            PlaygroundAvatars.CollectionChanged += PlaygroundAvatars_CollectionChanged;
+        }
+
+        private void PlaygroundAvatars_CollectionChanged(object sender, NotifyCollectionChangedEventArgs e)
+        {
+            if (e.Action == NotifyCollectionChangedAction.Add)
+            {
+                foreach (var _item in e.NewItems)
+                {
+                    ArenaAvatarViewModel _model = (ArenaAvatarViewModel)_item;
+                    if(_model != null)
+                    {
+                        _model.PropertyChanged += _model_PropertyChanged;
+                    }
+                }
+            }
+
+            if (e.Action == NotifyCollectionChangedAction.Remove)
+            {
+                foreach (var _item in e.OldItems)
+                {
+                    ArenaAvatarViewModel _model = (ArenaAvatarViewModel)_item;
+                    if (_model != null)
+                    {
+                        _model.PropertyChanged -= _model_PropertyChanged;
+                    }
+                }
+            }
+        }
+
+        private void _model_PropertyChanged(object sender, System.ComponentModel.PropertyChangedEventArgs e)
+        {
+            ArenaAvatarViewModel _model = (ArenaAvatarViewModel)sender;
+            if(_model != null)
+            {
+                if(e.PropertyName.Equals("AboutToRemove"))
+                {
+                    if (_model.AboutToRemove)
+                    {
+                        // S.Ristic - Leave it for now withouth the dialog
+                        //if (System.Windows.MessageBox.Show(string.Format("The character {0} will be removed from playground. Are you sure you want to continue?"
+                        //    , _model.CharacterName), "Warning"
+                        //    , MessageBoxButton.YesNo
+                        //    , MessageBoxImage.Exclamation) == MessageBoxResult.Yes)
+                        //{
+                        //    RemoveAvatarRequested(this, new RemoveArenaAvatarViewEventArgs { AvatarModel = _model });
+                        //} else
+                        //{
+                        //    _model.AboutToRemove = false;
+                        //}
+
+                        RemoveAvatarRequested(this, new RemoveArenaAvatarViewEventArgs { AvatarModel = _model });
+                    }
+                    
+                }
+                
+            }
+        }
 
         public ObservableCollection<ArenaAvatarViewModel> AvatarGalleryItems { get; } = new ObservableCollection<ArenaAvatarViewModel>();
 
@@ -59,6 +120,8 @@ namespace DialogGenerator.UI.ViewModels
         }
 
         public Size CanvasBounds { get; set; } = new Size();
+
+        public Size ControlBounds { get; set; } = new Size();
 
         public void AddAvatarToPlayground(ArenaAvatarViewModel _Avatar)
         {
@@ -154,7 +217,7 @@ namespace DialogGenerator.UI.ViewModels
             foreach (Character _c in _characters)
             {
                 ArenaAvatarViewModel _am = new ArenaAvatarViewModel
-                {
+                {                   
                     Character = _c,
                     Active = false,
                     InPlayground = false,
@@ -410,5 +473,10 @@ namespace DialogGenerator.UI.ViewModels
             }
         }
 
+    }
+
+    public class RemoveArenaAvatarViewEventArgs : EventArgs
+    {
+        public ArenaAvatarViewModel AvatarModel { get; set; }
     }
 }

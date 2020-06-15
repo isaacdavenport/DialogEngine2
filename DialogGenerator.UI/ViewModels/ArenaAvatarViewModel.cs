@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace DialogGenerator.UI.ViewModels
 {
-    public class ArenaAvatarViewModel : BindableBase
+    public class ArenaAvatarViewModel : BindableBase,IEquatable<ArenaAvatarViewModel>
     {
         private Character mCharacter;
         private int mLeft;
@@ -19,9 +19,24 @@ namespace DialogGenerator.UI.ViewModels
         private int mDecision = 1;
         private int mSleepInterval = 50;
         private string mCharacterName;
+        private bool mAboutToRemove = false;
 
+        public Guid Id { get; set; } = Guid.NewGuid();
         public double Width { get; set; }
         public double Height { get; set; }
+        public bool AboutToRemove
+        {
+            get
+            {
+                return mAboutToRemove;
+            }
+            set
+            {
+                mAboutToRemove = value;
+                RaisePropertyChanged();
+            }
+        }
+
         public Character Character
         {
             get
@@ -192,5 +207,12 @@ namespace DialogGenerator.UI.ViewModels
             mCancellationTokenSource.Cancel();
         }
 
+        public bool Equals(ArenaAvatarViewModel other)
+        {
+            if (Id.Equals(other.Id))
+                return true;
+
+            return false;
+        }
     }
 }

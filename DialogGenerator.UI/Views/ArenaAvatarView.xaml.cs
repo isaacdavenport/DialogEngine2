@@ -26,10 +26,7 @@ namespace DialogGenerator.UI.Views
         private bool mDrag = false;
         private double mMouseLeftPosition = 0.0;
         private double mMouseTopPosition = 0.0;
-
-        private Storyboard mStoryboard;
-        private DoubleAnimation mHorizontalAnimation;
-        private DoubleAnimation mVerticalAnimation;
+        public EventHandler RemoveRequested;
 
         public ArenaAvatarView()
         {
@@ -57,13 +54,23 @@ namespace DialogGenerator.UI.Views
                         {
                             double _difference = _model.Left + this.ActualWidth - Session.Get<double>(Constants.ARENA_WIDTH);
                             _model.Left -= ((int)_difference + 5);
+                            if(!_model.AboutToRemove)
+                            {
+                                _model.AboutToRemove = true;
+                            }
+                            
                         }
-
-                        if (_model.Left < 0)
+                        else if (_model.Left < 0)
                         {
                             _model.Left = 0;
                         }
-
+                        else
+                        {
+                            //if(_model.AboutToRemove)
+                            //{
+                            //    _model.AboutToRemove = false;
+                            //}                            
+                        }
                     }
 
                     if (e.PropertyName.Equals("Top"))
@@ -78,8 +85,8 @@ namespace DialogGenerator.UI.Views
                         {
                             _model.Top = 0;
                         }
-
                     }
+                    
                 });
             }
             catch (System.Threading.Tasks.TaskCanceledException) { }
@@ -89,12 +96,11 @@ namespace DialogGenerator.UI.Views
         private void UserControl_MouseDown(object sender, MouseButtonEventArgs e)
         {
             if(e.LeftButton == MouseButtonState.Pressed)
-            {                
+            {
                 mDrag = true;
                 mMouseLeftPosition = e.GetPosition(sender as IInputElement).X;
                 mMouseTopPosition = e.GetPosition(sender as IInputElement).Y;
                 Mouse.Capture(sender as IInputElement);
-                
             }
 
             if(e.RightButton == MouseButtonState.Pressed &&
@@ -124,13 +130,8 @@ namespace DialogGenerator.UI.Views
                 _left += _deltaX;
                 _top += _deltaY;
 
-                if(_checkBounds(_left, _deltaX, _top, _deltaY))
-                {
-                    //this.SetValue(Canvas.LeftProperty, _left);
-                    //this.SetValue(Canvas.TopProperty, _top);
-                    ((ArenaAvatarViewModel)DataContext).Left = (int)_left;
-                    ((ArenaAvatarViewModel)DataContext).Top = (int)_top;
-                }                
+                ((ArenaAvatarViewModel)DataContext).Left = (int)_left;
+                ((ArenaAvatarViewModel)DataContext).Top = (int)_top;           
             }
         }
 
@@ -147,8 +148,8 @@ namespace DialogGenerator.UI.Views
             _newLeft += this.ActualWidth;
             _newTop += this.ActualHeight;
 
-            if(_newLeft > Session.Get<double>(Constants.ARENA_WIDTH) ||
-                _newTop > Session.Get<double>(Constants.ARENA_HEIGHT))
+            if(_newLeft > Session.Get<double>(Constants.ARENA_TOTAL_WIDTH) ||
+                _newTop > Session.Get<double>(Constants.ARENA_TOTAL_HEIGHT))
             {
                 return false;
             }
