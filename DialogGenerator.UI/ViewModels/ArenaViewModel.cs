@@ -81,19 +81,18 @@ namespace DialogGenerator.UI.ViewModels
                 {
                     if (_model.AboutToRemove)
                     {
-                        // S.Ristic - Leave it for now withouth the dialog
-                        //if (System.Windows.MessageBox.Show(string.Format("The character {0} will be removed from playground. Are you sure you want to continue?"
-                        //    , _model.CharacterName), "Warning"
-                        //    , MessageBoxButton.YesNo
-                        //    , MessageBoxImage.Exclamation) == MessageBoxResult.Yes)
-                        //{
-                        //    RemoveAvatarRequested(this, new RemoveArenaAvatarViewEventArgs { AvatarModel = _model });
-                        //} else
-                        //{
-                        //    _model.AboutToRemove = false;
-                        //}
+                        if (System.Windows.MessageBox.Show(string.Format("The character {0} will be removed from playground. Are you sure you want to continue?"
+                            , _model.CharacterName), "Warning"
+                            , MessageBoxButton.YesNo
+                            , MessageBoxImage.Exclamation) == MessageBoxResult.Yes)
+                        {
+                            RemoveAvatarRequested(this, new RemoveArenaAvatarViewEventArgs { AvatarModel = _model });
+                        }
+                        else
+                        {
+                            _model.AboutToRemove = false;
+                        }
 
-                        RemoveAvatarRequested(this, new RemoveArenaAvatarViewEventArgs { AvatarModel = _model });
                     }
                     
                 }

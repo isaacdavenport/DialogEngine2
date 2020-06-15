@@ -121,7 +121,7 @@ namespace DialogGenerator.UI.Views
 
         private void UserControl_MouseMove(object sender, MouseEventArgs e)
         {
-            if (mDrag)
+            if (/* mDrag */ e.LeftButton == MouseButtonState.Pressed)
             {
                 double _deltaX = e.GetPosition(sender as IInputElement).X - mMouseLeftPosition;
                 double _deltaY = e.GetPosition(sender as IInputElement).Y - mMouseTopPosition;
