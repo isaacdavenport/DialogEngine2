@@ -521,23 +521,15 @@ namespace DialogGenerator.UI.ViewModels
             }
         }        
 
-        private class PhraseTypesCollection
+        private class PhraseKeysCollection
         {
-            string mVersionNumber;
-            ObservableCollection<string> mPhrases = new ObservableCollection<string>();
-
             [JsonProperty("Version")]
             public string Version { get; set; }
 
             [JsonProperty("Phrases")]
-            public ObservableCollection<string> Phrases
-            {
-                get
-                {
-                    return mPhrases;
-                }
-            }
+            public ObservableCollection<PhraseKey> Phrases { get; set; } = new ObservableCollection<PhraseKey>();
         }
+
 
         private void _initLists()
         {
@@ -547,23 +539,23 @@ namespace DialogGenerator.UI.ViewModels
                 using (var _reader = new StreamReader(_filePath))
                 {
                     string _jsonString = _reader.ReadToEnd();
-                    var _phraseTypesCollection = Serializer.Deserialize<PhraseTypesCollection>(_jsonString);
-                    if (_phraseTypesCollection != null && _phraseTypesCollection.Phrases.Count() > 0)
+                    var _phraseKeysCollection = Serializer.Deserialize<PhraseKeysCollection>(_jsonString);
+                    if (_phraseKeysCollection != null && _phraseKeysCollection.Phrases.Count() > 0)
                     {
-                        Keys.AddRange(_phraseTypesCollection.Phrases);
-                    }                    
+                        Keys.AddRange(_phraseKeysCollection.Phrases.Select(p => p.Name));
+                    }
                 }
 
                 var _phraseWeightValues = new ObservableCollection<double>();
                 for (double i = 0; i < 500; i++)
                 {
                     Values.Add(i);
-                }                
+                }
             }
             catch (IOException)
-            {                
+            {
             }
-            
+
         }
     }
 }
