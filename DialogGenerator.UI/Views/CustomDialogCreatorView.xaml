@@ -21,9 +21,15 @@
                 <ColumnDefinition Width="*" />
                 <ColumnDefinition Width="*" />
             </Grid.ColumnDefinitions>
-            <controls:CharacterSlotControl x:Name="LeftCharacterSlot" />
-            <controls:DialogSlotControl x:Name="DialogSlot" Grid.Column="1"/>
-            <controls:CharacterSlotControl x:Name="RightSlot" Grid.Column="2" />
+            <Border BorderBrush="DarkGray" BorderThickness="1" Margin="10">
+                <controls:CharacterSlotControl x:Name="LeftCharacterSlot" />
+            </Border>
+            <Border BorderBrush="DarkGray" BorderThickness="1" Margin="10" Grid.Column="1">
+                <controls:DialogSlotControl x:Name="DialogSlot" />
+            </Border>
+            <Border BorderBrush="DarkGray" BorderThickness="1" Margin="10" Grid.Column="2">
+                <controls:CharacterSlotControl x:Name="RightSlot" />
+            </Border>
         </Grid>
         <StackPanel Grid.Row="2" Orientation="Horizontal" HorizontalAlignment="Center" Width="Auto">
             <Button HorizontalAlignment="Right" MaxWidth="200" Margin="20" Command="{Binding SaveCommand}">Save</Button>
