@@ -14,7 +14,7 @@
             <RowDefinition Height="*" />
             <RowDefinition Height="Auto" />
         </Grid.RowDefinitions>
-        <TextBlock Text="Custom Dialog Generator" FontSize="16" FontWeight="Bold"/>
+        <TextBlock Text="Custom Dialog Generator" FontSize="24" FontWeight="Bold" Margin="20" HorizontalAlignment="Center"/>
         <Grid x:Name="ControlsGrid" Grid.Row="1">
             <Grid.ColumnDefinitions>
                 <ColumnDefinition Width="*" />
@@ -25,7 +25,11 @@
             <controls:DialogSlotControl x:Name="DialogSlot" Grid.Column="1"/>
             <controls:CharacterSlotControl x:Name="RightSlot" Grid.Column="2" />
         </Grid>
-        <Button Grid.Row="2" HorizontalAlignment="Center" MaxWidth="200" Margin="20">Save</Button>
+        <StackPanel Grid.Row="2" Orientation="Horizontal" HorizontalAlignment="Center" Width="Auto">
+            <Button HorizontalAlignment="Right" MaxWidth="200" Margin="20" Command="{Binding SaveCommand}">Save</Button>
+            <Button HorizontalAlignment="Left"  MaxWidth="200" Margin="20" Command="{Binding CloseCommand}">Close</Button>
+        </StackPanel>
+        <!--<Button Grid.Row="2" HorizontalAlignment="Center" MaxWidth="200" Margin="20" Command="{Binding SaveCommand}">Save</Button>-->
 
     </Grid>
 </UserControl>

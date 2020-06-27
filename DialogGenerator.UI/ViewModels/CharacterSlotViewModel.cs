@@ -30,6 +30,8 @@ namespace DialogGenerator.UI.ViewModels
         CollectionViewSource mCharacters;
         string mPhraseDescription;
         PhraseDefinitionModel mSelectedModel;
+        int mModelsInDialogCount = 0;
+        bool mCharacterSelectionEnabled = true;
 
         public CharacterSlotViewModel(ICharacterDataProvider _CharacterDataProvider, IEventAggregator _EventAggregator)
         {
@@ -40,14 +42,25 @@ namespace DialogGenerator.UI.ViewModels
             //mPhraseDefinitionModels.Filter += MPhraseDefinitionModels_Filter;
             mPhraseDefinitionModels.Source = mPhrases;
 
-            mEventAggregator.GetEvent<CharacterCollectionLoadedEvent>().Subscribe(_charactersLoaded);
-            //_initPhraseDefinitionModels();
-
             _bindCommands();
-            
-        }
+            _subscribeForEvents();
 
-        
+
+        }        
+
+        public bool CharacterSelectionEnabled
+        {
+            get
+            {
+                return mCharacterSelectionEnabled;
+            }
+
+            set
+            {
+                mCharacterSelectionEnabled = value;
+                RaisePropertyChanged();
+            }
+        }
 
         public Character SelectedCharacter
         {
@@ -92,6 +105,7 @@ namespace DialogGenerator.UI.ViewModels
                 mSelectedModel = value;
                 _updateDescription();
                 RaisePropertyChanged();
+                AddPhraseToDialogCommand.RaiseCanExecuteChanged();
             }
         }        
 
@@ -111,6 +125,26 @@ namespace DialogGenerator.UI.ViewModels
 
         public DelegateCommand ViewLoadedCommand { get; set; }
         public DelegateCommand ViewUnloadedCommand { get; set; }
+        public DelegateCommand AddPhraseToDialogCommand { get; set; }
+
+        #region Private Methods
+
+        private void _subscribeForEvents()
+        {
+            mEventAggregator.GetEvent<CharacterCollectionLoadedEvent>().Subscribe(_charactersLoaded);
+            mEventAggregator.GetEvent<AddedPhraseModelToDialogEvent>().Subscribe(_modelAdded);
+        }
+
+        private void _modelAdded(int _count)
+        {
+            if(_count > 0)
+            {
+                CharacterSelectionEnabled = false;
+            } else
+            {
+                CharacterSelectionEnabled = true;
+            }
+        }
 
         private void MPhraseDefinitionModels_Filter(object sender, FilterEventArgs e)
         {
@@ -263,11 +297,25 @@ namespace DialogGenerator.UI.ViewModels
         {
             ViewLoadedCommand = new DelegateCommand(_viewLoaded_Execute);
             ViewUnloadedCommand = new DelegateCommand(_viewUnloaded_Execute);
+            AddPhraseToDialogCommand = new DelegateCommand(_addPhraseToDialog_Execute, _addPhraseToDialog_CanExecute);
+        }
+
+        private void _addPhraseToDialog_Execute()
+        {
+            mEventAggregator.GetEvent<AddingPhraseModelToDialogEvent>().Publish(SelectedPhraseModel);
+        }
+
+        private bool _addPhraseToDialog_CanExecute()
+        {
+            return SelectedPhraseModel != null;
         }
 
         private void _viewUnloaded_Execute()
         {
-
+            // Do some cleaning
+            SelectedCharacter = null;
+            SelectedPhraseModel = null;
+            PhraseDescription = string.Empty;
         }
 
         private void _viewLoaded_Execute()
@@ -279,5 +327,7 @@ namespace DialogGenerator.UI.ViewModels
             }
             
         }
+
+        #endregion
     }
 }

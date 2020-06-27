@@ -37,6 +37,7 @@ namespace DialogGenerator.UI.Views
             }
         }
 
+
         private void UserControl_Loaded(object sender, RoutedEventArgs e)
         {
             CustomDialogCreatorViewModel _model = this.DataContext as CustomDialogCreatorViewModel;
@@ -44,9 +45,7 @@ namespace DialogGenerator.UI.Views
             {
                 this.LeftCharacterSlot.DataContext = _model.LeftCharacterModel;
                 this.RightSlot.DataContext = _model.RightCharacterModel;
-                this.DialogSlot.DataContext = _model.DialogModel;
-
-                _model.DialogModel.Popularity = 3.0;
+                this.DialogSlot.DataContext = _model.DialogModel;                
             }
 
             this.DataContextChanged += CustomDialogCreatorView_DataContextChanged;

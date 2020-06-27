@@ -4,9 +4,17 @@
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
              xmlns:xtk ="http://schemas.xceed.com/wpf/xaml/toolkit"
-             xmlns:local="clr-namespace:DialogGenerator.UI.Controls" xmlns:forms="clr-namespace:System.Windows.Forms;assembly=System.Windows.Forms"
+             xmlns:local="clr-namespace:DialogGenerator.UI.Controls" xmlns:forms="clr-namespace:System.Windows.Forms;assembly=System.Windows.Forms" xmlns:i="http://schemas.microsoft.com/expression/2010/interactivity"
              mc:Ignorable="d" 
              d:DesignHeight="800" d:DesignWidth="400">
+    <i:Interaction.Triggers>
+        <i:EventTrigger EventName="Loaded">
+            <i:InvokeCommandAction Command="{Binding ViewLoadedCommand}" />
+        </i:EventTrigger>
+        <i:EventTrigger EventName="Unloaded">
+            <i:InvokeCommandAction Command="{Binding ViewUnloadedCommand}" />
+        </i:EventTrigger>
+    </i:Interaction.Triggers>
     <Grid>
         <Grid.RowDefinitions>
             <RowDefinition Height="Auto" />
@@ -20,14 +28,14 @@
             <RowDefinition Height="Auto" />
         </Grid.RowDefinitions>
         <TextBlock Text="Dialog Name" HorizontalAlignment="Center"/>
-        <TextBox x:Name="DialogName" Grid.Row="1" HorizontalAlignment="Center" Text="{Binding DialogModel.DialogName}" MinWidth="200"/>
+        <TextBox x:Name="DialogName" Grid.Row="1" HorizontalAlignment="Center" Text="{Binding DialogName}" MinWidth="200"/>
         <TextBlock Text="Popularity" HorizontalAlignment="Center" Grid.Row="2"/>
         <ComboBox Grid.Row="3" ItemsSource="{Binding PopularityValues}" SelectedItem="{Binding Popularity}" IsEditable="True" IsTextSearchEnabled="True" HorizontalAlignment="Center" MinWidth="100"/>
         <TextBlock Text="Phrases" HorizontalAlignment="Center" Grid.Row="4"/>
         <ListBox x:Name="PhraseDefinitionModels" 
                  Grid.Row="5" 
-                 ItemsSource="{Binding DialogPhraseDefinitionModels}" 
-                 SelectedItem="SelectedPhrase" 
+                 ItemsSource="{Binding PhraseDefinitionModels}" 
+                 SelectedItem="{Binding SelectedPhrase}" 
                  Background="White" 
                  BorderBrush="DarkGray" 
                  BorderThickness="1" Margin="20" />
@@ -53,6 +61,6 @@
         <!--<RichTextBox x:Name="Description" Grid.Row="7" AcceptsReturn="True" />-->
 
 
-        <Button x:Name="RemovePhraseButton" Grid.Row="8" Width="200" Margin="20">Remove Selected Phrase</Button> 
+        <Button x:Name="RemovePhraseButton" Grid.Row="8" Width="200" Margin="20" Command="{Binding RemovePhraseFromListCommand}">Remove Selected Phrase</Button> 
     </Grid>
 </UserControl>

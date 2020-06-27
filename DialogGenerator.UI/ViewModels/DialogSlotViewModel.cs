@@ -1,13 +1,18 @@
 ﻿using DialogGenerator.Core;
 using DialogGenerator.DataAccess;
 using DialogGenerator.DataAccess.Helper;
+using DialogGenerator.Events;
 using DialogGenerator.Model;
 using DialogGenerator.UI.Data;
+using DialogGenerator.Utilities;
+using Prism.Commands;
+using Prism.Events;
 using Prism.Mvvm;
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.ComponentModel;
+using System.IO;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -25,17 +30,28 @@ namespace DialogGenerator.UI.ViewModels
         CollectionViewSource mPopularityValues;
         IDialogModelRepository mDialogModelRepository;
         ICharacterDataProvider mCharacterDataProvider;
+        IEventAggregator mEventAggregator;
         PhraseDefinitionModel mSelectedPhrase;
+        IMessageDialogService mMessageDialogService;
 
-        public DialogSlotViewModel(IDialogModelRepository _DialogModelRepository, ICharacterDataProvider _CharacterDataProvider)
+        public DialogSlotViewModel(IDialogModelRepository _DialogModelRepository
+            , ICharacterDataProvider _CharacterDataProvider
+            , IEventAggregator _EventAggregator
+            , IMessageDialogService _MessageDialogService)
         {
             mDialogModelRepository = _DialogModelRepository;
             mCharacterDataProvider = _CharacterDataProvider;
+            mEventAggregator = _EventAggregator;
+            mMessageDialogService = _MessageDialogService;
             mPhraseDefinitionModels = new CollectionViewSource();
             mPopularityValues = new CollectionViewSource();
             mPhraseDefinitionModels.Source = new ObservableCollection<PhraseDefinitionModel>();
             _initPopularityValues();
+            _subscribeToEvents();
+            _bindCommands();
         }
+
+        
 
         #region Properties
         public string DialogName
@@ -91,6 +107,7 @@ namespace DialogGenerator.UI.ViewModels
             {
                 mSelectedPhrase = value;
                 RaisePropertyChanged();
+                RemovePhraseFromListCommand.RaiseCanExecuteChanged();
             }
         }
 
@@ -114,30 +131,11 @@ namespace DialogGenerator.UI.ViewModels
 
         #endregion
 
-        #region Public methods
+        #region Commands
 
-        public bool AddPhraseDefinition(PhraseDefinitionModel _Model, out string error)
-        {
-            error = string.Empty;
-            var _collection = (mPhraseDefinitionModels.Source as ObservableCollection<PhraseDefinitionModel>);
-            if(_collection.Contains(_Model))
-            {
-                error = "This model is already in collection!";
-                return false;
-            }
-
-            _collection.Add(_Model);
-            mPhraseDefinitionModels.View?.Refresh();
-
-            return true;
-        }
-
-        public void RemovePhraseDefinition(PhraseDefinitionModel _Model)
-        {
-            var _collection = (mPhraseDefinitionModels.Source as ObservableCollection<PhraseDefinitionModel>);
-            _collection.Remove(_Model);
-            mPhraseDefinitionModels.View?.Refresh();
-        }
+        public DelegateCommand RemovePhraseFromListCommand { get; set; }
+        public DelegateCommand ViewLoadedCommand { get; set; }
+        public DelegateCommand ViewUnloadedCommand { get; set; }
 
         #endregion
 
@@ -224,9 +222,11 @@ namespace DialogGenerator.UI.ViewModels
 
             _jsonObjectTypesList.DialogModels[0].ArrayOfDialogModels.Add(_dialogModel);
 
+            // Create file path.
+            string _filePath = Path.Combine(ApplicationData.Instance.DataDirectory, DialogName.Replace(" ", string.Empty) + ".json");
+
             // Save dialog to file.
-            var _filePath = ApplicationData.Instance.DataDirectory + "\\" + DialogName + ".json";
-            Serializer.Serialize(_jsonObjectTypesList, _filePath);
+            Serializer.Serialize(_jsonObjectTypesList, _filePath );
 
             // Save character changes.
             foreach (var _character in _charactersForSaving)
@@ -242,23 +242,81 @@ namespace DialogGenerator.UI.ViewModels
 
         #region Private methods
 
+        private void _bindCommands()
+        {
+            RemovePhraseFromListCommand = new DelegateCommand(_removePhraseFromList_Execute, _removePhraseFromList_CanExecute);
+            ViewLoadedCommand = new DelegateCommand(_viewLoaded);
+            ViewUnloadedCommand = new DelegateCommand(_viewUnloaded);
+        }
+
+        private void _viewUnloaded()
+        {
+            // Cleaning.
+            DialogName = string.Empty;
+            Popularity = 1;
+            var _collection = mPhraseDefinitionModels.Source as ObservableCollection<PhraseDefinitionModel>;
+            _collection.Clear();
+            RemovePhraseFromListCommand.RaiseCanExecuteChanged();
+        }
+
+        private void _viewLoaded()
+        {
+            
+        }
+
+        private bool _removePhraseFromList_CanExecute()
+        {
+            return ((mPhraseDefinitionModels.Source as ObservableCollection<PhraseDefinitionModel>).Count > 0 && SelectedPhrase != null);
+        }
+
+        private void _removePhraseFromList_Execute()
+        {
+            var _phrasesCollection = mPhraseDefinitionModels.Source as ObservableCollection<PhraseDefinitionModel>;
+            _phrasesCollection.Remove(SelectedPhrase);
+            SelectedPhrase = null;
+            PhraseDefinitionModels?.Refresh();
+            mEventAggregator.GetEvent<AddedPhraseModelToDialogEvent>().Publish(_phrasesCollection.Count);
+            RemovePhraseFromListCommand.RaiseCanExecuteChanged();
+        }
+
+        private void _subscribeToEvents()
+        {
+            mEventAggregator.GetEvent<AddingPhraseModelToDialogEvent>().Subscribe(_wantToAddPhraseModel);
+        }
+
+        private void _wantToAddPhraseModel(PhraseDefinitionModel _phraseModel)
+        {
+            var _phraseDefinitionModels = mPhraseDefinitionModels.Source as ObservableCollection<PhraseDefinitionModel>;
+            if(_phraseDefinitionModels != null)
+            {
+                //if(_phraseDefinitionModels.Contains(_phraseModel))
+                //{
+                //    //MessageBox.Show()
+                //    mMessageDialogService.ShowMessage("Wrong parameter", "This phrase already exists in the dialog!");                    
+                //} else
+                //{
+                    _phraseDefinitionModels.Add(_phraseModel);
+                    mPhraseDefinitionModels.View?.Refresh();
+                    mEventAggregator.GetEvent<AddedPhraseModelToDialogEvent>().Publish(_phraseDefinitionModels.Count);
+                    RemovePhraseFromListCommand.RaiseCanExecuteChanged();
+                //}
+            }
+        }
+
         private void _initPopularityValues()
         {
-            var _values = new ObservableCollection<double>();
+            var _values = new double[] { .1, .2, .3, .4, .5, .6, .7, .8, .9 };
 
-            for(double i = 0.1; i < 1.0; i += 0.1)
+            foreach(var _value in _values)
             {
-                //_values.Add(i);
-                PopularityValues.Add(i);
+                PopularityValues.Add(_value);
             }
 
             for(double i = 1.0; i < 30; i ++)
             {
-                //_values.Add(i);
                 PopularityValues.Add(i);
             }
 
-            //mPopularityValues.Source = _values;
         }
 
         #endregion
