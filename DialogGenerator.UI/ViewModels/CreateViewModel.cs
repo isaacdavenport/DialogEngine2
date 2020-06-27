@@ -9,6 +9,7 @@ using DialogGenerator.Utilities;
 using Prism.Commands;
 using Prism.Events;
 using Prism.Mvvm;
+using Prism.Regions;
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
@@ -36,6 +37,7 @@ namespace DialogGenerator.UI.ViewModels
         private Character mSelectedCharacter;
         private CollectionViewSource mCharactersCollectionViewSource;
         private string mFilterText;
+        private IRegionManager mRegionManager;
 
         #endregion
 
@@ -46,8 +48,10 @@ namespace DialogGenerator.UI.ViewModels
             ,IWizardDataProvider _wizardDataProvider
             ,IDialogModelDataProvider _dialogModelDataProvider
             ,ICharacterDataProvider _characterDataProvider
-            ,IMessageDialogService _messageDialogService)
+            ,IMessageDialogService _messageDialogService
+            ,IRegionManager _RegionManager)
         {
+            mRegionManager = _RegionManager;
             mEventAggregator = _eventAggregator;
             mLogger = logger;
             mDialogDataRepository = _dialogDataRepository;
@@ -72,6 +76,7 @@ namespace DialogGenerator.UI.ViewModels
         public DelegateCommand CreateNewCharacterCommand { get; set; }
         public DelegateCommand ImportCharacterCommand { get; set; }
         public DelegateCommand OnlineCharactersCommand { get; set; }
+        public DelegateCommand CreateCustomDialogCommand { get; set; }
 
         #endregion
 
@@ -106,6 +111,12 @@ namespace DialogGenerator.UI.ViewModels
             CreateNewCharacterCommand = new DelegateCommand(_createNewCharacterCommand_Execute);
             ImportCharacterCommand = new DelegateCommand(_importCharacterCommand_Execute);
             OnlineCharactersCommand = new DelegateCommand(_onOnlineCharacters_Execute);
+            CreateCustomDialogCommand = new DelegateCommand(_onCreateCustomDialog_Execute);
+        }
+
+        private void _onCreateCustomDialog_Execute()
+        {
+            mRegionManager.Regions[Constants.ContentRegion].NavigationService.RequestNavigate("CustomDialogCreatorView");
         }
 
         private  void _onOnlineCharacters_Execute()

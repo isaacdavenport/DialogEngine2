@@ -521,16 +521,6 @@ namespace DialogGenerator.UI.ViewModels
             }
         }        
 
-        private class PhraseKeysCollection
-        {
-            [JsonProperty("Version")]
-            public string Version { get; set; }
-
-            [JsonProperty("Phrases")]
-            public ObservableCollection<PhraseKey> Phrases { get; set; } = new ObservableCollection<PhraseKey>();
-        }
-
-
         private void _initLists()
         {
             string _filePath = ApplicationData.Instance.DataDirectory + "\\Phrases.cfg";

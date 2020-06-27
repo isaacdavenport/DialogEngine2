@@ -171,8 +171,19 @@
                                 <TextBlock Text="Import Character From File" TextWrapping="Wrap" Foreground="White" FontSize="20" HorizontalAlignment="Center" VerticalAlignment="Center" />
                             </StackPanel>
                         </Grid>
-                </materialDesign:Card>
-                    
+                    </materialDesign:Card>
+
+                    <materialDesign:Card Width="150" HorizontalAlignment="Left" Focusable="True" Height="150" Margin="10" Background="#51cb8c" >
+                        <materialDesign:Card.InputBindings>
+                            <MouseBinding MouseAction="LeftClick" Command="{Binding CreateCustomDialogCommand}" />
+                        </materialDesign:Card.InputBindings>
+                        <Grid Style="{StaticResource CardGrid}">
+                            <StackPanel HorizontalAlignment="Center" VerticalAlignment="Center">
+                                <materialDesign:PackIcon Kind="Creation" HorizontalAlignment="Center" Height="50" Width="50" Foreground="White" />
+                                <TextBlock Text="Create Custom Dialog" TextWrapping="Wrap" Foreground="White" FontSize="20" HorizontalAlignment="Center" VerticalAlignment="Center" />
+                            </StackPanel>
+                        </Grid>
+                    </materialDesign:Card>
                 </StackPanel>
 
         </Grid>

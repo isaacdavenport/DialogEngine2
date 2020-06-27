@@ -12,6 +12,8 @@ namespace DialogGenerator.Model
         public PhraseEntry PhraseEntry { get; set; }
         public string Description { get; set; }
 
+        public Character Character { get; set; }
+
         public bool Equals(PhraseDefinitionModel other)
         {
             if(this.Text != other.Text)
@@ -19,17 +21,27 @@ namespace DialogGenerator.Model
                 return false;
             }
 
-            if(!this.PhraseEntry.Equals(other.PhraseEntry))
+            if (this.PhraseEntry != other.PhraseEntry)
             {
                 return false;
             }
 
-            if(!this.Description.Equals(other.Description))
+            if (!this.Description.Equals(other.Description))
+            {
+                return false;
+            }
+
+            if(this.Character != other.Character)
             {
                 return false;
             }
 
             return true;
+        }
+
+        public override string ToString()
+        {
+            return this.Text;
         }
     }
 }

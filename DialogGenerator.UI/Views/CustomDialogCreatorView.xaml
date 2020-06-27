@@ -1,0 +1,31 @@
+﻿<UserControl x:Class="DialogGenerator.UI.Views.CustomDialogCreatorView"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
+             xmlns:controls="clr-namespace:DialogGenerator.UI.Controls"
+             xmlns:prism="http://prismlibrary.com/"            
+             prism:ViewModelLocator.AutoWireViewModel="True"
+             mc:Ignorable="d" 
+             d:DesignHeight="800" d:DesignWidth="1400" Loaded="UserControl_Loaded">
+    <Grid x:Name="MainGrid">
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto" />
+            <RowDefinition Height="*" />
+            <RowDefinition Height="Auto" />
+        </Grid.RowDefinitions>
+        <TextBlock Text="Custom Dialog Generator" FontSize="16" FontWeight="Bold"/>
+        <Grid x:Name="ControlsGrid" Grid.Row="1">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="*" />
+                <ColumnDefinition Width="*" />
+                <ColumnDefinition Width="*" />
+            </Grid.ColumnDefinitions>
+            <controls:CharacterSlotControl x:Name="LeftCharacterSlot" />
+            <controls:DialogSlotControl x:Name="DialogSlot" Grid.Column="1"/>
+            <controls:CharacterSlotControl x:Name="RightSlot" Grid.Column="2" />
+        </Grid>
+        <Button Grid.Row="2" HorizontalAlignment="Center" MaxWidth="200" Margin="20">Save</Button>
+
+    </Grid>
+</UserControl>
