@@ -236,7 +236,9 @@ namespace DialogGenerator.UI.ViewModels
             {
                 mCharacterDataProvider.SaveAsync(_character);
             }
-            
+
+            // Restart the dialog engine.
+            mEventAggregator.GetEvent<CharacterUpdatedEvent>().Publish();
 
             return true;
 
