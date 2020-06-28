@@ -21,13 +21,22 @@
                 <ColumnDefinition Width="*" />
                 <ColumnDefinition Width="*" />
             </Grid.ColumnDefinitions>
-            <Border BorderBrush="DarkGray" BorderThickness="1" Margin="10">
+            <Border BorderBrush="DarkGray" BorderThickness="1" Margin="10" >
+                <Border.Effect>
+                    <DropShadowEffect BlurRadius="15" Direction="-90" RenderingBias="Quality" ShadowDepth="5"/>
+                </Border.Effect>
                 <controls:CharacterSlotControl x:Name="LeftCharacterSlot" />
             </Border>
             <Border BorderBrush="DarkGray" BorderThickness="1" Margin="10" Grid.Column="1">
+                <Border.Effect>
+                    <DropShadowEffect BlurRadius="15" Direction="-90" RenderingBias="Quality" ShadowDepth="5"/>
+                </Border.Effect>
                 <controls:DialogSlotControl x:Name="DialogSlot" />
             </Border>
             <Border BorderBrush="DarkGray" BorderThickness="1" Margin="10" Grid.Column="2">
+                <Border.Effect>
+                    <DropShadowEffect BlurRadius="15" Direction="-90" RenderingBias="Quality" ShadowDepth="5"/>
+                </Border.Effect>
                 <controls:CharacterSlotControl x:Name="RightSlot" />
             </Border>
         </Grid>

@@ -106,6 +106,7 @@ namespace DialogGenerator.UI.ViewModels
             set
             {
                 mSelectedPhrase = value;
+                PhraseFullText = mSelectedPhrase != null ? mSelectedPhrase.Description : string.Empty;
                 RaisePropertyChanged();
                 RemovePhraseFromListCommand.RaiseCanExecuteChanged();
             }
@@ -180,12 +181,12 @@ namespace DialogGenerator.UI.ViewModels
             {
                 Name = DialogName,
                 Popularity = Popularity,
-                PhraseTypeSequence = new List<string>()
+                PhraseTypeSequence = new List<string>(),
             };
 
             var _charactersForSaving = new List<Character>();
             int counter = 0;
-            string _dialogNameBase = DialogName.Trim(' ');
+            string _dialogNameBase = DialogName.Replace(" ", string.Empty);
             foreach (var _item in PhraseDefinitionModels.SourceCollection)
             {
                 PhraseDefinitionModel _model = (PhraseDefinitionModel)_item;
@@ -199,7 +200,7 @@ namespace DialogGenerator.UI.ViewModels
                     var _phraseTag = _dialogNameBase + counter;
                     _dialogModel.PhraseTypeSequence.Add(_phraseTag);
 
-                    var _phrase = _model.Character.Phrases.Where(p => p.DialogStr.Equals(_model.Text)).First();
+                    var _phrase = _model.Character.Phrases.Where(p => p.DialogStr.Equals(_model.Description)).First();
                     if (_phrase != null)
                     {
                         _phrase.PhraseWeights.Add(_phraseTag, Popularity);
@@ -218,12 +219,14 @@ namespace DialogGenerator.UI.ViewModels
                 ModelsCollectionName = "Custom Dialogs",
                 ArrayOfDialogModels = new List<ModelDialog>(),
                 Editable = true,
+                FileName = _dialogNameBase + ".json"
             });
 
             _jsonObjectTypesList.DialogModels[0].ArrayOfDialogModels.Add(_dialogModel);
+            mDialogModelRepository.GetAll().Add(_jsonObjectTypesList.DialogModels[0]);
 
             // Create file path.
-            string _filePath = Path.Combine(ApplicationData.Instance.DataDirectory, DialogName.Replace(" ", string.Empty) + ".json");
+            string _filePath = Path.Combine(ApplicationData.Instance.DataDirectory, _dialogNameBase + ".json");
 
             // Save dialog to file.
             Serializer.Serialize(_jsonObjectTypesList, _filePath );
@@ -233,6 +236,7 @@ namespace DialogGenerator.UI.ViewModels
             {
                 mCharacterDataProvider.SaveAsync(_character);
             }
+            
 
             return true;
 

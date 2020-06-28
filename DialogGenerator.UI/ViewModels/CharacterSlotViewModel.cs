@@ -217,28 +217,38 @@ namespace DialogGenerator.UI.ViewModels
             {
                 foreach(var _phrase in SelectedCharacter.Phrases)
                 {
+                    string _excerpt = string.Empty;
+                    if(_phrase.DialogStr.Length > 50)
+                    {
+                        _excerpt = _phrase.DialogStr.Substring(0, 50) + "...";
+                    } else
+                    {
+                        _excerpt = _phrase.DialogStr;
+                    }
+
                     var _phraseDefinitionModel = new PhraseDefinitionModel
                     {
-                        Text = _phrase.DialogStr,
+                        Text = _excerpt,
                         PhraseEntry = _phrase,     
                         Character = SelectedCharacter,
                     };
 
-                    string _description = string.Empty;
-                    foreach(var _phraseWeight in _phrase.PhraseWeights)
-                    {
-                        if(!string.IsNullOrEmpty(_description))
-                        {
-                            _description += ", ";                           
-                        }
+                    //string _description = string.Empty;
+                    //foreach(var _phraseWeight in _phrase.PhraseWeights)
+                    //{
+                    //    if(!string.IsNullOrEmpty(_description))
+                    //    {
+                    //        _description += ", ";                           
+                    //    }
 
-                        _description += _phraseWeight.Key;
-                        _description += "[";
-                        _description += _phraseWeight.Value;
-                        _description += "]";
-                    }
+                    //    _description += _phraseWeight.Key;
+                    //    _description += "[";
+                    //    _description += _phraseWeight.Value;
+                    //    _description += "]";
+                    //}
 
-                    _phraseDefinitionModel.Description = _description;
+                    //_phraseDefinitionModel.Description = _description;
+                    _phraseDefinitionModel.Description = _phrase.DialogStr;
                     _collection.Add(_phraseDefinitionModel);
                 }
             }
@@ -259,39 +269,7 @@ namespace DialogGenerator.UI.ViewModels
             _characters.AddRange(mCharacterDataProvider.GetAll());
             mCharacters.Source = _characters;
             mCharacters.View?.Refresh();
-        }
-
-        private void _dummyInitialization()
-        {
-            var _models = new ObservableCollection<PhraseDefinitionModel>();
-            var _charArray = new string[] { "Sinke", "Slavisa", "Steva", "Buca", "Tesla" };
-            foreach(var _name in _charArray)
-            {
-                var _phraseModel = new PhraseDefinitionModel
-                {
-                    Text = _name,
-                    Description = string.Empty,
-                    Character = new Character
-                    {
-                        CharacterName = _name,
-                        CharacterPrefix = _name
-                    }
-                };
-
-                _phraseModel.PhraseEntry = new PhraseEntry
-                {
-                    DialogStr = _name,
-                    FileName = _name + ".json"
-                };
-
-                _models.Add(_phraseModel);
-
-
-            }
-
-            mPhraseDefinitionModels.Source = _models;
-
-        }
+        }       
 
         private void _bindCommands()
         {
