@@ -39,8 +39,8 @@ namespace DialogGenerator.UI.ViewModels
             mEventAggregator = _EventAggregator;
             mMessageDialogService = _MessageDialogService;
             mRegionManager = _RegionManager;
-            LeftCharacterModel = new CharacterSlotViewModel(_CharacterDataProvider, _EventAggregator);
-            RightCharacterModel = new CharacterSlotViewModel(_CharacterDataProvider, _EventAggregator);
+            LeftCharacterModel = new CharacterSlotViewModel(_CharacterDataProvider, _EventAggregator, 1);
+            RightCharacterModel = new CharacterSlotViewModel(_CharacterDataProvider, _EventAggregator, 2);
             DialogModel = new DialogSlotViewModel(mDialogModelRepository, mCharacterDataProvider, _EventAggregator, _MessageDialogService);
 
             _bindCommands();

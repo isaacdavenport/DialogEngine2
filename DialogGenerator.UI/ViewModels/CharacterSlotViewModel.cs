@@ -33,20 +33,23 @@ namespace DialogGenerator.UI.ViewModels
         int mModelsInDialogCount = 0;
         bool mCharacterSelectionEnabled = true;
 
-        public CharacterSlotViewModel(ICharacterDataProvider _CharacterDataProvider, IEventAggregator _EventAggregator)
+        public CharacterSlotViewModel(ICharacterDataProvider _CharacterDataProvider
+            , IEventAggregator _EventAggregator
+            , int _SlotNumber)
         {
             mCharacterDataProvider = _CharacterDataProvider;
             mEventAggregator = _EventAggregator;
             mSelectedCharacter = null;
             mPhraseDefinitionModels = new CollectionViewSource();
-            //mPhraseDefinitionModels.Filter += MPhraseDefinitionModels_Filter;
             mPhraseDefinitionModels.Source = mPhrases;
+            SlotNumber = _SlotNumber;
 
             _bindCommands();
             _subscribeForEvents();
 
+        }
 
-        }        
+        public int SlotNumber { get; set; } = 0;
 
         public bool CharacterSelectionEnabled
         {
@@ -200,7 +203,8 @@ namespace DialogGenerator.UI.ViewModels
                                     Text = _phraseKey.Name,
                                     PhraseEntry = null,
                                     Description = _phraseKey.Description,
-                                    Character = null
+                                    Character = null, 
+                                    SlotNumber = SlotNumber
                                 };
 
                                 _collection.Add(_phraseDefinitionModel);
@@ -231,23 +235,9 @@ namespace DialogGenerator.UI.ViewModels
                         Text = _excerpt,
                         PhraseEntry = _phrase,     
                         Character = SelectedCharacter,
+                        SlotNumber = SlotNumber
                     };
 
-                    //string _description = string.Empty;
-                    //foreach(var _phraseWeight in _phrase.PhraseWeights)
-                    //{
-                    //    if(!string.IsNullOrEmpty(_description))
-                    //    {
-                    //        _description += ", ";                           
-                    //    }
-
-                    //    _description += _phraseWeight.Key;
-                    //    _description += "[";
-                    //    _description += _phraseWeight.Value;
-                    //    _description += "]";
-                    //}
-
-                    //_phraseDefinitionModel.Description = _description;
                     _phraseDefinitionModel.Description = _phrase.DialogStr;
                     _collection.Add(_phraseDefinitionModel);
                 }

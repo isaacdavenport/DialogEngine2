@@ -295,17 +295,21 @@ namespace DialogGenerator.UI.ViewModels
             var _phraseDefinitionModels = mPhraseDefinitionModels.Source as ObservableCollection<PhraseDefinitionModel>;
             if(_phraseDefinitionModels != null)
             {
-                //if(_phraseDefinitionModels.Contains(_phraseModel))
-                //{
-                //    //MessageBox.Show()
-                //    mMessageDialogService.ShowMessage("Wrong parameter", "This phrase already exists in the dialog!");                    
-                //} else
-                //{
-                    _phraseDefinitionModels.Add(_phraseModel);
-                    mPhraseDefinitionModels.View?.Refresh();
-                    mEventAggregator.GetEvent<AddedPhraseModelToDialogEvent>().Publish(_phraseDefinitionModels.Count);
-                    RemovePhraseFromListCommand.RaiseCanExecuteChanged();
-                //}
+                if(_phraseDefinitionModels.Count() > 0)
+                {
+                    var _lastAddedPhraseModel = _phraseDefinitionModels.Last();
+                    if (_lastAddedPhraseModel.SlotNumber == _phraseModel.SlotNumber)
+                    {                        
+                        mMessageDialogService.ShowMessage("Wrong parameter", "This character can't add two consequtive phrases! Plase add the prase from the other character!");
+                        return;
+                    }
+                }
+
+                _phraseDefinitionModels.Add(_phraseModel);
+                mPhraseDefinitionModels.View?.Refresh();
+                mEventAggregator.GetEvent<AddedPhraseModelToDialogEvent>().Publish(_phraseDefinitionModels.Count);
+                RemovePhraseFromListCommand.RaiseCanExecuteChanged();
+
             }
         }
 

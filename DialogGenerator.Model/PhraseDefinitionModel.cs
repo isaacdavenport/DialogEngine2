@@ -11,8 +11,8 @@ namespace DialogGenerator.Model
         public string Text { get; set; } = string.Empty;
         public PhraseEntry PhraseEntry { get; set; }
         public string Description { get; set; }
-
         public Character Character { get; set; }
+        public int SlotNumber { get; set; } = 0;
 
         public bool Equals(PhraseDefinitionModel other)
         {
@@ -32,6 +32,11 @@ namespace DialogGenerator.Model
             }
 
             if(this.Character != other.Character)
+            {
+                return false;
+            }
+
+            if(this.SlotNumber != other.SlotNumber)
             {
                 return false;
             }
