@@ -12,6 +12,7 @@ using NAudio.Lame;
 using NAudio.Wave;
 using Prism.Commands;
 using Prism.Events;
+using Prism.Interactivity.DefaultPopupWindows;
 using Prism.Mvvm;
 using Prism.Regions;
 using System;
@@ -1013,11 +1014,16 @@ namespace DialogGenerator.UI.ViewModels
                     }
                 }
 
+                var _date = DateTime.Now;
+                var _strDate = _date.ToString("yyyy/MM/dd hh:mm tt");
+                _date = DateTime.Parse(_strDate);
+
                 // Now, create the custom dialog.
                 ModelDialog _modelDialog = new ModelDialog
                 {
                     Name = mCharacter.CharacterPrefix + "_" + _wizardName + "_" + _identifier,
                     Popularity = 14,
+                    AddedOnDateTime = _date,
                 };
 
                 _modelDialog.PhraseTypeSequence = new List<string>();
