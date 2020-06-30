@@ -984,9 +984,21 @@ namespace DialogGenerator.UI.ViewModels
                 string _wizardName = mCurrentWizard.WizardName;
                 string[] _tokens = mCurrentWizard.Commands.Split(' ');
                 int _counter = 0;
+
+                // Check the first step of the wizard.
+                bool _hasIntro = mCurrentWizard.TutorialSteps[_counter].PhraseWeights.Count() == 0 ? true : false;
+
                 foreach (var _token in _tokens)
                 {
-                    var _phraseWeights = mCurrentWizard.TutorialSteps[_counter].PhraseWeights;
+                    Dictionary<string, double> _phraseWeights;
+                    if(_hasIntro)
+                    {
+                        _phraseWeights = mCurrentWizard.TutorialSteps[_counter + 1].PhraseWeights;
+                    } else
+                    {
+                        _phraseWeights = mCurrentWizard.TutorialSteps[_counter].PhraseWeights;
+                    }
+                    
 
                     if (_token.Equals("ContextualDialog"))
                         continue;
