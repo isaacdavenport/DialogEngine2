@@ -990,20 +990,21 @@ namespace DialogGenerator.UI.ViewModels
 
                 foreach (var _token in _tokens)
                 {
-                    Dictionary<string, double> _phraseWeights;
-                    if(_hasIntro)
-                    {
-                        _phraseWeights = mCurrentWizard.TutorialSteps[_counter + 1].PhraseWeights;
-                    } else
-                    {
-                        _phraseWeights = mCurrentWizard.TutorialSteps[_counter].PhraseWeights;
-                    }
-                    
+                    Dictionary<string, double> _phraseWeights;                                        
 
                     if (_token.Equals("ContextualDialog"))
                         continue;
                     if (_token.Equals("{" + string.Format("{0}", _counter) + "}"))
                     {
+                        if (_hasIntro)
+                        {
+                            _phraseWeights = mCurrentWizard.TutorialSteps[_counter + 1].PhraseWeights;
+                        }
+                        else
+                        {
+                            _phraseWeights = mCurrentWizard.TutorialSteps[_counter].PhraseWeights;
+                        }
+
                         if (_phraseWeights.Where(pw => pw.Key.Contains(_wizardName)).Count() > 0)
                         {
                             var _phraseWeight = _phraseWeights.Where(pw => pw.Key.Contains(_wizardName)).First();
