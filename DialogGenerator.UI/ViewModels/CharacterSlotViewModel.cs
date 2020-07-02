@@ -284,6 +284,7 @@ namespace DialogGenerator.UI.ViewModels
             SelectedCharacter = null;
             SelectedPhraseModel = null;
             PhraseDescription = string.Empty;
+            CharacterSelectionEnabled = true;
         }
 
         private void _viewLoaded_Execute()
