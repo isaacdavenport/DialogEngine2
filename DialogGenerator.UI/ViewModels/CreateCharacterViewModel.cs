@@ -916,21 +916,22 @@ namespace DialogGenerator.UI.ViewModels
             switch(stepName)
             {
                 case "Initialize":
-                    var _lastStepName = Session.Get<CreateCharacterState>(Constants.LAST_WIZARD_STATE);
-                    if (_lastStepName != null && !string.IsNullOrEmpty(_lastStepName.WizardName))
+                    var _lastWizardState = Session.Get<CreateCharacterState>(Constants.LAST_WIZARD_STATE);
+                    if (_lastWizardState != null && !string.IsNullOrEmpty(_lastWizardState.WizardName))
                     {
                         MessageDialogResult _result = await mMessageDialogService.ShowOKCancelDialogAsync("Resume previous session?", "Question", "Yes", "No");
                         if(_result.Equals(MessageDialogResult.OK))
                         {
                             mResumePreviousSession = true;
-                            Character = mCharacterDataProvider.GetByInitials(_lastStepName.CharacterPrefix);
+                            Character = mCharacterDataProvider.GetByInitials(_lastWizardState.CharacterPrefix);
                             Workflow.Fire(Triggers.CheckCounter);
                             break;
                         } else
                         {
-                            _lastStepName.WizardName = string.Empty;
-                            _lastStepName.StepIndex = 0;
-                            _lastStepName.CharacterPrefix = string.Empty;
+                            _lastWizardState.WizardName = string.Empty;
+                            _lastWizardState.StepIndex = 0;
+                            _lastWizardState.CharacterPrefix = string.Empty;
+                            Session.Set(Constants.LAST_WIZARD_STATE, _lastWizardState);
                         }                                                
                     }
 
@@ -993,7 +994,7 @@ namespace DialogGenerator.UI.ViewModels
                     NextButtonText = "Save";
                     break;
                 case "CheckCounter":
-                    var _lastWizardState = Session.Get<CreateCharacterState>(Constants.LAST_WIZARD_STATE);
+                    _lastWizardState = Session.Get<CreateCharacterState>(Constants.LAST_WIZARD_STATE);
                     if(_lastWizardState != null && !string.IsNullOrEmpty(_lastWizardState.WizardName))                    
                     {
                         MessageDialogResult _result;
@@ -1018,6 +1019,8 @@ namespace DialogGenerator.UI.ViewModels
                             _lastWizardState.StepIndex = 0;
                             _lastWizardState.CharacterPrefix = string.Empty;
                             Session.Set(Constants.LAST_WIZARD_STATE, _lastWizardState);
+                            Workflow.Fire(Triggers.Finish);
+                            mRegionManager.Regions[Constants.ContentRegion].NavigationService.RequestNavigate("CreateCharacterView");
                             Workflow.Fire(Triggers.Initialize);                            
                         }
 

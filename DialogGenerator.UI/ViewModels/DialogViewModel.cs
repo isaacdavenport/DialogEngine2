@@ -358,31 +358,40 @@ namespace DialogGenerator.UI.ViewModels
         }
 
         private async void _expertModeExecute()
-        {
+        {            
             CreateCharacterViewModel createCharacterViewModel = Session.Get(Constants.CREATE_CHARACTER_VIEW_MODEL) as CreateCharacterViewModel;
             if(createCharacterViewModel != null)
             {
-                string _nextWizardName = createCharacterViewModel.NextWizardName;
-                if(!_nextWizardName.Equals("Finished"))
+                var _lastWizardState = Session.Get<CreateCharacterState>(Constants.LAST_WIZARD_STATE);
+                if (_lastWizardState != null && !string.IsNullOrEmpty(_lastWizardState.WizardName))
                 {
-                    if( await mMessageDialogService.ShowOKCancelDialogAsync(String.Format("You are ready to add more lines using {0} wizard.", _nextWizardName), "Info") == MessageDialogResult.OK)
-                    {
-                        createCharacterViewModel.Workflow.Fire(Triggers.CheckCounter);
-                    } else
-                    {
-                        Session.Set(Constants.LAST_WIZARD_STATE, new CreateCharacterState
-                        {
-                            WizardName = string.Empty,
-                            StepIndex = 0,
-                            CharacterPrefix = string.Empty
-                        });
-
-                        createCharacterViewModel.Workflow.Fire(Triggers.Finish);                        
-                    }                    
+                    createCharacterViewModel.Workflow.Fire(Triggers.CheckCounter);
                 } else
                 {
-                    await mMessageDialogService.ShowMessage("INFO", "You have successfully completed the guided character creation!");
-                    createCharacterViewModel.Workflow.Fire(Triggers.Finish);
+                    string _nextWizardName = createCharacterViewModel.NextWizardName;
+                    if (!_nextWizardName.Equals("Finished"))
+                    {
+                        if (await mMessageDialogService.ShowOKCancelDialogAsync(String.Format("You are ready to add more lines using {0} wizard.", _nextWizardName), "Info") == MessageDialogResult.OK)
+                        {
+                            createCharacterViewModel.Workflow.Fire(Triggers.CheckCounter);
+                        }
+                        else
+                        {
+                            Session.Set(Constants.LAST_WIZARD_STATE, new CreateCharacterState
+                            {
+                                WizardName = string.Empty,
+                                StepIndex = 0,
+                                CharacterPrefix = string.Empty
+                            });
+
+                            createCharacterViewModel.Workflow.Fire(Triggers.Finish);
+                        }
+                    }
+                    else
+                    {
+                        await mMessageDialogService.ShowMessage("INFO", "You have successfully completed the guided character creation!");
+                        createCharacterViewModel.Workflow.Fire(Triggers.Finish);
+                    }
                 }
                 
             } else
