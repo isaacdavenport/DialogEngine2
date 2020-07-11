@@ -62,7 +62,7 @@ namespace DialogGenerator.UI.ViewModels
 
         private string mCharacterNameValidationError = string.Empty;
         private bool mCharacterNameHasError = false;
-        private ICharacterRadioBindingRepository mCharacterRadionBindingRepository;
+        private ICharacterRadioBindingRepository mCharacterRadionBindingRepository;        
 
         internal void SetCurrentStep(int index)
         {
@@ -126,7 +126,8 @@ namespace DialogGenerator.UI.ViewModels
 
             _bindCommands();
         }
-        
+
+        public CreateCharacterState State { get; set; } = new CreateCharacterState();
 
         public List<ToyEntry> RadiosCollection
         {
@@ -546,6 +547,12 @@ namespace DialogGenerator.UI.ViewModels
             }
 
             _initEntries();
+            //Session.Set(Constants.LAST_WIZARD_STATE, new CreateCharacterState
+            //{
+            //    WizardName = string.Empty,
+            //    StepIndex = 0,
+            //    CharacterPrefix = string.Empty
+            //});
             Character = new Character();
             Workflow.Fire(Triggers.SetName);
                         
@@ -725,7 +732,7 @@ namespace DialogGenerator.UI.ViewModels
         private async void _viewLoaded_execute()
         {
             await _checkWizardConfiguration();
-            Workflow.Fire(Triggers.SetName);
+            Workflow.Fire(Triggers.Initialize);
         }
 
         private void _viewUnloaded_execute()
@@ -735,6 +742,12 @@ namespace DialogGenerator.UI.ViewModels
         
         private void _configureWorkflow()
         {
+            Workflow.Configure(States.EnteredInitialization)
+                .OnEntry(() => _stepEntered("Initialize"))
+                .PermitReentry(Triggers.Initialize)
+                .Permit(Triggers.SetName, States.EnteredSetName)
+                .Permit(Triggers.CheckCounter, States.InCounter);
+
             Workflow.Configure(States.EnteredSetName)
                  .OnEntry(() => _stepEntered("Name"))
                  .OnExit(() => _stepExited("Name"))
@@ -746,7 +759,8 @@ namespace DialogGenerator.UI.ViewModels
                  .Permit(Triggers.SetAssignToy, States.EnteredSetAssignToy)
                  .Permit(Triggers.SetAuthor, States.EnteredSetAuthor)
                  .Permit(Triggers.StartWizard, States.InWizard)
-                 .Permit(Triggers.Finish, States.Finished);
+                 .Permit(Triggers.Finish, States.Finished)
+                 .Permit(Triggers.Initialize, States.EnteredInitialization);
 
             Workflow.Configure(States.EnteredSetInitials)
                  .OnEntry(() => _stepEntered("Initials"))
@@ -840,7 +854,8 @@ namespace DialogGenerator.UI.ViewModels
             Workflow.Configure(States.Finished)
                 .OnEntry(() => _stepEntered("Finished"))
                 .Permit(Triggers.SetAvatar, States.EnteredSetAvatar)
-                .Permit(Triggers.SetName, States.EnteredSetName);
+                .Permit(Triggers.SetName, States.EnteredSetName)
+                .Permit(Triggers.Initialize, States.EnteredInitialization);
             
         }
 
@@ -896,7 +911,28 @@ namespace DialogGenerator.UI.ViewModels
         {
             switch(stepName)
             {
-                case "Name":
+                case "Initialize":
+                    var _lastStepName = Session.Get<CreateCharacterState>(Constants.LAST_WIZARD_STATE);
+                    if (_lastStepName != null && !string.IsNullOrEmpty(_lastStepName.WizardName))
+                    {
+                        MessageDialogResult _result = await mMessageDialogService.ShowOKCancelDialogAsync("Resume previous session?", "Question", "Yes", "No");
+                        if(_result.Equals(MessageDialogResult.OK))
+                        {
+                            Character = mCharacterDataProvider.GetByInitials(_lastStepName.CharacterPrefix);
+                            Workflow.Fire(Triggers.CheckCounter);
+                            break;
+                        } else
+                        {
+                            _lastStepName.WizardName = string.Empty;
+                            _lastStepName.StepIndex = 0;
+                            _lastStepName.CharacterPrefix = string.Empty;
+                        }                                                
+                    }
+
+                    Workflow.Fire(Triggers.SetName);
+
+                    break;
+                case "Name":                    
                     CurrentStepIndex = 0;                    
                     CharacterName = Character.CharacterName;
                     CharacterHasNoVoice = Character.HasNoVoice;
@@ -952,15 +988,26 @@ namespace DialogGenerator.UI.ViewModels
                     NextButtonText = "Save";
                     break;
                 case "CheckCounter":
-                    if(mWizardPassthroughIndex < mDialogWizards.Count)
-                    {                                                
-                        CurrentDialogWizard = mDialogWizards[mWizardPassthroughIndex++];
+                    var _lastWizardState = Session.Get<CreateCharacterState>(Constants.LAST_WIZARD_STATE);
+                    if(_lastWizardState != null && !string.IsNullOrEmpty(_lastWizardState.WizardName))
+                    {
+                        int _wizardIndex = mDialogWizards.IndexOf(_lastWizardState.WizardName);
+                        mWizardPassthroughIndex = _wizardIndex;
+                        CurrentDialogWizard = mDialogWizards[_wizardIndex];
                         Workflow.Fire(Triggers.StartWizard);
                     } else
                     {
-                        mIsFinished = true;
-                        Workflow.Fire(Triggers.Finish);
-                    }
+                        if (mWizardPassthroughIndex < mDialogWizards.Count)
+                        {
+                            CurrentDialogWizard = mDialogWizards[/* mWizardPassthroughIndex++ */ mWizardPassthroughIndex];
+                            Workflow.Fire(Triggers.StartWizard);
+                        }
+                        else
+                        {
+                            mIsFinished = true;
+                            Workflow.Fire(Triggers.Finish);
+                        }
+                    }                    
                     
                     break;
                 case "Wizard":
@@ -979,16 +1026,6 @@ namespace DialogGenerator.UI.ViewModels
                     int _idx = mCharacterDataProvider.IndexOf(Character);
                     if (_idx == -1)
                     {
-                        //// First remove all that have state on
-                        //foreach(var _charMember in mCharacterDataProvider.GetAll())
-                        //{
-                        //    if(_charMember.State == Model.Enum.CharacterState.On)
-                        //    {
-                        //        _charMember.State = Model.Enum.CharacterState.Available;
-                        //    }
-                        //}
-
-
                         // Add the character to the collection.
                         await mCharacterDataProvider.AddAsync(Character);
 
@@ -1243,7 +1280,8 @@ namespace DialogGenerator.UI.ViewModels
         {
             Session.Set(Constants.NEW_CHARACTER, null);
             Session.Set(Constants.CHARACTER_EDIT_MODE, false);
-            Session.Set(Constants.CREATE_CHARACTER_VIEW_MODEL, null);
+            Session.Set(Constants.CREATE_CHARACTER_VIEW_MODEL, null);            
+
             mEventAgregator.GetEvent<GuidedCharacterCreationModeChangedEvent>().Publish(false);
         }
 
@@ -1331,6 +1369,7 @@ namespace DialogGenerator.UI.ViewModels
         }
     }
 
+
     public class ToyEntry
     {
         public int Key { get; set; }
@@ -1341,5 +1380,12 @@ namespace DialogGenerator.UI.ViewModels
         {
             return Value;
         }
+    }
+
+    public class CreateCharacterState
+    {
+        public string WizardName { get; set; } = string.Empty;
+        public int StepIndex { get; set; } = 0;
+        public string CharacterPrefix { get; set; }
     }
 }

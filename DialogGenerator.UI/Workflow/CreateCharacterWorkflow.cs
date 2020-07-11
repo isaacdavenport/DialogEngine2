@@ -5,7 +5,7 @@ using System.Windows.Input;
 namespace DialogGenerator.UI.Workflow.CreateCharacterWorkflow
 {
     public enum States
-    {
+    {        
         EnteredSetName,
         EnteredSetInitials,
         EnteredSetAge,
@@ -16,11 +16,12 @@ namespace DialogGenerator.UI.Workflow.CreateCharacterWorkflow
         InCounter,
         InWizard,
         Playing,
-        Finished
+        Finished,
+        EnteredInitialization,
     }
 
     public enum Triggers
-    {        
+    {               
         SetName,
         SetInitials,
         SetAge,
@@ -31,7 +32,8 @@ namespace DialogGenerator.UI.Workflow.CreateCharacterWorkflow
         CheckCounter,
         StartWizard,
         GoPlay,
-        Finish
+        Finish,
+        Initialize,
     }
 
 

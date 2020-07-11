@@ -1,9 +1,7 @@
 ﻿using DialogGenerator.Core;
 using DialogGenerator.Events;
-using DialogGenerator.Events.EventArgs;
 using DialogGenerator.Model;
 using DialogGenerator.UI.Data;
-using DialogGenerator.UI.Views;
 using DialogGenerator.UI.Views.Dialogs;
 using DialogGenerator.UI.Workflow.CreateCharacterWorkflow;
 using DialogGenerator.UI.Workflow.WizardWorkflow;
@@ -12,13 +10,11 @@ using NAudio.Lame;
 using NAudio.Wave;
 using Prism.Commands;
 using Prism.Events;
-using Prism.Interactivity.DefaultPopupWindows;
 using Prism.Mvvm;
 using Prism.Regions;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
-using System.Diagnostics;
 using System.IO;
 using System.Linq;
 using System.Speech.Synthesis;
@@ -495,10 +491,33 @@ namespace DialogGenerator.UI.ViewModels
 
             return phrase;
         }
-
+        
         private void _setDataForTutorialStep(int _currentStepIndex)
         {
+            if(_currentStepIndex != CurrentStepIndex)
+            {
+                CurrentStepIndex = _currentStepIndex;
+            }
+
             CurrentTutorialStep = CurrentWizard.TutorialSteps[_currentStepIndex];
+
+            var _lastWizardState = Session.Get<CreateCharacterState>(Constants.LAST_WIZARD_STATE);
+            if(_lastWizardState == null)
+            {
+                _lastWizardState = new CreateCharacterState
+                {
+                    WizardName = mCurrentWizard.WizardName,
+                    StepIndex = CurrentStepIndex,
+                    CharacterPrefix = Character.CharacterPrefix
+                };
+            } else
+            {
+                _lastWizardState.WizardName = mCurrentWizard.WizardName;
+                _lastWizardState.StepIndex = _currentStepIndex;
+                _lastWizardState.CharacterPrefix = Character.CharacterPrefix;
+            }
+            
+            Session.Set(Constants.LAST_WIZARD_STATE, _lastWizardState);
 
             if (Path.HasExtension(CurrentTutorialStep.VideoFileName))
             {
@@ -587,32 +606,72 @@ namespace DialogGenerator.UI.ViewModels
 
         private async void _view_Loaded()
         {
-            if(Session.Contains(Constants.CHARACTER_EDIT_MODE) && (bool) Session.Get(Constants.CHARACTER_EDIT_MODE))
+            var _lastWizardState = Session.Get<CreateCharacterState>(Constants.LAST_WIZARD_STATE);
+            if (Session.Contains(Constants.CHARACTER_EDIT_MODE) && (bool)Session.Get(Constants.CHARACTER_EDIT_MODE))
             {
-                CreateCharacterViewModel createCharacterViewModel = Session.Get(Constants.CREATE_CHARACTER_VIEW_MODEL) as CreateCharacterViewModel;
-                CurrentWizard = mWizardDataProvider.GetByName(createCharacterViewModel.CurrentDialogWizard);
                 Character = Session.Get(Constants.NEW_CHARACTER) as Character;
-                _setDataForTutorialStep(CurrentStepIndex);
+                CreateCharacterViewModel createCharacterViewModel = Session.Get(Constants.CREATE_CHARACTER_VIEW_MODEL) as CreateCharacterViewModel;
+                if (_lastWizardState == null || string.IsNullOrEmpty(_lastWizardState.WizardName) || !_lastWizardState.CharacterPrefix.Equals(Character.CharacterPrefix))
+                {
+                    CurrentWizard = mWizardDataProvider.GetByName(createCharacterViewModel.CurrentDialogWizard);
+                    _setDataForTutorialStep(CurrentStepIndex);
+                } else
+                {
+                    CurrentWizard = mWizardDataProvider.GetByName(_lastWizardState.WizardName);
+                    CurrentStepIndex = _lastWizardState.StepIndex;
+                    _setDataForTutorialStep(CurrentStepIndex);                    
+                }
+
                 Workflow.Fire(WizardTriggers.ReadyForUserAction);
             } else
             {
-                var result = await mMessageDialogService.ShowDedicatedDialogAsync<int?>(mWizardFormDialog);
+                if (Session.Contains(Constants.CHARACTER_EDIT_MODE) && (bool)Session.Get(Constants.CHARACTER_EDIT_MODE) == true)
+                {
+                    Character = Session.Get(Constants.NEW_CHARACTER) as Character;
+                }
+                else
+                {
+                    Character = mRegionManager.Regions[Constants.ContentRegion].Context as Character;
+                }
 
+                if(_lastWizardState != null && !string.IsNullOrEmpty(_lastWizardState.WizardName) && _lastWizardState.CharacterPrefix.Equals(Character.CharacterPrefix))
+                {
+                    MessageDialogResult _result = await mMessageDialogService.ShowOKCancelDialogAsync("Resume previous session?", "Question", "Yes", "No");
+                    if(_result.Equals(MessageDialogResult.OK))
+                    {
+                        CurrentWizard = mWizardDataProvider.GetByName(_lastWizardState.WizardName);
+                        _setDataForTutorialStep(_lastWizardState.StepIndex);
+                        Workflow.Fire(WizardTriggers.ReadyForUserAction);
+                        mSpeechSyntesizer.SpeakCompleted += _synth_SpeakCompleted;
+                        return;
+                    }
+                    
+                } 
+                    
+                var result = await mMessageDialogService.ShowDedicatedDialogAsync<int?>(mWizardFormDialog);
                 if (result.HasValue)
                 {
                     CurrentWizard = mWizardDataProvider.GetByIndex(result.Value);
 
-                    if (Session.Contains(Constants.CHARACTER_EDIT_MODE) && (bool)Session.Get(Constants.CHARACTER_EDIT_MODE) == true)
+                    if (_lastWizardState == null)
                     {
-                        Character = Session.Get(Constants.NEW_CHARACTER) as Character;
+                        _lastWizardState = new CreateCharacterState
+                        {
+                            WizardName = CurrentWizard.WizardName,
+                            StepIndex = CurrentStepIndex,
+                            CharacterPrefix = Character.CharacterPrefix
+                        };
                     }
                     else
                     {
-                        Character = mRegionManager.Regions[Constants.ContentRegion].Context as Character;
+                        _lastWizardState.WizardName = CurrentWizard.WizardName;
+                        _lastWizardState.StepIndex = CurrentStepIndex;
+                        _lastWizardState.CharacterPrefix = Character.CharacterPrefix;
                     }
 
-                    _setDataForTutorialStep(CurrentStepIndex);
+                    Session.Set(Constants.LAST_WIZARD_STATE, _lastWizardState);
 
+                    _setDataForTutorialStep(CurrentStepIndex);
                     Workflow.Fire(WizardTriggers.ReadyForUserAction);
                 }
                 else
@@ -723,16 +782,12 @@ namespace DialogGenerator.UI.ViewModels
         {
             if(_checkIsCreateCharacterSession())
             {
-                var result = await mMessageDialogService.ShowOKCancelDialogAsync("Character successfully updated!", "Info",
-                "Next", "Cancel");
+                await mMessageDialogService.ShowMessage("Info", "Character successfully updated!" );
 
-                if(result == MessageDialogResult.Cancel)
+                CreateCharacterViewModel cvwModel = Session.Get<CreateCharacterViewModel>(Constants.CREATE_CHARACTER_VIEW_MODEL);
+                if (cvwModel != null)
                 {
-                    CreateCharacterViewModel cvwModel = Session.Get<CreateCharacterViewModel>(Constants.CREATE_CHARACTER_VIEW_MODEL);
-                    if(cvwModel != null)
-                    {
-                        cvwModel.Workflow.Fire(Triggers.Finish);
-                    }
+                    cvwModel.WizardPassthroughIndex++;
                 }
 
                 mIsFinished = true;
@@ -753,12 +808,18 @@ namespace DialogGenerator.UI.ViewModels
                     Workflow.Fire(WizardTriggers.LeaveWizard);
                 }
             }
+
+            var _lastWizardState = Session.Get<CreateCharacterState>(Constants.LAST_WIZARD_STATE);
+            _lastWizardState.WizardName = string.Empty;
+            _lastWizardState.CharacterPrefix = string.Empty;
+            _lastWizardState.StepIndex = 0;
+            Session.Set(Constants.LAST_WIZARD_STATE, _lastWizardState);
                         
         }
 
         private bool _checkIsCreateCharacterSession()
         {
-            if(Session.Contains(Constants.CHARACTER_EDIT_MODE) && (bool)Session.Get(Constants.CHARACTER_EDIT_MODE))
+            if (Session.Contains(Constants.CHARACTER_EDIT_MODE) && (bool)Session.Get(Constants.CHARACTER_EDIT_MODE))
             {
                 return true;
             }
@@ -771,6 +832,8 @@ namespace DialogGenerator.UI.ViewModels
         #endregion
 
         #region - properties -
+
+        public CreateCharacterState LastState { get; set; }
 
         public WizardWorkflow Workflow { get; set; }
 

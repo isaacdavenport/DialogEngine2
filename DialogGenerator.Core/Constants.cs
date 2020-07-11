@@ -35,6 +35,7 @@
         public const string ARENA_TOTAL_WIDTH = "ArenaTotalWidth";
         public const string ARENA_TOTAL_HEIGHT = "ArenaTotalHeight";
         public const string CANCEL_DIALOG = "CancelDialog";
+        public const string LAST_WIZARD_STATE = "LastWizardState";
         
     }
 }
