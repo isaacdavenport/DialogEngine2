@@ -62,7 +62,9 @@ namespace DialogGenerator.UI.ViewModels
 
         private string mCharacterNameValidationError = string.Empty;
         private bool mCharacterNameHasError = false;
-        private ICharacterRadioBindingRepository mCharacterRadionBindingRepository;        
+        private ICharacterRadioBindingRepository mCharacterRadionBindingRepository;
+
+        private bool mResumePreviousSession = false;
 
         internal void SetCurrentStep(int index)
         {
@@ -758,6 +760,7 @@ namespace DialogGenerator.UI.ViewModels
                  .Permit(Triggers.SetAvatar, States.EnteredSetAvatar)
                  .Permit(Triggers.SetAssignToy, States.EnteredSetAssignToy)
                  .Permit(Triggers.SetAuthor, States.EnteredSetAuthor)
+                 .Permit(Triggers.CheckCounter, States.InCounter)
                  .Permit(Triggers.StartWizard, States.InWizard)
                  .Permit(Triggers.Finish, States.Finished)
                  .Permit(Triggers.Initialize, States.EnteredInitialization);
@@ -837,6 +840,7 @@ namespace DialogGenerator.UI.ViewModels
             Workflow.Configure(States.InCounter)
                   .OnEntry(() => _stepEntered("CheckCounter"))
                   .Permit(Triggers.StartWizard, States.InWizard)
+                  .Permit(Triggers.Initialize, States.EnteredInitialization)
                   .Permit(Triggers.Finish, States.Finished);
                     
 
@@ -918,6 +922,7 @@ namespace DialogGenerator.UI.ViewModels
                         MessageDialogResult _result = await mMessageDialogService.ShowOKCancelDialogAsync("Resume previous session?", "Question", "Yes", "No");
                         if(_result.Equals(MessageDialogResult.OK))
                         {
+                            mResumePreviousSession = true;
                             Character = mCharacterDataProvider.GetByInitials(_lastStepName.CharacterPrefix);
                             Workflow.Fire(Triggers.CheckCounter);
                             break;
@@ -989,25 +994,46 @@ namespace DialogGenerator.UI.ViewModels
                     break;
                 case "CheckCounter":
                     var _lastWizardState = Session.Get<CreateCharacterState>(Constants.LAST_WIZARD_STATE);
-                    if(_lastWizardState != null && !string.IsNullOrEmpty(_lastWizardState.WizardName))
+                    if(_lastWizardState != null && !string.IsNullOrEmpty(_lastWizardState.WizardName))                    
                     {
-                        int _wizardIndex = mDialogWizards.IndexOf(_lastWizardState.WizardName);
-                        mWizardPassthroughIndex = _wizardIndex;
-                        CurrentDialogWizard = mDialogWizards[_wizardIndex];
+                        MessageDialogResult _result;
+                        if (!mResumePreviousSession)
+                        {                            
+                           _result = await mMessageDialogService.ShowOKCancelDialogAsync("Resume previous session?", "Question", "Yes", "No");
+                        } else
+                        {
+                            mResumePreviousSession = false;
+                            _result = MessageDialogResult.OK;
+                        }
+                        
+                        if(_result.Equals(MessageDialogResult.OK))
+                        {
+                            int _wizardIndex = mDialogWizards.IndexOf(_lastWizardState.WizardName);
+                            mWizardPassthroughIndex = _wizardIndex;
+                            CurrentDialogWizard = mDialogWizards[_wizardIndex];
+                            Workflow.Fire(Triggers.StartWizard);                            
+                        } else
+                        {
+                            _lastWizardState.WizardName = string.Empty;
+                            _lastWizardState.StepIndex = 0;
+                            _lastWizardState.CharacterPrefix = string.Empty;
+                            Session.Set(Constants.LAST_WIZARD_STATE, _lastWizardState);
+                            Workflow.Fire(Triggers.Initialize);                            
+                        }
+
+                        break;                        
+                    }
+
+                    if (mWizardPassthroughIndex < mDialogWizards.Count)
+                    {
+                        CurrentDialogWizard = mDialogWizards[/* mWizardPassthroughIndex++ */ mWizardPassthroughIndex];
                         Workflow.Fire(Triggers.StartWizard);
-                    } else
+                    }
+                    else
                     {
-                        if (mWizardPassthroughIndex < mDialogWizards.Count)
-                        {
-                            CurrentDialogWizard = mDialogWizards[/* mWizardPassthroughIndex++ */ mWizardPassthroughIndex];
-                            Workflow.Fire(Triggers.StartWizard);
-                        }
-                        else
-                        {
-                            mIsFinished = true;
-                            Workflow.Fire(Triggers.Finish);
-                        }
-                    }                    
+                        mIsFinished = true;
+                        Workflow.Fire(Triggers.Finish);
+                    }                                       
                     
                     break;
                 case "Wizard":

@@ -18,6 +18,7 @@ using System.Collections.ObjectModel;
 using System.Diagnostics;
 using System.IO;
 using System.Linq;
+using System.Threading;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Input;
@@ -369,7 +370,14 @@ namespace DialogGenerator.UI.ViewModels
                         createCharacterViewModel.Workflow.Fire(Triggers.CheckCounter);
                     } else
                     {
-                        createCharacterViewModel.Workflow.Fire(Triggers.Finish);
+                        Session.Set(Constants.LAST_WIZARD_STATE, new CreateCharacterState
+                        {
+                            WizardName = string.Empty,
+                            StepIndex = 0,
+                            CharacterPrefix = string.Empty
+                        });
+
+                        createCharacterViewModel.Workflow.Fire(Triggers.Finish);                        
                     }                    
                 } else
                 {
