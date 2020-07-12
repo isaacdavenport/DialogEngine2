@@ -215,6 +215,7 @@ namespace DialogGenerator.UI.ViewModels
                 .Permit(WizardTriggers.LoadNextStep, WizardStates.LoadingNextStep)
                 .Permit(WizardTriggers.LeaveWizard, WizardStates.LeavingWizard)
                 .Permit(WizardTriggers.UserStartedAction, WizardStates.UserActionStarted)
+                .Permit(WizardTriggers.ShowChooseWizardDialog, WizardStates.ChooseWizardDialogShown)
                 .Permit(WizardTriggers.PlayInContext,WizardStates.PlayingInContext);
 
             Workflow.Configure(WizardStates.PlayingInContext)

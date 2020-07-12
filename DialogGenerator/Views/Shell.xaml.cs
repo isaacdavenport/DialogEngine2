@@ -64,12 +64,12 @@ namespace DialogGenerator.Views
 
             if (parameters != null)
             {
-                var activeView = mRegionManager.Regions[Constants.ContentRegion].ActiveViews.FirstOrDefault();
+                //var activeView = mRegionManager.Regions[Constants.ContentRegion].ActiveViews.FirstOrDefault();
 
-                if(activeView != null && activeView.GetType().FullName.Equals(typeof(WizardView).FullName))
-                {
-                    return;
-                }
+                //if(activeView != null  && activeView.GetType().FullName.Equals(typeof(WizardView).FullName ))
+                //{
+                //    return;
+                //}
 
                 if(parameters.Length == 3)
                 {

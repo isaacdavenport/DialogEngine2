@@ -184,14 +184,14 @@
         <StackPanel Grid.Row="2">
             <materialDesign:Card Width="150"  VerticalAlignment="Bottom" HorizontalAlignment="Left" Height="150" Margin="10" Background="#017a84" >
                 <materialDesign:Card.InputBindings>
-                    <MouseBinding MouseAction="LeftClick" Command="NavigationCommands.GoToPage">
-                        <MouseBinding.CommandParameter>
+                    <MouseBinding MouseAction="LeftClick" Command="{Binding GoBackCommand}">
+                        <!--<MouseBinding.CommandParameter>
                             <MultiBinding Converter="{StaticResource CloneValuesConverter}">
                                 <Binding Source="{x:Static inf:Constants.ContentRegion}" />
                                 <Binding Source="{x:Type view:CharacterDetailView}" />
                                 <Binding Path="Character" />
                             </MultiBinding>
-                        </MouseBinding.CommandParameter>
+                        </MouseBinding.CommandParameter>-->
                     </MouseBinding>
                 </materialDesign:Card.InputBindings>
                 <Grid Style="{StaticResource CardGrid}">

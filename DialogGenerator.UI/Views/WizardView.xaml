@@ -10,6 +10,8 @@
              xmlns:materialDesign="http://materialdesigninxaml.net/winfx/xaml/themes"
              xmlns:converters="clr-namespace:DialogGenerator.UI.Converters"
              xmlns:controls="clr-namespace:DialogGenerator.UI.Controls"
+             xmlns:inf="clr-namespace:DialogGenerator.Core;assembly=DialogGenerator.Core"
+             xmlns:view="clr-namespace:DialogGenerator.UI.Views"
              mc:Ignorable="d" 
              d:DesignHeight="450" 
              d:DesignWidth="800">
@@ -22,6 +24,7 @@
                     <converters:SaveAndNextBtnContentConverter x:Key="SaveAndNextBtnContentConverter" />
                     <converters:EndWizardBtnVisibilityConverter x:Key="EndWizardBtnVisibilityConverter" />
                     <converters:SkipBtnContentConverter x:Key="SkipBtnContentConverter" />
+                    <converters:CloneValuesConverter x:Key="CloneValuesConverter" />
                 </ResourceDictionary>
                 <ResourceDictionary Source="pack://application:,,,/DialogGenerator.UI;component/Themes/VoiceRecorderStyle.xaml" />
                 <ResourceDictionary Source="pack://application:,,,/DialogGenerator.UI;component/Themes/MaterialDesignThemes.TextBox.Overrides.xaml" />
@@ -183,6 +186,20 @@
                             <ColumnDefinition Width=".5*" />
                             <ColumnDefinition Width="*" />
                         </Grid.ColumnDefinitions>
+                        <StackPanel Grid.Column="0" Orientation="Horizontal" VerticalAlignment="Bottom" HorizontalAlignment="Left">
+                            <Button Content="Edit Character Lines" Style="{DynamicResource MaterialDesignRaisedButton}">
+                                <Button.InputBindings>
+                                    <MouseBinding MouseAction="LeftClick" Command="NavigationCommands.GoToPage">
+                                        <MouseBinding.CommandParameter>
+                                            <MultiBinding Converter="{StaticResource CloneValuesConverter}">
+                                                <Binding Source="{x:Static inf:Constants.ContentRegion}" />
+                                                <Binding Source="{x:Type view:CharacterDialogLinesView}" />
+                                            </MultiBinding>
+                                        </MouseBinding.CommandParameter>
+                                    </MouseBinding>
+                                </Button.InputBindings>
+                            </Button>
+                        </StackPanel>
                         <StackPanel Grid.Column="1" Orientation="Horizontal"
                                     VerticalAlignment="Bottom" HorizontalAlignment="Center" >
                             <TextBlock Text="{Binding CurrentWizard.WizardName}" FontSize="16" FontWeight="Bold" Foreground="{DynamicResource PrimaryHueMidBrush}" Margin="0,0,10,0"/>

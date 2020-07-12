@@ -8,16 +8,12 @@ using DialogGenerator.Utilities;
 using Prism.Commands;
 using Prism.Events;
 using Prism.Mvvm;
+using Prism.Regions;
 using System;
-using System.Collections.Generic;
 using System.ComponentModel;
 using System.IO;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Data;
-using System.Windows.Threading;
 
 namespace DialogGenerator.UI.ViewModels
 {
@@ -27,19 +23,22 @@ namespace DialogGenerator.UI.ViewModels
         private IEventAggregator mEventAggregator;
         private IMessageDialogService mMessageDialogService;
         private ICharacterDataProvider mCharacterDataProvider;
+        private IRegionManager mRegionManager;
         private Character mCharacter;
         private CollectionViewSource mPhrasesCollectionViewSource;
         private string mFilterText;
         private bool mIsDialogStarted;
-
+        private bool mIsFromWizard = false;
 
         public CharacterDialogLinesViewModel(ILogger _Logger
             , IEventAggregator _EventAggregator
             , IMessageDialogService _MessageDialogService
-            , ICharacterDataProvider _CharacterDataProvider)
+            , ICharacterDataProvider _CharacterDataProvider
+            , IRegionManager _RegionManager)
         {
             mLogger = _Logger;
             mEventAggregator = _EventAggregator;
+            mRegionManager = _RegionManager;
             mPhrasesCollectionViewSource = new CollectionViewSource();
             mMessageDialogService = _MessageDialogService;
             mCharacterDataProvider = _CharacterDataProvider;
@@ -82,6 +81,7 @@ namespace DialogGenerator.UI.ViewModels
         public DelegateCommand<string> PlayDialogLineCommand { get; set; }
         public DelegateCommand<PhraseEntry>DeletePhraseCommand { get; set; }
         public DelegateCommand<PhraseEntry>EditPhraseCommand { get; set; }
+        public DelegateCommand GoBackCommand { get; set; }
 
         public ICollectionView PhrasesViewSource
         {
@@ -105,6 +105,19 @@ namespace DialogGenerator.UI.ViewModels
             PlayDialogLineCommand = new DelegateCommand<string>(_playDialogLine_Execute, _playDialogLine_CanExecute);
             DeletePhraseCommand = new DelegateCommand<PhraseEntry>(_deletePhrase_Execute, _deletePrhase_CanExecute);
             EditPhraseCommand = new DelegateCommand<PhraseEntry>(_editPhrase_Execute, _editPhrase_CanExecute);
+            GoBackCommand = new DelegateCommand(_goBackCommand_execute);
+        }
+
+        private void _goBackCommand_execute()
+        {
+            if(mIsFromWizard)
+            {
+                mIsFromWizard = false;
+                mRegionManager.RequestNavigate("ContentRegion", "DialogGenerator.UI.Views.WizardView");
+            } else
+            {
+                mRegionManager.RequestNavigate("ContentRegion", "DialogGenerator.UI.Views.CharacterDetailView");
+            }
         }
 
         private void _onCharacterSaved(string _characterPrefix)
@@ -182,7 +195,17 @@ namespace DialogGenerator.UI.ViewModels
 
         private void _viewLoadedExecute()
         {
-            Character = Session.Get<Character>(Constants.SELECTED_CHARACTER);            
+            var _character = Session.Get<Character>(Constants.SELECTED_CHARACTER);            
+
+            if(_character == null || Session.Get<bool>(Constants.CHARACTER_EDIT_MODE))
+            {
+                CreateCharacterViewModel _cvm = Session.Get<CreateCharacterViewModel>(Constants.CREATE_CHARACTER_VIEW_MODEL);
+                Character = _cvm.Character;
+                mIsFromWizard = true;
+            } else
+            {
+                Character = _character;
+            }
         }
 
         private void _phrases_Filter(object sender, FilterEventArgs e)
