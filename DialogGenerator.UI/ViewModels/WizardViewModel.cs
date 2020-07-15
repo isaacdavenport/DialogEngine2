@@ -625,22 +625,21 @@ namespace DialogGenerator.UI.ViewModels
 
                 Workflow.Fire(WizardTriggers.ReadyForUserAction);
             } else
-            {
-                if (Session.Contains(Constants.CHARACTER_EDIT_MODE) && (bool)Session.Get(Constants.CHARACTER_EDIT_MODE) == true)
-                {
-                    Character = Session.Get(Constants.NEW_CHARACTER) as Character;
-                }
-                else
-                {
-                    Character = mRegionManager.Regions[Constants.ContentRegion].Context as Character;
-                }
-
+            {                
                 if(_lastWizardState != null && !string.IsNullOrEmpty(_lastWizardState.WizardName) && _lastWizardState.CharacterPrefix.Equals(Character.CharacterPrefix))
                 {
                     MessageDialogResult _result = await mMessageDialogService.ShowOKCancelDialogAsync("Resume previous session?", "Question", "Yes", "No");
                     if(_result.Equals(MessageDialogResult.OK))
                     {
                         CurrentWizard = mWizardDataProvider.GetByName(_lastWizardState.WizardName);
+                        if (Session.Contains(Constants.CHARACTER_EDIT_MODE) && (bool)Session.Get(Constants.CHARACTER_EDIT_MODE) == true)
+                        {
+                            Character = Session.Get(Constants.NEW_CHARACTER) as Character;
+                        }
+                        else
+                        {
+                            Character = mRegionManager.Regions[Constants.ContentRegion].Context as Character;
+                        }
                         _setDataForTutorialStep(_lastWizardState.StepIndex);
                         Workflow.Fire(WizardTriggers.ReadyForUserAction);
                         mSpeechSyntesizer.SpeakCompleted += _synth_SpeakCompleted;
@@ -653,6 +652,14 @@ namespace DialogGenerator.UI.ViewModels
                 if (result.HasValue)
                 {
                     CurrentWizard = mWizardDataProvider.GetByIndex(result.Value);
+                    if (Session.Contains(Constants.CHARACTER_EDIT_MODE) && (bool)Session.Get(Constants.CHARACTER_EDIT_MODE) == true)
+                    {
+                        Character = Session.Get(Constants.NEW_CHARACTER) as Character;
+                    }
+                    else
+                    {
+                        Character = mRegionManager.Regions[Constants.ContentRegion].Context as Character;
+                    }
 
                     if (_lastWizardState == null)
                     {
