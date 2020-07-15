@@ -1043,99 +1043,105 @@ namespace DialogGenerator.UI.ViewModels
                 // We have to clone the wizard because we are going 
                 // to change it's phraseweights collections.
                 mCurrentWizard = (Wizard)mCurrentWizard.Clone();
-
-                // This is the list of phrases which fill be used later in the creation 
-                // of custom dialog.
-                List<string> _phrasesForDialog = new List<string>();
-
-                // Identifier used for the new phrases and the dialog.
                 string _identifier = Guid.NewGuid().ToString();
                 _identifier = _identifier.Substring(0, 4);
 
-                // Dialog popularity.
-                int _popularity = -1;
-
-                // Now change the PhraseWeights
+                // Get popularity
+                string[] _items = mCurrentWizard.Commands.Split(' ');
+                double _dialogPopularity = 0.0;
+                Double.TryParse(_items[1], out _dialogPopularity);
+                
+                // Now, change the phrase weights of the wizard.
                 string _wizardName = mCurrentWizard.WizardName;
-                string[] _tokens = mCurrentWizard.Commands.Split(' ');
                 int _counter = 0;
-
-                // Check the first step of the wizard.
-                bool _hasIntro = mCurrentWizard.TutorialSteps[_counter].PhraseWeights.Count() == 0 ? true : false;
-
-                foreach (var _token in _tokens)
+                List<string> _keys = new List<string>();
+                foreach(var _tutorialStep in mCurrentWizard.TutorialSteps)
                 {
-                    Dictionary<string, double> _phraseWeights;                                        
-
-                    if (_token.Equals("ContextualDialog"))
+                    if (_tutorialStep.PhraseWeights.Count == 0)
                         continue;
-                    if (_token.Equals("{" + string.Format("{0}", _counter) + "}"))
+
+                    if(_tutorialStep.PhraseWeights.Keys.Contains(_wizardName))
+                    {                        
+                        _tutorialStep.PhraseWeights.Remove(_wizardName);
+                        string _key = _wizardName + "_" + _counter++ + "_" + _identifier;
+                        _keys.Add(_key);
+                        _tutorialStep.PhraseWeights.Add(_key, _dialogPopularity);
+                    }
+                }
+
+                // Check the dialog line
+                string[] _lines = mCurrentWizard.Commands.Split(';');
+                for(int i = 0; i < _lines.Length; i++)
+                {
+                    // This is the list of phrases which fill be used later in the creation 
+                    // of custom dialog.
+                    List<string> _phrasesForDialog = new List<string>();
+
+                    // Identifier used for the new phrases and the dialog.
+                    if(i > 0)
                     {
-                        if (_hasIntro)
+                        _identifier = Guid.NewGuid().ToString();
+                        _identifier = _identifier.Substring(0, 4);
+                    }
+
+                    // Dialog popularity.
+                    int _popularity = -1;
+                    var _line = _lines[i];
+                    string[] _tokens = _line.Split(' ');
+                    int _tokenCounter = 0;
+
+                    foreach (var _token in _tokens)
+                    {
+                        if (_token.Equals("ContextualDialog"))
+                            continue;
+                        if (_token.Equals("{" + string.Format("{0}", _tokenCounter) + "}"))
                         {
-                            _phraseWeights = mCurrentWizard.TutorialSteps[_counter + 1].PhraseWeights;
+                            _phrasesForDialog.Add(_keys[_tokenCounter++]);
                         }
                         else
                         {
-                            _phraseWeights = mCurrentWizard.TutorialSteps[_counter].PhraseWeights;
-                        }
-
-                        if (_phraseWeights.Where(pw => pw.Key.Contains(_wizardName)).Count() > 0)
-                        {
-                            var _phraseWeight = _phraseWeights.Where(pw => pw.Key.Contains(_wizardName)).First();
-                            string _phraseWeightKey = _phraseWeight.Key;
-                            double _phraseWeightValue = _phraseWeight.Value;
-                            _phraseWeights.Remove(_phraseWeightKey);
-                            string _newKey = _wizardName + "_" + _counter + "_" + _identifier;
-                            _phraseWeights.Add(_newKey, _phraseWeightValue);
-                            _phrasesForDialog.Add(_newKey);
-                            _counter++;
-                        }
-
-                    }
-                    else
-                    {
-                        if (!Int32.TryParse(_token, out _popularity))
-                        {
-                            _phrasesForDialog.Add(_token);
+                            if (!Int32.TryParse(_token, out _popularity))
+                            {
+                                _phrasesForDialog.Add(_token);
+                            } 
                         }
                     }
-                }
 
-                var _date = DateTime.Now;
-                var _strDate = _date.ToString("yyyy/MM/dd hh:mm tt");
-                _date = DateTime.Parse(_strDate);
+                    var _date = DateTime.Now;
+                    var _strDate = _date.ToString("yyyy/MM/dd hh:mm tt");
+                    _date = DateTime.Parse(_strDate);
 
-                // Now, create the custom dialog.
-                ModelDialog _modelDialog = new ModelDialog
-                {
-                    Name = mCharacter.CharacterPrefix + "_" + _wizardName + "_" + _identifier,
-                    Popularity = 14,
-                    AddedOnDateTime = _date,
-                };
-
-                _modelDialog.PhraseTypeSequence = new List<string>();
-                _modelDialog.PhraseTypeSequence.AddRange(_phrasesForDialog);
-
-                // Find or create the dialog collection
-                var _dialogsCollection = mDialogModelDataProvider.GetByName(mCharacter.CharacterPrefix + "_" + _wizardName + "Dialogs");
-                if (_dialogsCollection == null)
-                {
-                    _dialogsCollection = new ModelDialogInfo
+                    // Now, create the custom dialog.
+                    ModelDialog _modelDialog = new ModelDialog
                     {
-                        Editable = true,
-                        FileName = Character.FileName,
-                        ModelsCollectionName = mCharacter.CharacterPrefix + "_" + _wizardName + "Dialogs",
+                        Name = mCharacter.CharacterPrefix + "_" + _wizardName + "_" + _identifier,
+                        Popularity = _dialogPopularity,
+                        AddedOnDateTime = _date,
                     };
 
-                    _dialogsCollection.ArrayOfDialogModels = new List<ModelDialog>();
-                    mDialogModelDataProvider.GetAll().Add(_dialogsCollection);
-                }
+                    _modelDialog.PhraseTypeSequence = new List<string>();
+                    _modelDialog.PhraseTypeSequence.AddRange(_phrasesForDialog);
 
-                if (!_dialogsCollection.ArrayOfDialogModels.Contains(_modelDialog))
-                {
-                    _dialogsCollection.ArrayOfDialogModels.Add(_modelDialog);
-                }
+                    // Find or create the dialog collection
+                    var _dialogsCollection = mDialogModelDataProvider.GetByName(mCharacter.CharacterPrefix + "_" + _wizardName + "Dialogs");
+                    if (_dialogsCollection == null)
+                    {
+                        _dialogsCollection = new ModelDialogInfo
+                        {
+                            Editable = true,
+                            FileName = Character.FileName,
+                            ModelsCollectionName = mCharacter.CharacterPrefix + "_" + _wizardName + "Dialogs",
+                        };
+
+                        _dialogsCollection.ArrayOfDialogModels = new List<ModelDialog>();
+                        mDialogModelDataProvider.GetAll().Add(_dialogsCollection);
+                    }
+
+                    if (!_dialogsCollection.ArrayOfDialogModels.Contains(_modelDialog))
+                    {
+                        _dialogsCollection.ArrayOfDialogModels.Add(_modelDialog);
+                    }
+                }                                        
 
             }
         }
