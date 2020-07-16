@@ -684,10 +684,14 @@ namespace DialogGenerator.UI.ViewModels
                 }
                 else
                 {
-                    _lastWizardState.WizardName = string.Empty;
-                    _lastWizardState.StepIndex = 0;
-                    _lastWizardState.CharacterPrefix = string.Empty;
-                    Session.Set(Constants.LAST_WIZARD_STATE, _lastWizardState);
+                    if(_lastWizardState != null)
+                    {
+                        _lastWizardState.WizardName = string.Empty;
+                        _lastWizardState.StepIndex = 0;
+                        _lastWizardState.CharacterPrefix = string.Empty;
+                        Session.Set(Constants.LAST_WIZARD_STATE, _lastWizardState);
+                    }
+                    
                     Workflow.Fire(WizardTriggers.LeaveWizard);
                 }
             }
