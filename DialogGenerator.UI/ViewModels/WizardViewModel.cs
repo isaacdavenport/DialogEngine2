@@ -60,6 +60,7 @@ namespace DialogGenerator.UI.ViewModels
         private string mOutMp3File = string.Empty;
         private string mOutWavFile = string.Empty;
         private SpeechSynthesizer mSpeechSyntesizer;
+        private bool mRecordingAttempted = false;
 
         #endregion
 
@@ -158,6 +159,7 @@ namespace DialogGenerator.UI.ViewModels
                 case UI.Workflow.MP3RecorderStateMachine.States.Recording:
                     {
                         Workflow.Fire(WizardTriggers.UserStartedAction);
+                        mRecordingAttempted = true;
                         break;
                     }
                 case UI.Workflow.MP3RecorderStateMachine.States.Ready:
@@ -495,6 +497,8 @@ namespace DialogGenerator.UI.ViewModels
         
         private void _setDataForTutorialStep(int _currentStepIndex)
         {
+            mRecordingAttempted = false;
+
             if(_currentStepIndex != CurrentStepIndex)
             {
                 CurrentStepIndex = _currentStepIndex;
@@ -746,6 +750,31 @@ namespace DialogGenerator.UI.ViewModels
                     return;
                 }
             }
+
+            if(mRecordingAttempted == false)
+            {
+                var result = await mMessageDialogService.
+                   ShowOKCancelDialogAsync("You didn't record the the dialog line. If you don't do it, the line will not be saved? Are you sure about this?"
+                   , "Warning", "Yes", "No");
+
+                if (result == MessageDialogResult.Cancel)
+                {
+                    Workflow.Fire(WizardTriggers.ReadyForUserAction);
+                    return;
+                }
+
+                if (CurrentStepIndex >= CurrentWizard.TutorialSteps.Count - 1)
+                {
+                    Workflow.Fire(WizardTriggers.Finish);
+                    
+                } else
+                {
+                    Workflow.Fire(WizardTriggers.LoadNextStep);
+                }
+                
+                return;
+            }
+
             string[] _fileNameParts = VoiceRecorderControlViewModel.CurrentFilePath.Split('_');
             string _fileName = string.Empty;
             for(int i = 0; i < _fileNameParts.Length; i++)
