@@ -140,7 +140,7 @@ namespace DialogGenerator.UI.ViewModels
 
         private async void _editPhrase_Execute(PhraseEntry _phraseEntry)
         {            
-            EditPhraseViewModel _editPhraseViewModel = new EditPhraseViewModel(Character, _phraseEntry, mCharacterDataProvider, mMessageDialogService, mEventAggregator);
+            EditPhraseViewModel _editPhraseViewModel = new EditPhraseViewModel(Character, _phraseEntry, mCharacterDataProvider, mMessageDialogService, mEventAggregator, mLogger);
             EditPhraseView _editPhraseView = new EditPhraseView();
             _editPhraseView.DataContext = _editPhraseViewModel;
 

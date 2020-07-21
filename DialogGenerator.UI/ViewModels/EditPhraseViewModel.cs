@@ -19,6 +19,7 @@ using System.Speech.Synthesis;
 using System.Threading.Tasks;
 using System.Windows.Controls;
 using System.Windows.Data;
+using Xceed.Wpf.Toolkit;
 
 namespace DialogGenerator.UI.ViewModels
 {
@@ -32,6 +33,7 @@ namespace DialogGenerator.UI.ViewModels
         private ICharacterDataProvider mCharacterDataProvider;
         private IEventAggregator mEventAggregator;
         private IMessageDialogService mMessageDialogService;
+        private ILogger mLogger;
         private Character mCharacter;
         private CollectionViewSource mPhraseWeightsCollection;
         private ObservableCollection<PhraseWeight> mWeights = new ObservableCollection<PhraseWeight>();
@@ -47,7 +49,8 @@ namespace DialogGenerator.UI.ViewModels
             , PhraseEntry _PhraseEntry
             , ICharacterDataProvider _CharacterDataProvider
             , IMessageDialogService _MessageDialogService 
-            , IEventAggregator _EventAggregator)
+            , IEventAggregator _EventAggregator
+            , ILogger _Logger)
         {
             mPhraseEntry = _PhraseEntry;
             DialogLineText = mPhraseEntry.DialogStr;
@@ -55,6 +58,7 @@ namespace DialogGenerator.UI.ViewModels
             mCharacter = _Character;
             mMessageDialogService = _MessageDialogService;
             mEventAggregator = _EventAggregator;
+            mLogger = _Logger;
 
             MediaRecorderControlViewModel = new MediaRecorderControlViewModel(NAudioEngine.Instance, _MessageDialogService, _EventAggregator);
             MediaRecorderControlViewModel.PropertyChanged += MediaRecorderControlViewModel_PropertyChanged;
@@ -98,7 +102,7 @@ namespace DialogGenerator.UI.ViewModels
                 PhraseWeights += entry.Key;
                 PhraseWeights += "/";
                 PhraseWeights += entry.Value.ToString();
-                mWeights.Add(new PhraseWeight(entry.Key, entry.Value));
+                mWeights.Add(new PhraseWeight(entry.Key, entry.Value, mLogger));
             }
 
             mPhraseWeightsCollection = new CollectionViewSource();
@@ -357,7 +361,7 @@ namespace DialogGenerator.UI.ViewModels
 
         private void _addPhraseWeight_Execute()
         {
-            var _phraseWeight = new PhraseWeight(string.Empty, 0);
+            var _phraseWeight = new PhraseWeight(string.Empty, 0, mLogger);
             
             _phraseWeight.PropertyChanged += _phraseWeight_PropertyChanged;
             mWeights.Add(_phraseWeight);
@@ -486,12 +490,15 @@ namespace DialogGenerator.UI.ViewModels
     public class PhraseWeight : INotifyPropertyChanged
     {
         private string mKey;
+        private ILogger mLogger;
         public event PropertyChangedEventHandler PropertyChanged;
+        
 
-        public PhraseWeight(string _Key, double _Value)
+        public PhraseWeight(string _Key, double _Value, ILogger _Logger)
         {
             Key = _Key;
             Value = _Value;
+            mLogger = _Logger;
             _initLists();
         }
 
@@ -542,8 +549,10 @@ namespace DialogGenerator.UI.ViewModels
                     Values.Add(i);
                 }
             }
-            catch (IOException)
+            catch (Newtonsoft.Json.JsonReaderException e)
             {
+                //MessageBox.Show(e.Message, "Error", System.Windows.MessageBoxButton.OK, System.Windows.MessageBoxImage.Error);
+                mLogger.Error(e.Message);                
             }
 
         }

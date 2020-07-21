@@ -22,11 +22,17 @@ namespace DialogGenerator.DataAccess.Helper
             File.WriteAllText(path, _jsonLocal);
         }
 
-        public static T Deserialize<T>(string content)
+        public static T Deserialize<T>(string content) 
         {
-            var obj = JsonConvert.DeserializeObject<T>(content);
-
-            return obj;
+            try
+            {
+                var obj = JsonConvert.DeserializeObject<T>(content);
+                return obj;
+            } catch (Newtonsoft.Json.JsonReaderException e)
+            {
+                throw (e);
+            }
+            
         }
     }
 }
