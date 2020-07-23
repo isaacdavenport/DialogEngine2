@@ -343,9 +343,9 @@ namespace DialogGenerator.UI.ViewModels
         private void _startRecording_Execute()
         { 
             if(EnableRecording)
-            {
-                mSoundRecognizer.RecognizeAsync(RecognizeMode.Multiple);
+            {               
                 StateMachine.Fire(Triggers.Record);
+                mSoundRecognizer.RecognizeAsync(RecognizeMode.Multiple);
             } else
             {
                 mEventAggregator.GetEvent<RequestTranslationEvent>().Publish(this.GetType().Name);

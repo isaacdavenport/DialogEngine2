@@ -629,21 +629,15 @@ namespace DialogGenerator.UI.ViewModels
 
                 Workflow.Fire(WizardTriggers.ReadyForUserAction);
             } else
-            {                
-                if(_lastWizardState != null && !string.IsNullOrEmpty(_lastWizardState.WizardName) && _lastWizardState.CharacterPrefix.Equals(Character.CharacterPrefix))
+            {
+                Character = mRegionManager.Regions[Constants.ContentRegion].Context as Character;
+                if (_lastWizardState != null && !string.IsNullOrEmpty(_lastWizardState.WizardName) && _lastWizardState.CharacterPrefix.Equals(Character.CharacterPrefix))
                 {
                     MessageDialogResult _result = await mMessageDialogService.ShowOKCancelDialogAsync("Resume previous session?", "Question", "Yes", "No");
                     if(_result.Equals(MessageDialogResult.OK))
                     {
                         CurrentWizard = mWizardDataProvider.GetByName(_lastWizardState.WizardName);
-                        if (Session.Contains(Constants.CHARACTER_EDIT_MODE) && (bool)Session.Get(Constants.CHARACTER_EDIT_MODE) == true)
-                        {
-                            Character = Session.Get(Constants.NEW_CHARACTER) as Character;
-                        }
-                        else
-                        {
-                            Character = mRegionManager.Regions[Constants.ContentRegion].Context as Character;
-                        }
+                                                
                         _setDataForTutorialStep(_lastWizardState.StepIndex);
                         Workflow.Fire(WizardTriggers.ReadyForUserAction);
                         mSpeechSyntesizer.SpeakCompleted += _synth_SpeakCompleted;
@@ -656,14 +650,6 @@ namespace DialogGenerator.UI.ViewModels
                 if (result.HasValue)
                 {
                     CurrentWizard = mWizardDataProvider.GetByIndex(result.Value);
-                    if (Session.Contains(Constants.CHARACTER_EDIT_MODE) && (bool)Session.Get(Constants.CHARACTER_EDIT_MODE) == true)
-                    {
-                        Character = Session.Get(Constants.NEW_CHARACTER) as Character;
-                    }
-                    else
-                    {
-                        Character = mRegionManager.Regions[Constants.ContentRegion].Context as Character;
-                    }
 
                     if (_lastWizardState == null)
                     {
@@ -688,14 +674,7 @@ namespace DialogGenerator.UI.ViewModels
                 }
                 else
                 {
-                    if(_lastWizardState != null)
-                    {
-                        _lastWizardState.WizardName = string.Empty;
-                        _lastWizardState.StepIndex = 0;
-                        _lastWizardState.CharacterPrefix = string.Empty;
-                        Session.Set(Constants.LAST_WIZARD_STATE, _lastWizardState);
-                    }
-                    
+                    Session.Set(Constants.LAST_WIZARD_STATE, null);                                        
                     Workflow.Fire(WizardTriggers.LeaveWizard);
                 }
             }
@@ -825,7 +804,15 @@ namespace DialogGenerator.UI.ViewModels
 
         private async  void _finish()
         {
-            if(_checkIsCreateCharacterSession())
+
+            // Reset session data.
+            //var _lastWizardState = Session.Get<CreateCharacterState>(Constants.LAST_WIZARD_STATE);
+            //_lastWizardState.WizardName = string.Empty;
+            //_lastWizardState.CharacterPrefix = string.Empty;
+            //_lastWizardState.StepIndex = 0;
+            Session.Set(Constants.LAST_WIZARD_STATE, null);
+
+            if (_checkIsCreateCharacterSession())
             {
                 await mMessageDialogService.ShowMessage("Info", "Character successfully updated!" );
 
@@ -854,11 +841,7 @@ namespace DialogGenerator.UI.ViewModels
                 }
             }
 
-            var _lastWizardState = Session.Get<CreateCharacterState>(Constants.LAST_WIZARD_STATE);
-            _lastWizardState.WizardName = string.Empty;
-            _lastWizardState.CharacterPrefix = string.Empty;
-            _lastWizardState.StepIndex = 0;
-            Session.Set(Constants.LAST_WIZARD_STATE, _lastWizardState);
+            
                         
         }
 
