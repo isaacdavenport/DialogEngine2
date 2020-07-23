@@ -198,6 +198,8 @@ namespace DialogGenerator.UI.ViewModels
                         {
                             foreach(var _phraseKey in _phraseKeysCollection.Phrases)
                             {
+                                if (_phraseKey == null)
+                                    continue;
                                 var _phraseDefinitionModel = new PhraseDefinitionModel
                                 {
                                     Text = _phraseKey.Name,

@@ -537,9 +537,10 @@ namespace DialogGenerator.UI.ViewModels
                 {
                     string _jsonString = _reader.ReadToEnd();
                     var _phraseKeysCollection = Serializer.Deserialize<PhraseKeysCollection>(_jsonString);
+                                        
                     if (_phraseKeysCollection != null && _phraseKeysCollection.Phrases.Count() > 0)
                     {
-                        Keys.AddRange(_phraseKeysCollection.Phrases.Select(p => p.Name));
+                        Keys.AddRange(_phraseKeysCollection.Phrases.Where(p => p != null).Select(p => p.Name));
                     }
                 }
 
@@ -549,7 +550,7 @@ namespace DialogGenerator.UI.ViewModels
                     Values.Add(i);
                 }
             }
-            catch (Newtonsoft.Json.JsonReaderException e)
+            catch (/* Newtonsoft.Json.JsonReaderException */ Exception e)
             {
                 //MessageBox.Show(e.Message, "Error", System.Windows.MessageBoxButton.OK, System.Windows.MessageBoxImage.Error);
                 mLogger.Error(e.Message);                
