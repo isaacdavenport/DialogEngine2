@@ -319,6 +319,11 @@ namespace DialogGenerator.UI.ViewModels
                         _phraseEntry.PhraseWeights.Clear();
                         foreach(var _phraseWeight in mWeights)
                         {
+                            if(string.IsNullOrEmpty(_phraseWeight.Key))
+                            {
+                                continue;
+                            }    
+
                             _phraseEntry.PhraseWeights.Add(_phraseWeight.Key, _phraseWeight.Value);
                         }
                     }                    
