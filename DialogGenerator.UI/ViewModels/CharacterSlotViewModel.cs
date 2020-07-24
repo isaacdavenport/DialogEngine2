@@ -24,6 +24,7 @@ namespace DialogGenerator.UI.ViewModels
     {
         ICharacterDataProvider mCharacterDataProvider;
         IEventAggregator mEventAggregator;
+        ILogger mLogger;
         Character mSelectedCharacter;
         ObservableCollection<PhraseDefinitionModel> mPhrases = new ObservableCollection<PhraseDefinitionModel>();
         CollectionViewSource mPhraseDefinitionModels;
@@ -34,11 +35,12 @@ namespace DialogGenerator.UI.ViewModels
         bool mCharacterSelectionEnabled = true;
 
         public CharacterSlotViewModel(ICharacterDataProvider _CharacterDataProvider
-            , IEventAggregator _EventAggregator
+            , IEventAggregator _EventAggregator, ILogger _Logger
             , int _SlotNumber)
         {
             mCharacterDataProvider = _CharacterDataProvider;
             mEventAggregator = _EventAggregator;
+            mLogger = _Logger;
             mSelectedCharacter = null;
             mPhraseDefinitionModels = new CollectionViewSource();
             mPhraseDefinitionModels.Source = mPhrases;
@@ -216,8 +218,9 @@ namespace DialogGenerator.UI.ViewModels
                         }
                     }
                 }
-                catch (IOException)
+                catch (Exception e)
                 {
+                    mLogger.Error(e.Message);
                 }
             } else
             {
