@@ -638,7 +638,6 @@ namespace DialogGenerator.UI.ViewModels
                     if(_result.Equals(MessageDialogResult.OK))
                     {
                         CurrentWizard = mWizardDataProvider.GetByName(_lastWizardState.WizardName);
-                                                
                         _setDataForTutorialStep(_lastWizardState.StepIndex);
                         Workflow.Fire(WizardTriggers.ReadyForUserAction);
                         mSpeechSyntesizer.SpeakCompleted += _synth_SpeakCompleted;
@@ -881,7 +880,12 @@ namespace DialogGenerator.UI.ViewModels
             get { return mCurrentWizard; }
             set
             {
-                mCurrentWizard = value;                
+                mCurrentWizard = value;
+                if (mCurrentWizard != null && mCharacter != null)
+                {
+                    _inspectForCommandWizardAndChangeCharacter();
+                }
+
                 RaisePropertyChanged();
             }
         }
@@ -902,12 +906,7 @@ namespace DialogGenerator.UI.ViewModels
             set
             {
                 mCharacter = value;
-                VoiceRecorderControlViewModel.EnableRecording = !mCharacter.HasNoVoice;
-                if(mCurrentWizard != null && mCharacter != null)
-                {
-                    _inspectForCommandWizardAndChangeCharacter();
-                }
-                
+                VoiceRecorderControlViewModel.EnableRecording = !mCharacter.HasNoVoice;                                
                 RaisePropertyChanged();
             }
         }
@@ -1063,10 +1062,20 @@ namespace DialogGenerator.UI.ViewModels
                 string _identifier = Guid.NewGuid().ToString();
                 _identifier = _identifier.Substring(0, 4);
 
-                // Get popularity
                 string[] _items = mCurrentWizard.Commands.Split(' ');
+
+                // Check for the command name.
+                if(_items.Count() == 0 || !_items[0].Equals("ContextualDialog"))
+                {
+                    return;
+                }
+
+                // Get popularity.
                 double _dialogPopularity = 0.0;
-                Double.TryParse(_items[1], out _dialogPopularity);
+                if(_items.Count() < 2 || !Double.TryParse(_items[1], out _dialogPopularity))
+                {
+                    return;
+                }
                 
                 // Now, change the phrase weights of the wizard.
                 string _wizardName = mCurrentWizard.WizardName;
@@ -1105,9 +1114,13 @@ namespace DialogGenerator.UI.ViewModels
                     int _popularity = -1;
                     var _line = _lines[i];
                     string[] _tokens = _line.Split(' ');
+
+                    // Remove empty entries.
+                    var _clearedTokens = _tokens.Where(item => !string.IsNullOrEmpty(item)).Select(p => p);
+
                     int _tokenCounter = 0;
 
-                    foreach (var _token in _tokens)
+                    foreach (var _token in _clearedTokens)
                     {
                         if (_token.Equals("ContextualDialog"))
                             continue;
