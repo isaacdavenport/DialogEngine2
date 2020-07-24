@@ -550,7 +550,7 @@ namespace DialogGenerator.UI.ViewModels
                 }
 
                 var _phraseWeightValues = new ObservableCollection<double>();
-                for (double i = 0; i < 500; i++)
+                for (double i = 0; i < 60; i++)
                 {
                     Values.Add(i);
                 }
