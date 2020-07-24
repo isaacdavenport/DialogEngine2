@@ -287,6 +287,7 @@ namespace DialogGenerator.UI.ViewModels
                 if (!string.IsNullOrEmpty(DialogStr))
                 {
                     GenerateSpeech(mDialogStr);
+                    mRecordingAttempted = true;
                     await mMessageDialogService.ShowMessage("Notification", "The sound was generated from the text box");
                     SaveAndNext.RaiseCanExecuteChanged();
 
