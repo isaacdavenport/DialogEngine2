@@ -18,6 +18,7 @@ using System.ComponentModel;
 using System.IO;
 using System.Linq;
 using System.Speech.Synthesis;
+using System.Text.RegularExpressions;
 using System.Threading;
 using System.Threading.Tasks;
 using System.Windows;
@@ -61,6 +62,7 @@ namespace DialogGenerator.UI.ViewModels
         private string mOutWavFile = string.Empty;
         private SpeechSynthesizer mSpeechSyntesizer;
         private bool mRecordingAttempted = false;
+        private bool mIsRunningCommandWizard = false;
 
         #endregion
 
@@ -112,7 +114,7 @@ namespace DialogGenerator.UI.ViewModels
         public ICommand DialogHostLoaded { get; set; }
         public ICommand DialogHostUnloaded { get; set; }
         public DelegateCommand SaveAndNext { get; set; }
-        public ICommand SkipStep { get; set; }
+        public DelegateCommand SkipStep { get; set; }
         public DelegateCommand PlayInContext { get; set; }
         public ICommand StopPlayingInContext { get; set; }
         public ICommand Cancel { get; set; }
@@ -344,7 +346,7 @@ namespace DialogGenerator.UI.ViewModels
             try
             {
                 return (CurrentWizard != null && CurrentStepIndex < CurrentWizard.TutorialSteps.Count - 1)
-                        && Workflow.State == WizardStates.WaitingForUserAction;
+                        && Workflow.State == WizardStates.WaitingForUserAction && !mIsRunningCommandWizard;
             }
             catch (Exception exp) {
                 mLogger.Error("Skip step can exception - " + exp.Message);
@@ -863,7 +865,7 @@ namespace DialogGenerator.UI.ViewModels
 
         public CreateCharacterState LastState { get; set; }
 
-        public WizardWorkflow Workflow { get; set; }
+        public WizardWorkflow Workflow { get; set; }     
 
         public TutorialStep CurrentTutorialStep
         {
@@ -1054,6 +1056,9 @@ namespace DialogGenerator.UI.ViewModels
         {
             if (!string.IsNullOrEmpty(mCurrentWizard.Commands) && mCurrentWizard.Commands.Contains("ContextualDialog"))
             {
+                mIsRunningCommandWizard = true;
+                SkipStep.RaiseCanExecuteChanged();
+                
                 // Make a copy of the wizard and change it
 
                 // We have to clone the wizard because we are going 
@@ -1118,15 +1123,25 @@ namespace DialogGenerator.UI.ViewModels
                     // Remove empty entries.
                     var _clearedTokens = _tokens.Where(item => !string.IsNullOrEmpty(item)).Select(p => p);
 
-                    int _tokenCounter = 0;
-
                     foreach (var _token in _clearedTokens)
                     {
+                        Regex rx = new Regex(@"\{\d+\}");
+                        Match match = rx.Match(_token);
+
                         if (_token.Equals("ContextualDialog"))
                             continue;
-                        if (_token.Equals("{" + string.Format("{0}", _tokenCounter) + "}"))
+                        if (!string.IsNullOrEmpty(match.Value))
                         {
-                            _phrasesForDialog.Add(_keys[_tokenCounter++]);
+                            rx = new Regex(@"\d+");
+                            match = rx.Match(_token);
+                            if(!string.IsNullOrEmpty(match.Value))
+                            {
+                                var _idx = Int32.Parse(match.Value);
+                                if (_keys.Count > _idx)
+                                {
+                                    _phrasesForDialog.Add(_keys[_idx]);
+                                }
+                            }                                                       
                         }
                         else
                         {
@@ -1173,6 +1188,10 @@ namespace DialogGenerator.UI.ViewModels
                     }
                 }                                        
 
+            } else
+            {
+                mIsRunningCommandWizard = false;
+                SkipStep.RaiseCanExecuteChanged();
             }
         }
 
