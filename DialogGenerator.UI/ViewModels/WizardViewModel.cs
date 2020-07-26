@@ -514,13 +514,13 @@ namespace DialogGenerator.UI.ViewModels
             {
                 _lastWizardState = new CreateCharacterState
                 {
-                    WizardName = mCurrentWizard.WizardName,
+                    Wizard = mCurrentWizard,
                     StepIndex = CurrentStepIndex,
                     CharacterPrefix = Character.CharacterPrefix
                 };
             } else
             {
-                _lastWizardState.WizardName = mCurrentWizard.WizardName;
+                _lastWizardState.Wizard = mCurrentWizard;
                 _lastWizardState.StepIndex = _currentStepIndex;
                 _lastWizardState.CharacterPrefix = Character.CharacterPrefix;
             }
@@ -619,13 +619,13 @@ namespace DialogGenerator.UI.ViewModels
             {
                 Character = Session.Get(Constants.NEW_CHARACTER) as Character;
                 CreateCharacterViewModel createCharacterViewModel = Session.Get(Constants.CREATE_CHARACTER_VIEW_MODEL) as CreateCharacterViewModel;
-                if (_lastWizardState == null || string.IsNullOrEmpty(_lastWizardState.WizardName) || !_lastWizardState.CharacterPrefix.Equals(Character.CharacterPrefix))
+                if (_lastWizardState == null || _lastWizardState.Wizard != null || !_lastWizardState.CharacterPrefix.Equals(Character.CharacterPrefix))
                 {
                     CurrentWizard = mWizardDataProvider.GetByName(createCharacterViewModel.CurrentDialogWizard);
                     _setDataForTutorialStep(CurrentStepIndex);
                 } else
                 {
-                    CurrentWizard = mWizardDataProvider.GetByName(_lastWizardState.WizardName);
+                    CurrentWizard = _lastWizardState.Wizard;
                     CurrentStepIndex = _lastWizardState.StepIndex;
                     _setDataForTutorialStep(CurrentStepIndex);                    
                 }
@@ -634,12 +634,12 @@ namespace DialogGenerator.UI.ViewModels
             } else
             {
                 Character = mRegionManager.Regions[Constants.ContentRegion].Context as Character;
-                if (_lastWizardState != null && !string.IsNullOrEmpty(_lastWizardState.WizardName) && _lastWizardState.CharacterPrefix.Equals(Character.CharacterPrefix))
+                if (_lastWizardState != null && _lastWizardState.Wizard != null && _lastWizardState.CharacterPrefix.Equals(Character.CharacterPrefix))
                 {
                     MessageDialogResult _result = await mMessageDialogService.ShowOKCancelDialogAsync("Resume previous session?", "Question", "Yes", "No");
                     if(_result.Equals(MessageDialogResult.OK))
                     {
-                        CurrentWizard = mWizardDataProvider.GetByName(_lastWizardState.WizardName);
+                        CurrentWizard = _lastWizardState.Wizard;
                         _setDataForTutorialStep(_lastWizardState.StepIndex);
                         Workflow.Fire(WizardTriggers.ReadyForUserAction);
                         mSpeechSyntesizer.SpeakCompleted += _synth_SpeakCompleted;
@@ -657,14 +657,14 @@ namespace DialogGenerator.UI.ViewModels
                     {
                         _lastWizardState = new CreateCharacterState
                         {
-                            WizardName = CurrentWizard.WizardName,
+                            Wizard = CurrentWizard,
                             StepIndex = CurrentStepIndex,
                             CharacterPrefix = Character.CharacterPrefix
                         };
                     }
                     else
                     {
-                        _lastWizardState.WizardName = CurrentWizard.WizardName;
+                        _lastWizardState.Wizard = CurrentWizard;
                         _lastWizardState.StepIndex = CurrentStepIndex;
                         _lastWizardState.CharacterPrefix = Character.CharacterPrefix;
                     }
@@ -883,7 +883,7 @@ namespace DialogGenerator.UI.ViewModels
             set
             {
                 mCurrentWizard = value;
-                if (mCurrentWizard != null && mCharacter != null)
+                if (!Session.Get<bool>(Constants.CHARACTER_EDIT_MODE) && mCurrentWizard != null && mCharacter != null)
                 {
                     _inspectForCommandWizardAndChangeCharacter();
                 }
@@ -1057,9 +1057,7 @@ namespace DialogGenerator.UI.ViewModels
             if (!string.IsNullOrEmpty(mCurrentWizard.Commands) && mCurrentWizard.Commands.Contains("ContextualDialog"))
             {
                 mIsRunningCommandWizard = true;
-                SkipStep.RaiseCanExecuteChanged();
-                
-                // Make a copy of the wizard and change it
+                SkipStep.RaiseCanExecuteChanged();                
 
                 // We have to clone the wizard because we are going 
                 // to change it's phraseweights collections.
@@ -1067,7 +1065,12 @@ namespace DialogGenerator.UI.ViewModels
                 string _identifier = Guid.NewGuid().ToString();
                 _identifier = _identifier.Substring(0, 4);
 
-                string[] _items = mCurrentWizard.Commands.Split(' ');
+                // we also need to remember the commands property of the cloned wizard and delete it
+                // so that it doesn't repeat next time if the wizard comes to continue.
+                string _commands = mCurrentWizard.Commands;
+                mCurrentWizard.Commands = string.Empty;
+
+                string[] _items = _commands.Split(' ');
 
                 // Check for the command name.
                 if(_items.Count() == 0 || !_items[0].Equals("ContextualDialog"))
@@ -1101,7 +1104,7 @@ namespace DialogGenerator.UI.ViewModels
                 }
 
                 // Check the dialog line
-                string[] _lines = mCurrentWizard.Commands.Split(';');
+                string[] _lines = _commands.Split(';');
                 for(int i = 0; i < _lines.Length; i++)
                 {
                     // This is the list of phrases which fill be used later in the creation 

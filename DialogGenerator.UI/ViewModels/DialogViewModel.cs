@@ -363,7 +363,7 @@ namespace DialogGenerator.UI.ViewModels
             if(createCharacterViewModel != null)
             {
                 var _lastWizardState = Session.Get<CreateCharacterState>(Constants.LAST_WIZARD_STATE);
-                if (_lastWizardState != null && !string.IsNullOrEmpty(_lastWizardState.WizardName))
+                if (_lastWizardState != null && _lastWizardState.Wizard != null)
                 {
                     createCharacterViewModel.Workflow.Fire(Triggers.CheckCounter);
                 } else
@@ -377,12 +377,7 @@ namespace DialogGenerator.UI.ViewModels
                         }
                         else
                         {
-                            Session.Set(Constants.LAST_WIZARD_STATE, new CreateCharacterState
-                            {
-                                WizardName = string.Empty,
-                                StepIndex = 0,
-                                CharacterPrefix = string.Empty
-                            });
+                            Session.Set(Constants.LAST_WIZARD_STATE, null);
 
                             createCharacterViewModel.Workflow.Fire(Triggers.Finish);
                         }

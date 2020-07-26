@@ -917,7 +917,7 @@ namespace DialogGenerator.UI.ViewModels
             {
                 case "Initialize":
                     var _lastWizardState = Session.Get<CreateCharacterState>(Constants.LAST_WIZARD_STATE);
-                    if (_lastWizardState != null && !string.IsNullOrEmpty(_lastWizardState.WizardName))
+                    if (_lastWizardState != null && _lastWizardState.Wizard != null)
                     {
                         MessageDialogResult _result = await mMessageDialogService.ShowOKCancelDialogAsync("Resume previous session?", "Question", "Yes", "No");
                         if(_result.Equals(MessageDialogResult.OK))
@@ -928,10 +928,7 @@ namespace DialogGenerator.UI.ViewModels
                             break;
                         } else
                         {
-                            _lastWizardState.WizardName = string.Empty;
-                            _lastWizardState.StepIndex = 0;
-                            _lastWizardState.CharacterPrefix = string.Empty;
-                            Session.Set(Constants.LAST_WIZARD_STATE, _lastWizardState);
+                            Session.Set(Constants.LAST_WIZARD_STATE, null);
                         }                                                
                     }
 
@@ -995,7 +992,7 @@ namespace DialogGenerator.UI.ViewModels
                     break;
                 case "CheckCounter":
                     _lastWizardState = Session.Get<CreateCharacterState>(Constants.LAST_WIZARD_STATE);
-                    if(_lastWizardState != null && !string.IsNullOrEmpty(_lastWizardState.WizardName))                    
+                    if(_lastWizardState != null && _lastWizardState.Wizard != null)                    
                     {
                         MessageDialogResult _result;
                         if (!mResumePreviousSession)
@@ -1009,16 +1006,12 @@ namespace DialogGenerator.UI.ViewModels
                         
                         if(_result.Equals(MessageDialogResult.OK))
                         {
-                            int _wizardIndex = mDialogWizards.IndexOf(_lastWizardState.WizardName);
-                            mWizardPassthroughIndex = _wizardIndex;
-                            CurrentDialogWizard = mDialogWizards[_wizardIndex];
+ 
+                            CurrentDialogWizard = _lastWizardState.Wizard.WizardName;
                             Workflow.Fire(Triggers.StartWizard);                            
                         } else
                         {
-                            _lastWizardState.WizardName = string.Empty;
-                            _lastWizardState.StepIndex = 0;
-                            _lastWizardState.CharacterPrefix = string.Empty;
-                            Session.Set(Constants.LAST_WIZARD_STATE, _lastWizardState);
+                            Session.Set(Constants.LAST_WIZARD_STATE, null);
                             Workflow.Fire(Triggers.Finish);
                             mRegionManager.Regions[Constants.ContentRegion].NavigationService.RequestNavigate("CreateCharacterView");
                             Workflow.Fire(Triggers.Initialize);                            
@@ -1413,7 +1406,7 @@ namespace DialogGenerator.UI.ViewModels
 
     public class CreateCharacterState
     {
-        public string WizardName { get; set; } = string.Empty;
+        public Wizard Wizard { get; set; }
         public int StepIndex { get; set; } = 0;
         public string CharacterPrefix { get; set; }
     }
