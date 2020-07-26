@@ -23,7 +23,8 @@ namespace DialogGenerator.Tests.UI.ViewModel
         protected Mock<ICharacterDataProvider> characterDataProviderMock = new Mock<ICharacterDataProvider>();
         protected Mock<IWizardDataProvider> wizardDataProviderMock = new Mock<IWizardDataProvider>();
         protected Mock<IDialogModelDataProvider> dialogModelDataProviderMock = new Mock<IDialogModelDataProvider>();
-        protected Mock<IDialogDataRepository> dialogDataRepositoryMock = new Mock<IDialogDataRepository>();        
+        protected Mock<IDialogDataRepository> dialogDataRepositoryMock = new Mock<IDialogDataRepository>();
+        protected Mock<IRegionManager> regionManagerMock = new Mock<IRegionManager>();
 
         protected Mock<OpenCharacterDetailViewEvent> openCharacterDetailViewEventMock = new Mock<OpenCharacterDetailViewEvent>();
         protected Mock<CharacterSelectionActionChangedEvent> characterSelectionActionChangedEvent = new Mock<CharacterSelectionActionChangedEvent>();

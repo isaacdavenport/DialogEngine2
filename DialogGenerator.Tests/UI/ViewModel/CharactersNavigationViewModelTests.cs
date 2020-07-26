@@ -15,7 +15,8 @@ namespace DialogGenerator.Tests.UI.ViewModel
                 ,wizardDataProviderMock.Object
                 ,dialogModelDataProviderMock.Object
                 ,characterDataProviderMock.Object
-                ,messageDialogServiceMock.Object);
+                ,messageDialogServiceMock.Object
+                ,regionManagerMock.Object);
 
             testSetup();
         }
