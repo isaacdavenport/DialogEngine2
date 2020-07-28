@@ -500,54 +500,62 @@ namespace DialogGenerator.UI.ViewModels
         
         private void _setDataForTutorialStep(int _currentStepIndex)
         {
-            mRecordingAttempted = false;
-
-            if(_currentStepIndex != CurrentStepIndex)
+            try
             {
-                CurrentStepIndex = _currentStepIndex;
-            }
+                mRecordingAttempted = false;
 
-            CurrentTutorialStep = CurrentWizard.TutorialSteps[_currentStepIndex];
-
-            var _lastWizardState = Session.Get<CreateCharacterState>(Constants.LAST_WIZARD_STATE);
-            if(_lastWizardState == null)
-            {
-                _lastWizardState = new CreateCharacterState
+                if (_currentStepIndex != CurrentStepIndex)
                 {
-                    Wizard = mCurrentWizard,
-                    StepIndex = CurrentStepIndex,
-                    CharacterPrefix = Character.CharacterPrefix
-                };
-            } else
+                    CurrentStepIndex = _currentStepIndex;
+                }
+
+                CurrentTutorialStep = CurrentWizard.TutorialSteps[_currentStepIndex];
+
+                var _lastWizardState = Session.Get<CreateCharacterState>(Constants.LAST_WIZARD_STATE);
+                if (_lastWizardState == null)
+                {
+                    _lastWizardState = new CreateCharacterState
+                    {
+                        Wizard = mCurrentWizard,
+                        StepIndex = CurrentStepIndex,
+                        CharacterPrefix = Character.CharacterPrefix
+                    };
+                }
+                else
+                {
+                    _lastWizardState.Wizard = mCurrentWizard;
+                    _lastWizardState.StepIndex = CurrentStepIndex;
+                    _lastWizardState.CharacterPrefix = Character.CharacterPrefix;
+                }
+
+                Session.Set(Constants.LAST_WIZARD_STATE, _lastWizardState);
+
+                if (Path.HasExtension(CurrentTutorialStep.VideoFileName))
+                {
+                    MediaPlayerControlViewModel.CurrentVideoFilePath =
+                       Path.Combine(ApplicationData.Instance.VideoDirectory, CurrentTutorialStep.VideoFileName);
+                }
+                else
+                {
+                    MediaPlayerControlViewModel.CurrentVideoFilePath =
+                       Path.Combine(ApplicationData.Instance.VideoDirectory, CurrentTutorialStep.VideoFileName + ".avi");
+                }
+
+                DialogStr = "";
+
+                if (!CurrentTutorialStep.CollectUserInput)
+                {
+                    VoiceRecorderControlViewModel.CurrentFilePath = "";
+                    return;
+                }
+
+                VoiceRecorderControlViewModel.
+                    CurrentFilePath = $"{Character.CharacterPrefix}_{CurrentTutorialStep.PhraseWeights.Keys.First()}_{DateTime.Now.ToString("yyyy-dd-MM-HH-mm-ss")}";
+            } catch (Exception e)
             {
-                _lastWizardState.Wizard = mCurrentWizard;
-                _lastWizardState.StepIndex = _currentStepIndex;
-                _lastWizardState.CharacterPrefix = Character.CharacterPrefix;
+                mLogger.Error("WizardViewModel::_setDataForTutorialStep" + e.Message);
             }
             
-            Session.Set(Constants.LAST_WIZARD_STATE, _lastWizardState);
-
-            if (Path.HasExtension(CurrentTutorialStep.VideoFileName))
-            {
-                MediaPlayerControlViewModel.CurrentVideoFilePath =
-                   Path.Combine(ApplicationData.Instance.VideoDirectory, CurrentTutorialStep.VideoFileName);
-            }
-            else
-            {
-                MediaPlayerControlViewModel.CurrentVideoFilePath =
-                   Path.Combine(ApplicationData.Instance.VideoDirectory, CurrentTutorialStep.VideoFileName + ".avi");
-            }
-
-            DialogStr = "";
-
-            if (!CurrentTutorialStep.CollectUserInput)
-            {
-                VoiceRecorderControlViewModel.CurrentFilePath = "";
-                return;
-            }
-
-            VoiceRecorderControlViewModel.
-                CurrentFilePath = $"{Character.CharacterPrefix}_{CurrentTutorialStep.PhraseWeights.Keys.First()}_{DateTime.Now.ToString("yyyy-dd-MM-HH-mm-ss")}";
         }
 
         #endregion
