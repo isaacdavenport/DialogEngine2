@@ -366,7 +366,7 @@ namespace DialogGenerator.UI.ViewModels
 
         private void _addPhraseWeight_Execute()
         {
-            var _phraseWeight = new PhraseWeight(string.Empty, 0, mLogger);
+            var _phraseWeight = new PhraseWeight(string.Empty, 10, mLogger);
             
             _phraseWeight.PropertyChanged += _phraseWeight_PropertyChanged;
             mWeights.Add(_phraseWeight);

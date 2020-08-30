@@ -46,6 +46,7 @@ namespace DialogGenerator.UI.ViewModels
             mPhraseDefinitionModels = new CollectionViewSource();
             mPopularityValues = new CollectionViewSource();
             mPhraseDefinitionModels.Source = new ObservableCollection<PhraseDefinitionModel>();
+            Popularity = 10;
             _initPopularityValues();
             _subscribeToEvents();
             _bindCommands();
