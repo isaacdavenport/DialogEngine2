@@ -346,7 +346,7 @@ namespace DialogGenerator.UI.ViewModels
             try
             {
                 return (CurrentWizard != null && CurrentStepIndex < CurrentWizard.TutorialSteps.Count - 1)
-                        && Workflow.State == WizardStates.WaitingForUserAction && !mIsRunningCommandWizard;
+                        && Workflow.State == WizardStates.WaitingForUserAction && (!mIsRunningCommandWizard || !CurrentTutorialStep.CollectUserInput);
             }
             catch (Exception exp) {
                 mLogger.Error("Skip step can exception - " + exp.Message);
