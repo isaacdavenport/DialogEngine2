@@ -45,24 +45,33 @@ namespace DialogGenerator.DataAccess
 
         private void _serializeCharacter(Character character)
         {
-            string _fileName = string.IsNullOrEmpty(character.FileName)
-                ? character.CharacterName.Replace(" ", string.Empty) + ".json"
-                : character.FileName;
-
-            character.FileName = _fileName;
-
-            var _jsonObjectsTypesList = _findDataForFile(_fileName);
-            _jsonObjectsTypesList.Editable = character.Editable;
-
-            var _collectionName = character.CharacterPrefix + "_" + "SampleDialogs";
-            if(_jsonObjectsTypesList.DialogModels.Where(dm => dm.ModelsCollectionName.Equals(_collectionName)).Count() == 0)
+            try
             {
-                _addSampleModelsToCharacter(character, ref _jsonObjectsTypesList);
-            }            
+                string _fileName = string.IsNullOrEmpty(character.FileName)
+                    ? character.CharacterName.Replace(" ", string.Empty) + ".json"
+                    : character.FileName;
 
-            Serializer.Serialize(_jsonObjectsTypesList, Path.Combine(ApplicationData.Instance.DataDirectory, _fileName));
-            mLogger.Info("serializing JSON output for: " + character.CharacterName);
-            mEventAggregator.GetEvent<CharacterSavedEvent>().Publish(character.CharacterPrefix);
+                character.FileName = _fileName;
+
+                var _jsonObjectsTypesList = _findDataForFile(_fileName);
+                _jsonObjectsTypesList.Editable = character.Editable;
+
+                var _collectionName = character.CharacterPrefix + "_" + "SampleDialogs";
+                if (!_jsonObjectsTypesList.DialogModels.Any(dm => dm.ModelsCollectionName.Equals(_collectionName)))
+                {
+                    _addSampleModelsToCharacter(character, ref _jsonObjectsTypesList);
+                }
+
+                Serializer.Serialize(_jsonObjectsTypesList,
+                    Path.Combine(ApplicationData.Instance.DataDirectory, _fileName));
+                mLogger.Info("serializing JSON output for: " + character.CharacterName);
+                mEventAggregator.GetEvent<CharacterSavedEvent>().Publish(character.CharacterPrefix);
+            }
+            catch (Exception e)
+            {
+                mLogger.Error("Save character exception - " + e.Message);
+            }
+            
         }
 
         private JSONObjectsTypesList _findDataForFile(string _fileName)
