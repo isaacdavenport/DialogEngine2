@@ -45,6 +45,7 @@ namespace DialogGenerator.UI.Views
             {
                 this.LeftCharacterSlot.DataContext = _model.LeftCharacterModel;
                 this.RightSlot.DataContext = _model.RightCharacterModel;
+                _model.DialogModel.Popularity = 10;
                 this.DialogSlot.DataContext = _model.DialogModel;                
             }
 
