@@ -297,6 +297,29 @@ namespace DialogGenerator.DialogEngine
             return _mostRecentAdventureDialogs;
         }
 
+        private bool _checkForRecentPhrases(int dialogModel)
+        {
+            var dialog = mContext.DialogModelsList[dialogModel];
+            bool result = false;
+            dialog.PhraseTypeSequence.ForEach(p =>
+            {
+                if (!result && mContext.CharactersList[mContext.Character1Num].RecentPhrases
+                    .Any(rp => rp.PhraseWeights.Keys.Contains(p)))
+                {
+                    result = true;
+                }
+
+                if (!result && mContext.CharactersList[mContext.Character2Num].RecentPhrases
+                    .Any(rp => rp.PhraseWeights.Keys.Contains(p)))
+                {
+                    result = true;
+                }
+
+            });
+
+            return result;
+        }
+
         #endregion
 
         #region - public functions -
@@ -385,9 +408,12 @@ namespace DialogGenerator.DialogEngine
                 // don't want a greeting with same characters as last
                 var _inappropriateGreeting = mContext.DialogModelsList[_dialogModel].PhraseTypeSequence[0].Equals("Greeting")
                                              && mContext.SameCharactersAsLast;
+                // Check for recent phrases - Sinisa
+                var _containsRecentPhrases = _checkForRecentPhrases(_dialogModel);
+
 
                 if (_dialogPreRequirementsMet && _charactersHavePhrases && !_inappropriateGreeting &&
-                    !_dialogModelUsedRecently)
+                    !_dialogModelUsedRecently && !_containsRecentPhrases)
                 {
                     _dialogModelFits = true;
                 }
@@ -408,6 +434,8 @@ namespace DialogGenerator.DialogEngine
             }
             return _dialogModel;
         }
+
+        
 
         //  See the comment above PickAWeightedDialog() above since PickAWeightedPhrase works the same way
         public PhraseEntry PickAWeightedPhrase(int _speakingCharacter, string _currentPhraseType)
@@ -464,5 +492,6 @@ namespace DialogGenerator.DialogEngine
         }
 
         #endregion
+
     }
 }
