@@ -2,6 +2,7 @@
 using DialogGenerator.DataAccess;
 using DialogGenerator.DialogEngine.Model;
 using DialogGenerator.Events;
+using DialogGenerator.Events.EventArgs;
 using DialogGenerator.Model;
 using DialogGenerator.Model.Enum;
 using Prism.Events;
@@ -9,6 +10,10 @@ using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
+using System.Net;
+using DialogGenerator.Utilities;
+using DialogGenerator.Utilities.Dialogs;
+using Microsoft.Practices.ObjectBuilder2;
 
 namespace DialogGenerator.DialogEngine
 {
@@ -22,6 +27,7 @@ namespace DialogGenerator.DialogEngine
         private double mDialogModelPopularitySum;
         private DialogContext mContext;
         private Random mRandom;
+        private IMessageDialogService mMessageDialogService;
 
         #endregion
 
@@ -29,15 +35,17 @@ namespace DialogGenerator.DialogEngine
 
         public DialogModelsManager(ILogger logger,IEventAggregator _eventAggregator
             ,IDialogModelRepository _dialogModelRepository
-            ,DialogContext context, Random _Random)
+            ,DialogContext context, Random _Random, IMessageDialogService _messageDialogService)
         {
             mLogger = logger;
             mEventAggregator = _eventAggregator;
             mDialogModelRepository = _dialogModelRepository;
             mContext = context;
             mRandom = _Random;
+            mMessageDialogService = _messageDialogService;
 
             mEventAggregator.GetEvent<InitializeDialogModelEvent>().Subscribe(_onInitializeDialogModel);
+            mEventAggregator.GetEvent<SelectedCharactersPairChangedEvent>().Subscribe(_onSelectedCharactersPairChanged);
         }
 
         #endregion
@@ -47,6 +55,74 @@ namespace DialogGenerator.DialogEngine
         private void _onInitializeDialogModel()
         {
             Initialize();
+        }
+
+        private void _onSelectedCharactersPairChanged(SelectedCharactersPairEventArgs obj)
+        {
+            if (obj != null && mContext.DialogModelsList.Any())
+            {
+                mContext.PossibleDialogModelsList = _preparePossibleDialogModelsList(obj.Character1Index, obj.Character2Index);
+            }
+        }
+
+        private List<ModelDialog> _preparePossibleDialogModelsList(int character1Index, int character2Index)
+        {
+
+            var _possibleList = mContext.DialogModelsList
+                .Where(dlg => dlg.PhraseTypeSequence
+                    .Select((entry, i) => new { i, entry })
+                    .Where(a => a.i % 2 == 0)
+                    .Select(z => z.entry)
+                    .ToList()
+                    .All(pts => mContext.CharactersList[character1Index].Phrases
+                        .Any(phrase => phrase.PhraseWeights.Keys.Contains(pts)))).ToList();
+
+            _possibleList = _possibleList
+                .Where(dlg => dlg.PhraseTypeSequence
+                    .Select((entry, i) => new { i, entry })
+                    .Where(a => a.i % 2 != 0)
+                    .Select(z => z.entry)
+                    .ToList()
+                    .All(pts => mContext.CharactersList[character2Index].Phrases
+                        .Any(phrase => phrase.PhraseWeights.Keys.Contains(pts)))).ToList();
+
+
+            //if (!_possibleList.Any())
+            //{
+            //    _possibleList = mContext.DialogModelsList
+            //        .Where(dlg => dlg.PhraseTypeSequence
+            //            .Select((entry, i) => new { i, entry })
+            //            .Where(a => a.i % 2 == 0)
+            //            .Select(z => z.entry)
+            //            .ToList()
+            //            .All(pts => mContext.CharactersList[mContext.Character2Num].Phrases
+            //                .Any(phrase => phrase.PhraseWeights.Keys.Contains(pts)))).ToList();
+
+            //    _possibleList = _possibleList
+            //        .Where(dlg => dlg.PhraseTypeSequence
+            //            .Select((entry, i) => new { i, entry })
+            //            .Where(a => a.i % 2 != 0)
+            //            .Select(z => z.entry)
+            //            .ToList()
+            //            .All(pts => mContext.CharactersList[mContext.Character1Num].Phrases
+            //                .Any(phrase => phrase.PhraseWeights.Keys.Contains(pts)))).ToList();
+            //}
+
+            //List<ModelDialog> _finalList = new List<ModelDialog>();
+            //_possibleList.ForEach(item =>
+            //{
+            //    if(!_finalList.Any(dlg => 
+            //        ( dlg.PhraseTypeSequence.All(seq => item.PhraseTypeSequence.Contains(seq)) && 
+            //                                item.PhraseTypeSequence.All(ips => dlg.PhraseTypeSequence.Contains(ips)))))
+            //    {
+            //        _finalList.Add(item);
+            //    }
+
+            //});
+
+            //return _finalList;
+
+            return _possibleList;
         }
 
         private bool _checkIfDialogPreRequirementMet(int _dialogModel)
@@ -245,29 +321,64 @@ namespace DialogGenerator.DialogEngine
 
         private bool _checkIfCharactersHavePhrasesForDialog(int _dialogModel, int _character1Num, int _character2Num)
         {
-            var _currentCharacter = _character1Num;
+            //var _currentCharacter = _character1Num;
 
-            foreach (var _element in mContext.DialogModelsList[_dialogModel].PhraseTypeSequence)
+            //foreach (var _element in mContext.DialogModelsList[_dialogModel].PhraseTypeSequence)
+            //{
+            //    //try again if characters lack phrases for this model
+            //    if (mContext.CharactersList[_currentCharacter].PhraseTotals.PhraseWeights.ContainsKey(_element))
+            //    {
+            //        if (mContext.CharactersList[_currentCharacter].PhraseTotals.PhraseWeights[_element] < 0.015f)
+            //            return false;
+
+            //        if (_currentCharacter == _character1Num)
+            //            _currentCharacter = _character2Num;
+            //        else
+            //            _currentCharacter = _character1Num;
+
+            //    }
+            //    else
+            //    {
+            //        return false;
+            //    }
+            //}
+
+            //return true;
+            bool bResult = false;
+            bool bFirstCharacter = true;
+            bool bSecondCharacter = true;
+
+            var dialog = mContext.DialogModelsList[_dialogModel];
+
+            // Entries with the even indices.
+            dialog.PhraseTypeSequence.Select((entry, i) => new { i, entry }).Where(p => p.i % 2 == 0).Select(e => e.entry).ToList().ForEach(
+                str =>
+                {
+                    if (!mContext.CharactersList[_character1Num].Phrases
+                        .Any(rp => rp.PhraseWeights.Keys.Contains(str)))
+                    {
+                        bFirstCharacter = false;
+                    }
+                });
+
+            // Entries with the odd indices.
+            if (bFirstCharacter)
             {
-                //try again if characters lack phrases for this model
-                if (mContext.CharactersList[_currentCharacter].PhraseTotals.PhraseWeights.ContainsKey(_element))
-                {
-                    if (mContext.CharactersList[_currentCharacter].PhraseTotals.PhraseWeights[_element] < 0.015f)
-                        return false;
-
-                    if (_currentCharacter == _character1Num)
-                        _currentCharacter = _character2Num;
-                    else
-                        _currentCharacter = _character1Num;
-
-                }
-                else
-                {
-                    return false;
-                }
+                dialog.PhraseTypeSequence.Select((entry, i) => new { i, entry }).Where(p => p.i % 2 != 0).Select(e => e.entry).ToList().ForEach(
+                    str =>
+                    {
+                        if (!mContext.CharactersList[mContext.Character2Num].Phrases
+                            .Any(rp => rp.PhraseWeights.Keys.Contains(str)))
+                        {
+                            bSecondCharacter = false;
+                        }
+                    });
             }
 
-            return true;
+            bResult = bFirstCharacter && bSecondCharacter;
+
+            return bResult;
+
         }
 
         private List<int> _findMostRecentAdventureDialogIndexes()
@@ -301,21 +412,65 @@ namespace DialogGenerator.DialogEngine
         {
             var dialog = mContext.DialogModelsList[dialogModel];
             bool result = false;
-            dialog.PhraseTypeSequence.ForEach(p =>
+
+            var _bufferLength = Math.Min(mContext.CharactersList[mContext.Character1Num].RecentPhrases.Count(),
+                mContext.CharactersList[mContext.Character2Num].RecentPhrases.Count());
+
+            _bufferLength = Character.RecentPhrasesQueueSize;
+
+            if (_bufferLength < Character.RecentPhrasesQueueSize)
             {
-                if (!result && mContext.CharactersList[mContext.Character1Num].RecentPhrases
-                    .Any(rp => rp.PhraseWeights.Keys.Contains(p)))
-                {
-                    result = true;
-                }
+                // Entries with the even indices.
+                dialog.PhraseTypeSequence.Select((entry, i) => new { i, entry }).Where(p => p.i % 2 == 0).Select(e => e.entry).ToList().ForEach(
+                    str =>
+                    {
+                        if (!result && mContext.CharactersList[mContext.Character1Num].RecentPhrases.Last().PhraseWeights.ContainsKey(str))
+                        {
+                            result = true;
+                        }
+                    });
 
-                if (!result && mContext.CharactersList[mContext.Character2Num].RecentPhrases
-                    .Any(rp => rp.PhraseWeights.Keys.Contains(p)))
+                // Entries with the odd indices.
+                if (!result)
                 {
-                    result = true;
+                    dialog.PhraseTypeSequence.Select((entry, i) => new { i, entry }).Where(p => p.i % 2 != 0).Select(e => e.entry).ToList().ForEach(
+                        str =>
+                        {
+                            if (!result && mContext.CharactersList[mContext.Character2Num].RecentPhrases.Last().PhraseWeights.ContainsKey(str))
+                                
+                            {
+                                result = true;
+                            }
+                        });
                 }
+            }
+            else
+            {
+                // Entries with the even indices.
+                dialog.PhraseTypeSequence.Select((entry, i) => new { i, entry }).Where(p => p.i % 2 == 0).Select(e => e.entry).ToList().ForEach(
+                    str =>
+                    {
+                        if (!result && mContext.CharactersList[mContext.Character1Num].RecentPhrases
+                            .Any(rp => rp.PhraseWeights.Keys.Contains(str)))
+                        {
+                            result = true;
+                        }
+                    });
 
-            });
+                // Entries with the odd indices.
+                if (!result)
+                {
+                    dialog.PhraseTypeSequence.Select((entry, i) => new { i, entry }).Where(p => p.i % 2 != 0).Select(e => e.entry).ToList().ForEach(
+                        str =>
+                        {
+                            if (!result && mContext.CharactersList[mContext.Character2Num].RecentPhrases
+                                .Any(rp => rp.PhraseWeights.Keys.Contains(str)))
+                            {
+                                result = true;
+                            }
+                        });
+                }
+            }
 
             return result;
         }
@@ -376,21 +531,25 @@ namespace DialogGenerator.DialogEngine
                     return _nextAdventureDialogIdx; // we have an adventure dialog for these characters go with it
             }
 
-            int _max_attempts = 30000;  //TODO eventually we want to get away from this check
+            //int _max_attempts = 30000;  //TODO eventually we want to get away from this check
+
+            int _max_attempts = 0;
+
             // if we create a list of only dialog models that will work for the two characters and iterate through that
             // smaller list, we won't have to worry about landing on dialog models the two characters can't use
             // we can also throw and log a more definate error about how the two characters have no dialog models
             // they can both participate in if or log that it is a low number (lower than the dozen or so models two 
             // characters with just the basic wizard lines give them access to).
 
-            while (!_dialogModelFits && _attempts < _max_attempts)
+            while (!_dialogModelFits /* && _attempts < _max_attempts */)
             {
                 _attempts++;
                 _dialogWeightIndex = mRandom.NextDouble();
-                _dialogWeightIndex *= mDialogModelPopularitySum;
+                //_dialogWeightIndex *= mDialogModelPopularitySum;
+                _dialogWeightIndex *= mContext.PossibleDialogModelsList.Sum(dlg => dlg.Popularity);
                 double _currentDialogWeightSum = 0;
 
-                foreach (var _dialog in mContext.DialogModelsList)
+                foreach (var _dialog in mContext.PossibleDialogModelsList)
                 {
                     _currentDialogWeightSum += _dialog.Popularity;
 
@@ -406,8 +565,9 @@ namespace DialogGenerator.DialogEngine
                     mContext.Character1Num, mContext.Character2Num);
                 var _dialogPreRequirementsMet = _checkIfDialogPreRequirementMet(_dialogModel);
                 // don't want a greeting with same characters as last
-                var _inappropriateGreeting = mContext.DialogModelsList[_dialogModel].PhraseTypeSequence[0].Equals("Greeting")
-                                             && mContext.SameCharactersAsLast;
+                //var _inappropriateGreeting = mContext.DialogModelsList[_dialogModel].PhraseTypeSequence[0].Equals("Greeting")
+                //                             && mContext.SameCharactersAsLast;
+                var _inappropriateGreeting = false;
                 // Check for recent phrases - Sinisa
                 var _containsRecentPhrases = _checkForRecentPhrases(_dialogModel);
 
@@ -426,11 +586,20 @@ namespace DialogGenerator.DialogEngine
                     // TODO uncomment 
                     //DialogDataHelper.AddMessage(new WarningMessage(attemptsWarningMsg));
                     mLogger.Debug(attemptsWarningMsg);
+
+                    // Reset history.
+                    mContext.HistoricalDialogs.Clear();
+                    mContext.CharactersList[mContext.Character1Num].ClearRecentPhrases();
+                    mContext.CharactersList[mContext.Character2Num].ClearRecentPhrases();
+                    _attempts = 0;
                 }
-                if (_dialogPreRequirementsMet && _charactersHavePhrases && _attempts > 15000)
-                {
-                    _dialogModelFits = true;
-                }
+                //if (_dialogPreRequirementsMet && _charactersHavePhrases && _attempts > 15000)
+                //{
+                //    //_dialogModelFits = true;
+                //    Debug.WriteLine("No more dialogs left!");
+                //    mContext.HistoricalDialogs.Clear();
+
+                //}
             }
             return _dialogModel;
         }
@@ -444,7 +613,13 @@ namespace DialogGenerator.DialogEngine
 
             try
             {
-                _selectedPhrase = mContext.CharactersList[_speakingCharacter].Phrases[0]; //initialize to unused phrase
+                _selectedPhrase = new PhraseEntry
+                {
+                    DialogStr = " .... ",
+                };
+
+                //_selectedPhrase = mContext.CharactersList[_speakingCharacter].Phrases[0]; //initialize to unused phrase
+
                 //Randomly select a phrase of correct Type
                 var _phraseIsDuplicate = true;
 

@@ -11,6 +11,7 @@ namespace DialogGenerator.DialogEngine.Model
         public int Character2Num = 2;
         public bool SameCharactersAsLast;
         public List<ModelDialog> DialogModelsList = new List<ModelDialog>();
+        public List<ModelDialog> PossibleDialogModelsList = new List<ModelDialog>();
         public ObservableCollection<Character> CharactersList = new ObservableCollection<Character>();
         public List<HistoricalDialog> HistoricalDialogs = new List<HistoricalDialog>();
         public List<HistoricalPhrase> HistoricalPhrases = new List<HistoricalPhrase>();

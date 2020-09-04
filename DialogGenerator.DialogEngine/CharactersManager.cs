@@ -80,11 +80,15 @@ namespace DialogGenerator.DialogEngine
                 }
             }
 
-            for (var i = 0; i < Character.RecentPhrasesQueueSize && i < character.Phrases.Count; i++)
+            if (character.RecentPhrases.Count == 0)
             {
-                // we always deque after enque so this sets que size
-                character.RecentPhrases.Enqueue(character.Phrases[0]);
+                for (var i = 0; i < Character.RecentPhrasesQueueSize && i < character.Phrases.Count / 2; i++)
+                {
+                    // we always deque after enque so this sets que size
+                    character.RecentPhrases.Enqueue(character.Phrases[0]);
+                }
             }
+            
         }
 
         private void _removePhrasesOverParentalRating(Character _inCharacter)

@@ -205,6 +205,22 @@ namespace DialogGenerator.Model
             return other.CharacterPrefix.Equals(this.CharacterPrefix);
         }
 
+        public void ClearRecentPhrases()
+        {
+            int _queueLength = RecentPhrases.Count;
+            RecentPhrases.Clear();
+            for (int i = 0; i < _queueLength; i++)
+            {
+                RecentPhrases.Enqueue(new PhraseEntry
+                {
+                    PhraseWeights = new Dictionary<string, double>(),
+                    PhraseRating = "10",
+                    DialogStr = "...",
+                    FileName = "empty"
+                });
+            }
+        }
+
         public void Merge(Character other)
         {
             if (!this.Equals(other))
