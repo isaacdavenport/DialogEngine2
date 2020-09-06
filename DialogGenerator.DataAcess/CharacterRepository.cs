@@ -56,11 +56,11 @@ namespace DialogGenerator.DataAccess
                 var _jsonObjectsTypesList = _findDataForFile(_fileName);
                 _jsonObjectsTypesList.Editable = character.Editable;
 
-                var _collectionName = character.CharacterPrefix + "_" + "SampleDialogs";
-                if (!_jsonObjectsTypesList.DialogModels.Any(dm => dm.ModelsCollectionName.Equals(_collectionName)))
-                {
-                    _addSampleModelsToCharacter(character, ref _jsonObjectsTypesList);
-                }
+                //var _collectionName = character.CharacterPrefix + "_" + "SampleDialogs";
+                //if (!_jsonObjectsTypesList.DialogModels.Any(dm => dm.ModelsCollectionName.Equals(_collectionName)))
+                //{
+                //    _addSampleModelsToCharacter(character, ref _jsonObjectsTypesList);
+                //}
 
                 Serializer.Serialize(_jsonObjectsTypesList,
                     Path.Combine(ApplicationData.Instance.DataDirectory, _fileName));
