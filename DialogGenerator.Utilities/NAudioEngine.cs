@@ -420,17 +420,24 @@ namespace DialogGenerator.Utilities
             IsRecording = true;    
         }
 
-
         /// <summary>
         /// Stops recording sound
         /// </summary>
         public void StopRecording()
         {
-            mWaveInDevice.Dispose();
-            mWaveInDevice = null;
-            mWaveFileWriter.Close();
-            mWaveFileWriter.Dispose();
-            mWaveFileWriter = null;
+            if (mWaveInDevice != null)
+            {
+                mWaveInDevice.Dispose();
+                mWaveInDevice = null;
+            }
+
+            if (mWaveFileWriter != null)
+            {
+                mWaveFileWriter.Close();
+                mWaveFileWriter.Dispose();
+                mWaveFileWriter = null;
+            }
+            
         }
 
         /// <summary>
