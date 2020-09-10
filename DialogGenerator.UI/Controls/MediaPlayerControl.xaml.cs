@@ -91,6 +91,13 @@ namespace DialogGenerator.UI.Controls
 
         private void MediaPlayerControl_Unloaded(object sender, RoutedEventArgs e)
         {
+            (DataContext as MediaPlayerControlViewModel).PlayRequested -= _mediaPlayerControl_PlayRequested;
+            (DataContext as MediaPlayerControlViewModel).PauseRequested -= _mediaPlayerControl_PauseRequested;
+            (DataContext as MediaPlayerControlViewModel).StopRequested -= _mediaPlayerControl_StopRequested;
+            (DataContext as MediaPlayerControlViewModel).ShiftForwardRequested -= MediaPlayerControl_ShiftForwardRequested;
+            (DataContext as MediaPlayerControlViewModel).ShiftBackwardsRequested -= MediaPlayerControl_ShiftBackwardsRequested;
+            (DataContext as MediaPlayerControlViewModel).PropertyChanged -= MediaPlayerControl_PropertyChanged;
+
             mUpdateTimer.Stop();
         }
 
@@ -103,7 +110,20 @@ namespace DialogGenerator.UI.Controls
         {
             if (e.PropertyName.Equals("CurrentVideoFilePath"))
             {
-                VideoPositionScroll.Value = 0;
+                try
+                {
+                    if (VideoPlayer.IsInputMethodEnabled)
+                    {
+                        VideoPlayer.Source = new Uri(((MediaPlayerControlViewModel)sender).CurrentVideoFilePath);
+                    }
+
+                    VideoPositionScroll.Value = 0;
+                }
+                catch (Exception ex)
+                {
+                    MessageBox.Show(ex.Message, "Error", MessageBoxButton.OK, MessageBoxImage.Error);
+                }
+                
             }
         }
 

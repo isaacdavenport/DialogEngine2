@@ -23,6 +23,7 @@ using System.Threading;
 using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Input;
+using System.Windows.Threading;
 
 namespace DialogGenerator.UI.ViewModels
 {
@@ -63,6 +64,7 @@ namespace DialogGenerator.UI.ViewModels
         private SpeechSynthesizer mSpeechSyntesizer;
         private bool mRecordingAttempted = false;
         private bool mIsRunningCommandWizard = false;
+        private Timer mTimer;
 
         #endregion
 
@@ -103,6 +105,8 @@ namespace DialogGenerator.UI.ViewModels
             _configureWorkflow();
             _bindEvents();
             _bindCommands();
+
+            
         }
 
 
@@ -346,7 +350,7 @@ namespace DialogGenerator.UI.ViewModels
             try
             {
                 return (CurrentWizard != null && CurrentStepIndex < CurrentWizard.TutorialSteps.Count - 1)
-                        && Workflow.State == WizardStates.WaitingForUserAction && (!mIsRunningCommandWizard || !CurrentTutorialStep.CollectUserInput);
+                        && Workflow.State == WizardStates.WaitingForUserAction && (!mIsRunningCommandWizard || !CurrentTutorialStep.CollectUserInput) && !TimerBlock;
             }
             catch (Exception exp) {
                 mLogger.Error("Skip step can exception - " + exp.Message);
@@ -710,13 +714,28 @@ namespace DialogGenerator.UI.ViewModels
                 ++CurrentStepIndex;
 
                 _setDataForTutorialStep(CurrentStepIndex);
+
+                mTimer = new Timer(_preventSkip, null, 1000, -1);
             }
             catch (Exception ex)
             {
                 mLogger.Error("_skipStep" + ex.Message);
             }
 
+            // Disable skip for 1 sec.
+            TimerBlock = true;
+            SkipStep.RaiseCanExecuteChanged();
+            mTimer = new Timer(_preventSkip, null, 500, -1);
+            
             Workflow.Fire(WizardTriggers.ReadyForUserAction);
+        }
+
+        private void _preventSkip(object state)
+        {
+            TimerBlock = false;
+            SkipStep.RaiseCanExecuteChanged();
+
+            mTimer.Dispose();
         }
 
         private async void _saveStep()
@@ -975,6 +994,8 @@ namespace DialogGenerator.UI.ViewModels
                 RaisePropertyChanged();
             }
         }
+
+        public bool TimerBlock { get; set; } = false;
 
         #endregion
 
