@@ -16,6 +16,13 @@ using System.Windows.Input;
 
 namespace DialogGenerator.UI.ViewModels
 {
+    public enum LoggingTypes
+    {
+        Error,
+        Info,
+        Debug,
+    }
+
     public class VoiceRecorderControlViewModel : BindableBase
     {
         #region - fields -
@@ -30,6 +37,7 @@ namespace DialogGenerator.UI.ViewModels
         private bool mEnableRecording = true;
         private IEventAggregator mEventAggregator;
         private SpeechRecognitionEngine mSoundRecognizer;
+        private ILogger mLogger;
 
         #endregion
 
@@ -41,8 +49,9 @@ namespace DialogGenerator.UI.ViewModels
         /// <param name="player">Instance of <see cref="ISoundPlayer"/></param>
         public VoiceRecorderControlViewModel(NAudioEngine player
                                             , WizardWorkflow _wizardWorkflow
-                                            ,IMessageDialogService _messageDialogService
-                                            ,IEventAggregator _EventAggregator)
+                                            , IMessageDialogService _messageDialogService
+                                            , IEventAggregator _EventAggregator
+                                            , ILogger _Logger)
         {
             SoundPlayer = player;
             StateMachine = new MP3RecorderStateMachine(() => { });
@@ -50,6 +59,7 @@ namespace DialogGenerator.UI.ViewModels
             mMessageDialogService = _messageDialogService;
             mEventAggregator = _EventAggregator;
             mTimer = new Timer(_timer_Elapsed, null, Timeout.Infinite, Timeout.Infinite);
+            mLogger = _Logger;
 
             StateMachine.PropertyChanged += _stateMachine_PropertyChanged;
             mWizardWorkflow.PropertyChanged += _mWizardWorkflow_PropertyChanged;
@@ -221,6 +231,22 @@ namespace DialogGenerator.UI.ViewModels
                 }
             }
         }
+
+        public void Log(LoggingTypes type, string message)
+        {
+            switch(type)
+            {
+                case LoggingTypes.Error:
+                    mLogger.Error(message);
+                    break;
+                case LoggingTypes.Info:
+                    mLogger.Info(message);
+                    break;
+                default:
+                    mLogger.Debug(message);
+                    break;                        
+            }
+        }
         
         #endregion
 
@@ -316,24 +342,49 @@ namespace DialogGenerator.UI.ViewModels
 
         private void _startPlaying()
         {
-            mSoundPlayer.OpenFile(Path.Combine(ApplicationData.Instance.AudioDirectory, CurrentFilePath + ".mp3"));
-            mSoundPlayer.Play();
+            try
+            {
+                mSoundPlayer.OpenFile(Path.Combine(ApplicationData.Instance.AudioDirectory, CurrentFilePath + ".mp3"));
+                mSoundPlayer.Play();
+            } catch(Exception e)
+            {
+                //MessageBox.Show(e.Message, "Playback Error", MessageBoxButton.OK, MessageBoxImage.Error);
+                mLogger.Error("Voice recorder exception - (m)_startPlaying " + e.Message);
+            }
+            
         }
 
         private void _startRecording()
         {
-            mSoundPlayer.StartRecording(Path.Combine(ApplicationData.Instance.AudioDirectory, CurrentFilePath + ".mp3"));
-            mRecordingStartedTime = DateTime.Now;
-            mTimer.Change(0, 1000);           
+            try
+            {
+                mSoundPlayer.StartRecording(Path.Combine(ApplicationData.Instance.AudioDirectory, CurrentFilePath + ".mp3"));
+                mRecordingStartedTime = DateTime.Now;
+                mTimer.Change(0, 1000);
+            } catch (Exception e)
+            {
+                //MessageBox.Show(e.Message, "Recording Error", MessageBoxButton.OK, MessageBoxImage.Error);
+                mLogger.Error("Voice recorder exception - (m)_startRecording " + e.Message);
+            }
+                   
         }
 
         private void _startPlaying_Execute()
         {
-            StateMachine.Fire(Triggers.Play);
+            try
+            {
+                StateMachine.Fire(Triggers.Play);
+            }
+            catch (Exception e)
+            {
+                //MessageBox.Show(e.Message, "Start Playing Error", MessageBoxButton.OK, MessageBoxImage.Error);
+                mLogger.Error("Voice recorder exception - (m)_startPlaying_Execute " + e.Message);
+            }
+            
         }
 
         private bool _startPlaying_CanExecute()
-        {
+        {            
             return StateMachine.State == States.Ready
                    && mWizardWorkflow.State != WizardStates.PlayingInContext
                    && !string.IsNullOrEmpty(CurrentFilePath)
@@ -342,15 +393,23 @@ namespace DialogGenerator.UI.ViewModels
 
         private void _startRecording_Execute()
         { 
-            if(EnableRecording)
-            {               
-                StateMachine.Fire(Triggers.Record);
-                mSoundRecognizer.RecognizeAsync(RecognizeMode.Multiple);
-            } else
+            try
             {
-                mEventAggregator.GetEvent<RequestTranslationEvent>().Publish(this.GetType().Name);
+                if (EnableRecording)
+                {
+                    StateMachine.Fire(Triggers.Record);
+                    mSoundRecognizer.RecognizeAsync(RecognizeMode.Multiple);
+                }
+                else
+                {
+                    mEventAggregator.GetEvent<RequestTranslationEvent>().Publish(this.GetType().Name);
+                }
+            } catch (Exception e)
+            {
+                //MessageBox.Show(e.Message, "Start Recording Error", MessageBoxButton.OK, MessageBoxImage.Error);
+                mLogger.Error("Voice recorder exception - (m)_startRecording_Execute " + e.Message);
             }
-            
+                        
         }
 
         private bool _startRecording_CanExecute()
