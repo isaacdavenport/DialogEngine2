@@ -269,11 +269,14 @@ namespace DialogGenerator.DataAccess
 
             // Find dialog models collections that match the above selected phrase weights.            
             List<ModelDialogInfo> _matchedDialogInfos = new List<ModelDialogInfo>();
-            
+
             if(_phraseWeights.Count > 0)
             {
                 ObservableCollection<ModelDialogInfo> _dlgModels = Session.Get(Constants.DIALOG_MODELS) as ObservableCollection<ModelDialogInfo>;
-                if(_dlgModels != null && _dlgModels.Count > 0)
+
+                //var _testList = _dlgModels?.Where(dm => dm.ModelsCollectionName.Equals("Custom Dialogs")).ToList();
+
+                if (_dlgModels != null && _dlgModels.Count > 0)
                 {
                     foreach(var _dlginfo in _dlgModels)
                     {
@@ -284,9 +287,19 @@ namespace DialogGenerator.DataAccess
                             {
                                 if(_phraseWeights.Contains(_phraseType))
                                 {
-                                    if(!_matchedDialogInfos.Contains(_dlginfo))
+                                    if (!_matchedDialogInfos.Contains(_dlginfo))
                                     {
-                                        _matchedDialogInfos.Add(_dlginfo);
+                                        _matchedDialogInfos.Add(_dlginfo.Clone());
+                                    }
+                                    else
+                                    {
+                                        var _matchedDialogInfo =
+                                            _matchedDialogInfos.First(d => d.ModelsCollectionName.Equals(_dlginfo.ModelsCollectionName));
+
+                                        if (!_matchedDialogInfo.ArrayOfDialogModels.Any(d => d.Equals(_dialogModel)))
+                                        {
+                                            _matchedDialogInfo.ArrayOfDialogModels.Add(_dialogModel.Clone());
+                                        }
                                     }
                                 }
                             }

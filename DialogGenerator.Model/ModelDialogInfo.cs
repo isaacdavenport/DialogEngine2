@@ -73,5 +73,26 @@ namespace DialogGenerator.Model
         {
             PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(_propertyName));
         }
+
+        public ModelDialogInfo Clone()
+        {
+            ModelDialogInfo _dlgInfo = new ModelDialogInfo
+            {
+                ModelsCollectionName = this.ModelsCollectionName,
+                ArrayOfDialogModels = new List<ModelDialog>(),
+                Editable = this.Editable,
+                FileName = this.FileName,
+                JsonArrayIndex = this.JsonArrayIndex,
+                SelectedModelDialogIndex = this.SelectedModelDialogIndex,
+                State = this.State
+            };
+
+            foreach(var _dialogModel in this.ArrayOfDialogModels)
+            {
+                _dlgInfo.ArrayOfDialogModels.Add(_dialogModel.Clone());
+            }            
+
+            return _dlgInfo;
+        }
     }
 }

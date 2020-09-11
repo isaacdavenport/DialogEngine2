@@ -113,5 +113,21 @@ namespace DialogGenerator.Model
 
             return true;
         }
+
+        public ModelDialog Clone()
+        {
+            ModelDialog _modelDialog = new ModelDialog
+            {
+                AddedOnDateTime = this.AddedOnDateTime,
+                Name = this.Name,
+                Adventure = this.Adventure,
+                PhraseTypeSequence = this.PhraseTypeSequence,
+                Popularity = this.Popularity,
+                Provides = this.Provides,
+                Requires = this.Requires,                
+            };
+
+            return _modelDialog;
+        }
     }
 }
