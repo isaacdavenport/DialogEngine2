@@ -93,7 +93,7 @@ namespace DialogGenerator.UI.ViewModels
             MediaPlayerControlViewModel = new MediaPlayerControlViewModel(Workflow, mLogger);
 
             mLogger.Info("Before creating of VoiceRecorderControlViewModel");
-            VoiceRecorderControlViewModel = new VoiceRecorderControlViewModel(NAudioEngine.Instance,Workflow,mMessageDialogService, _eventAggregator);
+            VoiceRecorderControlViewModel = new VoiceRecorderControlViewModel(NAudioEngine.Instance,Workflow,mMessageDialogService, _eventAggregator, logger);
             mLogger.Info("After creating of VoiceRecorderControlViewModel");
 
             mLogger.Info("Before calling of the speech synthesizer");
