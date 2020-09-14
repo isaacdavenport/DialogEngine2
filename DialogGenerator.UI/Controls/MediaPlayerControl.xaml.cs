@@ -45,6 +45,11 @@ namespace DialogGenerator.UI.Controls
             mUpdateTimer.Interval = TimeSpan.FromSeconds(0.1);
             mUpdateTimer.Tick += MUpdateTimer_Tick;
 
+            if(this.VideoPlayer.Source == null)
+            {
+                this.VideoPlayer.Source = new Uri(((MediaPlayerControlViewModel)this.DataContext).CurrentVideoFilePath);
+            }
+
         }
 
         private void MediaPlayerControl_ShiftBackwardsRequested(object sender, EventArgs e)
