@@ -51,7 +51,6 @@ namespace DialogGenerator.UI.ViewModels
         private IMessageDialogService mMessageDialogService;
         private string mCurrentDialogWizard = String.Empty;
         private string mNextButtonText = "Next";
-        private bool mIsFinished = false;
         private IBLEDataProviderFactory mBLEDataProviderFactory;
         private IBLEDataProvider mCurrentDataProvider;
         private CancellationTokenSource mCancellationTokenSource;
@@ -628,7 +627,6 @@ namespace DialogGenerator.UI.ViewModels
             CurrentStepIndex = 0;
             NextButtonText = "Next";
             WizardPassthroughIndex = 0;
-            mIsFinished = false;
             SelectedRadio = RadiosCollection[0];
 
             Character = new Character();
@@ -1027,7 +1025,6 @@ namespace DialogGenerator.UI.ViewModels
                     }
                     else
                     {
-                        mIsFinished = true;
                         Workflow.Fire(Triggers.Finish);
                     }                                       
                     
@@ -1238,19 +1235,10 @@ namespace DialogGenerator.UI.ViewModels
 
         private class WizardCollection
         {
-            string mVersionNumber;
-            ObservableCollection<string> mWizards = new ObservableCollection<string>();
-            
             [JsonProperty("Version")]
             public string Version { get; set; }
             [JsonProperty("Wizards")]
-            public ObservableCollection<string> Wizards
-            {
-                get
-                {
-                    return mWizards;
-                }
-            }
+            public ObservableCollection<string> Wizards { get; } = new ObservableCollection<string>();
         }
 
         private bool _loadWizardCollection()
@@ -1275,7 +1263,7 @@ namespace DialogGenerator.UI.ViewModels
                     }
                                         
                 }
-            } catch (IOException ioe)
+            } catch (IOException)
             {
                 return false;
             }
@@ -1310,7 +1298,6 @@ namespace DialogGenerator.UI.ViewModels
         private void _onCreateCommand_execute()
         {
             _initEntries();
-            mIsFinished = false;
             Character = new Character();
             Workflow.Fire(Triggers.SetName);
             mRegionManager.Regions[Constants.ContentRegion].NavigationService.RequestNavigate("CreateView");

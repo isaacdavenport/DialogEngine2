@@ -595,23 +595,10 @@ namespace DialogGenerator.CharacterSelection
                 {
                     NextCharacter1 = _nextSpeakingCharacter1Index;
                     NextCharacter2 = _nextSpeakingCharacter2Index;
-                    // S. Ristic - This condition will prevent the character selection
-                    // while entering the play mode in guided character creation mode.
-                    if (/* _areRadioPairsDifferent(NextCharacter1, NextCharacter2, CurrentCharacter1, CurrentCharacter2) 
-                        || mFreshStart */  true)
-                    {
-                        _nextCharactersSelectedAreNew = true;
-                        mLogger.Info("New speaking characters assigned by BLE: Character 1 is " + NextCharacter1 +
-                            " Character 2 is " + NextCharacter2);
-                    }
-                    else
-                    {
-                        mLogger.Info(String.Format("Characters not assigned! Current1 = {0}, Next1 = {1}, Current2 = {2}, Next2 = {3}"
-                            , CurrentCharacter1
-                            , NextCharacter1
-                            , CurrentCharacter2
-                            , NextCharacter2));
-                    }
+
+                    _nextCharactersSelectedAreNew = true;
+                    mLogger.Info("New speaking characters assigned by BLE: Character 1 is " + NextCharacter1 +
+                        " Character 2 is " + NextCharacter2);                                        
                 }
                 else
                 {

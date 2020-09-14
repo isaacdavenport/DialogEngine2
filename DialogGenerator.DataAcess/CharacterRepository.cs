@@ -115,8 +115,7 @@ namespace DialogGenerator.DataAccess
                         // Check sample dialogs collections for the dialogs other than ones
                         // defined in the SampleDialogs.cfg
                         if(_dialogModel.ModelsCollectionName.Contains("SampleDialogs"))
-                        {
-                            bool _exists = true;
+                        {                            
                             List<int> indices = new List<int>();
                             for(int i = 0; i < _dialogModel.ArrayOfDialogModels.Count; i++)
                             {
@@ -128,16 +127,7 @@ namespace DialogGenerator.DataAccess
 
                             _dialogModel.ArrayOfDialogModels.RemoveAll(el => indices.Contains(_dialogModel.ArrayOfDialogModels.IndexOf(el)) );
 
-                            //foreach(var _dialog in _dialogModel.ArrayOfDialogModels)
-                            //{
-                            //    if (!_sampleDialogsList.DialogModels[0].ArrayOfDialogModels.Contains(_dialog))
-                            //    {
-                            //        _exists = false;
-                            //        break;
-                            //    }                                                                                                        
-                            //}
-
-                            if(/* !_exists */ _dialogModel.ArrayOfDialogModels.Count > 0)
+                            if(_dialogModel.ArrayOfDialogModels.Count > 0)
                             {
                                 var _jsonList = new JSONObjectsTypesList();
                                 _jsonList.DialogModels.Add(_dialogModel);

@@ -45,7 +45,7 @@ namespace DialogGenerator.DataAccess
                 .Where(dm => dm.ModelsCollectionName.Equals(name))
                 .FirstOrDefault();
                 return _dialogModelInfo;
-            } catch (Exception e)
+            } catch (Exception)
             {
                 return null;
             }

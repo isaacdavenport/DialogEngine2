@@ -23,7 +23,6 @@ namespace DialogGenerator.UI.Views
     /// </summary>
     public partial class ArenaAvatarView : UserControl
     {
-        private bool mDrag = false;
         private double mMouseLeftPosition = 0.0;
         private double mMouseTopPosition = 0.0;
         public EventHandler RemoveRequested;
@@ -97,7 +96,6 @@ namespace DialogGenerator.UI.Views
         {
             if(e.LeftButton == MouseButtonState.Pressed)
             {
-                mDrag = true;
                 mMouseLeftPosition = e.GetPosition(sender as IInputElement).X;
                 mMouseTopPosition = e.GetPosition(sender as IInputElement).Y;
                 Mouse.Capture(sender as IInputElement);
@@ -115,13 +113,12 @@ namespace DialogGenerator.UI.Views
 
         private void UserControl_MouseUp(object sender, MouseButtonEventArgs e)
         {
-            mDrag = false;
             Mouse.Capture(null);
         }
 
         private void UserControl_MouseMove(object sender, MouseEventArgs e)
         {
-            if (/* mDrag */ e.LeftButton == MouseButtonState.Pressed)
+            if (e.LeftButton == MouseButtonState.Pressed)
             {
                 double _deltaX = e.GetPosition(sender as IInputElement).X - mMouseLeftPosition;
                 double _deltaY = e.GetPosition(sender as IInputElement).Y - mMouseTopPosition;

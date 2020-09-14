@@ -229,8 +229,7 @@ namespace DialogGenerator.UI.Views
         private void Playground_MouseLeftButtonUp(object sender, System.Windows.Input.MouseButtonEventArgs e)
         {
             ArenaViewModel _model = this.DataContext as ArenaViewModel;
-            AvatarPair _avatarPair = _model.FindClosestAvatarPair();
-            int a = 1;
+            AvatarPair _avatarPair = _model.FindClosestAvatarPair();         
         }
 
 

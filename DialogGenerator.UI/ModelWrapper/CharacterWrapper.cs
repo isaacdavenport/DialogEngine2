@@ -25,8 +25,8 @@ namespace DialogGenerator.UI.Wrapper
         {
             List<string> errors = new List<string>();
 
-            switch (_propertyName)
-            {
+            //switch (_propertyName)
+            //{
                 //case nameof(CharacterPrefix):
                 //    {
                 //        var character = mCharacterDataProvider.GetByInitials(CharacterPrefix);
@@ -35,7 +35,7 @@ namespace DialogGenerator.UI.Wrapper
                 //            errors.Add("Character initials must be unique.");
                 //        break;
                 //    }                    
-            }
+            //}
 
             return errors;
         }

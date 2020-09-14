@@ -30,8 +30,7 @@ namespace DialogGenerator.UI.ViewModels
         CollectionViewSource mPhraseDefinitionModels;
         CollectionViewSource mCharacters;
         string mPhraseDescription;
-        PhraseDefinitionModel mSelectedModel;
-        int mModelsInDialogCount = 0;
+        PhraseDefinitionModel mSelectedModel;        
         bool mCharacterSelectionEnabled = true;
 
         public CharacterSlotViewModel(ICharacterDataProvider _CharacterDataProvider

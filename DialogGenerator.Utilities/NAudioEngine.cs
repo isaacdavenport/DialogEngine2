@@ -361,7 +361,7 @@ namespace DialogGenerator.Utilities
                     _normalizeMP3File(_outputPathMP3);
                     File.Copy(_outputPathMP3, mCurrentFilePath, true);
                 }
-                catch(Exception ex)
+                catch(Exception)
                 {
 
                 }
@@ -540,7 +540,7 @@ namespace DialogGenerator.Utilities
                     ChannelLength = mInputStream.TotalTime.TotalSeconds;
                     CanPlay = true;
                 }
-                catch(Exception ex)
+                catch(Exception)
                 {
                     ActiveStream = null;
                     CanPlay = false;
