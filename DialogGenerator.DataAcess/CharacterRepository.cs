@@ -56,12 +56,6 @@ namespace DialogGenerator.DataAccess
                 var _jsonObjectsTypesList = _findDataForFile(_fileName);
                 _jsonObjectsTypesList.Editable = character.Editable;
 
-                //var _collectionName = character.CharacterPrefix + "_" + "SampleDialogs";
-                //if (!_jsonObjectsTypesList.DialogModels.Any(dm => dm.ModelsCollectionName.Equals(_collectionName)))
-                //{
-                //    _addSampleModelsToCharacter(character, ref _jsonObjectsTypesList);
-                //}
-
                 Serializer.Serialize(_jsonObjectsTypesList,
                     Path.Combine(ApplicationData.Instance.DataDirectory, _fileName));
                 mLogger.Info("serializing JSON output for: " + character.CharacterName);
@@ -89,81 +83,12 @@ namespace DialogGenerator.DataAccess
 
         private void _removeFile(string _fileName)
         {
-            var _jsonObjectsTypesList = _findDataForFile(_fileName);
-            var _sampleDialogsList = new JSONObjectsTypesList();            
-
-            using (var reader = new StreamReader(ApplicationData.Instance.DataDirectory + "\\SampleDialogs.cfg"))
+            string _fullPath = Path.Combine(ApplicationData.Instance.DataDirectory, _fileName);
+            if (File.Exists(_fullPath))
             {
-                string _jsonString = reader.ReadToEnd();
-                _sampleDialogsList = Serializer.Deserialize<JSONObjectsTypesList>(_jsonString);
+                FileSystem.DeleteFile(_fullPath, UIOption.OnlyErrorDialogs, RecycleOption.SendToRecycleBin);
             }
 
-            if (!_isListNullOrEmpty(_jsonObjectsTypesList.Characters)
-                || !_isListNullOrEmpty(_jsonObjectsTypesList.Wizards)
-                || !_isListNullOrEmpty(_jsonObjectsTypesList.DialogModels))
-            {
-
-                // S.Ristic 10/12/2019.
-                // For each of the custom dialog models and wizards
-                // create a separate json file.
-                if (_isListNullOrEmpty(_jsonObjectsTypesList.Characters))
-                {
-                    foreach(var _dialogModel in _jsonObjectsTypesList.DialogModels)
-                    {
-
-                        // S.Ristic 05/19/2020
-                        // Check sample dialogs collections for the dialogs other than ones
-                        // defined in the SampleDialogs.cfg
-                        if(_dialogModel.ModelsCollectionName.Contains("SampleDialogs"))
-                        {                            
-                            List<int> indices = new List<int>();
-                            for(int i = 0; i < _dialogModel.ArrayOfDialogModels.Count; i++)
-                            {
-                                if(_sampleDialogsList.DialogModels[0].ArrayOfDialogModels.Contains(_dialogModel.ArrayOfDialogModels[i]))
-                                {
-                                    indices.Add(i);
-                                }
-                            }
-
-                            _dialogModel.ArrayOfDialogModels.RemoveAll(el => indices.Contains(_dialogModel.ArrayOfDialogModels.IndexOf(el)) );
-
-                            if(_dialogModel.ArrayOfDialogModels.Count > 0)
-                            {
-                                var _jsonList = new JSONObjectsTypesList();
-                                _jsonList.DialogModels.Add(_dialogModel);
-                                var _separateFileName = _dialogModel.ModelsCollectionName + ".json";
-                                Serializer.Serialize(_jsonList, Path.Combine(ApplicationData.Instance.DataDirectory, _separateFileName));
-                            }                            
-                        }                        
-                    }
-
-                    foreach( var _wizard in _jsonObjectsTypesList.Wizards)
-                    {
-                        var _jsonList = new JSONObjectsTypesList();
-                        _jsonList.Wizards.Add(_wizard);
-                        var _separateFileName = _wizard.WizardName + ".json";
-                        Serializer.Serialize(_jsonList, Path.Combine(ApplicationData.Instance.DataDirectory, _separateFileName));
-                    }
-
-                    // S.Ristic 10/12/2019.
-                    // And now delete the original file.
-                    string _fullPath = Path.Combine(ApplicationData.Instance.DataDirectory, _fileName);
-                    if (File.Exists(_fullPath))
-                    {
-                        FileSystem.DeleteFile(_fullPath, UIOption.OnlyErrorDialogs, RecycleOption.SendToRecycleBin);
-                    }
-
-                }
-
-            }
-            else
-            {
-                string _fullPath = Path.Combine(ApplicationData.Instance.DataDirectory, _fileName);
-                if (File.Exists(_fullPath))
-                {
-                    FileSystem.DeleteFile(_fullPath, UIOption.OnlyErrorDialogs, RecycleOption.SendToRecycleBin);
-                }
-            }
             mLogger.Info("removing file: " + _fileName);
 
         }
@@ -413,37 +338,7 @@ namespace DialogGenerator.DataAccess
 
         }
 
-        #region Private methods
-
-        private void _addSampleModelsToCharacter(Character character, ref JSONObjectsTypesList _list)
-        {
-            var _jsonObjectsTypesList = new JSONObjectsTypesList();
-            if (!File.Exists(ApplicationData.Instance.DataDirectory + "\\SampleDialogs.cfg"))
-                return;
-
-            using (var reader = new StreamReader(ApplicationData.Instance.DataDirectory + "\\SampleDialogs.cfg")) //creates new streamerader for fs stream. Could also construct with filename...
-            {
-                string _jsonString = reader.ReadToEnd();
-
-                _jsonObjectsTypesList = Serializer.Deserialize<JSONObjectsTypesList>(_jsonString);
-                if (_jsonObjectsTypesList != null)
-                {                    
-                    foreach (var _dialogModel in _jsonObjectsTypesList.DialogModels)
-                    {
-                        _dialogModel.FileName = character.FileName;
-                        _dialogModel.ModelsCollectionName = character.CharacterPrefix + "_" + _dialogModel.ModelsCollectionName;
-                        foreach (var _dialog in _dialogModel.ArrayOfDialogModels)
-                        {
-                            var _dialogName = _dialog.Name;
-                            _dialogName = character.CharacterPrefix + "_" + _dialogName;
-                            _dialog.Name = _dialogName;
-                        }
-
-                        _list.DialogModels.Add(_dialogModel);
-                    }
-                }
-            }
-        }
+        #region Private methods        
 
         #endregion
     }
