@@ -201,15 +201,25 @@ namespace DialogGenerator.UI.ViewModels
                         mCharacterDataProvider.GetAll().Add(_importedCharacter);
                     }
 
-                    foreach (var _importedDialogModel in _JSONObjectsTypesList.DialogModels.ToList()?? Enumerable.Empty<ModelDialogInfo>())
+                    foreach (var _importedDialogModelInfo in _JSONObjectsTypesList.DialogModels.ToList()?? Enumerable.Empty<ModelDialogInfo>())
                     {
-                        if (mDialogModelDataProvider.GetByName(_importedDialogModel.ModelsCollectionName) == null)
+                        var _containedCollection = mDialogModelDataProvider.GetByName(_importedDialogModelInfo.ModelsCollectionName);
+                        if (_containedCollection == null)
                         {
-                            mDialogModelDataProvider.GetAll().Add(_importedDialogModel);
+                            mDialogModelDataProvider.GetAll().Add(_importedDialogModelInfo);
                         }
                         else
                         {
-                            _JSONObjectsTypesList.DialogModels.Remove(_importedDialogModel);
+                            _importedDialogModelInfo.ArrayOfDialogModels.RemoveAll(dlg => _containedCollection.ArrayOfDialogModels.Contains(dlg));
+
+                            if(_importedDialogModelInfo.ArrayOfDialogModels.Count == 0)
+                            {
+                                _JSONObjectsTypesList.DialogModels.Remove(_importedDialogModelInfo);
+                            } else
+                            {
+                                _containedCollection.ArrayOfDialogModels.AddRange(_importedDialogModelInfo.ArrayOfDialogModels);
+                            }
+                            
                         }
                     }
 
