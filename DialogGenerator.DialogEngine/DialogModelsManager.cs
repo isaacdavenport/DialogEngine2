@@ -451,13 +451,14 @@ namespace DialogGenerator.DialogEngine
                     _preparePossibleDialogModelsList(mContext.Character1Num, mContext.Character2Num);
             }
 
-            if (!mContext.SameCharactersAsLast &&
-                mContext.PossibleDialogModelsList.Any(d => d.PhraseTypeSequence.Contains("Greeting")))
-            {
-                return mContext.DialogModelsList.IndexOf(
-                    mContext.PossibleDialogModelsList.First(d => d.PhraseTypeSequence.Contains("Greeting"))
-                );
-            }
+            // Commented DLGEN-543 S.Ristic - We do not want after each character change to start with a greeting.
+            //if (!mContext.SameCharactersAsLast &&
+            //    mContext.PossibleDialogModelsList.Any(d => d.PhraseTypeSequence.Contains("Greeting")))
+            //{
+            //    return mContext.DialogModelsList.IndexOf(
+            //        mContext.PossibleDialogModelsList.First(d => d.PhraseTypeSequence.Contains("Greeting"))
+            //    );
+            //}
 
             // if we create a list of only dialog models that will work for the two characters and iterate through that
             // smaller list, we won't have to worry about landing on dialog models the two characters can't use
