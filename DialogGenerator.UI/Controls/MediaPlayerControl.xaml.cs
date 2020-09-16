@@ -33,21 +33,23 @@ namespace DialogGenerator.UI.Controls
 
         private void _mediaPlayerControl_Loaded(object sender, RoutedEventArgs e)
         {
-            (DataContext as MediaPlayerControlViewModel).PlayRequested += _mediaPlayerControl_PlayRequested;
-            (DataContext as MediaPlayerControlViewModel).PauseRequested += _mediaPlayerControl_PauseRequested;
-            (DataContext as MediaPlayerControlViewModel).StopRequested += _mediaPlayerControl_StopRequested;
-            (DataContext as MediaPlayerControlViewModel).ShiftForwardRequested += MediaPlayerControl_ShiftForwardRequested;
-            (DataContext as MediaPlayerControlViewModel).ShiftBackwardsRequested += MediaPlayerControl_ShiftBackwardsRequested;
-            (DataContext as MediaPlayerControlViewModel).PropertyChanged += MediaPlayerControl_PropertyChanged;
+            MediaPlayerControlViewModel _mvm = ((MediaPlayerControlViewModel)DataContext);
+
+            _mvm.PlayRequested += _mediaPlayerControl_PlayRequested;
+            _mvm.PauseRequested += _mediaPlayerControl_PauseRequested;
+            _mvm.StopRequested += _mediaPlayerControl_StopRequested;
+            _mvm.ShiftForwardRequested += MediaPlayerControl_ShiftForwardRequested;
+            _mvm.ShiftBackwardsRequested += MediaPlayerControl_ShiftBackwardsRequested;
+            _mvm.PropertyChanged += MediaPlayerControl_PropertyChanged;
 
 
             mUpdateTimer = new DispatcherTimer();
             mUpdateTimer.Interval = TimeSpan.FromSeconds(0.1);
             mUpdateTimer.Tick += MUpdateTimer_Tick;
 
-            if(this.VideoPlayer.Source == null)
+            if(this.VideoPlayer.Source == null && !string.IsNullOrEmpty(_mvm.CurrentVideoFilePath))
             {
-                this.VideoPlayer.Source = new Uri(((MediaPlayerControlViewModel)this.DataContext).CurrentVideoFilePath);
+                this.VideoPlayer.Source = new Uri(_mvm.CurrentVideoFilePath);
             }
 
         }
