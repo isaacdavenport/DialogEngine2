@@ -90,9 +90,25 @@ namespace DialogGenerator.DialogEngine
                     .All(pts => mContext.CharactersList[character2Index].Phrases
                         .Any(phrase => phrase.PhraseWeights.Keys.Contains(pts)))).ToList();
 
+            // Removing multiple greetings.
+            var listToReturn = new List<ModelDialog>();
 
+            _possibleList.ForEach(dlg =>
+                {
+                    if (dlg.PhraseTypeSequence.Contains("Greeting"))
+                    {
+                        if (!listToReturn.Any(d => d.PhraseTypeSequence.Any(ps => ps.Equals("Greeting"))))
+                        {
+                            listToReturn.Add(dlg);
+                        }
+                    } else
+                    {
+                        listToReturn.Add(dlg);
+                    }
+                }
+            );
             
-            return _possibleList;
+            return listToReturn;
         }
 
         private bool _checkIfDialogPreRequirementMet(int _dialogModel)
@@ -490,7 +506,7 @@ namespace DialogGenerator.DialogEngine
                                              && mContext.SameCharactersAsLast;
                 var _containsRecentPhrases = _checkForRecentPhrases(_dialogModel);
 
-                if (_dialogPreRequirementsMet && !_inappropriateGreeting &&
+                if (_dialogPreRequirementsMet && /*!_inappropriateGreeting &&*/
                     !_dialogModelUsedRecently && !_containsRecentPhrases)
                 {
                     _dialogModelFits = true;
