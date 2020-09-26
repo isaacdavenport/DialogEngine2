@@ -346,11 +346,14 @@ namespace DialogGenerator.DialogEngine
 
         private  Triggers _startDialog(CancellationToken token)
         {
+            if (mIndexOfCurrentDialogModel <= 0 || mIndexOfCurrentDialogModel >= mContext.DialogModelsList.Count)
+                return Triggers.FinishDialog;
+
             try
             {
                 System.Console.WriteLine("Dialog {0} started", mIndexOfCurrentDialogModel);
 
-                var _speakingCharacter = mContext.Character1Num;
+                 var _speakingCharacter = mContext.Character1Num;
                 var _selectedPhrase = mContext.CharactersList[_speakingCharacter].Phrases[0]; //initialize to unused placeholder phrase
 
                 string _debugMessage = "_startDialog " + mContext.CharactersList[mContext.Character1Num].CharacterPrefix + " and " +
@@ -442,7 +445,11 @@ namespace DialogGenerator.DialogEngine
                             _speakingCharacter = mContext.Character1Num;
                     }
 
-                    mContext.HistoricalDialogs[mContext.HistoricalDialogs.Count - 1].Completed = true;
+                    if(mContext.HistoricalDialogs.Count > 0)
+                    {
+                        mContext.HistoricalDialogs[mContext.HistoricalDialogs.Count - 1].Completed = true;
+                    }
+                    
 
                     if (mContext.HistoricalDialogs.Count > 2000)
                         mContext.HistoricalDialogs.RemoveRange(0, 100);
