@@ -252,8 +252,16 @@ namespace DialogGenerator.UI.ViewModels
 
         private void _initCharactersCollection()
         {
-            mCharacters = new CollectionViewSource();
             var _characters = new ObservableCollection<Character>();
+            if (mCharacters != null)
+            {
+                _characters = mCharacters.Source as ObservableCollection<Character>;
+                _characters.Clear();
+            } else
+            {
+                mCharacters = new CollectionViewSource();
+            }
+                        
             _characters.Add(new Character
             {
                 CharacterName = "GENERIC",
