@@ -323,7 +323,12 @@ namespace DialogGenerator.UI.ViewModels
                 PopularityValues.Add(_value);
             }
 
-            for(double i = 1.0; i < 30; i ++)
+            for(double i = 1.0; i < 15; i ++)
+            {
+                PopularityValues.Add(i);
+            }
+
+            for(double i = 20; i <= 200; i += 5)
             {
                 PopularityValues.Add(i);
             }
