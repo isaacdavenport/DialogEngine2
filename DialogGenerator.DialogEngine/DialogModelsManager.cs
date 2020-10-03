@@ -61,11 +61,15 @@ namespace DialogGenerator.DialogEngine
         {
             if (obj != null && mContext.DialogModelsList.Any())
             {
-                mContext.PossibleDialogModelsList = _preparePossibleDialogModelsList(obj.Character1Index, obj.Character2Index);
-                mContext.CharactersList[obj.Character1Index].ClearRecentPhrases();
-                mContext.CharactersList[obj.Character2Index].ClearRecentPhrases();
-                mContext.HistoricalDialogs.Clear();
-                mContext.HistoricalPhrases.Clear();
+                if(obj.Character1Index != -1 && obj.Character2Index != -1)
+                {
+                    mContext.PossibleDialogModelsList = _preparePossibleDialogModelsList(obj.Character1Index, obj.Character2Index);
+                    mContext.CharactersList[obj.Character1Index].ClearRecentPhrases();
+                    mContext.CharactersList[obj.Character2Index].ClearRecentPhrases();
+                    mContext.HistoricalDialogs.Clear();
+                    mContext.HistoricalPhrases.Clear();
+                } 
+               
             }
         }
 
