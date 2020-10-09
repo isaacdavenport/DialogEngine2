@@ -95,24 +95,25 @@ namespace DialogGenerator.DialogEngine
                         .Any(phrase => phrase.PhraseWeights.Keys.Contains(pts)))).ToList();
 
             // Removing multiple greetings.
-            var listToReturn = new List<ModelDialog>();
+            //var listToReturn = new List<ModelDialog>();
 
-            _possibleList.ForEach(dlg =>
-                {
-                    if (dlg.PhraseTypeSequence.Contains("Greeting"))
-                    {
-                        if (!listToReturn.Any(d => d.PhraseTypeSequence.Any(ps => ps.Equals("Greeting"))))
-                        {
-                            listToReturn.Add(dlg);
-                        }
-                    } else
-                    {
-                        listToReturn.Add(dlg);
-                    }
-                }
-            );
-            
-            return listToReturn;
+            //_possibleList.ForEach(dlg =>
+            //    {
+            //        if (dlg.PhraseTypeSequence.Contains("Greeting"))
+            //        {
+            //            if (!listToReturn.Any(d => d.PhraseTypeSequence.Any(ps => ps.Equals("Greeting"))))
+            //            {
+            //                listToReturn.Add(dlg);
+            //            }
+            //        } else
+            //        {
+            //            listToReturn.Add(dlg);
+            //        }
+            //    }
+            //);
+
+            //return listToReturn;
+            return _possibleList;
         }
 
         private bool _checkIfDialogPreRequirementMet(int _dialogModel)
@@ -279,12 +280,15 @@ namespace DialogGenerator.DialogEngine
             return _returnIndex; // code for no next adventure continuance found
         }
 
-        public void _swapCharactersOneAndTwo()
+        private bool _isGreetingDialog(int idx)
         {
-            var _tempCh1 = mContext.Character1Num;
-            mContext.Character1Num = mContext.Character2Num;
-            mContext.Character2Num = _tempCh1;
-            // it doesn't appear we should update prior characters 1 and 2 here
+            var _dlg = mContext.DialogModelsList[idx];
+            if (_dlg.PhraseTypeSequence.Where(p => p.Equals("Greeting")).Count() == 2)
+            {
+                return true;
+            }
+
+            return false;
         }
 
         private bool _checkIfDialogModelUsedRecently(int _dialogModel)
@@ -412,6 +416,14 @@ namespace DialogGenerator.DialogEngine
 
         #region - public functions -
 
+        public void _swapCharactersOneAndTwo()
+        {
+            var _tempCh1 = mContext.Character1Num;
+            mContext.Character1Num = mContext.Character2Num;
+            mContext.Character2Num = _tempCh1;
+            // it doesn't appear we should update prior characters 1 and 2 here
+        }
+
         public void Initialize()
         {
             if (mContext.DialogModelsList.Count > 0)
@@ -428,6 +440,122 @@ namespace DialogGenerator.DialogEngine
                     mContext.DialogModelsList.Add(_dialogModel);
                 }
             }
+        }
+
+        public int PickAWeightedDialog2()
+        {
+            var _dialogModel = 0;
+            var _mostRecentAdventureDialogIndexes = _findMostRecentAdventureDialogIndexes();
+
+            // most recent will be in the 0 index of list which will be hit first in foreach
+            if (_mostRecentAdventureDialogIndexes.Count > 0)
+            {
+                var _nextAdventureDialogIdx = _findNextAdventureDialogForCharacters(_mostRecentAdventureDialogIndexes);
+                if (_nextAdventureDialogIdx > 0 && _nextAdventureDialogIdx < mContext.DialogModelsList.Count)
+                    return _nextAdventureDialogIdx; // we have an adventure dialog for these characters go with it
+            }
+
+            if (mContext.PossibleDialogModelsList == null || !mContext.PossibleDialogModelsList.Any())
+            {
+                mContext.PossibleDialogModelsList =
+                    _preparePossibleDialogModelsList(mContext.Character1Num, mContext.Character2Num);
+            }
+
+            //if(mContext.HistoricalDialogs.Any() && mContext.PossibleDialogModelsList.Any())
+            //{
+            //    // Get last dialog indices in the history dialogs collection.
+            //    int _depth = Math.Min(DialogEngineConstants.RecentDialogsQueSize, mContext.HistoricalDialogs.Count);
+            //    var _lastDlgIndices = mContext.HistoricalDialogs.Select((dlg, i) => new { i, dlg }).Where(dlg => dlg.i >= mContext.HistoricalDialogs.Count - _depth).Select(a => a.dlg.DialogIndex).ToList();
+            //    var _lastDialogs = mContext.DialogModelsList.Select((dlg, i) => new { i, dlg }).Where(dlgObject => _lastDlgIndices.Contains(dlgObject.i)).Select(dlgObj => dlgObj.dlg).ToList();
+            //    mContext.PossibleDialogModelsList = mContext.PossibleDialogModelsList.Except(_lastDialogs).ToList();
+            //}
+
+            if(mContext.PossibleDialogModelsList.Count == 0)
+            {
+                return _dialogModel;
+            }
+
+            var _itemsToRemove = _dialogsToRemove();
+            var _filteredList = new List<ModelDialog>();
+            if(_itemsToRemove.Count > 0)
+            {
+                //var _resetHistory = _itemsToRemove.Count == mContext.PossibleDialogModelsList.Count ? true : false;
+                if(mContext.PossibleDialogModelsList.Count == _itemsToRemove.Count)
+                {
+                    mContext.HistoricalDialogs.Clear();
+                    mContext.CharactersList[mContext.Character1Num].ClearRecentPhrases();
+                    mContext.CharactersList[mContext.Character2Num].ClearRecentPhrases();
+                    _itemsToRemove = _dialogsToRemove();
+
+                    if(mContext.PossibleDialogModelsList.Count == _itemsToRemove.Count)
+                    {
+                        // Leave at least one dialog.
+                        _itemsToRemove.RemoveAt(0);
+                    }
+                }
+
+                _filteredList = mContext.PossibleDialogModelsList.Except(_itemsToRemove).ToList();
+                
+            }
+
+            var _currentDialogWeightSum = 0.0;
+            var _dialogWeightIndex = mRandom.NextDouble();
+            _dialogWeightIndex *= _filteredList.Sum(dlg => dlg.Popularity);
+            foreach (var _dialog in _filteredList)
+            {
+                _currentDialogWeightSum += _dialog.Popularity;
+
+                if (_currentDialogWeightSum > _dialogWeightIndex)
+                {
+                    _dialogModel = mContext.DialogModelsList.IndexOf(_dialog);
+                    break;
+                }
+            }
+
+            return _dialogModel;
+        }        
+
+        private List<ModelDialog> _dialogsToRemove()
+        {
+            var _itemsToRemove = new List<ModelDialog>();
+            ModelDialog _greetingDialog = null;
+            mContext.PossibleDialogModelsList.ForEach(dlg =>
+            {
+                bool _removeCriteriaMet = false;
+                var _idx = mContext.DialogModelsList.IndexOf(dlg);
+                if (_checkIfDialogModelUsedRecently(_idx))
+                {
+                    _removeCriteriaMet = true;
+                }
+
+                if (!_removeCriteriaMet && !_checkIfDialogPreRequirementMet(_idx))
+                {
+                    _removeCriteriaMet = true;
+                }
+
+                if (!_removeCriteriaMet && _checkForRecentPhrases(_idx))
+                {
+                    _removeCriteriaMet = true;
+                }
+
+                if (_isGreetingDialog(_idx))
+                {
+                    if(_greetingDialog != null)
+                    {
+                        _removeCriteriaMet = true;
+                    } else
+                    {
+                        _greetingDialog = dlg;
+                    }                    
+                }                
+
+                if (_removeCriteriaMet)
+                {
+                    _itemsToRemove.Add(dlg);
+                }
+            });
+
+            return _itemsToRemove;
         }
 
         // PickAWeightedDialog and PickAWeightedPhrase use a statistical approach to randomly select DialogModels and 

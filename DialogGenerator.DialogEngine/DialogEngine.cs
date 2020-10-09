@@ -318,6 +318,12 @@ namespace DialogGenerator.DialogEngine
                 if (mCharacterPairSelectionDataCached.Character1Index == -1 || mCharacterPairSelectionDataCached.Character2Index == -1)
                     return Triggers.PrepareDialogParameters;
 
+                if (Session.Get<bool>(Constants.NEEDS_RESTART) || Session.Get<bool>(Constants.CANCEL_DIALOG))
+                {
+                    Session.Set(Constants.CANCEL_DIALOG, false);
+                    return Triggers.PrepareDialogParameters;
+                }
+
                 if (!_setNextCharacters())
                     return Triggers.PrepareDialogParameters;
 
@@ -325,7 +331,7 @@ namespace DialogGenerator.DialogEngine
 
                 mIndexOfCurrentDialogModel = Session.Get<int>(Constants.SELECTED_DLG_MODEL) >= 0
                                             ? Session.Get<int>(Constants.SELECTED_DLG_MODEL)
-                                            : mDialogModelsManager.PickAWeightedDialog();
+                                            : mDialogModelsManager.PickAWeightedDialog2();
 
                 token.ThrowIfCancellationRequested();
                 _addDialogModelToHistory(mIndexOfCurrentDialogModel, mContext.Character1Num, mContext.Character2Num);
@@ -346,7 +352,7 @@ namespace DialogGenerator.DialogEngine
 
         private  Triggers _startDialog(CancellationToken token)
         {
-            if (mIndexOfCurrentDialogModel <= 0 || mIndexOfCurrentDialogModel >= mContext.DialogModelsList.Count)
+            if (mIndexOfCurrentDialogModel < 0 || mIndexOfCurrentDialogModel >= mContext.DialogModelsList.Count)
                 return Triggers.FinishDialog;
 
             try
