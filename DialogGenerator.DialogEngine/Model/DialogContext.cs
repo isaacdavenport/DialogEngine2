@@ -15,5 +15,7 @@ namespace DialogGenerator.DialogEngine.Model
         public ObservableCollection<Character> CharactersList = new ObservableCollection<Character>();
         public List<HistoricalDialog> HistoricalDialogs = new List<HistoricalDialog>();
         public List<HistoricalPhrase> HistoricalPhrases = new List<HistoricalPhrase>();
+        public bool NoDialogs = false;
+        public bool FirstRoundGone = false;
     }
 }

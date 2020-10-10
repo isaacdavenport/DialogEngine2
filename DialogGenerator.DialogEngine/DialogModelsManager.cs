@@ -14,6 +14,7 @@ using System.Net;
 using DialogGenerator.Utilities;
 using DialogGenerator.Utilities.Dialogs;
 using Microsoft.Practices.ObjectBuilder2;
+using System.Windows;
 
 namespace DialogGenerator.DialogEngine
 {
@@ -58,16 +59,23 @@ namespace DialogGenerator.DialogEngine
         }
 
         private void _onSelectedCharactersPairChanged(SelectedCharactersPairEventArgs obj)
-        {
+        {            
             if (obj != null && mContext.DialogModelsList.Any())
             {
                 if(obj.Character1Index != -1 && obj.Character2Index != -1)
                 {
                     mContext.PossibleDialogModelsList = _preparePossibleDialogModelsList(obj.Character1Index, obj.Character2Index);
+                    if(mContext.PossibleDialogModelsList.Count > 0 && mContext.NoDialogs)
+                    {
+                        mContext.NoDialogs = false;
+                    }
+
                     mContext.CharactersList[obj.Character1Index].ClearRecentPhrases();
                     mContext.CharactersList[obj.Character2Index].ClearRecentPhrases();
                     mContext.HistoricalDialogs.Clear();
                     mContext.HistoricalPhrases.Clear();
+
+                    mContext.FirstRoundGone = false;
                 } 
                
             }
@@ -461,18 +469,26 @@ namespace DialogGenerator.DialogEngine
                     _preparePossibleDialogModelsList(mContext.Character1Num, mContext.Character2Num);
             }
 
-            //if(mContext.HistoricalDialogs.Any() && mContext.PossibleDialogModelsList.Any())
-            //{
-            //    // Get last dialog indices in the history dialogs collection.
-            //    int _depth = Math.Min(DialogEngineConstants.RecentDialogsQueSize, mContext.HistoricalDialogs.Count);
-            //    var _lastDlgIndices = mContext.HistoricalDialogs.Select((dlg, i) => new { i, dlg }).Where(dlg => dlg.i >= mContext.HistoricalDialogs.Count - _depth).Select(a => a.dlg.DialogIndex).ToList();
-            //    var _lastDialogs = mContext.DialogModelsList.Select((dlg, i) => new { i, dlg }).Where(dlgObject => _lastDlgIndices.Contains(dlgObject.i)).Select(dlgObj => dlgObj.dlg).ToList();
-            //    mContext.PossibleDialogModelsList = mContext.PossibleDialogModelsList.Except(_lastDialogs).ToList();
-            //}
-
             if(mContext.PossibleDialogModelsList.Count == 0)
             {
-                return _dialogModel;
+                // Ovde ubaciti izmenu karaktera
+                _swapCharactersOneAndTwo();
+                mContext.PossibleDialogModelsList = _preparePossibleDialogModelsList(mContext.Character1Num, mContext.Character2Num);
+                if(mContext.PossibleDialogModelsList.Count == 0)
+                {
+                    if(!mContext.NoDialogs) {
+                        //MessageBox.Show("Characters have no mutual dialogs!", "Error", MessageBoxButton.OK, MessageBoxImage.Error);
+                        mContext.NoDialogs = true;
+                    }
+
+                    return -1;
+                }
+            } else
+            {
+                if(mContext.NoDialogs)
+                {
+                    mContext.NoDialogs = false;
+                }
             }
 
             var _itemsToRemove = _dialogsToRemove();
@@ -486,16 +502,19 @@ namespace DialogGenerator.DialogEngine
                     mContext.CharactersList[mContext.Character1Num].ClearRecentPhrases();
                     mContext.CharactersList[mContext.Character2Num].ClearRecentPhrases();
                     _itemsToRemove = _dialogsToRemove();
-
-                    if(mContext.PossibleDialogModelsList.Count == _itemsToRemove.Count)
+                    if (_itemsToRemove.Count == mContext.PossibleDialogModelsList.Count)
                     {
                         // Leave at least one dialog.
                         _itemsToRemove.RemoveAt(0);
                     }
+                    
                 }
 
                 _filteredList = mContext.PossibleDialogModelsList.Except(_itemsToRemove).ToList();
                 
+            } else
+            {
+                _filteredList = mContext.PossibleDialogModelsList;
             }
 
             var _currentDialogWeightSum = 0.0;
@@ -538,7 +557,7 @@ namespace DialogGenerator.DialogEngine
                     _removeCriteriaMet = true;
                 }
 
-                if (_isGreetingDialog(_idx))
+                if (!_removeCriteriaMet && _isGreetingDialog(_idx))
                 {
                     if(_greetingDialog != null)
                     {
@@ -547,13 +566,35 @@ namespace DialogGenerator.DialogEngine
                     {
                         _greetingDialog = dlg;
                     }                    
-                }                
+                }           
+                
+                if(!_removeCriteriaMet && (_greetingDialog != null || dlg.PhraseTypeSequence.Contains("Greeting")))
+                {
+                    
+                    if(mContext.FirstRoundGone)
+                    {
+                        _removeCriteriaMet = true;
+                    }
+                }
 
                 if (_removeCriteriaMet)
                 {
                     _itemsToRemove.Add(dlg);
                 }
             });
+
+            if(_greetingDialog != null && !mContext.FirstRoundGone)
+            {
+                var _popularity = _greetingDialog.Popularity;
+                if(_itemsToRemove.Where(dlg => dlg.Popularity > _popularity).Any())
+                {
+                    double _maxPopularity = _itemsToRemove.Max(dlg => dlg.Popularity);                    
+                    var _mostPopularGreetingDlg = _itemsToRemove.First(dlg => dlg.Popularity == _maxPopularity);
+
+                    _itemsToRemove.Remove(_mostPopularGreetingDlg);
+                    _itemsToRemove.Add(_greetingDialog);
+                }
+            }
 
             return _itemsToRemove;
         }

@@ -334,7 +334,11 @@ namespace DialogGenerator.DialogEngine
                                             : mDialogModelsManager.PickAWeightedDialog2();
 
                 token.ThrowIfCancellationRequested();
-                _addDialogModelToHistory(mIndexOfCurrentDialogModel, mContext.Character1Num, mContext.Character2Num);
+
+                if(mIndexOfCurrentDialogModel != -1)
+                {
+                    _addDialogModelToHistory(mIndexOfCurrentDialogModel, mContext.Character1Num, mContext.Character2Num);
+                }                
 
                 return Triggers.StartDialog;
             }
@@ -359,7 +363,7 @@ namespace DialogGenerator.DialogEngine
             {
                 System.Console.WriteLine("Dialog {0} started", mIndexOfCurrentDialogModel);
 
-                 var _speakingCharacter = mContext.Character1Num;
+                var _speakingCharacter = mContext.Character1Num;
                 var _selectedPhrase = mContext.CharactersList[_speakingCharacter].Phrases[0]; //initialize to unused placeholder phrase
 
                 string _debugMessage = "_startDialog " + mContext.CharactersList[mContext.Character1Num].CharacterPrefix + " and " +
@@ -462,8 +466,11 @@ namespace DialogGenerator.DialogEngine
 
                     if (mContext.HistoricalPhrases.Count > 8000)
                         mContext.HistoricalPhrases.RemoveRange(0, 100);
-
+                    
                 }
+
+                if (!mContext.FirstRoundGone)
+                    mContext.FirstRoundGone = true;
 
                 int _completedDlgModels = Session.Get<int>(Constants.COMPLETED_DLG_MODELS);
                 Session.Set(Constants.COMPLETED_DLG_MODELS, ++_completedDlgModels);
