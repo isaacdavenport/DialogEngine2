@@ -254,10 +254,19 @@ namespace DialogGenerator.UI.ViewModels
 
         private void _loadSoundEngine()
         {
-            mSoundRecognizer = new SpeechRecognitionEngine(System.Globalization.CultureInfo.GetCultureInfo("en-US"));
-            mSoundRecognizer.LoadGrammar(new DictationGrammar());
-            mSoundRecognizer.SetInputToDefaultAudioDevice();
-            mSoundRecognizer.SpeechRecognized += MSoundRecognizer_SpeechRecognized;
+            try
+            {
+                mSoundRecognizer = new SpeechRecognitionEngine(System.Globalization.CultureInfo.GetCultureInfo("en-US"));
+                mSoundRecognizer.LoadGrammar(new DictationGrammar());
+                mSoundRecognizer.SetInputToDefaultAudioDevice();
+                mSoundRecognizer.SpeechRecognized += MSoundRecognizer_SpeechRecognized;
+            } catch (Exception e)
+            {
+                string _msg = "Error during the sound recognizer initialization - ";
+                _msg += e.Message;
+                mLogger.Error(_msg);
+            }
+            
         }
 
         private void _unloadSoundEngine()
