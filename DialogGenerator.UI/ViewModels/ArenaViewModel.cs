@@ -27,6 +27,7 @@ namespace DialogGenerator.UI.ViewModels
         private Random mRandom;
         private IMessageDialogService mMessageDialogService;
         public EventHandler<RemoveArenaAvatarViewEventArgs> RemoveAvatarRequested;
+        private bool mCharactersHaveNoDialogs = false;
         
         public ArenaViewModel(ILogger _Logger
             , IEventAggregator _EventAggregator
@@ -42,7 +43,13 @@ namespace DialogGenerator.UI.ViewModels
 
             mEventAggregator.GetEvent<CharacterCollectionLoadedEvent>().Subscribe(_onCharacterCollectionLoaded);
             mEventAggregator.GetEvent<CharactersInConversationEvent>().Subscribe(_onCharactersInConversation);
+            mEventAggregator.GetEvent<CharactersHaveDialogsEvent>().Subscribe(_onCharactersHaveDialogs);
             PlaygroundAvatars.CollectionChanged += PlaygroundAvatars_CollectionChanged;
+        }
+
+        private void _onCharactersHaveDialogs(bool have)
+        {
+            CharactersHaveNoDialogs = !have;
         }
 
         private void PlaygroundAvatars_CollectionChanged(object sender, NotifyCollectionChangedEventArgs e)
@@ -97,6 +104,20 @@ namespace DialogGenerator.UI.ViewModels
                     
                 }
                 
+            }
+        }
+
+        public bool CharactersHaveNoDialogs
+        {
+            get
+            {
+                return mCharactersHaveNoDialogs;
+            }
+
+            set
+            {
+                mCharactersHaveNoDialogs = value;
+                RaisePropertyChanged();
             }
         }
 

@@ -481,6 +481,7 @@ namespace DialogGenerator.DialogEngine
                         mContext.NoDialogs = true;
                     }
 
+                    mEventAggregator.GetEvent<CharactersHaveDialogsEvent>().Publish(false);
                     return -1;
                 }
             } else
@@ -489,6 +490,8 @@ namespace DialogGenerator.DialogEngine
                 {
                     mContext.NoDialogs = false;
                 }
+
+                mEventAggregator.GetEvent<CharactersHaveDialogsEvent>().Publish(true);
             }
 
             var _itemsToRemove = _dialogsToRemove();

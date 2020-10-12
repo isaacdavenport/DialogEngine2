@@ -17,6 +17,7 @@
     <UserControl.Resources>
         <converters:ImageToFullPathValueConverter x:Key="ImageToFullPathValueConverter" />
         <converters:ImageContentValueConverter x:Key="ImageContentValueConverter" />
+        <converters:BoolToVisibilityConverter x:Key="BoolToVisibilityConverter" />
         <DataTemplate x:Key="AvatarPanel">
             <materialDesign:Card Width="60" Margin="5" Background="AliceBlue" BorderBrush="Green" BorderThickness="2">
                 <Grid>
@@ -62,14 +63,25 @@
             <ColumnDefinition Width="Auto"/>
             <ColumnDefinition Width="Auto"/>
         </Grid.ColumnDefinitions>
-        <Canvas x:Name="Playground" 
-                Grid.Column="0" 
+        <Grid Grid.Column="0">
+            <Grid.RowDefinitions>
+                <RowDefinition Height="*"/>
+                <RowDefinition Height="Auto"/>
+            </Grid.RowDefinitions>
+            <Border Grid.Row="1" Height="50" Background="#ffffaa" Visibility="{Binding CharactersHaveNoDialogs, Converter={StaticResource BoolToVisibilityConverter}}">
+                <TextBlock Text="The selected character pair has no common dialogs! Please select another pair!" 
+                           Foreground="#51cb8c" FontWeight="Bold"  HorizontalAlignment="Center" VerticalAlignment="Center"/>
+            </Border>
+            <Canvas x:Name="Playground" 
+                Grid.Row="0" 
                 Background="#ffffaa" 
                 AllowDrop="True" 
                 Drop="Playground_Drop" 
                 DragEnter="Playground_DragEnter" 
                 MouseLeftButtonUp="Playground_MouseLeftButtonUp" 
                 SizeChanged="Playground_SizeChanged"/>
+        </Grid>
+        
         <Separator Grid.Column="1" Width="2"/>
         <ScrollViewer VerticalScrollBarVisibility="Auto" Grid.Column="2">
             <ItemsControl x:Name="AvatarGallery" 
