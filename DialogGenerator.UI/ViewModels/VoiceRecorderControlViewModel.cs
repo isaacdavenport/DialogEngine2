@@ -265,13 +265,15 @@ namespace DialogGenerator.UI.ViewModels
                 string _msg = "Error during the sound recognizer initialization - ";
                 _msg += e.Message;
                 mLogger.Error(_msg);
+                mSoundRecognizer = null;
             }
             
         }
 
         private void _unloadSoundEngine()
         {
-            mSoundRecognizer.SpeechRecognized -= MSoundRecognizer_SpeechRecognized;
+            if(mSoundRecognizer != null)
+                mSoundRecognizer.SpeechRecognized -= MSoundRecognizer_SpeechRecognized;
         }
 
         private void MSoundRecognizer_SpeechRecognized(object sender, SpeechRecognizedEventArgs e)
@@ -407,7 +409,8 @@ namespace DialogGenerator.UI.ViewModels
                 if (EnableRecording)
                 {
                     StateMachine.Fire(Triggers.Record);
-                    mSoundRecognizer.RecognizeAsync(RecognizeMode.Multiple);
+                    if(mSoundRecognizer != null)
+                        mSoundRecognizer.RecognizeAsync(RecognizeMode.Multiple);
                 }
                 else
                 {
@@ -437,7 +440,8 @@ namespace DialogGenerator.UI.ViewModels
                         mTimer.Change(Timeout.Infinite, Timeout.Infinite);
                         mSoundPlayer.StopRecording();                                                    
                         StateMachine.Fire(Triggers.On);
-                        mSoundRecognizer.RecognizeAsyncStop();
+                        if(mSoundRecognizer != null)
+                            mSoundRecognizer.RecognizeAsyncStop();
                         break;
                     }
                 case States.Playing:
