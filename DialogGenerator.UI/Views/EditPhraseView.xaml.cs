@@ -67,7 +67,6 @@ namespace DialogGenerator.UI.Views
         {
             DialogHost.CloseDialogCommand.Execute(null, CancelDialogButton);
         }
-        
 
     }
 }

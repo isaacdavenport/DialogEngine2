@@ -319,12 +319,12 @@ namespace DialogGenerator.UI.ViewModels
                         _phraseEntry.PhraseWeights.Clear();
                         foreach(var _phraseWeight in mWeights)
                         {
-                            if(string.IsNullOrEmpty(_phraseWeight.Key))
+                            if(string.IsNullOrEmpty(_phraseWeight.Key.Key))
                             {
                                 continue;
                             }    
 
-                            _phraseEntry.PhraseWeights.Add(_phraseWeight.Key, _phraseWeight.Value);
+                            _phraseEntry.PhraseWeights.Add(_phraseWeight.Key.Key, _phraseWeight.Value);
                         }
                     }                    
                 }
@@ -360,7 +360,7 @@ namespace DialogGenerator.UI.ViewModels
 
         private bool _addPhraseWeight_CanExecute()
         {
-            bool _hasEmptyEntries = mWeights.Where(phw => string.IsNullOrEmpty(phw.Key)).Count() > 0;
+            bool _hasEmptyEntries = mWeights.Where(phw => string.IsNullOrEmpty(phw.Key.Key)).Count() > 0;
             return !_hasEmptyEntries;
         }
 
@@ -494,23 +494,23 @@ namespace DialogGenerator.UI.ViewModels
 
     public class PhraseWeight : INotifyPropertyChanged
     {
-        private string mKey;
+        private ComboEntry mKey;
         private ILogger mLogger;
         public event PropertyChangedEventHandler PropertyChanged;
         
 
         public PhraseWeight(string _Key, double _Value, ILogger _Logger)
         {
-            Key = _Key;
+            _initLists();
+            Key = new ComboEntry() {Key = _Key, Description = ""};
             Value = _Value;
             mLogger = _Logger;
-            _initLists();
         }
 
-        public ObservableCollection<string> Keys { get; set; } = new ObservableCollection<string>();
+        public ObservableCollection<ComboEntry> Keys { get; set; } = new ObservableCollection<ComboEntry>();
         public ObservableCollection<double> Values { get; set; } = new ObservableCollection<double>();
 
-        public string Key { 
+        public ComboEntry Key { 
             get
             {
                 return mKey;
@@ -518,9 +518,11 @@ namespace DialogGenerator.UI.ViewModels
 
             set
             {
+
                 mKey = value;
                 OnNofityPropertyChanged(nameof(Key));
             }
+
         }
 
         public double Value { get; set; }
@@ -542,10 +544,11 @@ namespace DialogGenerator.UI.ViewModels
                 {
                     string _jsonString = _reader.ReadToEnd();
                     var _phraseKeysCollection = Serializer.Deserialize<PhraseKeysCollection>(_jsonString);
-                                        
+
                     if (_phraseKeysCollection != null && _phraseKeysCollection.Phrases.Count() > 0)
                     {
-                        Keys.AddRange(_phraseKeysCollection.Phrases.Where(p => p != null).Select(p => p.Name));
+                        Keys.AddRange(_phraseKeysCollection.Phrases.Where(p => p != null).Select(p => new ComboEntry
+                            { Key = p.Name, Description = p.Description}));
                     }
                 }
 
@@ -561,6 +564,22 @@ namespace DialogGenerator.UI.ViewModels
                 mLogger.Error(e.Message);                
             }
 
+        }
+    }
+
+    public class ComboEntry : Object, IComparable<ComboEntry>
+    {
+        public string Key { get; set; }
+        public string Description { get; set; }
+
+        public int CompareTo(ComboEntry other)
+        {
+            return other.Key.CompareTo(this.Key);
+        }
+
+        public override string ToString()
+        {
+            return Key;
         }
     }
 }

@@ -39,5 +39,5 @@ using System.Windows;
 )]
 
 //This is the version number picked up for  display in debug/settings screen
-[assembly: AssemblyVersion("5.84")] 
+[assembly: AssemblyVersion("5.85")] 
 
