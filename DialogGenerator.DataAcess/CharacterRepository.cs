@@ -260,7 +260,29 @@ namespace DialogGenerator.DataAccess
         }
 
         public async Task AddAsync(Character character)
-        {            
+        {
+            if (!_checkForSilence(character))
+            {
+                var _phrase = new PhraseEntry()
+                {
+                    DialogStr = "",
+                    FileName = "HalfSilence",
+                    PhraseRating = "PG",
+                    PhraseWeights = new Dictionary<string, double>(),
+                };
+
+                _phrase.PhraseWeights.Add("GiveSilence", 10.0);
+
+                // Copy file
+                // Get character prefix
+                var _destFileName = ApplicationData.Instance.AudioDirectory + "\\" + character.CharacterPrefix + "_HalfSecSilence.mp3";
+                var _sourceFileName = ApplicationData.Instance.AudioDirectory + "\\XX_HalfSecSilence.mp3";
+                File.Copy(_sourceFileName,_destFileName);
+                
+                character.Phrases.Add(_phrase);
+
+            }
+
             // add character to list of characters, so we can grab its data to serialize to file
             GetAll().Add(character);            
 
@@ -268,6 +290,17 @@ namespace DialogGenerator.DataAccess
             {
                 _serializeCharacter(character);
             });
+        }
+
+        private bool _checkForSilence(Character character)
+        {
+            if (character.Phrases.Count(p => p.PhraseWeights.ContainsKey("GiveSilence")) > 0)
+            {
+                return true;
+            }
+
+            return false;
+
         }
 
         public ObservableCollection<Character> GetAll()
