@@ -73,7 +73,7 @@
     <HeatDirectory OutputFile="$(ProjectDir)\DataFiles.wxs" Transforms="$(ProjectDir)\Transform.xsl" Directory="C:\Users\$(USERNAME)\Documents\DialogGenerator" ComponentGroupName="DataFiles" DirectoryRefId="DataFolder" PreprocessorVariable="var.HarvestPath" GenerateGuidsNow="true" KeepEmptyDirectories="true" SuppressRegistry="true" SuppressRootDirectory="true" ToolPath="$(WixToolPath)" NoLogo="true" />
   </Target>
   <PropertyGroup>
-    <PostBuildEvent>C:\Isaac\Toys2Life\DialogEngine\DialogGenerator.Setup\bin\Debug\signtool sign /sha1 afd41048e607af658ca15d80a46400b860ce5d0d C:\Isaac\Toys2Life\DialogEngine\DialogGenerator.Setup\bin\Debug\DialogGenerator.msi</PostBuildEvent>
+    <PostBuildEvent />
   </PropertyGroup>
   <!--
 	<Target Name="AfterBuild">

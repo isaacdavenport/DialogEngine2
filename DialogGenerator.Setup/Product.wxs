@@ -10,7 +10,7 @@
     <Package InstallerVersion="200" Compressed="yes" InstallScope="perMachine" />
 
     <Condition Message="This application can only be installed on Windows 10">
-      <![CDATA[Installed OR (VersionNT >= 603)]]>
+      <![CDATA[Installed OR (VersionNT >= 603) OR (VersionNT64 >= 603)]]>
     </Condition>
     
 		<MajorUpgrade DowngradeErrorMessage="A newer version of [ProductName] is already installed." 
