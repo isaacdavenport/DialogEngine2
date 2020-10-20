@@ -266,7 +266,7 @@ namespace DialogGenerator.DataAccess
                 var _phrase = new PhraseEntry()
                 {
                     DialogStr = "",
-                    FileName = "HalfSilence",
+                    FileName = "HalfSecSilence_" + DateTime.Now.ToString("yyyy-dd-MM-HH-mm-ss"),
                     PhraseRating = "PG",
                     PhraseWeights = new Dictionary<string, double>(),
                 };
@@ -274,8 +274,7 @@ namespace DialogGenerator.DataAccess
                 _phrase.PhraseWeights.Add("GiveSilence", 10.0);
 
                 // Copy file
-                // Get character prefix
-                var _destFileName = ApplicationData.Instance.AudioDirectory + "\\" + character.CharacterPrefix + "_HalfSecSilence.mp3";
+                var _destFileName = ApplicationData.Instance.AudioDirectory + "\\" + character.CharacterPrefix + "_" + _phrase.FileName + ".mp3";
                 var _sourceFileName = ApplicationData.Instance.AudioDirectory + "\\XX_HalfSecSilence.mp3";
                 File.Copy(_sourceFileName,_destFileName);
                 
