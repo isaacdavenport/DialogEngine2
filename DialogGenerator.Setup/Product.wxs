@@ -5,8 +5,14 @@
   
 	<Product Id="*" Name="$(var.SkuName)" Language="1033" Version="$(var.VersionNumber)" 
    Manufacturer="$(var.Manufacturer)" UpgradeCode="880cbb5f-2d77-425a-8d96-a8000443c1f2">
-        
-		<Package InstallerVersion="200" Compressed="yes" InstallScope="perMachine" />
+
+
+    <Package InstallerVersion="200" Compressed="yes" InstallScope="perMachine" />
+
+    <Condition Message="This application can only be installed on Windows 10">
+      <![CDATA[Installed OR (VersionNT >= 603)]]>
+    </Condition>
+    
 		<MajorUpgrade DowngradeErrorMessage="A newer version of [ProductName] is already installed." 
       AllowSameVersionUpgrades="yes" AllowDowngrades="no" Schedule="afterInstallInitialize"/>
 		<MediaTemplate EmbedCab="yes" />
