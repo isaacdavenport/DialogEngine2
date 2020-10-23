@@ -98,7 +98,9 @@ namespace DialogGenerator.Core
 
         public string DefaultImage { get; set; } = "avatar.png";        
         public int NumberOfRadios { get; set; } = 6;
-        public string URLToUpdateFile { get; set; } = "http://drive.google.com/uc?export=download&id=1nkflu9P-y1gQMajnxv58BRU7TqrgBh9U";
+        
+        public string URLToUpdateFile { get; set; } = "https://drive.google.com/uc?export=download&id=1sAeUrBq6A29G9sI5tJekLNkFclqBeYiX";        
+
         public int CheckForUpdateInterval { get; set; } = 30; // minutes
 
         public bool TextDialogsOn { get; set; } = true;
