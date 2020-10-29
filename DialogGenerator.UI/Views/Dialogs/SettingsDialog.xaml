@@ -144,21 +144,18 @@
                 <Label Content="Version:" Grid.Column="0" HorizontalAlignment="Right" Margin="10" Grid.Row="5" />
                 <Label Content="{Binding Version}" Grid.Column="2" HorizontalAlignment="Left" Margin="0,10,0,0" Grid.Row="5" />
 
-                <Grid Grid.Row="6" Grid.ColumnSpan="3">
-                    <Grid.ColumnDefinitions>
-                        <ColumnDefinition Width="Auto"/>
-                        <ColumnDefinition Width="*" />
-                        <ColumnDefinition Width="Auto" />
-                    </Grid.ColumnDefinitions>
-                    <Label Content="Background image:" HorizontalAlignment="Right"/>
-                    <Label Content="{Binding Settings.BackgroundImage, Converter={StaticResource ImageShortNameConverter}}" Grid.Column="1" FontWeight="Bold"/>
-                    <Button Grid.Column="2" Command="{Binding SelectBacgroundCommand}">
-                        <StackPanel Orientation="Horizontal">
-                            <Image Source="Resources/openfile24.png" Width="20" Height="20"/>
-                        </StackPanel>
-                    </Button>
+ 
+                <Label Content="Background image:" HorizontalAlignment="Right" Grid.Row="6"/>
+                <Button Command="{Binding SelectBacgroundCommand}" Grid.Row="6" Grid.Column="2" Width="90" HorizontalAlignment="Left">
+                    <StackPanel Orientation="Horizontal">
+                        <Image Source="Resources/openfile24.png" Width="20" Height="20"/>
+                        <TextBlock Text="Select"/>
+                    </StackPanel>
+                </Button>
 
-                </Grid>
+                <Image Source="{Binding Settings.BackgroundImage}" Grid.Row="7" Grid.ColumnSpan="3" Width="300" Margin="20" />
+
+                
             </Grid>
             <StackPanel Orientation="Horizontal" HorizontalAlignment="Center" Grid.Row="1" Grid.ColumnSpan="2">
                 <Button Content="Save"
