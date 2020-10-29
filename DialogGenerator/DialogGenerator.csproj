@@ -234,6 +234,7 @@
     <Resource Include="Resources\logo.jpg">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Resource>
+    <Resource Include="Resources\openfile.png" />
     <Content Include="Resources\Silence.mp3" />
     <Resource Include="Resources\T2L_C.jpg.ico" />
   </ItemGroup>

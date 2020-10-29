@@ -154,6 +154,7 @@
     <Compile Include="Converters\CloneValuesConverter.cs" />
     <Compile Include="Converters\DivideBy2ValueConverter.cs" />
     <Compile Include="Converters\IdentifierConverter.cs" />
+    <Compile Include="Converters\ImageShortNameConverter.cs" />
     <Compile Include="Converters\NotBoolToVisibilityConverter.cs" />
     <Compile Include="Converters\EndWizardBtnVisibilityConverter.cs" />
     <Compile Include="Converters\ImageContentSmallSizeValueConverter.cs" />
@@ -436,6 +437,9 @@
   </ItemGroup>
   <ItemGroup>
     <Resource Include="Views\Pictures\Apps-Dialog-Remove-icon.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="Views\Dialogs\Resources\openfile24.png" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <Import Project="..\packages\NAudio.Lame.1.1.0\build\NAudio.Lame.targets" Condition="Exists('..\packages\NAudio.Lame.1.1.0\build\NAudio.Lame.targets')" />

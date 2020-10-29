@@ -1,7 +1,10 @@
 ﻿using DialogGenerator.Core;
+using DialogGenerator.Events;
 using DialogGenerator.UI.Wrapper;
 using MaterialDesignThemes.Wpf;
+using Microsoft.Win32;
 using Prism.Commands;
+using Prism.Events;
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
@@ -20,13 +23,17 @@ namespace DialogGenerator.UI.Views.Dialogs
     public partial class SettingsDialog : UserControl,INotifyPropertyChanged
     {
         private ApplicationDataWrapper mSettings;
+        private IEventAggregator mEventAggregator;
 
-        public SettingsDialog()
+
+        public SettingsDialog(IEventAggregator _EventAggregator)
         {
             DataContext = this;
 
             WebsiteCommand = new DelegateCommand(_websiteCommand_Execute);
             CloseCommand = new DelegateCommand(_closeCommand_Execute);
+            SelectBacgroundCommand = new DelegateCommand(_selectBackgroundImage_Execute);
+            mEventAggregator = _EventAggregator;
 
             InitializeComponent();
 
@@ -40,8 +47,11 @@ namespace DialogGenerator.UI.Views.Dialogs
             }
         }
 
+        
         public ICommand WebsiteCommand { get; set; }
         public ICommand CloseCommand { get; set; }
+
+        public ICommand SelectBacgroundCommand { get; set; }
 
         private void _websiteCommand_Execute()
         {
@@ -53,6 +63,18 @@ namespace DialogGenerator.UI.Views.Dialogs
             Settings.Model.Save();
             DialogHost.CloseDialogCommand.Execute(null,this.CloseBtn);
         }
+
+        private void _selectBackgroundImage_Execute()
+        {
+            OpenFileDialog openFileDialog = new OpenFileDialog();
+            openFileDialog.InitialDirectory = ApplicationData.Instance.ImagesDirectory;
+            if(openFileDialog.ShowDialog() == true)
+            {
+                Settings.BackgroundImage = openFileDialog.FileName;
+                mEventAggregator.GetEvent<ArenaBackgroundChangedEvent>().Publish();
+            }
+        }
+
 
         public virtual void OnPropertyChanged(string _propertyName)
         {

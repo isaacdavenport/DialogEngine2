@@ -28,6 +28,7 @@ namespace DialogGenerator.UI.ViewModels
         private IMessageDialogService mMessageDialogService;
         public EventHandler<RemoveArenaAvatarViewEventArgs> RemoveAvatarRequested;
         private bool mCharactersHaveNoDialogs = false;
+        private string mBackgroundImage;
         
         public ArenaViewModel(ILogger _Logger
             , IEventAggregator _EventAggregator
@@ -44,7 +45,16 @@ namespace DialogGenerator.UI.ViewModels
             mEventAggregator.GetEvent<CharacterCollectionLoadedEvent>().Subscribe(_onCharacterCollectionLoaded);
             mEventAggregator.GetEvent<CharactersInConversationEvent>().Subscribe(_onCharactersInConversation);
             mEventAggregator.GetEvent<CharactersHaveDialogsEvent>().Subscribe(_onCharactersHaveDialogs);
+            mEventAggregator.GetEvent<ArenaBackgroundChangedEvent>().Subscribe(_onArenaBackgroundChanged);
             PlaygroundAvatars.CollectionChanged += PlaygroundAvatars_CollectionChanged;
+
+            BackgroundImage = ApplicationData.Instance.BackgroundImage;
+                        
+        }
+
+        private void _onArenaBackgroundChanged()
+        {
+            BackgroundImage = ApplicationData.Instance.BackgroundImage;
         }
 
         private void _onCharactersHaveDialogs(bool have)
@@ -104,6 +114,20 @@ namespace DialogGenerator.UI.ViewModels
                     
                 }
                 
+            }
+        }
+
+        public string BackgroundImage
+        {
+            get
+            {
+                return mBackgroundImage;
+            }
+
+            set
+            {
+                mBackgroundImage = value;
+                RaisePropertyChanged();
             }
         }
 

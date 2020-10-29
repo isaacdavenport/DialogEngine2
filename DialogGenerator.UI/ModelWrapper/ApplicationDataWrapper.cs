@@ -67,6 +67,20 @@ namespace DialogGenerator.UI.Wrapper
             return errors;
         }
 
+        public string BackgroundImage
+        {
+            get
+            {
+                return getValue<string>();
+            }
+
+            set
+            {
+                setValue(value);
+                validateProperty(nameof(BackgroundImage));
+            }
+        }
+
         public bool TagUsageCheck
         {
             get { return getValue<bool>(); }

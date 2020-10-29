@@ -74,12 +74,15 @@
             </Border>
             <Canvas x:Name="Playground" 
                 Grid.Row="0" 
-                Background="#ffffaa" 
                 AllowDrop="True" 
                 Drop="Playground_Drop" 
                 DragEnter="Playground_DragEnter" 
                 MouseLeftButtonUp="Playground_MouseLeftButtonUp" 
-                SizeChanged="Playground_SizeChanged"/>
+                SizeChanged="Playground_SizeChanged">
+                <Canvas.Background>
+                    <ImageBrush ImageSource="{Binding BackgroundImage}" Stretch="UniformToFill" AlignmentY="Center" />
+                </Canvas.Background>
+            </Canvas>
         </Grid>
         
         <Separator Grid.Column="1" Width="2"/>

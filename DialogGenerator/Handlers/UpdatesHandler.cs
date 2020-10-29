@@ -24,7 +24,7 @@ namespace DialogGenerator.Handlers
             AutoUpdater.ReportErrors = true;
 
             //mcTimer.Start();
-            AutoUpdater.Start(ApplicationData.Instance.URLToUpdateFile);
+            //AutoUpdater.Start(ApplicationData.Instance.URLToUpdateFile);
         }
 
         private void _mcTimer_Tick(object sender, EventArgs e)
@@ -82,7 +82,7 @@ namespace DialogGenerator.Handlers
 
         public void CheckForUpdates()
         {
-            //AutoUpdater.Start(ApplicationData.Instance.URLToUpdateFile);
+            AutoUpdater.Start(ApplicationData.Instance.URLToUpdateFile);
         }
     }
 }

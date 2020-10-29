@@ -55,6 +55,7 @@
     <Compile Include="ActiveCharactersEvent.cs" />
     <Compile Include="AddedPhraseModelToDialogEvent.cs" />
     <Compile Include="AddingPhraseModelToDialogEvent.cs" />
+    <Compile Include="ArenaBackgroundChangedEvent.cs" />
     <Compile Include="ChangedCharacterStateEvent.cs" />
     <Compile Include="ChangedDialogModelStateEvent.cs" />
     <Compile Include="CharacterCollectionLoadedEvent.cs" />

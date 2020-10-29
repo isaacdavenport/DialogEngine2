@@ -23,6 +23,7 @@ namespace DialogGenerator.Core
         private string mImagesDirectory;
         private string mToolsDirectory;
         private string mEditorTempDirectory;
+        private string mBackgroundImage;
 
         static ApplicationData()
         {
@@ -120,6 +121,10 @@ namespace DialogGenerator.Core
         [DisplayName("Current parental rating:")]
         [RegularExpression(@"^(?:PG|G|PG13|R)$", ErrorMessage = @"Allowed values: PG,G,PG13,R.")]
         public string CurrentParentalRating { get; set; } = "PG";
+
+        [Editable(true)]
+        [DisplayName("Background image:")]
+        public string BackgroundImage { get; set; } = string.Empty;
 
         [Description("Delay between 2 phrases in dialog.")]
         [DisplayName("Delay between phrases:")]
