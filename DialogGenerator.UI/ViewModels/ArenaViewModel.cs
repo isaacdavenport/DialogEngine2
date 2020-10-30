@@ -10,6 +10,7 @@ using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Collections.Specialized;
+using System.IO;
 using System.Linq;
 using System.Threading;
 using System.Windows;
@@ -29,6 +30,7 @@ namespace DialogGenerator.UI.ViewModels
         public EventHandler<RemoveArenaAvatarViewEventArgs> RemoveAvatarRequested;
         private bool mCharactersHaveNoDialogs = false;
         private string mBackgroundImage;
+        private bool mHasBackgroundImage = false;
         
         public ArenaViewModel(ILogger _Logger
             , IEventAggregator _EventAggregator
@@ -117,6 +119,20 @@ namespace DialogGenerator.UI.ViewModels
             }
         }
 
+        public bool HasBackgroundImage
+        {
+            get
+            {
+                return mHasBackgroundImage;
+            }
+
+            set
+            {
+                mHasBackgroundImage = value;
+                RaisePropertyChanged();
+            }
+        }
+
         public string BackgroundImage
         {
             get
@@ -127,6 +143,14 @@ namespace DialogGenerator.UI.ViewModels
             set
             {
                 mBackgroundImage = value;
+                if (!string.IsNullOrEmpty(mBackgroundImage) && File.Exists(mBackgroundImage))
+                {
+                    HasBackgroundImage = true;
+                } else
+                {
+                    HasBackgroundImage = false;
+                }
+
                 RaisePropertyChanged();
             }
         }

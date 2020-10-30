@@ -79,9 +79,26 @@
                 DragEnter="Playground_DragEnter" 
                 MouseLeftButtonUp="Playground_MouseLeftButtonUp" 
                 SizeChanged="Playground_SizeChanged">
-                <Canvas.Background>
-                    <ImageBrush ImageSource="{Binding BackgroundImage}" Stretch="UniformToFill" AlignmentY="Center" />
-                </Canvas.Background>
+                <Canvas.Style>
+                    <Style>
+                        <Style.Triggers>
+                            <DataTrigger Binding="{Binding HasBackgroundImage}" Value="True">
+                                <Setter Property="Canvas.Background">
+                                    <Setter.Value>
+                                        <ImageBrush ImageSource="{Binding BackgroundImage}" Stretch="UniformToFill" AlignmentY="Center" />
+                                    </Setter.Value>
+                                </Setter>
+                            </DataTrigger>
+                            <DataTrigger Binding="{Binding HasBackgroundImage}" Value="False">
+                                <Setter Property="Canvas.Background">
+                                    <Setter.Value>
+                                        <SolidColorBrush Color="LightYellow"/>
+                                    </Setter.Value>
+                                </Setter>
+                            </DataTrigger>
+                        </Style.Triggers>
+                    </Style>
+                </Canvas.Style>
             </Canvas>
         </Grid>
         
