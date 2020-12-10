@@ -503,7 +503,7 @@ namespace DialogGenerator.UI.ViewModels
 
         private async void _onOpenSettingsDialog_Execute()
         {
-            await mMessageDialogService.ShowDedicatedDialogAsync<int?>(new SettingsDialog(mEventAggregator));
+            await mMessageDialogService.ShowDedicatedDialogAsync<int?>(new SettingsDialog(mEventAggregator, mDialogModelRepository));
             if(ApplicationData.Instance.DebugModeOn)
             {
                 IsDebugViewVisible = Visibility.Visible;
@@ -515,7 +515,7 @@ namespace DialogGenerator.UI.ViewModels
 
         private async void _configureDialogCommand_Execute()
         {
-            await mMessageDialogService.ShowDedicatedDialogAsync<int?>(new SettingsDialog(mEventAggregator));
+            await mMessageDialogService.ShowDedicatedDialogAsync<int?>(new SettingsDialog(mEventAggregator, mDialogModelRepository));
         }
 
         private async void _startDialogCommand_Execute()

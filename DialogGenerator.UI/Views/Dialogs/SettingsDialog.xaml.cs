@@ -1,5 +1,7 @@
 ﻿using DialogGenerator.Core;
+using DialogGenerator.DataAccess;
 using DialogGenerator.Events;
+using DialogGenerator.Model;
 using DialogGenerator.UI.Wrapper;
 using MaterialDesignThemes.Wpf;
 using Microsoft.Win32;
@@ -12,8 +14,11 @@ using System.ComponentModel;
 using System.Diagnostics;
 using System.IO;
 using System.Speech.Synthesis;
+using System.Windows;
 using System.Windows.Controls;
+using System.Windows.Data;
 using System.Windows.Input;
+using System.Windows.Media;
 
 namespace DialogGenerator.UI.Views.Dialogs
 {
@@ -24,9 +29,13 @@ namespace DialogGenerator.UI.Views.Dialogs
     {
         private ApplicationDataWrapper mSettings;
         private IEventAggregator mEventAggregator;
+        private CollectionViewSource mDialogs;
+        private ObservableCollection<string> mDialogModels = new ObservableCollection<string>();
+        private IDialogModelRepository mDialogModelRepository;
+        private string mPreferredDialogName = string.Empty;
 
 
-        public SettingsDialog(IEventAggregator _EventAggregator)
+        public SettingsDialog(IEventAggregator _EventAggregator, IDialogModelRepository _DialogModelRepository)
         {
             DataContext = this;
 
@@ -34,8 +43,11 @@ namespace DialogGenerator.UI.Views.Dialogs
             CloseCommand = new DelegateCommand(_closeCommand_Execute);
             SelectBacgroundCommand = new DelegateCommand(_selectBackgroundImage_Execute);
             mEventAggregator = _EventAggregator;
+            mDialogModelRepository = _DialogModelRepository;
 
-            InitializeComponent();
+            _initDialogModelsList();
+            mDialogs = new CollectionViewSource();
+            mDialogs.Source = mDialogModels;            
 
             Settings = new ApplicationDataWrapper(ApplicationData.Instance);
             using(SpeechSynthesizer _speech = new SpeechSynthesizer())
@@ -45,9 +57,26 @@ namespace DialogGenerator.UI.Views.Dialogs
                     VoiceTypesCollection.Add(_voiceType.VoiceInfo.Name);
                 }
             }
+
+            InitializeComponent();
+
+            _handleDialogNameEntry(textBox.Text);
+            resultStackBorder.Visibility = Visibility.Collapsed;
+            
+        }        
+
+        private void _initDialogModelsList()
+        {
+            
+            foreach (var _dlgInfo in mDialogModelRepository.GetAll())
+            {
+                foreach( var _dialog in _dlgInfo.ArrayOfDialogModels)
+                {
+                    mDialogModels.Add(_dialog.Name);
+                }
+            }
         }
 
-        
         public ICommand WebsiteCommand { get; set; }
         public ICommand CloseCommand { get; set; }
 
@@ -75,6 +104,13 @@ namespace DialogGenerator.UI.Views.Dialogs
             }
         }
 
+        public ICollectionView Dialogs
+        {
+            get
+            {
+                return mDialogs.View;
+            }
+        }
 
         public virtual void OnPropertyChanged(string _propertyName)
         {
@@ -104,5 +140,89 @@ namespace DialogGenerator.UI.Views.Dialogs
         }
 
         public event PropertyChangedEventHandler PropertyChanged;
+
+        private void textBox_KeyUp(object sender, KeyEventArgs e)
+        {
+            string query = (sender as TextBox).Text;
+            _handleDialogNameEntry(query);
+        }
+
+        private void _handleDialogNameEntry(string query)
+        {
+            var data = mDialogModels;
+            var border = (resultStack.Parent as ScrollViewer).Parent as Border;
+
+            resultStack.Children.Clear();
+            if (string.IsNullOrEmpty(query))
+            {
+                foreach (var item in data)
+                {
+                    addEntry(item);
+                }
+            }
+            else
+            {
+                foreach (var item in data)
+                {
+                    if (item.ToLower().StartsWith(query.ToLower()))
+                    {
+                        addEntry(item);
+                    }
+                }
+            }
+
+            if(resultStack.Children.Count == 0)
+            {
+                border.Visibility = Visibility.Collapsed;
+            } else
+            {
+                border.Visibility = Visibility.Visible;
+            }
+        }
+
+        private void addEntry(string item)
+        {
+            TextBlock block = new TextBlock();
+            block.Text = item;
+            block.Margin = new Thickness(2, 3, 2, 3);
+            block.Cursor = Cursors.Hand;
+
+            block.MouseLeftButtonUp += (sender, e) =>
+            {
+                //textBox.Text = (sender as TextBlock).Text;
+                Settings.PreferredDialogName = (sender as TextBlock).Text;
+            };
+
+            block.MouseEnter += (sender, e) =>
+            {
+                TextBlock b = sender as TextBlock;
+                b.Background = Brushes.PeachPuff;
+            };
+
+            block.MouseLeave += (sender, e) =>
+            {
+                TextBlock b = sender as TextBlock;
+                b.Background = Brushes.Transparent;
+            };
+
+            resultStack.Children.Add(block);
+        }
+
+        private void textBox_GotFocus(object sender, RoutedEventArgs e)
+        {
+            if(resultStackBorder.Visibility == Visibility.Collapsed)
+                resultStackBorder.Visibility = Visibility.Visible;
+            
+        }
+
+        private void textBox_MouseLeftButtonDown(object sender, MouseButtonEventArgs e)
+        {
+            if (resultStackBorder.Visibility == Visibility.Visible)
+                resultStackBorder.Visibility = Visibility.Collapsed;
+            else
+                resultStackBorder.Visibility = Visibility.Visible;
+        }
+
+        
     }
 }

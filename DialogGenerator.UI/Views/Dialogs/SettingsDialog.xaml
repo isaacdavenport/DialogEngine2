@@ -5,6 +5,7 @@
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
              xmlns:materialDesign="http://materialdesigninxaml.net/winfx/xaml/themes"
              xmlns:converters="clr-namespace:DialogGenerator.UI.Converters"
+             xmlns:additional="http://wpfcontrols.com/"
              mc:Ignorable="d"
              MinWidth="800"
              d:DesignHeight="550" d:DesignWidth="800">
@@ -65,6 +66,9 @@
                     <RowDefinition Height="auto" />
                     <RowDefinition Height="auto" />
                     <RowDefinition Height="auto" />
+                    <RowDefinition Height="auto" />
+                    <RowDefinition Height="auto" />
+                    <RowDefinition Height="*" />
 
                 </Grid.RowDefinitions>
 
@@ -95,6 +99,30 @@
                 <Label Content="Radio move's strength sensitivity .01-.99:" Grid.Column="0" HorizontalAlignment="Right" Margin="10" Grid.Row="7" />
                 <TextBox Grid.Row="7" MinWidth="75" Text="{Binding Settings.RadioMovesSignalStrengthSensitivity,UpdateSourceTrigger=LostFocus,Mode=TwoWay}" 
                      HorizontalAlignment="Left" Margin="10" Grid.Column="2" materialDesign:ValidationAssist.UsePopup="True" />
+
+                <CheckBox Content="Use preferred dialog model" Grid.Row="8" x:Name="IsUsingPreferredDialogModel" IsChecked="{Binding Settings.HasPreferredDialog}" Margin="10" HorizontalAlignment="Right"/>
+
+                <Label Content="Preferred Dialog Model" Grid.Column="0" HorizontalAlignment="Right" Margin="10" Grid.Row="9" Visibility="{Binding ElementName=IsUsingPreferredDialogModel, Path=IsChecked, Mode=TwoWay, Converter={StaticResource BooleanToVisibilityConverter }}"/>
+                <StackPanel Grid.Row="9" Grid.Column="2" Margin="10" Orientation="Vertical" Visibility="{Binding ElementName=IsUsingPreferredDialogModel, Path=IsChecked, Mode=TwoWay, Converter={StaticResource BooleanToVisibilityConverter }}">
+                    <TextBox x:Name="textBox" 
+                             KeyUp="textBox_KeyUp" 
+                             Width="200" 
+                             Text="{Binding Settings.PreferredDialogName, UpdateSourceTrigger=LostFocus, Mode=TwoWay}" 
+                             GotFocus="textBox_GotFocus" 
+                             PreviewMouseLeftButtonDown="textBox_MouseLeftButtonDown"/>
+                    <Border x:Name="resultStackBorder" 
+                            Height="150" 
+                            Width="200" 
+                            BorderBrush="Black" 
+                            BorderThickness="1" 
+                            Margin="0, 5, 0, 0" 
+                            materialDesign:ShadowAssist.Darken="True" 
+                            materialDesign:ShadowAssist.ShadowDepth="Depth3">
+                        <ScrollViewer VerticalScrollBarVisibility="Auto" Background="White">
+                            <StackPanel x:Name="resultStack"></StackPanel>
+                        </ScrollViewer>
+                    </Border>
+                </StackPanel>
 
             </Grid>
             <Grid Grid.Column="1" Grid.Row="0">

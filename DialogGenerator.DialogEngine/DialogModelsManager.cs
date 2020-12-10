@@ -455,6 +455,20 @@ namespace DialogGenerator.DialogEngine
             var _dialogModel = 0;
             var _mostRecentAdventureDialogIndexes = _findMostRecentAdventureDialogIndexes();
 
+            var settings = ApplicationData.Instance;
+
+            if(settings.HasPreferredDialog)
+            {
+                var _preferredDialog = mContext.DialogModelsList.Where(d => d.Name.Equals(settings.PreferredDialogName)).First();
+                if(_preferredDialog != null)
+                {
+                    if(_isDialogEgligibleForCharacters(_preferredDialog, mContext.Character1Num, mContext.Character2Num))
+                    {
+                        return mContext.DialogModelsList.IndexOf(_preferredDialog);
+                    }
+                }
+            }
+
             // most recent will be in the 0 index of list which will be hit first in foreach
             if (_mostRecentAdventureDialogIndexes.Count > 0)
             {
@@ -535,72 +549,9 @@ namespace DialogGenerator.DialogEngine
             }
 
             return _dialogModel;
-        }        
-
-        private List<ModelDialog> _dialogsToRemove()
-        {
-            var _itemsToRemove = new List<ModelDialog>();
-            ModelDialog _greetingDialog = null;
-            mContext.PossibleDialogModelsList.ForEach(dlg =>
-            {
-                bool _removeCriteriaMet = false;
-                var _idx = mContext.DialogModelsList.IndexOf(dlg);
-                if (_checkIfDialogModelUsedRecently(_idx))
-                {
-                    _removeCriteriaMet = true;
-                }
-
-                if (!_removeCriteriaMet && !_checkIfDialogPreRequirementMet(_idx))
-                {
-                    _removeCriteriaMet = true;
-                }
-
-                if (!_removeCriteriaMet && _checkForRecentPhrases(_idx))
-                {
-                    _removeCriteriaMet = true;
-                }
-
-                if (!_removeCriteriaMet && _isGreetingDialog(_idx))
-                {
-                    if(_greetingDialog != null)
-                    {
-                        _removeCriteriaMet = true;
-                    } else
-                    {
-                        _greetingDialog = dlg;
-                    }                    
-                }           
-                
-                if(!_removeCriteriaMet && (_greetingDialog != null || dlg.PhraseTypeSequence.Contains("Greeting")))
-                {
-                    
-                    if(mContext.FirstRoundGone)
-                    {
-                        _removeCriteriaMet = true;
-                    }
-                }
-
-                if (_removeCriteriaMet)
-                {
-                    _itemsToRemove.Add(dlg);
-                }
-            });
-
-            if(_greetingDialog != null && !mContext.FirstRoundGone)
-            {
-                var _popularity = _greetingDialog.Popularity;
-                if(_itemsToRemove.Where(dlg => dlg.Popularity > _popularity).Any())
-                {
-                    double _maxPopularity = _itemsToRemove.Max(dlg => dlg.Popularity);                    
-                    var _mostPopularGreetingDlg = _itemsToRemove.First(dlg => dlg.Popularity == _maxPopularity);
-
-                    _itemsToRemove.Remove(_mostPopularGreetingDlg);
-                    _itemsToRemove.Add(_greetingDialog);
-                }
-            }
-
-            return _itemsToRemove;
         }
+
+
 
         // PickAWeightedDialog and PickAWeightedPhrase use a statistical approach to randomly select DialogModels and 
         // Phrases.  Each DialogModel has a popularity weighting factor and each phrase has a PhraseWeight number.  
@@ -774,6 +725,122 @@ namespace DialogGenerator.DialogEngine
             }
 
             return _selectedPhrase;
+        }
+
+        #endregion
+
+        #region Private Methods
+
+        private bool _isDialogEgligibleForCharacters(ModelDialog preferredDialog, int character1Num, int character2Num)
+        {
+
+            bool character1First = false;
+            bool character2Second = false;
+            bool character1Second = false;
+            bool character2First = false;
+
+
+            character1First = preferredDialog.PhraseTypeSequence.Select((entry, i) => new { i, entry })
+                .Where(a => a.i % 2 == 0)
+                .Select(z => z.entry)
+                .ToList()
+                .All(pts => mContext.CharactersList[character1Num].Phrases.Any(phrase => phrase.PhraseWeights.Keys.Contains(pts)));
+            if (character1First)
+            {
+                character2Second = preferredDialog.PhraseTypeSequence.Select((entry, i) => new { i, entry })
+                    .Where(a => a.i % 2 == 1)
+                    .Select(z => z.entry)
+                    .ToList()
+                    .All(pts => mContext.CharactersList[character2Num].Phrases.Any(phrase => phrase.PhraseWeights.Keys.Contains(pts)));
+
+                if (character1First && character2Second)
+                    return true;
+            }
+            else
+            {
+                character1Second = preferredDialog.PhraseTypeSequence.Select((entry, i) => new { i, entry })
+                                .Where(a => a.i % 2 == 1)
+                                .Select(z => z.entry)
+                                .ToList()
+                                .All(pts => mContext.CharactersList[character1Num].Phrases.Any(phrase => phrase.PhraseWeights.Keys.Contains(pts)));
+
+                character2First = preferredDialog.PhraseTypeSequence.Select((entry, i) => new { i, entry })
+                                .Where(a => a.i % 2 == 0)
+                                .Select(z => z.entry)
+                                .ToList()
+                                .All(pts => mContext.CharactersList[character2Num].Phrases.Any(phrase => phrase.PhraseWeights.Keys.Contains(pts)));
+                if (character1Second && character2First)
+                    return true;
+
+            }
+
+            return false;
+        }
+
+        private List<ModelDialog> _dialogsToRemove()
+        {
+            var _itemsToRemove = new List<ModelDialog>();
+            ModelDialog _greetingDialog = null;
+            mContext.PossibleDialogModelsList.ForEach(dlg =>
+            {
+                bool _removeCriteriaMet = false;
+                var _idx = mContext.DialogModelsList.IndexOf(dlg);
+                if (_checkIfDialogModelUsedRecently(_idx))
+                {
+                    _removeCriteriaMet = true;
+                }
+
+                if (!_removeCriteriaMet && !_checkIfDialogPreRequirementMet(_idx))
+                {
+                    _removeCriteriaMet = true;
+                }
+
+                if (!_removeCriteriaMet && _checkForRecentPhrases(_idx))
+                {
+                    _removeCriteriaMet = true;
+                }
+
+                if (!_removeCriteriaMet && _isGreetingDialog(_idx))
+                {
+                    if (_greetingDialog != null)
+                    {
+                        _removeCriteriaMet = true;
+                    }
+                    else
+                    {
+                        _greetingDialog = dlg;
+                    }
+                }
+
+                if (!_removeCriteriaMet && (_greetingDialog != null || dlg.PhraseTypeSequence.Contains("Greeting")))
+                {
+
+                    if (mContext.FirstRoundGone)
+                    {
+                        _removeCriteriaMet = true;
+                    }
+                }
+
+                if (_removeCriteriaMet)
+                {
+                    _itemsToRemove.Add(dlg);
+                }
+            });
+
+            if (_greetingDialog != null && !mContext.FirstRoundGone)
+            {
+                var _popularity = _greetingDialog.Popularity;
+                if (_itemsToRemove.Where(dlg => dlg.Popularity > _popularity).Any())
+                {
+                    double _maxPopularity = _itemsToRemove.Max(dlg => dlg.Popularity);
+                    var _mostPopularGreetingDlg = _itemsToRemove.First(dlg => dlg.Popularity == _maxPopularity);
+
+                    _itemsToRemove.Remove(_mostPopularGreetingDlg);
+                    _itemsToRemove.Add(_greetingDialog);
+                }
+            }
+
+            return _itemsToRemove;
         }
 
         #endregion

@@ -67,6 +67,35 @@ namespace DialogGenerator.UI.Wrapper
             return errors;
         }
 
+        public bool HasPreferredDialog
+        {
+            get
+            {
+                return getValue<bool>();
+            }
+
+            set
+            {
+                setValue(value);
+                validateProperty(nameof(HasPreferredDialog));
+            }
+        }
+
+        public string PreferredDialogName
+        {
+            get
+            {
+                return getValue<string>();
+            }
+
+            set
+            {
+                setValue(value);
+                validateProperty(nameof(PreferredDialogName));
+            }
+
+        }
+
         public string BackgroundImage
         {
             get

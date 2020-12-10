@@ -92,6 +92,14 @@ namespace DialogGenerator.Core
             }
         }
 
+        [XmlIgnore]
+        [Editable(true)]
+        public bool HasPreferredDialog { get; set; } = false;
+
+        [XmlIgnore]
+        [Editable(true)]
+        public string PreferredDialogName { get; set; } = string.Empty;
+
         public bool MonitorMessageParseFails { get; set; } = false;
         public string JSONEditorExeFileName { get; set; } = "JSONedit.exe"; 
         public string WebsiteUrl { get; set; } = "www.toys2life.org";
