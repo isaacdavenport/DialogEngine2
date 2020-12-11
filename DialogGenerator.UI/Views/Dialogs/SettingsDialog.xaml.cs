@@ -164,7 +164,7 @@ namespace DialogGenerator.UI.Views.Dialogs
             {
                 foreach (var item in data)
                 {
-                    if (item.ToLower().StartsWith(query.ToLower()))
+                    if (item.ToLower().Contains(query.ToLower()))
                     {
                         addEntry(item);
                     }
