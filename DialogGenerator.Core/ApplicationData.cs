@@ -108,7 +108,7 @@ namespace DialogGenerator.Core
         public string DefaultImage { get; set; } = "avatar.png";        
         public int NumberOfRadios { get; set; } = 6;
         
-        public string URLToUpdateFile { get; set; } = "https://drive.google.com/uc?export=download&id=1sAeUrBq6A29G9sI5tJekLNkFclqBeYiX";        
+        public string URLToUpdateFile { get; set; } = "https://www.dropbox.com/s/uee58uqcpqrslln/update.xml?dl=1";        
 
         public int CheckForUpdateInterval { get; set; } = 30; // minutes
 

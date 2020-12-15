@@ -158,6 +158,35 @@ namespace DialogGenerator.DataAccess
                 }
             }
 
+            //  var logPath =   "${USERPROFILE}\Documents\DialogGenerator\Log\"; // can't use what log4net uses with {USERPROFILE} to get to log folder path
+            var logPath = ApplicationData.Instance.AppDataDirectory + "\\Log\\";  // perhaps this should be done in applicationdata.cs or perhaps we should use log4nets folder
+                        
+            File.Delete(logPath + "WizardsList.json");
+            File.Delete(logPath + "DialogModelsList.json");
+            File.Delete(logPath + "CharactersList.json");
+            File.Delete(logPath + "ShortDialogModels.json");
+
+            Serializer.Serialize(_JSONObjectTypesList.Wizards, logPath + "WizardsList.json");
+            Serializer.Serialize(_JSONObjectTypesList.DialogModels, logPath + "DialogModelsList.json");
+            Serializer.Serialize(_JSONObjectTypesList.Characters, logPath + "CharactersList.json");
+
+            List<ModelDialog> _shortDialogModels = new List<ModelDialog>();
+            foreach (var modelDialogGroup in _JSONObjectTypesList.DialogModels)
+            {
+                foreach (var modelDialog in modelDialogGroup.ArrayOfDialogModels)
+                {
+                    if (modelDialog.PhraseTypeSequence.Count < 2)
+                    {
+                        _shortDialogModels.Add(modelDialog);
+                    }
+                }
+            }
+            // TODO this generates an exception that gets sent out to the user's debug screen in the error window object missing version
+            if (_shortDialogModels.Count > 0)
+            {
+                Serializer.Serialize(_shortDialogModels, logPath + "ShortDialogModels.json");
+            }
+
             return _JSONObjectTypesList;
         }
     }
