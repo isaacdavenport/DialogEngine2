@@ -70,6 +70,7 @@ namespace DialogGenerator.Handlers
                 else
                 {
                     //await mMessageDialogService.ShowMessage(@"No update available", @"There is no update available please try again later.");
+                    mLogger.Error("AUTOUPDATER : There is no update available please try again later.");
                 }
             }
             else
@@ -77,12 +78,14 @@ namespace DialogGenerator.Handlers
                 //await mMessageDialogService.ShowMessage(
                 //    @"Update check failed"
                 //    , @"There is a problem reaching update server please check your internet connection and try again later.");
+                mLogger.Error("AUTOUPDATER : There is a problem connecting to update server -  " + ApplicationData.Instance.URLToUpdateFile);
             }
         }
 
         public void CheckForUpdates()
         {
             AutoUpdater.Start(ApplicationData.Instance.URLToUpdateFile);
+            mLogger.Info("AUTOUPDATER : Checking updates from " + ApplicationData.Instance.URLToUpdateFile);
         }
     }
 }
