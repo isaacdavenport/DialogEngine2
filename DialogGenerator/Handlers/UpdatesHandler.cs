@@ -39,7 +39,7 @@ namespace DialogGenerator.Handlers
                 if (args.IsUpdateAvailable)
                 {
                     MessageDialogResult _dialogResult;
-                    if (args.Mandatory)
+                    if (args.Mandatory.Value)
                     {
                         _dialogResult = await mMessageDialogService.ShowMessage(
                             "Update Available",
@@ -56,7 +56,7 @@ namespace DialogGenerator.Handlers
                     {
                         try
                         {
-                            if (AutoUpdater.DownloadUpdate())
+                            if (AutoUpdater.DownloadUpdate(args))
                             {
                                 Application.Current.Shutdown();
                             }
