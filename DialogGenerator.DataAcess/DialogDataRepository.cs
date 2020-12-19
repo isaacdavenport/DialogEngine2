@@ -164,27 +164,60 @@ namespace DialogGenerator.DataAccess
             File.Delete(logPath + "WizardsList.json");
             File.Delete(logPath + "DialogModelsList.json");
             File.Delete(logPath + "CharactersList.json");
-            File.Delete(logPath + "ShortDialogModels.json");
+            File.Delete(logPath + "PotentialDialogModelProblems.json");
+            File.Delete(logPath + "BadPhraseWeights.json");
+            File.Delete(logPath + "MissingMp3Phrases.json");
 
             Serializer.Serialize(_JSONObjectTypesList.Wizards, logPath + "WizardsList.json");
             Serializer.Serialize(_JSONObjectTypesList.DialogModels, logPath + "DialogModelsList.json");
             Serializer.Serialize(_JSONObjectTypesList.Characters, logPath + "CharactersList.json");
 
-            List<ModelDialog> _shortDialogModels = new List<ModelDialog>();
+            List<ModelDialog> _problemDialgModels = new List<ModelDialog>();
             foreach (var modelDialogGroup in _JSONObjectTypesList.DialogModels)
             {
                 foreach (var modelDialog in modelDialogGroup.ArrayOfDialogModels)
                 {
-                    if (modelDialog.PhraseTypeSequence.Count < 2)
+                    if (modelDialog.PhraseTypeSequence.Count < 2 || modelDialog.Popularity < 0.999 || modelDialog.Popularity > 99)
                     {
-                        _shortDialogModels.Add(modelDialog);
+                        _problemDialgModels.Add(modelDialog);
                     }
                 }
             }
+
             // TODO this generates an exception that gets sent out to the user's debug screen in the error window object missing version
-            if (_shortDialogModels.Count > 0)
+            if (_problemDialgModels.Count > 0)
             {
-                Serializer.Serialize(_shortDialogModels, logPath + "ShortDialogModels.json");
+                Serializer.Serialize(_problemDialgModels, logPath + "PotentialDialogModelProblems.json");
+            }
+
+            List<PhraseEntry> _problemPhrases = new List<PhraseEntry>();
+            List<PhraseEntry> _noMp3Phrases = new List<PhraseEntry>();
+            foreach (var character in _JSONObjectTypesList.Characters)
+            {
+                foreach (var phrase in character.Phrases)
+                {
+                    string _phraseFileName = $"{character.CharacterPrefix}_{phrase.FileName}.mp3";
+                    string _phraseFileAbsolutePath = Path.Combine(ApplicationData.Instance.AudioDirectory, _phraseFileName);
+                    foreach (var weight in phrase.PhraseWeights.Values)
+                    if (weight < 0.999 || weight > 99)
+                    {
+                        _problemPhrases.Add(phrase);
+                    }
+                    if (!File.Exists(_phraseFileAbsolutePath))
+                    {
+                        _noMp3Phrases.Add(phrase);
+                    }
+                }
+            }
+
+            if (_noMp3Phrases.Count > 0)
+            {
+                Serializer.Serialize(_noMp3Phrases, logPath + "MissingMp3Phrases.json");
+            }
+
+            if (_problemPhrases.Count > 0)
+            {
+                Serializer.Serialize(_problemPhrases, logPath + "BadPhraseWeights.json");
             }
 
             return _JSONObjectTypesList;
