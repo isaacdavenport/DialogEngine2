@@ -153,6 +153,12 @@ namespace DialogGenerator.UI.ViewModels
                 return false;
             }
 
+            if(DialogName.Contains("\\"))
+            {
+                errorMessage = "Dialog name can't contain '" + (char)0x5C + "' character!";
+                return false;
+            }
+
             bool _exists = false;
             foreach (var _modelDialogInfo in mDialogModelRepository.GetAll())
             {
