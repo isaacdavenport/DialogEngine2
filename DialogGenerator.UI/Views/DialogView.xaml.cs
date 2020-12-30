@@ -1,5 +1,6 @@
 ﻿using DialogGenerator.UI.ViewModels;
 using System.Collections.Specialized;
+using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Media;
 
@@ -34,5 +35,6 @@ namespace DialogGenerator.UI.Views
                 mScrollViewer.ScrollToBottom();
             }
         }
+
     }
 }

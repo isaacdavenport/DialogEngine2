@@ -106,10 +106,17 @@
                                     <StackPanel Grid.Column="1">
                                         <TextBlock Padding="8,10,4,4" TextWrapping="Wrap" FontWeight="Bold"
                                            Text="{Binding Character.CharacterName }" Width="auto" HorizontalAlignment="Left"  />
-                                        <TextBlock Padding="8,4,4,4" TextWrapping="Wrap" Text="{Binding Path=DialogLine }" Width="auto" HorizontalAlignment="Left"  />
+                                    <TextBlock Padding="8,4,4,4" TextWrapping="Wrap" Text="{Binding Path=DialogLine }" Width="auto" HorizontalAlignment="Left">
+                                        <TextBlock.ContextMenu>
+                                            <ContextMenu>
+                                                <MenuItem Header="Copy" Command="{Binding CopyCommand}"/>
+                                            </ContextMenu>
+                                        </TextBlock.ContextMenu>
+                                    </TextBlock>
                                     </StackPanel>
                                 </Grid>
-                            </DockPanel>
+                                
+                        </DockPanel>
                         </DataTemplate>
 
                         <DataTemplate DataType="{x:Type s:String}">
