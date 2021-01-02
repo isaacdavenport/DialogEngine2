@@ -50,6 +50,8 @@ namespace DialogGenerator.UI.ViewModels
         private bool mRadioModeOn = false;
         private ArenaViewModel mArenaViewModel;
         private AssignedRadiosViewModel mAssignedRadiosViewModel;
+        private bool mCanPause = false;
+        private bool mCanResume = false;
 
 
         #endregion
@@ -90,6 +92,16 @@ namespace DialogGenerator.UI.ViewModels
             {
                 IsDebugViewVisible = Visibility.Visible;
             }
+
+            mDialogEngine.PropertyChanged += MDialogEngine_PropertyChanged;
+        }
+
+        private void MDialogEngine_PropertyChanged(object sender, System.ComponentModel.PropertyChangedEventArgs e)
+        {
+            PauseCommand.RaiseCanExecuteChanged();
+            ResumeCommand.RaiseCanExecuteChanged();
+            CanPause = mDialogEngine.Running;
+            CanResume = mDialogEngine.PauseCancellationTokenSource != null;
         }
 
         private void _onCharacterSelectionModelChanged()
@@ -154,6 +166,34 @@ namespace DialogGenerator.UI.ViewModels
         #endregion
 
         #region - properties
+        public bool CanPause
+        {
+            get
+            {
+                return mCanPause;
+            }
+
+            set
+            {
+                mCanPause = value;
+                OnPropertyChanged();
+            }
+        }
+
+        public bool CanResume
+        {
+            get
+            {
+                return mCanResume;
+            }
+
+            set
+            {
+                mCanResume = value;
+                OnPropertyChanged();
+            }
+        }
+
         public ObservableCollection<Character> Characters
         {
             get
@@ -312,6 +352,9 @@ namespace DialogGenerator.UI.ViewModels
         public DelegateCommand ToggleAssignedRadiosCommand { get; set; }
         public DelegateCommand ShowPDFHelpCommand { get; set; }
 
+        public DelegateCommand PauseCommand { get; set; }
+        public DelegateCommand ResumeCommand { get; set; }
+
 
         #endregion
 
@@ -333,6 +376,29 @@ namespace DialogGenerator.UI.ViewModels
             ExpertModeCommand = new DelegateCommand(_expertModeExecute, _expertMode_CanExecute);
             ToggleAssignedRadiosCommand = new DelegateCommand(_toggleAssignedRadios_Execute);
             ShowPDFHelpCommand = new DelegateCommand(_showPDFHelpCommand_execute);
+            PauseCommand = new DelegateCommand(_pauseCommandExecute, _pauseCommandCanExecute);
+            ResumeCommand = new DelegateCommand(_resumeCommandExecute, _resumeCommandCanExecute);
+        }
+
+        private bool _resumeCommandCanExecute()
+        {
+            return mDialogEngine.PauseCancellationTokenSource != null;
+        }
+
+        private void _resumeCommandExecute()
+        {
+            mDialogEngine.PauseCancellationTokenSource.Cancel();
+        }
+
+        private bool _pauseCommandCanExecute()
+        {
+            return mDialogEngine.Running;                       
+        }
+
+        private void _pauseCommandExecute()
+        {
+            mDialogEngine.PauseCancellationTokenSource = new CancellationTokenSource();
+            CanPause = false;
         }
 
         private void _showPDFHelpCommand_execute()

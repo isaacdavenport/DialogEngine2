@@ -8,16 +8,19 @@ using DialogGenerator.Model;
 using DialogGenerator.Model.Enum;
 using DialogGenerator.Utilities;
 using Prism.Events;
+using Prism.Mvvm;
 using System;
 using System.Collections.Generic;
+using System.ComponentModel;
 using System.IO;
 using System.Linq;
+using System.Runtime.CompilerServices;
 using System.Threading;
 using System.Threading.Tasks;
 
 namespace DialogGenerator.DialogEngine
 {
-    public class DialogEngine:IDialogEngine
+    public class DialogEngine:IDialogEngine 
     {
         #region - fields -
 
@@ -39,6 +42,41 @@ namespace DialogGenerator.DialogEngine
         private SelectedCharactersPairEventArgs mCharacterPairSelectionDataCached;
         private CancellationTokenSource mCancellationTokenSource;
         private CancellationTokenSource mStateMachineTaskTokenSource = new CancellationTokenSource();
+        private bool mRunning;
+        private CancellationTokenSource mPauseCancellationTokenSource;
+
+        public event PropertyChangedEventHandler PropertyChanged;
+
+        #endregion
+
+        #region - properties -
+
+        public CancellationTokenSource PauseCancellationTokenSource
+        {
+            get
+            {
+                return mPauseCancellationTokenSource;
+            }
+
+            set
+            {
+                mPauseCancellationTokenSource = value;
+                OnPropertyChanged();
+            }
+        }
+
+        public bool Running { 
+            get
+            {
+                return mRunning;
+            }
+
+            set
+            {
+                mRunning = value;
+                OnPropertyChanged();
+            }
+        }
 
         #endregion
 
@@ -63,6 +101,9 @@ namespace DialogGenerator.DialogEngine
 
             _configureWorkflow();
             _subscribeForEvents();
+
+            Running = false;
+            PauseCancellationTokenSource = null;
         }
 
         #endregion
@@ -354,7 +395,7 @@ namespace DialogGenerator.DialogEngine
             return Triggers.PrepareDialogParameters;
         }
 
-        private  Triggers _startDialog(CancellationToken token)
+        private  async Task<Triggers> _startDialog(CancellationToken token)
         {
             if (mIndexOfCurrentDialogModel < 0 || mIndexOfCurrentDialogModel >= mContext.DialogModelsList.Count)
                 return Triggers.FinishDialog;
@@ -443,6 +484,12 @@ namespace DialogGenerator.DialogEngine
 
                         _playAudio(_pathAndFileName); 
 
+                        if(PauseCancellationTokenSource != null)
+                        {
+                            await PauseEngine(PauseCancellationTokenSource.Token);
+                            PauseCancellationTokenSource = null;
+                        }
+
                         if (!_dialogTrackerAndBLESelectedCharactersSame() && Session.Get<bool>(Constants.BLE_MODE_ON))
                         {
                             mContext.SameCharactersAsLast = false;
@@ -524,7 +571,17 @@ namespace DialogGenerator.DialogEngine
 
         #endregion
 
+        #region - protected functions -
+
+        protected void OnPropertyChanged([CallerMemberName] string name = null)
+        {
+            PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(name));
+        }
+
+        #endregion
+
         #region - public functions -
+
 
         public void Initialize()
         {
@@ -564,6 +621,7 @@ namespace DialogGenerator.DialogEngine
 
             await Task.Run(async() =>
             {
+                Running = true;
                 Thread.CurrentThread.Name = "DialogGeneratorThread";
                 Console.WriteLine(Thread.CurrentThread.Name + " started!");
                 mLogger.Debug(Thread.CurrentThread.Name + " started!");
@@ -623,7 +681,7 @@ namespace DialogGenerator.DialogEngine
                             }
                         case States.DialogStarted:
                             {
-                                Triggers _nextTrigger = _startDialog(mStateMachineTaskTokenSource.Token);
+                                Triggers _nextTrigger = await _startDialog(mStateMachineTaskTokenSource.Token);
                                 string _debugMessage = "Start dialog returned " + _nextTrigger.ToString();
                                 mLogger.Debug(_debugMessage, ApplicationData.Instance.DialogLoggerKey);
 
@@ -658,6 +716,7 @@ namespace DialogGenerator.DialogEngine
 
                 await _characterSelectionTask;
 
+                Running = false;
                 Console.WriteLine(Thread.CurrentThread.Name + " stopped!");
                 mLogger.Debug(Thread.CurrentThread.Name + " stopped!");
 
@@ -682,5 +741,23 @@ namespace DialogGenerator.DialogEngine
         }
 
         #endregion
+
+        public async Task PauseEngine(CancellationToken cancellationToken)
+        {
+            bool isWaiting = true;
+            Running = false;
+            while(isWaiting)
+            {
+                try
+                {
+                    await Task.Delay(10000, cancellationToken);
+                } 
+                catch(TaskCanceledException)
+                {
+                    isWaiting = false;
+                }
+            }
+            Running = true;
+        }
     }
 }
