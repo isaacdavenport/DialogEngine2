@@ -22,6 +22,7 @@ using System.ComponentModel;
 using System.IO;
 using System.Linq;
 using System.Speech.Synthesis;
+using System.Text.RegularExpressions;
 using System.Threading;
 using System.Threading.Tasks;
 using System.Windows.Input;
@@ -220,17 +221,27 @@ namespace DialogGenerator.UI.ViewModels
                 RaisePropertyChanged("CharacterName");
                 CharacterInitials = _getCharacterInitials();
                 CharacterIdentifier = _getCharacterIdentifier();
-                NextStepCommand.RaiseCanExecuteChanged();     
-                if((mCharacterName != null && mCharacterName.Length > 0) && (mCharacterName.Length <= 2 || mCharacterName.Length > 30 || char.IsDigit(mCharacterName.Substring(0,1).ToCharArray()[0])))
+                NextStepCommand.RaiseCanExecuteChanged();
+
+                if (!string.IsNullOrEmpty(mCharacterName) 
+                    &&  (mCharacterName.Length <= 2 
+                    || mCharacterName.Length > 30 
+                    || char.IsDigit(mCharacterName.Substring(0,1).ToCharArray()[0]) 
+                    || !Regex.IsMatch(mCharacterName, Constants.FILENAME_CHECK_REGEX)))
                 {
-                    if (mCharacterName.Length <= 2 && !char.IsDigit(mCharacterName.Substring(0, 1).ToCharArray()[0]))
+                    if(!Regex.IsMatch(mCharacterName, Constants.FILENAME_CHECK_REGEX))
+                    {
+                        CharacterNameValidationError = "The name contains the illegal characters!";
+                        CharacterNameHasError = true;
+                    }
+                    else if (mCharacterName.Length <= 2 && !char.IsDigit(mCharacterName.Substring(0, 1).ToCharArray()[0]))
                     {
                         CharacterNameValidationError = "The name must consist of at least 3 characters!";
                         CharacterNameHasError = true;
                     } else if (mCharacterName.Length > 30 ) {
                         CharacterNameValidationError = "The name must not have more than 30 characters!";
                         CharacterNameHasError = true;
-                    }
+                    }                    
                     else
                     {
                         CharacterNameValidationError = "The first character of the name must be a letter!";
@@ -240,7 +251,8 @@ namespace DialogGenerator.UI.ViewModels
                 } else
                 {
                     CharacterNameValidationError = string.Empty;
-                    CharacterNameHasError = false;
+                    CharacterNameHasError = false;                 
+                    
                 }
             }
         }
@@ -721,7 +733,12 @@ namespace DialogGenerator.UI.ViewModels
 
         private bool _nextStep_CanExecute()
         {
-            return !string.IsNullOrEmpty(CharacterName) && CharacterName.Length >= 3;
+            return !string.IsNullOrEmpty(CharacterName) &&
+                CharacterName.Length >= 3 &&
+                CharacterName.Length <= 30 &&
+                !char.IsDigit(mCharacterName.Substring(0, 1).ToCharArray()[0]) &&
+                Regex.IsMatch(CharacterName, Constants.FILENAME_CHECK_REGEX);
+
         }
 
         private void _nextStep_Execute()

@@ -154,7 +154,7 @@ namespace DialogGenerator.UI.ViewModels
                 return false;
             }
 
-            if(!Regex.IsMatch(DialogName, Constants.FILENAME_CHECK_REGEX))
+            if (!Regex.IsMatch(DialogName, Constants.FILENAME_CHECK_REGEX))
             {
                 errorMessage = "Dialog name \"" + DialogName + "\" contains illegal characters!";
                 return false;
