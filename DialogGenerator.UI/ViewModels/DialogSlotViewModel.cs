@@ -15,6 +15,7 @@ using System.ComponentModel;
 using System.IO;
 using System.Linq;
 using System.Text;
+using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Data;
@@ -153,11 +154,12 @@ namespace DialogGenerator.UI.ViewModels
                 return false;
             }
 
-            if(DialogName.Contains("\\"))
+            if(!Regex.IsMatch(DialogName, Constants.FILENAME_CHECK_REGEX))
             {
-                errorMessage = "Dialog name can't contain '" + (char)0x5C + "' character!";
+                errorMessage = "Dialog name \"" + DialogName + "\" contains illegal characters!";
                 return false;
             }
+
 
             bool _exists = false;
             foreach (var _modelDialogInfo in mDialogModelRepository.GetAll())
