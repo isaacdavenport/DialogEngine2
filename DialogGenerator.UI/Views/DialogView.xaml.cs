@@ -23,8 +23,6 @@ namespace DialogGenerator.UI.Views
             this.AssignedRadiosControl.DataContext = model.AssignedRadiosViewModel;
         }
 
-
-
         private void _textOutput_CollectionChanged(object sender, NotifyCollectionChangedEventArgs e)
         {
             if(e.Action == NotifyCollectionChangedAction.Add)
@@ -36,5 +34,26 @@ namespace DialogGenerator.UI.Views
             }
         }
 
+        private void Border_SizeChanged(object sender, SizeChangedEventArgs e)
+        {
+            ArenaView.Height = e.NewSize.Height;
+        }
+
+        private void UserControl_Loaded(object sender, RoutedEventArgs e)
+        {
+            // Get height of the main window
+            var mainWindowHeight = Application.Current.MainWindow.ActualHeight - 40;
+
+            // Get height of the button bar.
+            var bottomHeight = ButtonsPanel.ActualHeight;
+
+            // Get the max height of the dialog lines area. 
+            var maxHeight = mainWindowHeight - (350 + bottomHeight);
+
+            // Set it.
+            DialogLinesRowDefinition.MaxHeight = maxHeight;
+
+
+        }
     }
 }

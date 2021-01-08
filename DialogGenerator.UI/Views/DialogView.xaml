@@ -20,7 +20,7 @@
              TextOptions.TextRenderingMode="Auto"
              TextElement.Foreground="{DynamicResource MaterialDesignBody}"
              mc:Ignorable="d" 
-             d:DesignHeight="450" d:DesignWidth="800">
+             d:DesignHeight="450" d:DesignWidth="800" Loaded="UserControl_Loaded">
     
     <UserControl.Resources>
         <ResourceDictionary>
@@ -49,18 +49,21 @@
 
     <Grid Background="White">
         <Grid.RowDefinitions>
+            <RowDefinition Height="*" MinHeight="350"/>
             <RowDefinition Height="Auto"/>
-            <RowDefinition Height="*"/>
+            <RowDefinition x:Name="DialogLinesRowDefinition" Height="200" MinHeight="200"/>
             <RowDefinition Height="Auto" />
             <RowDefinition Height="Auto"/>
             <RowDefinition Height="Auto" />
         </Grid.RowDefinitions>
 
-        <Border Grid.Row="0" BorderBrush="DarkGray" BorderThickness="2" Visibility="{Binding RadioModeOn, Converter={StaticResource NotBoolToVisibilityConverter}}">
-            <view:ArenaView x:Name="ArenaView"  />
+        <Border Grid.Row="0" BorderBrush="DarkGray" BorderThickness="2" Visibility="{Binding RadioModeOn, Converter={StaticResource NotBoolToVisibilityConverter}}" SizeChanged="Border_SizeChanged">
+            <view:ArenaView x:Name="ArenaView" Height="500" />
         </Border>
 
-        <Grid Grid.Row="1" HorizontalAlignment="Stretch">
+        <GridSplitter Grid.Row="1" HorizontalAlignment="Stretch" Height="5"/>
+
+        <Grid Grid.Row="2" HorizontalAlignment="Stretch">
             <Grid.ColumnDefinitions>
                 <ColumnDefinition Width="*"/>
                 <ColumnDefinition Width="5"/>
@@ -175,14 +178,14 @@
             </Border>
         </Grid>
 
-        <Border  Grid.Row="4" Background="White"   BorderBrush="LightGray" BorderThickness="0,1,0,0">
+        <Border Grid.Row="5" Background="White"   BorderBrush="LightGray" BorderThickness="0,1,0,0">
             <Grid>
                 <Grid.ColumnDefinitions>
                     <ColumnDefinition Width="Auto"/>
                     <ColumnDefinition Width="*" />
                 </Grid.ColumnDefinitions>
 
-                <StackPanel Orientation="Horizontal" VerticalAlignment="Center" Margin="0,0,5,0" HorizontalAlignment="Left" Grid.Column="0">
+                <StackPanel x:Name="ButtonsPanel" Orientation="Horizontal" VerticalAlignment="Center" Margin="0,0,5,0" HorizontalAlignment="Left" Grid.Column="0">
                     <materialDesign:Card Width="150" HorizontalAlignment="Left" VerticalAlignment="Center"  Height="150" Margin="10" Background="Orange" >
                         <Grid Style="{StaticResource CardGrid}">
                             <StackPanel HorizontalAlignment="Center" VerticalAlignment="Center">

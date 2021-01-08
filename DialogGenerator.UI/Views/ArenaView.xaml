@@ -9,7 +9,6 @@
              xmlns:local="clr-namespace:DialogGenerator.UI.Views"
              mc:Ignorable="d" 
              MinHeight="350"
-             MaxHeight="350"
              d:DesignHeight="850" 
              d:DesignWidth="800" 
              Loaded="UserControl_Loaded" 
