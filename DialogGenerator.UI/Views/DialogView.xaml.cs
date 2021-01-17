@@ -1,4 +1,5 @@
-﻿using DialogGenerator.UI.ViewModels;
+﻿using DialogGenerator.Events.EventArgs;
+using DialogGenerator.UI.ViewModels;
 using System.Collections.Specialized;
 using System.Windows;
 using System.Windows.Controls;
@@ -54,6 +55,13 @@ namespace DialogGenerator.UI.Views
             DialogLinesRowDefinition.MaxHeight = maxHeight;
 
 
+        }
+
+        private void DockPanel_MouseLeftButtonDown(object sender, System.Windows.Input.MouseButtonEventArgs e)
+        {            
+            DockPanel dPanel = (DockPanel)sender;
+            NewDialogLineEventArgs args = dPanel.DataContext as NewDialogLineEventArgs;
+            args.Selected = true;
         }
     }
 }

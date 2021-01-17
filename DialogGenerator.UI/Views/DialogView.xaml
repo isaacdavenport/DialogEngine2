@@ -31,6 +31,7 @@
             <converters:CloneValuesConverter x:Key="CloneValuesConverter" />
             <converters:ImageContentSmallSizeValueConverter x:Key="ImageContentSmallSizeValueConverter" />
             <converters:BoolToVisibilityConverter x:Key="BoolToVisibilityConverter" />
+            <converters:BoolToColorConverter x:Key="BoolToColorConverter" />
             <converters:NotBoolToVisibilityConverter x:Key="NotBoolToVisibilityConverter" />
             <converters:ImageContentValueConverter x:Key="ImageContentValueConverter" />
             <converters:BoolToRowHeightConverter x:Key="BoolToRowHeightConverter"/>
@@ -97,7 +98,7 @@
 
                     <ItemsControl.Resources>
                         <DataTemplate DataType="{x:Type eventArgs:NewDialogLineEventArgs }">
-                            <DockPanel HorizontalAlignment="Left" Margin="50,10,20,10">
+                            <DockPanel HorizontalAlignment="Left" Margin="50,10,20,10" MouseLeftButtonDown="DockPanel_MouseLeftButtonDown" Background="{Binding Selected, Converter={StaticResource BoolToColorConverter}, ConverterParameter=White|Yellow}">
                                 <Grid>
                                     <Grid.ColumnDefinitions>
                                         <ColumnDefinition Width="auto" />
@@ -158,7 +159,12 @@
                                     <materialDesign:PackIcon Kind="DeleteEmpty" Foreground="Red" />
                                 </MenuItem.Icon>
                             </MenuItem>
-                        </ContextMenu>
+                        <MenuItem Header="Copy Lines" FontSize="13" Command="{Binding CopyLinesCommand}"   Background="White" >
+                            <MenuItem.Icon>
+                                <materialDesign:PackIcon Kind="ContentCopy" Foreground="Black" />
+                            </MenuItem.Icon>
+                        </MenuItem>
+                    </ContextMenu>
                     </ItemsControl.ContextMenu>
                 </ItemsControl>
             

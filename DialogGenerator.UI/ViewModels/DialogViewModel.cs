@@ -96,6 +96,26 @@ namespace DialogGenerator.UI.ViewModels
             mDialogEngine.PropertyChanged += MDialogEngine_PropertyChanged;
         }
 
+        public void CopyAndClear()
+        {
+            string strToCopy = string.Empty;
+            foreach(NewDialogLineEventArgs line in DialogLinesCollection)
+            {
+                if(line.Selected)
+                {
+                    if(!string.IsNullOrEmpty(strToCopy))
+                    {
+                        strToCopy += "\n";                        
+                    }
+
+                    strToCopy += line.DialogLine;
+                    line.Selected = false;
+                }
+            }
+
+            Clipboard.SetText(strToCopy);
+        }
+
         private void MDialogEngine_PropertyChanged(object sender, System.ComponentModel.PropertyChangedEventArgs e)
         {
             PauseCommand.RaiseCanExecuteChanged();
@@ -354,6 +374,7 @@ namespace DialogGenerator.UI.ViewModels
 
         public DelegateCommand PauseCommand { get; set; }
         public DelegateCommand ResumeCommand { get; set; }
+        public DelegateCommand CopyLinesCommand { get; set; }
 
 
         #endregion
@@ -378,6 +399,12 @@ namespace DialogGenerator.UI.ViewModels
             ShowPDFHelpCommand = new DelegateCommand(_showPDFHelpCommand_execute);
             PauseCommand = new DelegateCommand(_pauseCommandExecute, _pauseCommandCanExecute);
             ResumeCommand = new DelegateCommand(_resumeCommandExecute, _resumeCommandCanExecute);
+            CopyLinesCommand = new DelegateCommand(_copyCommand_execute);
+        }
+
+        private void _copyCommand_execute()
+        {
+            CopyAndClear();
         }
 
         private bool _resumeCommandCanExecute()
