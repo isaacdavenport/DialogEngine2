@@ -94,11 +94,11 @@
                         Background="Yellow"
                         VerticalAlignment="Stretch" 
                         HorizontalAlignment="Stretch"
-                        ItemsSource="{Binding DialogLinesCollection}">
+                        ItemsSource="{Binding DialogLinesCollection}" PreviewMouseLeftButtonDown="TextOutput_MouseLeftButtonDown">
 
                     <ItemsControl.Resources>
                         <DataTemplate DataType="{x:Type eventArgs:NewDialogLineEventArgs }">
-                            <DockPanel HorizontalAlignment="Left" Margin="50,10,20,10" MouseLeftButtonDown="DockPanel_MouseLeftButtonDown" Background="{Binding Selected, Converter={StaticResource BoolToColorConverter}, ConverterParameter=White|Yellow}">
+                            <DockPanel HorizontalAlignment="Left" Margin="50,10,20,10" PreviewMouseLeftButtonDown="DockPanel_MouseLeftButtonDown" Background="{Binding Selected, Converter={StaticResource BoolToColorConverter}, ConverterParameter=White|Yellow}">
                                 <Grid>
                                     <Grid.ColumnDefinitions>
                                         <ColumnDefinition Width="auto" />
@@ -107,20 +107,14 @@
                                     <materialDesign:ColorZone  Background="Transparent" VerticalAlignment="Stretch" 
                                                       Content="{Binding Character.CharacterImage, Converter={StaticResource ImageContentSmallSizeValueConverter}}" >
                                     </materialDesign:ColorZone>
-                                    <StackPanel Grid.Column="1">
-                                        <TextBlock Padding="8,10,4,4" TextWrapping="Wrap" FontWeight="Bold"
-                                           Text="{Binding Character.CharacterName }" Width="auto" HorizontalAlignment="Left"  />
-                                    <TextBlock Padding="8,4,4,4" TextWrapping="Wrap" Text="{Binding Path=DialogLine }" Width="auto" HorizontalAlignment="Left">
-                                        <TextBlock.ContextMenu>
-                                            <ContextMenu>
-                                                <MenuItem Header="Copy" Command="{Binding CopyCommand}"/>
-                                            </ContextMenu>
-                                        </TextBlock.ContextMenu>
-                                    </TextBlock>
-                                    </StackPanel>
-                                </Grid>
+                                <StackPanel Grid.Column="1">
+                                    <TextBlock Padding="8,10,4,4" TextWrapping="Wrap" FontWeight="Bold"
+                                               Text="{Binding Character.CharacterName }" Width="auto" HorizontalAlignment="Left"  />
+                                    <TextBlock Padding="8,4,4,4" TextWrapping="Wrap" Text="{Binding Path=DialogLine }" Width="auto" HorizontalAlignment="Left" />
+                                </StackPanel>
+                            </Grid>
                                 
-                        </DockPanel>
+                            </DockPanel>
                         </DataTemplate>
 
                         <DataTemplate DataType="{x:Type s:String}">
@@ -159,11 +153,16 @@
                                     <materialDesign:PackIcon Kind="DeleteEmpty" Foreground="Red" />
                                 </MenuItem.Icon>
                             </MenuItem>
-                        <MenuItem Header="Copy Lines" FontSize="13" Command="{Binding CopyLinesCommand}"   Background="White" >
-                            <MenuItem.Icon>
-                                <materialDesign:PackIcon Kind="ContentCopy" Foreground="Black" />
-                            </MenuItem.Icon>
-                        </MenuItem>
+                            <MenuItem Header="Select All" FontSize="13" Command="{Binding SelectAllCommand}"   Background="White" >
+                                <MenuItem.Icon>
+                                    <materialDesign:PackIcon Kind="SelectAll" Foreground="Black" />
+                                </MenuItem.Icon>
+                            </MenuItem>
+                            <MenuItem Header="Copy Lines" FontSize="13" Command="{Binding CopyLinesCommand}"   Background="White" >
+                                <MenuItem.Icon>
+                                    <materialDesign:PackIcon Kind="ContentCopy" Foreground="Black" />
+                                </MenuItem.Icon>
+                            </MenuItem>
                     </ContextMenu>
                     </ItemsControl.ContextMenu>
                 </ItemsControl>

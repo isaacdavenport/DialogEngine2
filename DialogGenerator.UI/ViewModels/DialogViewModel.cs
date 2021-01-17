@@ -375,6 +375,7 @@ namespace DialogGenerator.UI.ViewModels
         public DelegateCommand PauseCommand { get; set; }
         public DelegateCommand ResumeCommand { get; set; }
         public DelegateCommand CopyLinesCommand { get; set; }
+        public DelegateCommand SelectAllCommand { get; set; }
 
 
         #endregion
@@ -400,6 +401,15 @@ namespace DialogGenerator.UI.ViewModels
             PauseCommand = new DelegateCommand(_pauseCommandExecute, _pauseCommandCanExecute);
             ResumeCommand = new DelegateCommand(_resumeCommandExecute, _resumeCommandCanExecute);
             CopyLinesCommand = new DelegateCommand(_copyCommand_execute);
+            SelectAllCommand = new DelegateCommand(_selectAllCommand_execute);
+        }
+
+        private void _selectAllCommand_execute()
+        {
+            foreach(NewDialogLineEventArgs line in DialogLinesCollection)
+            {
+                line.Selected = true;
+            }
         }
 
         private void _copyCommand_execute()

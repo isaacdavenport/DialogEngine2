@@ -3,6 +3,7 @@ using DialogGenerator.UI.ViewModels;
 using System.Collections.Specialized;
 using System.Windows;
 using System.Windows.Controls;
+using System.Windows.Input;
 using System.Windows.Media;
 
 namespace DialogGenerator.UI.Views
@@ -58,10 +59,37 @@ namespace DialogGenerator.UI.Views
         }
 
         private void DockPanel_MouseLeftButtonDown(object sender, System.Windows.Input.MouseButtonEventArgs e)
-        {            
+        {
+            DialogViewModel dvm = this.DataContext as DialogViewModel;
+            if(!Keyboard.IsKeyDown(Key.LeftCtrl))
+            {
+                foreach(NewDialogLineEventArgs line in dvm.DialogLinesCollection)
+                {
+                    line.Selected = false;
+                }
+            }
+
             DockPanel dPanel = (DockPanel)sender;
             NewDialogLineEventArgs args = dPanel.DataContext as NewDialogLineEventArgs;
-            args.Selected = true;
+            if (!args.Selected)
+                args.Selected = true;
+            else
+                args.Selected = false;
+
+            e.Handled = true;
+        }
+
+        private void TextOutput_MouseLeftButtonDown(object sender, MouseButtonEventArgs e)
+        {
+            if(e.OriginalSource.GetType() != typeof(TextBlock))
+            {
+                DialogViewModel dvm = this.DataContext as DialogViewModel;
+                foreach(NewDialogLineEventArgs line in dvm.DialogLinesCollection)
+                {
+                    line.Selected = false;
+                }
+            }
+                
         }
     }
 }
