@@ -10,6 +10,9 @@ namespace DialogGenerator.Utilities
     {
         public void Error(string message = null, [CallerFilePath] string file = "", [CallerLineNumber] int line = 0)
         {
+            if (Application.Current.Dispatcher == null)
+                return;
+            
             if (Application.Current.Dispatcher.CheckAccess())
             {
                 if (ErrorsCollection.Count > 150)
@@ -31,6 +34,9 @@ namespace DialogGenerator.Utilities
 
         public void Info(string message = null, [CallerFilePath] string file = "", [CallerLineNumber] int line = 0)
         {
+            if (Application.Current.Dispatcher == null)
+                return;
+            
             if (Application.Current.Dispatcher.CheckAccess())
             {
                 if (InformationsCollection.Count > 150)
@@ -52,6 +58,9 @@ namespace DialogGenerator.Utilities
 
         public void Warning(string message = null, [CallerFilePath] string file = "", [CallerLineNumber] int line = 0)
         {
+            if (Application.Current.Dispatcher == null)
+                return;
+            
             if (Application.Current.Dispatcher.CheckAccess())
             {
                 if (WarningsCollection.Count > 150)
