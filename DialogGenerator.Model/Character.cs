@@ -69,7 +69,7 @@ namespace DialogGenerator.Model
         [JsonProperty("CharacterPrefix"),Required(ErrorMessage ="Character initials is required.")]
         public string CharacterPrefix { get; set; } = "";
 
-        [FileExtensions(Extensions ="jpg,jpe,jpeg,png",ErrorMessage ="Allowed image file extensions: jpg,jpe,jpeg,png.")]
+        [FileExtensions(Extensions ="jpg,jpe,jpeg,png,gif,jfif,tiff,apng,avif,webp",ErrorMessage ="Allowed image file extensions: jpg,jpe,jpeg,png,gif,jfif,tiff,apng,avif,webp.")]
         [JsonProperty("CharacterImage")]
         public string CharacterImage
         {
