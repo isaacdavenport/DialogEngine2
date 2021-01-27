@@ -108,6 +108,8 @@ namespace DialogGenerator.UI.ViewModels
                         strToCopy += "\n";                        
                     }
 
+                    strToCopy += line.Character.CharacterName;
+                    strToCopy += " - ";
                     strToCopy += line.DialogLine;
                     line.Selected = false;
                 }
