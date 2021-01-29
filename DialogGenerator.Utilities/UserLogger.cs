@@ -10,7 +10,7 @@ namespace DialogGenerator.Utilities
     {
         public void Error(string message = null, [CallerFilePath] string file = "", [CallerLineNumber] int line = 0)
         {
-            if (Application.Current.Dispatcher == null)
+            if (Application.Current == null)
                 return;
             
             if (Application.Current.Dispatcher.CheckAccess())
