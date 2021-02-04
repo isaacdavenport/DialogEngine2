@@ -372,7 +372,7 @@ namespace DialogGenerator.DialogEngine
 
                 mIndexOfCurrentDialogModel = Session.Get<int>(Constants.SELECTED_DLG_MODEL) >= 0
                                             ? Session.Get<int>(Constants.SELECTED_DLG_MODEL)
-                                            : mDialogModelsManager.PickAWeightedDialog2();
+                                            : mDialogModelsManager.PickAWeightedDialog();
 
                 token.ThrowIfCancellationRequested();
 

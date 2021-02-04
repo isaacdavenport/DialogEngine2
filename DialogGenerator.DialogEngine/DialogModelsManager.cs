@@ -450,7 +450,25 @@ namespace DialogGenerator.DialogEngine
             }
         }
 
-        public int PickAWeightedDialog2()
+        // PickAWeightedDialog and PickAWeightedPhrase use a statistical approach to randomly select DialogModels and 
+        // Phrases.  Each DialogModel has a popularity weighting factor and each phrase has a PhraseWeight number.  
+        // The larger these numbers are the more often that DialogModel or Phrase will come up.  Here is a sample calculation
+        // for phrases.  Say that Johny has three lines with a value for the PhraseWeight RequestAffirmation.
+        //  "Have you seen my mommy?" 0.4
+        //  "Mommy! Mommy!"  0.6
+        //  "I don't feel so good" 2.0
+        // The lines above will also have PhraseWeights for other PhraseWeight tags like Exclamation YesNoQuestion etc. but
+        // if the dialog model calls for a RequestAffirmation line we look for all the lines with a RequestAffirmation PhraseWeight
+        // tag and add them up 2+0.6+0.4=3.  We get a random number which comes back between 0-1, lets say it came up at .75
+        // We mutiply the random number by the sum of the weights  .75*3 = 2.25
+        // We now step through the lines (or DialogModels in the other method) to find our random selection by weight/poularity
+        //  Have you seen my mommy gets us to 0.4, not bigger than 2.25 yet
+        //  Now we addin 0.6 for the "Mommy! Mommy!" line .4+.6 = 1 and not larger than 2.25 yet
+        //  Now we add in the 2 weighting for the "I don't feel so good" line and .4+.6+2 = 3 is larger than 2.25 so we have found 
+        //  our randomly selected line.  You can see that if the random number were lower we would have selected one of the earlier 
+        //  lines.  You can also see that the weight of the last line at 2 is larger than the weight of the first line at 0.4 so
+        //  the last line is more likely to come up than both the previous two lines.
+        public int PickAWeightedDialog()
         {
             var _dialogModel = 0;
             var _mostRecentAdventureDialogIndexes = _findMostRecentAdventureDialogIndexes();
@@ -459,7 +477,7 @@ namespace DialogGenerator.DialogEngine
 
             if(settings.HasPreferredDialog)
             {
-                var _preferredDialog = mContext.DialogModelsList.Where(d => d.Name.Equals(settings.PreferredDialogName)).First();
+                var _preferredDialog = mContext.DialogModelsList.Where(d => d.Name.Equals(settings.PreferredDialogName)).FirstOrDefault();
                 if(_preferredDialog != null)
                 {
                     if(_isDialogEgligibleForCharacters(_preferredDialog, mContext.Character1Num, mContext.Character2Num))
@@ -550,123 +568,7 @@ namespace DialogGenerator.DialogEngine
 
             return _dialogModel;
         }
-
-
-
-        // PickAWeightedDialog and PickAWeightedPhrase use a statistical approach to randomly select DialogModels and 
-        // Phrases.  Each DialogModel has a popularity weighting factor and each phrase has a PhraseWeight number.  
-        // The larger these numbers are the more often that DialogModel or Phrase will come up.  Here is a sample calculation
-        // for phrases.  Say that Johny has three lines with a value for the PhraseWeight RequestAffirmation.
-        //  "Have you seen my mommy?" 0.4
-        //  "Mommy! Mommy!"  0.6
-        //  "I don't feel so good" 2.0
-        // The lines above will also have PhraseWeights for other PhraseWeight tags like Exclamation YesNoQuestion etc. but
-        // if the dialog model calls for a RequestAffirmation line we look for all the lines with a RequestAffirmation PhraseWeight
-        // tag and add them up 2+0.6+0.4=3.  We get a random number which comes back between 0-1, lets say it came up at .75
-        // We mutiply the random number by the sum of the weights  .75*3 = 2.25
-        // We now step through the lines (or DialogModels in the other method) to find our random selection by weight/poularity
-        //  Have you seen my mommy gets us to 0.4, not bigger than 2.25 yet
-        //  Now we addin 0.6 for the "Mommy! Mommy!" line .4+.6 = 1 and not larger than 2.25 yet
-        //  Now we add in the 2 weighting for the "I don't feel so good" line and .4+.6+2 = 3 is larger than 2.25 so we have found 
-        //  our randomly selected line.  You can see that if the random number were lower we would have selected one of the earlier 
-        //  lines.  You can also see that the weight of the last line at 2 is larger than the weight of the first line at 0.4 so
-        //  the last line is more likely to come up than both the previous two lines.
-        public int PickAWeightedDialog()
-        {
-            var _dialogModel = 0;
-            var _attempts = 0;
-            var _dialogModelFits = false;
-            var _mostRecentAdventureDialogIndexes = _findMostRecentAdventureDialogIndexes();
-
-            // most recent will be in the 0 index of list which will be hit first in foreach
-            if (_mostRecentAdventureDialogIndexes.Count > 0)
-            {
-                var _nextAdventureDialogIdx = _findNextAdventureDialogForCharacters(_mostRecentAdventureDialogIndexes);
-                if (_nextAdventureDialogIdx > 0 && _nextAdventureDialogIdx < mContext.DialogModelsList.Count)
-                    return _nextAdventureDialogIdx; // we have an adventure dialog for these characters go with it
-            }
-
-            //int _max_attempts = 30000;  //TODO eventually we want to get away from this check
-
-            if (mContext.PossibleDialogModelsList == null || !mContext.PossibleDialogModelsList.Any())
-            {
-                mContext.PossibleDialogModelsList =
-                    _preparePossibleDialogModelsList(mContext.Character1Num, mContext.Character2Num);
-            }
-
-            // Commented DLGEN-543 S.Ristic - We do not want after each character change to start with a greeting.
-            //if (!mContext.SameCharactersAsLast &&
-            //    mContext.PossibleDialogModelsList.Any(d => d.PhraseTypeSequence.Contains("Greeting")))
-            //{
-            //    return mContext.DialogModelsList.IndexOf(
-            //        mContext.PossibleDialogModelsList.First(d => d.PhraseTypeSequence.Contains("Greeting"))
-            //    );
-            //}
-
-            // if we create a list of only dialog models that will work for the two characters and iterate through that
-            // smaller list, we won't have to worry about landing on dialog models the two characters can't use
-            // we can also throw and log a more definate error about how the two characters have no dialog models
-            // they can both participate in if or log that it is a low number (lower than the dozen or so models two 
-            // characters with just the basic wizard lines give them access to).
-
-            while (!_dialogModelFits /* && _attempts < _max_attempts */)
-            {
-                _attempts++;
-                var _dialogWeightIndex = mRandom.NextDouble();
-                _dialogWeightIndex *= mContext.PossibleDialogModelsList.Sum(dlg => dlg.Popularity);
-                double _currentDialogWeightSum = 0;
-
-                foreach (var _dialog in mContext.PossibleDialogModelsList)
-                {
-                    _currentDialogWeightSum += _dialog.Popularity;
-
-                    if (_currentDialogWeightSum > _dialogWeightIndex)
-                    {
-                        _dialogModel = mContext.DialogModelsList.IndexOf(_dialog);
-                        break;
-                    }
-                }
-
-                var _dialogModelUsedRecently = _checkIfDialogModelUsedRecently(_dialogModel);
-                var _dialogPreRequirementsMet = _checkIfDialogPreRequirementMet(_dialogModel);
-                var _inappropriateGreeting = mContext.DialogModelsList[_dialogModel].PhraseTypeSequence[0].Equals("Greeting")
-                                             && mContext.SameCharactersAsLast;
-                var _containsRecentPhrases = _checkForRecentPhrases(_dialogModel);
-
-                if (_dialogPreRequirementsMet && /*!_inappropriateGreeting &&*/
-                    !_dialogModelUsedRecently && !_containsRecentPhrases)
-                {
-                    _dialogModelFits = true;
-                }
-                if (_attempts == 500)
-                {
-                    var attemptsWarningMsg = "Characters " + mContext.CharactersList[mContext.Character1Num].CharacterPrefix +
-                        " and " + mContext.CharactersList[mContext.Character2Num].CharacterPrefix +
-                        " took over 500 attempts to find a workable dialog model.";
-                    Debug.WriteLine(attemptsWarningMsg);
-                    // TODO uncomment 
-                    //DialogDataHelper.AddMessage(new WarningMessage(attemptsWarningMsg));
-                    mLogger.Debug(attemptsWarningMsg);
-
-                    // Reset history.
-                    mContext.HistoricalDialogs.Clear();
-                    mContext.CharactersList[mContext.Character1Num].ClearRecentPhrases();
-                    mContext.CharactersList[mContext.Character2Num].ClearRecentPhrases();
-                    _attempts = 0;
-                }
-                //if (_dialogPreRequirementsMet && _charactersHavePhrases && _attempts > 15000)
-                //{
-                //    //_dialogModelFits = true;
-                //    Debug.WriteLine("No more dialogs left!");
-                //    mContext.HistoricalDialogs.Clear();
-
-                //}
-            }
-            return _dialogModel;
-        }
-
-        
-
+                       
         //  See the comment above PickAWeightedDialog() above since PickAWeightedPhrase works the same way
         public PhraseEntry PickAWeightedPhrase(int _speakingCharacter, string _currentPhraseType)
         {
