@@ -433,9 +433,11 @@ namespace DialogGenerator.UI.ViewModels
 
         private void _stopRecorder_Execute()
         {
-            switch (StateMachine.State)
+            try
             {
-                case States.Recording:
+                switch (StateMachine.State)
+                {
+                    case States.Recording:
                     {
                         mTimer.Change(Timeout.Infinite, Timeout.Infinite);
                         mSoundPlayer.StopRecording();                                                    
@@ -444,7 +446,7 @@ namespace DialogGenerator.UI.ViewModels
                             mSoundRecognizer.RecognizeAsyncStop();
                         break;
                     }
-                case States.Playing:
+                    case States.Playing:
                     {
                         if (mSoundPlayer.CanStop)
                             mSoundPlayer.Stop();
@@ -453,7 +455,12 @@ namespace DialogGenerator.UI.ViewModels
                             StateMachine.Fire(Triggers.Stop);
                         break;
                     }
+                }
+            } catch (Exception e)
+            {
+                mLogger.Error("Voice recorder exception - (m)_startRecording_Execute " + e.Message);
             }
+            
         }
 
         #endregion
