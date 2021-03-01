@@ -427,6 +427,7 @@ namespace DialogGenerator.UI.ViewModels
         private void _resumeCommandExecute()
         {
             mDialogEngine.PauseCancellationTokenSource.Cancel();
+            mLogger.Info("Dialog View - (Button Click) Dialog engine resumed");
         }
 
         private bool _pauseCommandCanExecute()
@@ -438,6 +439,7 @@ namespace DialogGenerator.UI.ViewModels
         {
             mDialogEngine.PauseCancellationTokenSource = new CancellationTokenSource();
             CanPause = false;
+            mLogger.Info("Dialog View - (Button Click) Pause Requested");
         }
 
         private void _showPDFHelpCommand_execute()
@@ -463,7 +465,7 @@ namespace DialogGenerator.UI.ViewModels
         }
 
         private async void _expertModeExecute()
-        {            
+        {
             CreateCharacterViewModel createCharacterViewModel = Session.Get(Constants.CREATE_CHARACTER_VIEW_MODEL) as CreateCharacterViewModel;
             if(createCharacterViewModel != null)
             {

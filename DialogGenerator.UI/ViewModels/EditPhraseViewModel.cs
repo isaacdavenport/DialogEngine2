@@ -248,6 +248,7 @@ namespace DialogGenerator.UI.ViewModels
         #endregion
 
         #region Commands
+        public DelegateCommand LoadCommand { get; private set; }
         public DelegateCommand CloseCommand { get; private set; }
         public DelegateCommand AddPhraseWeightCommand { get; private set; }
         public DelegateCommand<PhraseWeight> RemovePhraseWeightCommand { get; private set; }
@@ -331,6 +332,8 @@ namespace DialogGenerator.UI.ViewModels
             }
 
             await mCharacterDataProvider.SaveAsync(mCharacter);
+
+            mLogger.Debug($"Edit Phrase View Model - Saved changes for the character '{mCharacter.CharacterName}'");
         }
 
         #endregion
@@ -346,6 +349,8 @@ namespace DialogGenerator.UI.ViewModels
 
             mEventAggregator.GetEvent<RequestTranslationEvent>().Unsubscribe(_onTranslationRequired);
             mEventAggregator.GetEvent<SpeechConvertedEvent>().Unsubscribe(_onSpeechRecognized);
+            
+            mLogger.Debug($"Edit Phrase View - Closing for character '{mCharacter.CharacterName}'");
         }
         
         private bool _viewClose_CanExecute()
@@ -389,9 +394,15 @@ namespace DialogGenerator.UI.ViewModels
 
         private void _bindCommands()
         {
+            LoadCommand = new DelegateCommand(_viewLoad_execute);
             CloseCommand = new DelegateCommand(_viewClose_Execute, _viewClose_CanExecute);
             AddPhraseWeightCommand = new DelegateCommand(_addPhraseWeight_Execute, _addPhraseWeight_CanExecute);
             RemovePhraseWeightCommand = new DelegateCommand<PhraseWeight>(_removePhraseWeight_Execute, _removePhraseWeight_CanExecute);
+        }
+
+        private void _viewLoad_execute()
+        {
+            mLogger.Debug($"Edit Phrase View - Loaded for '{mCharacter.CharacterName}'");
         }
 
         private void _bindEvents()

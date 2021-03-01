@@ -257,6 +257,8 @@ namespace DialogGenerator.UI.ViewModels
         {
             VoiceRecorderControlViewModel.StateMachine.PropertyChanged += _vrc_stateMachine_PropertyChanged;
             MediaPlayerControlViewModel.StateMachine.PropertyChanged += _mpc_stateMachine_PropertyChanged;
+
+            //mLogger.Debug($"Wizard View - Wizard '{ mCurrentWizard.WizardName}' started!");
         }
 
         private void _bindCommands()
@@ -643,6 +645,8 @@ namespace DialogGenerator.UI.ViewModels
                 }
 
                 Workflow.Fire(WizardTriggers.ReadyForUserAction);
+                
+                mLogger.Debug($"Wizard View - Wizard '{mCurrentWizard.WizardName}' loaded from Guided Creation Mode!");
             } else
             {
                 Character = mRegionManager.Regions[Constants.ContentRegion].Context as Character;
@@ -685,6 +689,8 @@ namespace DialogGenerator.UI.ViewModels
 
                     _setDataForTutorialStep(CurrentStepIndex);
                     Workflow.Fire(WizardTriggers.ReadyForUserAction);
+                    
+                    mLogger.Debug($"Wizard View - Wizard '{mCurrentWizard.WizardName}' loaded from Expert Mode!");
                 }
                 else
                 {
@@ -694,7 +700,7 @@ namespace DialogGenerator.UI.ViewModels
             }
 
             mSpeechSyntesizer.SpeakCompleted += _synth_SpeakCompleted;
-
+            
         }
 
         private void _view_Unloaded()
@@ -716,6 +722,8 @@ namespace DialogGenerator.UI.ViewModels
                 _setDataForTutorialStep(CurrentStepIndex);
 
                 mTimer = new Timer(_preventSkip, null, 1000, -1);
+
+                mLogger.Debug($"Wizard View - Step {CurrentStepIndex} of the wizard '{mCurrentWizard.WizardName}' entered.");
             }
             catch (Exception ex)
             {
@@ -847,7 +855,9 @@ namespace DialogGenerator.UI.ViewModels
                 Workflow.Fire(WizardTriggers.Finish);
                 return;
             }
-
+            
+            mLogger.Debug($"Wizard View - The wizard step {CurrentStepIndex} of '{CurrentWizard.WizardName}' saved and finished.");
+            
             Workflow.Fire(WizardTriggers.LoadNextStep);
         }
 
@@ -890,7 +900,7 @@ namespace DialogGenerator.UI.ViewModels
                 }
             }
 
-            
+            mLogger.Debug($"Wizard View - Wizard '{CurrentWizard.WizardName}' finished!");
                         
         }
 

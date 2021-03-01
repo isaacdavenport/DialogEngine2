@@ -56,6 +56,8 @@ namespace DialogGenerator.UI.ViewModels
 
         public DelegateCommand SaveCommand { get; set; }
         public DelegateCommand CloseCommand { get; set; }
+        public DelegateCommand LoadCommand { get; set; }
+
 
         private void _subscribeEvents()
         {
@@ -66,10 +68,17 @@ namespace DialogGenerator.UI.ViewModels
         {
             SaveCommand = new DelegateCommand(_saveExecute, _saveCanExecute);
             CloseCommand = new DelegateCommand(_closeExecute);
+            LoadCommand = new DelegateCommand(_loadExecute);
+        }
+
+        private void _loadExecute()
+        {
+            mLogger.Debug($"Custom Dialog Creator View - Loading.");
         }
 
         private void _closeExecute()
         {
+            mLogger.Debug($"Custom Dialog Creator View - Closing");
             mRegionManager.Regions[Constants.ContentRegion].NavigationService.RequestNavigate("CreateView");
         }
 

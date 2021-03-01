@@ -11,6 +11,7 @@
              xmlns:view="clr-namespace:DialogGenerator.UI.Views"
              xmlns:converters="clr-namespace:DialogGenerator.UI.Converters"
              xmlns:local="clr-namespace:DialogGenerator.UI.Views"
+             xmlns:i="http://schemas.microsoft.com/expression/2010/interactivity"
              mc:Ignorable="d" 
              d:DesignHeight="450" d:DesignWidth="800">
     <UserControl.Resources>
@@ -77,6 +78,16 @@
             </ResourceDictionary.MergedDictionaries>
         </ResourceDictionary>
     </UserControl.Resources>
+    
+    <i:Interaction.Triggers>
+        <i:EventTrigger EventName="Loaded">
+            <i:InvokeCommandAction Command="{Binding ViewLoadedCommand}" />
+        </i:EventTrigger>
+        <i:EventTrigger EventName="Unloaded">
+            <i:InvokeCommandAction Command="{Binding ViewUnloadedCommand}" />
+        </i:EventTrigger>
+    </i:Interaction.Triggers>
+    
     <Grid >
         <Grid.RowDefinitions>
             <RowDefinition Height="auto" />

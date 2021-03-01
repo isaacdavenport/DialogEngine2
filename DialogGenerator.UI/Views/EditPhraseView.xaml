@@ -16,6 +16,9 @@
         </ResourceDictionary>
     </UserControl.Resources>
     <i:Interaction.Triggers>
+        <i:EventTrigger EventName="Loaded">
+            <i:InvokeCommandAction Command="{Binding LoadCommand}"/>
+        </i:EventTrigger>
         <i:EventTrigger EventName="Unloaded">
             <i:InvokeCommandAction Command="{Binding CloseCommand}" />
         </i:EventTrigger>

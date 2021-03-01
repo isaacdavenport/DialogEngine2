@@ -536,7 +536,17 @@ namespace DialogGenerator.UI.ViewModels
         public void nextStep()
         {
             int _currentStepIndex = CurrentStepIndex;
-            Workflow.Fire((Triggers) (++_currentStepIndex));   
+            Workflow.Fire((Triggers) (++_currentStepIndex));
+
+            if (mWizard.Steps.Count == _currentStepIndex)
+            {
+                mLogger.Debug($"Create character view - Saving the initial character info of '{ mCharacterName }'. Moving on to the 'Basic Wizard'.");
+            }
+            else
+            {
+                var _stepName = mWizard.Steps[_currentStepIndex].StepName;
+                mLogger.Debug($"Create character view - Advanced to '{_stepName}' step.");
+            }
         }
 
         public void previousStep()
@@ -545,6 +555,9 @@ namespace DialogGenerator.UI.ViewModels
             {
                 int _currentStepIndex = CurrentStepIndex;
                 Workflow.Fire((Triggers) (--_currentStepIndex));
+                
+                var _stepName = mWizard.Steps[_currentStepIndex].StepName;
+                mLogger.Debug($"Create character view - Back to '{_stepName}' step.");
             }            
         }
 
@@ -750,11 +763,13 @@ namespace DialogGenerator.UI.ViewModels
         {
             await _checkWizardConfiguration();
             Workflow.Fire(Triggers.Initialize);
+            
+            mLogger.Debug($"Create Character View - Guided character creation loaded!");
         }
 
         private void _viewUnloaded_execute()
         {
-            
+            mLogger.Debug($"Create Character View - Guided character creation exited!");
         }
         
         private void _configureWorkflow()
@@ -1054,6 +1069,8 @@ namespace DialogGenerator.UI.ViewModels
                         _openCreateSession(Character);                        
                     }
 
+                    mLogger.Debug($"Create character view - Entering wizard");
+
                     // Start the wizard.
                     mRegionManager.Regions[Constants.ContentRegion].NavigationService.RequestNavigate("WizardView");
                     break;
@@ -1113,10 +1130,13 @@ namespace DialogGenerator.UI.ViewModels
                         Workflow.Fire(Triggers.Finish);
                     }
 
+                    mLogger.Debug($"Create character view - Entering play mode");
+
                     // Call the play window.
                     mRegionManager.Regions[Constants.ContentRegion].NavigationService.RequestNavigate("DialogView");
                     break;
                 case "Finished":
+                    mLogger.Debug($"Create character view - Entering finish");
                     _processFinish();                    
                     break;
                 default:

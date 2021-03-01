@@ -159,6 +159,7 @@ namespace DialogGenerator.UI.ViewModels
             var character =mRegionManager.Regions[Constants.ContentRegion].Context as Character;
             Load(string.IsNullOrEmpty(character.CharacterPrefix) ? "" : character.CharacterPrefix);
             Session.Set(Constants.SELECTED_CHARACTER, character);
+            mLogger.Debug($"Character Detail View - Loaded for character '{Character.CharacterName}'");
             await _startRadioScanning();
         }        
 
@@ -178,6 +179,7 @@ namespace DialogGenerator.UI.ViewModels
 
             _stopRadioScanning();
             //Session.Set(Constants.SELECTED_CHARACTER, null);
+            mLogger.Debug($"Character Detail View - Unloaded for character '{Character.CharacterName}'");
         }
 
         private async Task _startRadioScanning()
@@ -410,6 +412,8 @@ namespace DialogGenerator.UI.ViewModels
             {
                 FileHelper.ClearDirectory(ApplicationData.Instance.TempDirectory);
                 mMessageDialogService.CloseBusyDialog();
+
+                mLogger.Debug($"Character Detail View - Character '{mCharacter.CharacterName}' exported!");
             }
         }
 
@@ -444,6 +448,8 @@ namespace DialogGenerator.UI.ViewModels
             {
                 mLogger.Error("_editWithJSONEditorCommand_Execute " + ex.Message);
             }
+
+            mLogger.Debug($"Character Detail View - JSON file opened with JSON editor for character '{mCharacter.CharacterName}'");
         }
 
         private bool _deleteCommand_CanExecute()

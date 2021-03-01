@@ -110,6 +110,7 @@ namespace DialogGenerator.UI.ViewModels
 
         private void _goBackCommand_execute()
         {
+            mLogger.Debug($"Character Dialog Lines View - exited for character '{Character.CharacterName}'.");
             if(mIsFromWizard)
             {
                 mIsFromWizard = false;
@@ -190,10 +191,13 @@ namespace DialogGenerator.UI.ViewModels
             string _fullPath = Path.Combine(ApplicationData.Instance.AudioDirectory, _fullFileName);
             MP3PlayerDialog dialog = new MP3PlayerDialog(_fullPath);
 
+            mLogger.Debug($"Character Dialog Lines View - About to play dialog line for character {mCharacter.CharacterName}'");
             await mMessageDialogService.ShowDedicatedDialogAsync<int?>(dialog);
+            mLogger.Debug($"Character Dialog Lines View - Dialog line for character {mCharacter.CharacterName}' played!");
         }
 
         private void _viewLoadedExecute()
+        
         {
             var _character = Session.Get<Character>(Constants.SELECTED_CHARACTER);            
 
@@ -206,6 +210,8 @@ namespace DialogGenerator.UI.ViewModels
             {
                 Character = _character;
             }
+            
+            mLogger.Debug($"Character Dialog Lines View - Loaded");
         }
 
         private void _phrases_Filter(object sender, FilterEventArgs e)
