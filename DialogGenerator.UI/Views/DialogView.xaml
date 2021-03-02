@@ -179,7 +179,7 @@
             </GridSplitter>-->
             <Border Grid.Column="2" BorderBrush="LightGray" HorizontalAlignment="Stretch" 
                 Visibility="{Binding IsDebugViewVisible}" VerticalAlignment="Stretch" BorderThickness="1,1,0,0" >
-                <views:DebugView HorizontalAlignment="Stretch" VerticalAlignment="Stretch" Visibility="{Binding IsDebugViewVisible}"/>
+                <views:DebugView HorizontalAlignment="Stretch" VerticalAlignment="Stretch" />
             </Border>
         </Grid>
 

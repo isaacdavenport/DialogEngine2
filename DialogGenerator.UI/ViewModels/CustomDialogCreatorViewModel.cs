@@ -14,6 +14,7 @@ using System.Linq;
 using System.Runtime.InteropServices;
 using System.Text;
 using System.Threading.Tasks;
+using System.Windows.Input;
 
 namespace DialogGenerator.UI.ViewModels
 {
@@ -56,7 +57,8 @@ namespace DialogGenerator.UI.ViewModels
 
         public DelegateCommand SaveCommand { get; set; }
         public DelegateCommand CloseCommand { get; set; }
-        public DelegateCommand LoadCommand { get; set; }
+        public ICommand ViewLoadedCommand { get; set; }
+        public ICommand ViewUnloadedCommand { get; set; }
 
 
         private void _subscribeEvents()
@@ -68,17 +70,22 @@ namespace DialogGenerator.UI.ViewModels
         {
             SaveCommand = new DelegateCommand(_saveExecute, _saveCanExecute);
             CloseCommand = new DelegateCommand(_closeExecute);
-            LoadCommand = new DelegateCommand(_loadExecute);
+            ViewLoadedCommand = new DelegateCommand(_viewLoadedExecute);
+            ViewUnloadedCommand = new DelegateCommand(_viewUnloadedExecute);
         }
 
-        private void _loadExecute()
+        private void _viewUnloadedExecute()
         {
             mLogger.Debug($"Custom Dialog Creator View - Loading.");
         }
 
+        private void _viewLoadedExecute()
+        {
+            mLogger.Debug($"Custom Dialog Creator View - Unloading.");
+        }
+
         private void _closeExecute()
         {
-            mLogger.Debug($"Custom Dialog Creator View - Closing");
             mRegionManager.Regions[Constants.ContentRegion].NavigationService.RequestNavigate("CreateView");
         }
 

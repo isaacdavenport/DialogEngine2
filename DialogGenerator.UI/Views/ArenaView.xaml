@@ -17,6 +17,8 @@
         <converters:ImageToFullPathValueConverter x:Key="ImageToFullPathValueConverter" />
         <converters:ImageContentValueConverter x:Key="ImageContentValueConverter" />
         <converters:BoolToVisibilityConverter x:Key="BoolToVisibilityConverter" />
+        <FrameworkElement x:Key="ProxyElement" DataContext="{Binding}"/>
+        <ImageBrush x:Key="MyImageBrush" ImageSource="{Binding BackgroundImage}" Stretch="UniformToFill" AlignmentY="Center"/>
         <DataTemplate x:Key="AvatarPanel">
             <materialDesign:Card Width="60" Margin="5" Background="AliceBlue" BorderBrush="Green" BorderThickness="2">
                 <Grid>
@@ -71,6 +73,7 @@
                 <TextBlock Text="The selected character pair has no common dialogs! Please select another pair!" 
                            Foreground="#51cb8c" FontWeight="Bold"  HorizontalAlignment="Center" VerticalAlignment="Center"/>
             </Border>
+            <ContentControl Visibility="Collapsed" Content="{StaticResource ProxyElement}"/>
             <Canvas x:Name="Playground" 
                 Grid.Row="0" 
                 AllowDrop="True" 
@@ -79,12 +82,12 @@
                 MouseLeftButtonUp="Playground_MouseLeftButtonUp" 
                 SizeChanged="Playground_SizeChanged">
                 <Canvas.Style>
-                    <Style>
+                    <Style TargetType="Canvas">
                         <Style.Triggers>
                             <DataTrigger Binding="{Binding HasBackgroundImage}" Value="True">
                                 <Setter Property="Canvas.Background">
                                     <Setter.Value>
-                                        <ImageBrush ImageSource="{Binding BackgroundImage}" Stretch="UniformToFill" AlignmentY="Center" />
+                                        <DynamicResource ResourceKey="MyImageBrush"/>
                                     </Setter.Value>
                                 </Setter>
                             </DataTrigger>

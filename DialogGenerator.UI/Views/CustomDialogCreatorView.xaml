@@ -8,11 +8,7 @@
              prism:ViewModelLocator.AutoWireViewModel="True"
              mc:Ignorable="d" 
              d:DesignHeight="800" d:DesignWidth="1400" Loaded="UserControl_Loaded">
-    <i:Interaction.Triggers>
-        <i:EventTrigger EventName="Loaded">
-            <i:InvokeCommandAction Command="{Binding LoadCommand}"/>
-        </i:EventTrigger>
-    </i:Interaction.Triggers>
+
     <Grid x:Name="MainGrid">
         <Grid.RowDefinitions>
             <RowDefinition Height="Auto" />
@@ -30,19 +26,19 @@
                 <Border.Effect>
                     <DropShadowEffect BlurRadius="15" Direction="-90" RenderingBias="Quality" ShadowDepth="5"/>
                 </Border.Effect>
-                <controls:CharacterSlotControl x:Name="LeftCharacterSlot" />
+                <controls:CharacterSlotControl x:Name="LeftCharacterSlot" DataContext="{Binding LeftCharacterModel}" />
             </Border>
             <Border BorderBrush="DarkGray" BorderThickness="1" Margin="10" Grid.Column="1">
                 <Border.Effect>
                     <DropShadowEffect BlurRadius="15" Direction="-90" RenderingBias="Quality" ShadowDepth="5"/>
                 </Border.Effect>
-                <controls:DialogSlotControl x:Name="DialogSlot" />
+                <controls:DialogSlotControl x:Name="DialogSlot" DataContext="{Binding DialogModel}"/>
             </Border>
             <Border BorderBrush="DarkGray" BorderThickness="1" Margin="10" Grid.Column="2">
                 <Border.Effect>
                     <DropShadowEffect BlurRadius="15" Direction="-90" RenderingBias="Quality" ShadowDepth="5"/>
                 </Border.Effect>
-                <controls:CharacterSlotControl x:Name="RightSlot" />
+                <controls:CharacterSlotControl x:Name="RightSlot" DataContext="{Binding RightCharacterModel}" />
             </Border>
         </Grid>
         <StackPanel Grid.Row="2" Orientation="Horizontal" HorizontalAlignment="Center" Width="Auto">
