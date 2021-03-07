@@ -100,6 +100,14 @@ namespace DialogGenerator.Core
         [Editable(true)]
         public string PreferredDialogName { get; set; } = string.Empty;
 
+        [XmlIgnore]
+        [Editable(true)]
+        public bool ForceCharacterSwap { get; set; } = false;
+
+        [XmlIgnore] 
+        [Editable(true)]
+        public int CharacterSwapInterval { get; set; } = 4;
+
         public bool MonitorMessageParseFails { get; set; } = false;
         public string JSONEditorExeFileName { get; set; } = "JSONedit.exe"; 
         public string WebsiteUrl { get; set; } = "www.toys2life.org";

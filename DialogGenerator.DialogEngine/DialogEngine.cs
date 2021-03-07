@@ -44,12 +44,17 @@ namespace DialogGenerator.DialogEngine
         private CancellationTokenSource mStateMachineTaskTokenSource = new CancellationTokenSource();
         private bool mRunning;
         private CancellationTokenSource mPauseCancellationTokenSource;
+        private int mRunningDialogIndex = 0;
+        private bool mFirstCharacterSpeaking = true;
+        private bool mForceCharacterSwapping = true;
 
         public event PropertyChangedEventHandler PropertyChanged;
 
         #endregion
 
         #region - properties -
+
+        public int DialogsCountBeforeSwap { get; set; } = 4;
 
         public CancellationTokenSource PauseCancellationTokenSource
         {
@@ -202,6 +207,7 @@ namespace DialogGenerator.DialogEngine
 
         private void _onSelectedCharactersPairChanged(SelectedCharactersPairEventArgs obj)
         {
+            mRunningDialogIndex = 0;
             mCharacterPairSelectionDataCached = obj;
             Session.Set(Constants.COMPLETED_DLG_MODELS, 0);
 
@@ -399,12 +405,22 @@ namespace DialogGenerator.DialogEngine
         {
             if (mIndexOfCurrentDialogModel < 0 || mIndexOfCurrentDialogModel >= mContext.DialogModelsList.Count)
                 return Triggers.FinishDialog;
-
+            
             try
             {
                 System.Console.WriteLine("Dialog {0} started", mIndexOfCurrentDialogModel);
 
-                var _speakingCharacter = mContext.Character1Num;
+                if (ApplicationData.Instance.ForceCharacterSwap)
+                {
+                    if (mRunningDialogIndex != 0 && mRunningDialogIndex % ApplicationData.Instance.CharacterSwapInterval == 0)
+                    {
+                        mFirstCharacterSpeaking = !mFirstCharacterSpeaking;
+                    }
+                }
+                
+                mRunningDialogIndex++;
+                
+                var _speakingCharacter = mFirstCharacterSpeaking ? mContext.Character1Num : mContext.Character2Num;
                 var _selectedPhrase = mContext.CharactersList[_speakingCharacter].Phrases[0]; //initialize to unused placeholder phrase
 
                 string _debugMessage = "_startDialog " + mContext.CharactersList[mContext.Character1Num].CharacterPrefix + " and " +
@@ -521,6 +537,7 @@ namespace DialogGenerator.DialogEngine
 
                 int _completedDlgModels = Session.Get<int>(Constants.COMPLETED_DLG_MODELS);
                 Session.Set(Constants.COMPLETED_DLG_MODELS, ++_completedDlgModels);
+                
             }
             catch (OperationCanceledException)
             {
@@ -554,8 +571,8 @@ namespace DialogGenerator.DialogEngine
             //}
 
             //_streamWriter.Flush();
-            //_fs.Close();            
-
+            //_fs.Close();        
+            
             return Triggers.PrepareDialogParameters;
         }
 

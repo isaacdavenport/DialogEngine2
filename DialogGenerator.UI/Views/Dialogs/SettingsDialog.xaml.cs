@@ -13,6 +13,7 @@ using System.Collections.ObjectModel;
 using System.ComponentModel;
 using System.Diagnostics;
 using System.IO;
+using System.Net.Mime;
 using System.Speech.Synthesis;
 using System.Windows;
 using System.Windows.Controls;
@@ -230,6 +231,23 @@ namespace DialogGenerator.UI.Views.Dialogs
                 resultStackBorder.Visibility = Visibility.Visible;
         }
 
-        
+
+        private void UIElement_OnPreviewLostKeyboardFocus(object sender, KeyboardFocusChangedEventArgs e)
+        {
+            try
+            {
+                TextBox tb = sender as TextBox;
+                if (tb != null)
+                {
+                    var val = Convert.ToInt16(tb.Text);
+                    if (val <= 0) tb.Text = Convert.ToString(1);
+                    if (val > 10) tb.Text = Convert.ToString(10);
+                }
+            }
+            catch (Exception)
+            {
+                MessageBox.Show("The value must be an integer between 1 and 10!");
+            }
+        }
     }
 }
