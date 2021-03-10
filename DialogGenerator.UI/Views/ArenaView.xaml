@@ -20,7 +20,7 @@
         <FrameworkElement x:Key="ProxyElement" DataContext="{Binding}"/>
         <ImageBrush x:Key="MyImageBrush" ImageSource="{Binding BackgroundImage}" Stretch="UniformToFill" AlignmentY="Center"/>
         <DataTemplate x:Key="AvatarPanel">
-            <materialDesign:Card Width="60" Margin="5" Background="AliceBlue" BorderBrush="Green" BorderThickness="2">
+            <materialDesign:Card Width="60" Margin="5" Background="AliceBlue" BorderBrush="Green" BorderThickness="2" ToolTip="{Binding Character.Description}">
                 <Grid>
                     <Grid.RowDefinitions>
                         <RowDefinition Height="35"/>
@@ -37,7 +37,7 @@
                                Foreground="White"/>
                     </Border>
                     
-                    <Image Width="50" 
+                    <Image Width="50"                            
                            Grid.Row="1" 
                            Source="{Binding Character.CharacterImage, Converter={StaticResource ImageToFullPathValueConverter}}" 
                            Margin="5"/>

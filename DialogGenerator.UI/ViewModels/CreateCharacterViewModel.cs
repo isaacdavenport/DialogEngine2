@@ -31,12 +31,13 @@ namespace DialogGenerator.UI.ViewModels
 {
     public class CreateCharacterViewModel : BindableBase
     {
-        private string mCharacterName = String.Empty;
-        private string mCharacterInitials = String.Empty;
-        private string mCharacterIdentifier = String.Empty;
-        private string mCharacterImage = String.Empty;
+        private string mCharacterName = string.Empty;
+        private string mCharacterInitials = string.Empty;
+        private string mCharacterIdentifier = string.Empty;
+        private string mCharacterImage = string.Empty;
         private string mCharacterGender = "Female";
-        private string mCharacterAuthor = String.Empty;
+        private string mCharacterAuthor = string.Empty;
+        private string mCharacterDescription = string.Empty;
         private int mCharacterAge = 10;
         private int mWizardPassthroughIndex = 0;
         private List<string> mDialogWizards = new List<string>();
@@ -377,6 +378,16 @@ namespace DialogGenerator.UI.ViewModels
             }
         }
 
+        public string CharacterDescription
+        {
+            get => mCharacterDescription;
+            set
+            {
+                mCharacterDescription = value;
+                RaisePropertyChanged();
+            }
+        }
+
         public bool CharacterHasNoVoice
         {
             get
@@ -637,12 +648,14 @@ namespace DialogGenerator.UI.ViewModels
 
         private void _initEntries()
         {
-            CharacterName = String.Empty;
-            CharacterInitials = String.Empty;
-            CharacterIdentifier = String.Empty;
+            CharacterName = string.Empty;
+            CharacterInitials = string.Empty;
+            CharacterIdentifier = string.Empty;
             CharacterAge = 10;
             CharacterGender = "Male";
             CharacterImage = "Avatar.png";
+            CharacterAuthor = string.Empty;
+            CharacterDescription = string.Empty;
             CharacterHasNoVoice = false;
             if(VoiceCollection.Count > 0)
             {
@@ -864,8 +877,22 @@ namespace DialogGenerator.UI.ViewModels
                  .Permit(Triggers.SetGender, States.EnteredSetGender)
                  .Permit(Triggers.SetAssignToy, States.EnteredSetAssignToy)
                  .Permit(Triggers.SetAvatar, States.EnteredSetAvatar)
+                 .Permit(Triggers.SetDescription, States.EnteredSetDescription)
                  .Permit(Triggers.CheckCounter, States.InCounter)
                  .Permit(Triggers.Finish, States.Finished);
+            
+            Workflow.Configure(States.EnteredSetDescription)
+                .OnEntry(() => _stepEntered("Description"))
+                .OnExit(() => _stepExited("Description"))
+                .Permit(Triggers.SetName, States.EnteredSetName)
+                .Permit(Triggers.SetInitials, States.EnteredSetInitials)
+                .Permit(Triggers.SetAge, States.EnteredSetAge)
+                .Permit(Triggers.SetGender, States.EnteredSetGender)
+                .Permit(Triggers.SetAssignToy, States.EnteredSetAssignToy)
+                .Permit(Triggers.SetAvatar, States.EnteredSetAvatar)
+                .Permit(Triggers.SetAuthor, States.EnteredSetAuthor)
+                .Permit(Triggers.CheckCounter, States.InCounter)
+                .Permit(Triggers.Finish, States.Finished);
 
             Workflow.Configure(States.InCounter)
                   .OnEntry(() => _stepEntered("CheckCounter"))
@@ -921,6 +948,10 @@ namespace DialogGenerator.UI.ViewModels
                     break;
                 case "Author":
                     Character.Author = CharacterAuthor;
+                    NextButtonText = "Next";
+                    break;
+                case "Description":
+                    Character.Description = CharacterDescription;
                     NextButtonText = "Next";
                     break;
                 case "AssignToy":
@@ -1018,6 +1049,11 @@ namespace DialogGenerator.UI.ViewModels
                 case "Author":
                     CurrentStepIndex = 6;
                     CharacterAuthor = Character.Author;
+                    NextButtonText = "Next";
+                    break;
+                case "Description":
+                    CurrentStepIndex = 7;
+                    CharacterDescription = Character.Description;
                     NextButtonText = "Save";
                     break;
                 case "CheckCounter":

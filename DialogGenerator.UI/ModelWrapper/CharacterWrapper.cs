@@ -110,6 +110,20 @@ namespace DialogGenerator.UI.Wrapper
             }
         }
 
+        public string Description
+        {
+            get
+            {
+                return getValue<string>();
+            }
+
+            set
+            {
+                setValue(value);
+                validateProperty(nameof(Description));
+            }
+        }
+
         public bool HasNoVoice
         {
             get { return getValue<bool>(); }

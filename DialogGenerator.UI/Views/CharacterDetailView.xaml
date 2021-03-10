@@ -100,8 +100,9 @@
                                     <RowDefinition Height="auto" />
                                     <RowDefinition Height="auto" />
                                     <RowDefinition Height="auto" />
+                                    <RowDefinition Height="*" />
                                 </Grid.RowDefinitions>
-                                <StackPanel Grid.Row="0" Grid.Column="1">
+                                <StackPanel Grid.Row="0">
                                     <Label Content="Character name:" HorizontalAlignment="Left" Margin="-5,0,0,0"/>
                                     <TextBox MinWidth="300"
                                                  Margin="0"
@@ -112,7 +113,7 @@
                                                  Text="{Binding Character.CharacterName,Mode=TwoWay,UpdateSourceTrigger=PropertyChanged}"/>
                                 </StackPanel>
 
-                                <StackPanel Grid.Row="1" Grid.Column="1">
+                                <StackPanel Grid.Row="1">
                                     <Label Content="Character initials:" HorizontalAlignment="Left" Margin="-5,15,0,0"/>
                                     <StackPanel Orientation="Horizontal" HorizontalAlignment="Left" Margin="0">
                                         <TextBox HorizontalAlignment="Left"
@@ -151,7 +152,7 @@
                                 </StackPanel>
 
 
-                                <StackPanel Grid.Row="2" Grid.Column="1">
+                                <StackPanel Grid.Row="2" >
                                     <Label Content="Character age:" HorizontalAlignment="Left" Margin="-5,15,0,0" />
                                     <ComboBox ItemsSource="{Binding AgeValues}"
                                               Margin="0"
@@ -168,7 +169,7 @@
                                     </ComboBox>
                                 </StackPanel>
 
-                                <StackPanel Grid.Row="3" Grid.Column="1">
+                                <StackPanel Grid.Row="3">
                                     <Label Content="Character gender:" HorizontalAlignment="Left" Margin="-5,15,0,0" />
                                     <ComboBox ItemsSource="{Binding GenderValues}"
                                               Style="{StaticResource MaterialDesignComboBox}"
@@ -179,13 +180,13 @@
                                               SelectedValue="{Binding Character.CharacterGender,Converter={StaticResource CharacterGenderValueConverter}}"/>
                                 </StackPanel>
 
-                                <StackPanel Grid.Row="4" Grid.Column="1">
+                                <StackPanel Grid.Row="4">
                                     <Label Content="Assigned toy (shake a radio to change it):" HorizontalAlignment="Left" Margin="-5,15,0,0" />
                                     <TextBlock Text="{Binding Character.RadioNum, Converter={StaticResource CharacterRadioNumberToTextValueConverter}}" 
                                             HorizontalAlignment="Left" Margin="0" />
                                 </StackPanel>
 
-                                <StackPanel Grid.Row="5" Grid.Column="1" Margin="0,20,0,0">
+                                <StackPanel Grid.Row="5" Margin="0,20,0,0">
                                     <Label Content="Author:" HorizontalAlignment="Left" Margin="-5,0,0,0"/>
                                     <TextBox MinWidth="300"
                                                  Margin="0"
@@ -195,18 +196,29 @@
                                                  materialDesign:ValidationAssist.UsePopup="True"
                                                  Text="{Binding Character.Author,Mode=TwoWay,UpdateSourceTrigger=PropertyChanged}"/>
                                 </StackPanel>
-                                <CheckBox Content="Enable text to speech" IsChecked="{Binding Character.HasNoVoice}" Grid.Row="6" Grid.Column="1" Margin="0,20,0,0" />
-                                <StackPanel Grid.Row="7" Grid.Column="1" Margin="0,20,0,0" Visibility="{Binding Character.HasNoVoice, Converter={StaticResource BooleanToVisibilityConverter}}">
+                                <StackPanel Grid.Row="6">
+                                    <Label Content="Description" HorizontalAlignment="Left" Margin="-5,20,0,0"/>
+                                    <TextBox MinWidth="300"
+                                             Margin="0"
+                                             HorizontalAlignment="Left"
+                                             materialDesign:HintAssist.Hint="Enter the character description ..."
+                                             Text="{Binding Character.Description, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" TextWrapping="Wrap"
+                                             />
+                                    
+                                </StackPanel>
+                                
+                                <CheckBox Content="Enable text to speech" IsChecked="{Binding Character.HasNoVoice}" Grid.Row="7" Margin="0,20,0,0" />
+                                <StackPanel Grid.Row="8" Margin="0,20,0,0" Visibility="{Binding Character.HasNoVoice, Converter={StaticResource BooleanToVisibilityConverter}}">
                                     <Label Content="Voices:" HorizontalAlignment="Left"/>
                                     <ComboBox ItemsSource="{Binding VoicesCollection}" 
                                               SelectedItem="{Binding Character.Voice}"/>
                                 </StackPanel>
-                                <StackPanel Grid.Row="8" Grid.Column="1" Margin="0,20,0,0" Visibility="{Binding Character.HasNoVoice, Converter={StaticResource BooleanToVisibilityConverter}}">
+                                <StackPanel Grid.Row="9" Margin="0,20,0,0" Visibility="{Binding Character.HasNoVoice, Converter={StaticResource BooleanToVisibilityConverter}}">
                                     <Label Content="Speech rate:" HorizontalAlignment="Left"/>
                                     <TextBox Text="{Binding Character.SpeechRate}" />
                                 </StackPanel>
 
-                                <StackPanel HorizontalAlignment="Center" Margin="0,20,0,0" Orientation="Horizontal" Grid.Row="9" Grid.ColumnSpan="2">
+                                <StackPanel HorizontalAlignment="Center" Margin="0,20,0,0" Orientation="Horizontal" Grid.Row="10" Grid.ColumnSpan="2">
                                     <Button Style="{StaticResource MaterialDesignFlatButton}" Content="Delete" Command="{Binding DeleteCommand}" />
                                     <Button Content="Save" Command="{Binding SaveCommand}" Background="#51cb8c" 
                                                 BorderBrush="#51cb8c" Style="{DynamicResource MaterialDesignRaisedButton}"  Margin="10,0,0,0" />

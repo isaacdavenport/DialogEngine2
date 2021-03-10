@@ -23,11 +23,12 @@ namespace DialogGenerator.Model
         private bool mHasNoVoice = false;
         private string mVoice = string.Empty;
         private int mSpeechRate = -1;
+        private String mDescription = string.Empty;
 
         #endregion
 
         #region - properties -
-
+        
         [JsonIgnore]
         public PhraseEntry PhraseTotals
         {
@@ -173,6 +174,21 @@ namespace DialogGenerator.Model
             {
                 mSpeechRate = value;
                 OnPropertyChanged("SpeechRate");
+            }
+        }
+
+        [JsonProperty("Description", NullValueHandling = NullValueHandling.Ignore)]
+        public string Description
+        {
+            get
+            {
+                return mDescription;
+            }
+
+            set
+            {
+                mDescription = value;
+                OnPropertyChanged("Description");
             }
         }
 

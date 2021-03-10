@@ -186,7 +186,7 @@ namespace DialogGenerator.Core
         public string BLEVectorsLoggerKey { get; set; } = "BLEVectorsLog";
 
         [XmlIgnore]
-        public string JSONFilesVersion { get; set; } = "1.4";  // updated after removing of the default value for the JSONObjectsTypesList 'Editable' property.
+        public string JSONFilesVersion { get; set; } = "1.5";  // updated after removing of the default value for the JSONObjectsTypesList 'Editable' property.
 
         [XmlIgnore]
         public string RootDirectory
