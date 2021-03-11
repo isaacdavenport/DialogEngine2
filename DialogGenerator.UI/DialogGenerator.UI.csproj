@@ -178,6 +178,7 @@
     <Compile Include="Converters\SaveAndNextBtnContentConverter.cs" />
     <Compile Include="Converters\SkipBtnContentConverter.cs" />
     <Compile Include="Converters\StarWidthConverter.cs" />
+    <Compile Include="Converters\StringLengthToVisibilityConverter.cs" />
     <Compile Include="Converters\UniqueCharacterIdentifierToPrefixValueConverter.cs" />
     <Compile Include="Converters\UniqueIdentifierTbVisibilityValueConverter.cs" />
     <Compile Include="Converters\WizardAndMP3PlayerStatesToBtnVisibilityConverter.cs" />

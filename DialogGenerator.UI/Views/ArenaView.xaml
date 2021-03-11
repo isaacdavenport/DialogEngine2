@@ -17,10 +17,16 @@
         <converters:ImageToFullPathValueConverter x:Key="ImageToFullPathValueConverter" />
         <converters:ImageContentValueConverter x:Key="ImageContentValueConverter" />
         <converters:BoolToVisibilityConverter x:Key="BoolToVisibilityConverter" />
+        <converters:StringLengthToVisibilityConverter x:Key="StringLengthToVisibilityConverter" />
         <FrameworkElement x:Key="ProxyElement" DataContext="{Binding}"/>
         <ImageBrush x:Key="MyImageBrush" ImageSource="{Binding BackgroundImage}" Stretch="UniformToFill" AlignmentY="Center"/>
         <DataTemplate x:Key="AvatarPanel">
-            <materialDesign:Card Width="60" Margin="5" Background="AliceBlue" BorderBrush="Green" BorderThickness="2" ToolTip="{Binding Character.Description}">
+            <materialDesign:Card Width="60" Margin="5" Background="AliceBlue" BorderBrush="Green" BorderThickness="2" >
+                <materialDesign:Card.ToolTip>
+                    <ToolTip MaxWidth="400" Visibility="{Binding Character.Description, Converter={StaticResource StringIsEmptyVisibilityConverter}}">
+                        <TextBlock Text="{Binding Character.Description}" TextWrapping="Wrap" />
+                    </ToolTip>
+                </materialDesign:Card.ToolTip>
                 <Grid>
                     <Grid.RowDefinitions>
                         <RowDefinition Height="35"/>
