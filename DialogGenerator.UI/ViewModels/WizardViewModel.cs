@@ -900,7 +900,7 @@ namespace DialogGenerator.UI.ViewModels
                 }
             }
 
-            mLogger.Debug($"Wizard View - Wizard '{CurrentWizard.WizardName}' finished!");
+            mLogger.Debug($"Wizard View - Wizard successfully finished!");
                         
         }
 
