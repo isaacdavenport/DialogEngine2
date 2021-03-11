@@ -98,15 +98,7 @@ namespace DialogGenerator.Core
 
         [XmlIgnore]
         [Editable(true)]
-        public string PreferredDialogName { get; set; } = string.Empty;
-
-        [XmlIgnore]
-        [Editable(true)]
-        public bool ForceCharacterSwap { get; set; } = false;
-
-        [XmlIgnore] 
-        [Editable(true)]
-        public int CharacterSwapInterval { get; set; } = 4;
+        public string PreferredDialogName { get; set; } = string.Empty;        
 
         public bool MonitorMessageParseFails { get; set; } = false;
         public string JSONEditorExeFileName { get; set; } = "JSONedit.exe"; 
@@ -178,6 +170,12 @@ namespace DialogGenerator.Core
         [Editable(true)]
         [DisplayName("Motion window:")]
         public int MsMotionWindow { get; set; } = 1500;
+
+        [Editable(true)]
+        public bool ForceCharacterSwap { get; set; } = false;
+
+        [Editable(true)]
+        public int CharacterSwapInterval { get; set; } = 4;
 
         [XmlIgnore]
         public string DialogLoggerKey { get; set; } = "LogDialog";
