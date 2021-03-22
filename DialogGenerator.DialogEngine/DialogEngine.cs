@@ -551,29 +551,6 @@ namespace DialogGenerator.DialogEngine
             }
 
             System.Console.WriteLine("Dialog {0} stopped regularly", mIndexOfCurrentDialogModel);
-
-            //List<string> _allPhrases = new List<string>();
-            //foreach(var _dialogModel in mContext.DialogModelsList)
-            //{
-            //    foreach(var _phrase in _dialogModel.PhraseTypeSequence)
-            //    {
-            //        if(!_allPhrases.Contains(_phrase))
-            //        {
-            //            _allPhrases.Add(_phrase);
-            //        }
-            //    }
-            //}
-
-            //FileStream _fs = File.Create(ApplicationData.Instance.DataDirectory + "\\" + "PhrasesAuto.cfg");
-            //StreamWriter _streamWriter = new StreamWriter(_fs);
-            //string _output = string.Empty;
-            //for(int i = 0; i < _allPhrases.Count; i++) 
-            //{
-            //    _streamWriter.WriteLine(_allPhrases[i]);
-            //}
-
-            //_streamWriter.Flush();
-            //_fs.Close();        
             
             return Triggers.PrepareDialogParameters;
         }

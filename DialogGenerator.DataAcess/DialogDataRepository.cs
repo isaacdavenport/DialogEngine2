@@ -305,7 +305,7 @@ namespace DialogGenerator.DataAccess
             {
                 Serializer.Serialize(_problemPhrases, logPath + "BadPhraseWeights.json");
             }
-            mLogger.Info("Deleted old session logs, writing new WizardList.json, DialogModelList.json, CharacterList.json and other logs.");
+            mLogger.Info("Deleted old session logs, writing new WizardList.json, DialogModelsList.json, CharacterList.json and other logs.");
             mLogger.Info("Total dialog model count across all dialog model groups: " + _dialogModelsTakenFromArrays.Count);
         }
     }
