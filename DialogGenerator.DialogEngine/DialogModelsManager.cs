@@ -102,25 +102,6 @@ namespace DialogGenerator.DialogEngine
                     .All(pts => mContext.CharactersList[character2Index].Phrases
                         .Any(phrase => phrase.PhraseWeights.Keys.Contains(pts)))).ToList();
 
-            // Removing multiple greetings.
-            //var listToReturn = new List<ModelDialog>();
-
-            //_possibleList.ForEach(dlg =>
-            //    {
-            //        if (dlg.PhraseTypeSequence.Contains("Greeting"))
-            //        {
-            //            if (!listToReturn.Any(d => d.PhraseTypeSequence.Any(ps => ps.Equals("Greeting"))))
-            //            {
-            //                listToReturn.Add(dlg);
-            //            }
-            //        } else
-            //        {
-            //            listToReturn.Add(dlg);
-            //        }
-            //    }
-            //);
-
-            //return listToReturn;
             return _possibleList;
         }
 
@@ -214,77 +195,6 @@ namespace DialogGenerator.DialogEngine
                     break;                
 
             }
-
-            // S.Ristic - Full linq approach
-            // Explanation: Code is nice, but the trade off is that all loops have to be finished, even if the value
-            //              was found in the first dialog, because the linq loops can't be broken.
-
-            //mContext.DialogModelsList.Select((s,i) => new { i, s })
-            //    .ToList()
-            //    .ForEach(dmod => {
-            //        _recentAdventureDialogs.Where(r => r.Adventure == dmod.s.Adventure).ToList().ForEach(rad =>
-            //        {
-            //            rad.Provides.ForEach(provides =>
-            //            {
-            //                if (dmod.s.Requires.Contains(provides))
-            //                {
-            //                    //if a the most recent adventure dialog in the adventure provides what we require we won't 
-            //                    //go backwards in adventures
-            //                    _ch1First = _checkIfCharactersHavePhrasesForDialog(dmod.i, mContext.Character1Num, mContext.Character2Num);
-            //                    _ch2First = _checkIfCharactersHavePhrasesForDialog(dmod.i, mContext.Character2Num, mContext.Character1Num);
-
-            //                    if (_ch1First || _ch2First)
-            //                    {
-            //                        if (_ch2First)
-            //                            _swapCharactersOneAndTwo();
-
-            //                        if(_returnIndex == -1)
-            //                            _returnIndex = dmod.i;
-                                    
-            //                    }
-            //                }
-            //            });
-            //        });                    
-            //    });
-
-            // S.Ristic - the old approach without linq's
-
-            ////if we have recently done adventures give priority to adventure dialogs check them first
-            //foreach (var _recentAdventureIdx in _mostRecentAdventureDialogIndexes)
-            //{
-            //    //given recent adventures
-            //    foreach (var _possibleDialog in mContext.DialogModelsList) //TODO probably a cleaner way to do this with Linq and lamda expressions
-            //    {
-            //        //look for follow on adventure possibilities
-            //        var _possibleDialogIdx = mContext.DialogModelsList.IndexOf(_possibleDialog);
-
-            //        if (mContext.DialogModelsList[_recentAdventureIdx].Adventure == _possibleDialog.Adventure)
-            //        {
-            //            foreach (var _providedStringKey in mContext.DialogModelsList[_recentAdventureIdx].Provides)
-            //            {
-            //                if (_possibleDialog.Requires.Contains(_providedStringKey))
-            //                {
-            //                    //if a the most recent adventure dialog in the adventure provides what we require we won't 
-            //                    //go backwards in adventures
-            //                    _ch1First = _checkIfCharactersHavePhrasesForDialog(_possibleDialogIdx, mContext.Character1Num, mContext.Character2Num);
-
-            //                    _ch2First = _checkIfCharactersHavePhrasesForDialog(_possibleDialogIdx, mContext.Character2Num, mContext.Character1Num);
-
-            //                    if (_ch1First || _ch2First)
-            //                    {
-            //                        if (_ch2First)
-            //                            _swapCharactersOneAndTwo();
-
-
-            //                        return _possibleDialogIdx;
-            //                    }
-            //                }
-            //            }
-
-            //        }
-            //    }
-            //}
-
             return _returnIndex; // code for no next adventure continuance found
         }
 
@@ -482,6 +392,7 @@ namespace DialogGenerator.DialogEngine
                 {
                     if(_isDialogEgligibleForCharacters(_preferredDialog, mContext.Character1Num, mContext.Character2Num))
                     {
+                        mLogger.Info("PickAWeightedDialog returning preferredDialog " + _preferredDialog.Name);
                         return mContext.DialogModelsList.IndexOf(_preferredDialog);
                     }
                 }
@@ -492,7 +403,10 @@ namespace DialogGenerator.DialogEngine
             {
                 var _nextAdventureDialogIdx = _findNextAdventureDialogForCharacters(_mostRecentAdventureDialogIndexes);
                 if (_nextAdventureDialogIdx > 0 && _nextAdventureDialogIdx < mContext.DialogModelsList.Count)
+                {
+                    mLogger.Info("Adventure dialog model found " + mContext.DialogModelsList[_nextAdventureDialogIdx].Name);
                     return _nextAdventureDialogIdx; // we have an adventure dialog for these characters go with it
+                }
             }
 
             if (mContext.PossibleDialogModelsList == null || !mContext.PossibleDialogModelsList.Any())
@@ -505,12 +419,14 @@ namespace DialogGenerator.DialogEngine
             {
                 // Ovde ubaciti izmenu karaktera
                 _swapCharactersOneAndTwo();
+                mLogger.Info("No possible dialog models found swapped characters one and two");
                 mContext.PossibleDialogModelsList = _preparePossibleDialogModelsList(mContext.Character1Num, mContext.Character2Num);
                 if(mContext.PossibleDialogModelsList.Count == 0)
                 {
                     if(!mContext.NoDialogs) {
                         //MessageBox.Show("Characters have no mutual dialogs!", "Error", MessageBoxButton.OK, MessageBoxImage.Error);
                         mContext.NoDialogs = true;
+                        mLogger.Info("Still no possible dialog models found after swapping characters one and two, they can not talk to one another");
                     }
 
                     mEventAggregator.GetEvent<CharactersHaveDialogsEvent>().Publish(false);
@@ -522,7 +438,7 @@ namespace DialogGenerator.DialogEngine
                 {
                     mContext.NoDialogs = false;
                 }
-
+                mLogger.Info("PossibleDialogModelList entries count " + mContext.PossibleDialogModelsList.Count.ToString());
                 mEventAggregator.GetEvent<CharactersHaveDialogsEvent>().Publish(true);
             }
 
@@ -551,6 +467,8 @@ namespace DialogGenerator.DialogEngine
             {
                 _filteredList = mContext.PossibleDialogModelsList;
             }
+            mLogger.Info("Possible dialog models that can be used filtered down to " + _filteredList.Count.ToString());
+
 
             var _currentDialogWeightSum = 0.0;
             var _dialogWeightIndex = mRandom.NextDouble();
@@ -573,6 +491,7 @@ namespace DialogGenerator.DialogEngine
         public PhraseEntry PickAWeightedPhrase(int _speakingCharacter, string _currentPhraseType)
         {
             PhraseEntry _selectedPhrase = null;
+            int k = 1000;
 
             try
             {
@@ -581,12 +500,9 @@ namespace DialogGenerator.DialogEngine
                     DialogStr = " .... ",
                 };
 
-                //_selectedPhrase = mContext.CharactersList[_speakingCharacter].Phrases[0]; //initialize to unused phrase
-
                 //Randomly select a phrase of correct Type
                 var _phraseIsDuplicate = true;
-
-                for (var k = 0; k < 6 && _phraseIsDuplicate; k++) //do retries if selected phrase is recently used
+                for (k = 0; k < 25 && _phraseIsDuplicate; k++) //do retries if selected phrase is recently used
                 {
                     _phraseIsDuplicate = false;
                     var _phraseTableWeightedIndex = mRandom.NextDouble(); // rand 0.0 - 1.0
@@ -625,6 +541,9 @@ namespace DialogGenerator.DialogEngine
             {
                 mLogger.Error("PickAWeightedPhrase " + ex.Message);
             }
+            mLogger.Info("PickAWeightedPhrase for character " + mContext.CharactersList[_speakingCharacter].CharacterName + 
+                " used " + k.ToString() + " retries to select a " + _currentPhraseType + " of " +
+                (_selectedPhrase.DialogStr.Length <= 18 ? _selectedPhrase.DialogStr : _selectedPhrase.DialogStr.Substring(0, 16)) );
 
             return _selectedPhrase;
         }

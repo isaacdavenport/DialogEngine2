@@ -219,11 +219,13 @@ namespace DialogGenerator.DialogEngine
 
             if(obj != null)
             {
-                mLogger.Debug($"_onSelectedCharactersPairChanged- cached_ch1 - " +
-                    $"{mCharacterPairSelectionDataCached?.Character1Index} cached_ch2-{mCharacterPairSelectionDataCached?.Character2Index} " +
-                    $"- ch1:{obj.Character1Index} ch2: {obj.Character2Index} ", ApplicationData.Instance.DialogLoggerKey);
+                mLogger.Info("_onSelectedCharactersPairChanged character 1 set to " + obj.Character1Index + " " + 
+                    mContext.CharactersList[obj.Character1Index].CharacterName  + " character 2 set to "
+                    + obj.Character1Index + " " + mContext.CharactersList[obj.Character1Index].CharacterName);
+            } else
+            {
+                mLogger.Debug("_onSelectedCharactersPairChanged was passed a null pair of selected characters");
             }
-            
         }
 
         private void _playAudio(string _pathAndFileName)

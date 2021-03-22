@@ -171,14 +171,15 @@ namespace DialogGenerator.DataAccess
             File.Delete(logPath + "CharactersList.json");
             File.Delete(logPath + "PotentialDialogModelProblems.json");
             File.Delete(logPath + "BadPhraseWeights.json");
-            File.Delete(logPath + "MissingMp3Phrases.json");
+            File.Delete(logPath + "MissingMp3Files.json");
             File.Delete(logPath + "TotalTagWeights.json");
+            File.Delete(logPath + "MissingTagsByCharacter.json");
 
             Serializer.Serialize(_JSONObjectTypesList.Wizards, logPath + "WizardsList.json");
             Serializer.Serialize(_JSONObjectTypesList.Characters, logPath + "CharactersList.json");
-            mLogger.Info("Deleted old session logs, writing new WizardList.json, DialogModelList.json, CharacterList.json logs.");
 
             var _totalTagWeights = new Dictionary<string, double>();
+            var _listOfPhraseTypeTags = new List<string>();
 
             string _filePath = ApplicationData.Instance.DataDirectory + "\\Phrases.cfg";
             try
@@ -202,6 +203,7 @@ namespace DialogGenerator.DataAccess
                                 continue;
                             }
                             _totalTagWeights.Add(_phraseKey.Name, 0.0);
+                            _listOfPhraseTypeTags.Add(_phraseKey.Name);
                         }
                     }
                 }
@@ -271,15 +273,40 @@ namespace DialogGenerator.DataAccess
                 }
             }
 
+            var _allCharactersMissingPhraseTypes = new List<List<string>>();
+            foreach (var character in _JSONObjectTypesList.Characters)
+            {
+                var _thisCharactersMissingPhraseTypes = new List<string>();
+                _thisCharactersMissingPhraseTypes.Add(character.CharacterPrefix);
+                _thisCharactersMissingPhraseTypes.Add(character.CharacterName);
+                _thisCharactersMissingPhraseTypes.Add(character.FileName);
+                _thisCharactersMissingPhraseTypes.AddRange(_listOfPhraseTypeTags);
+                foreach (var phrase in character.Phrases)
+                {   // start with a complete list of all generic tags from phrases.cfg and remove the ones 
+                    //    called out in character to get a list of whats missing 
+                    foreach (var _phraseTypeTag in phrase.PhraseWeights.Keys)
+                        if (_thisCharactersMissingPhraseTypes.Contains(_phraseTypeTag))
+                        {
+                            _thisCharactersMissingPhraseTypes.Remove(_phraseTypeTag);
+                        }
+                }
+                _allCharactersMissingPhraseTypes.Add(_thisCharactersMissingPhraseTypes);
+            }
+
+            Serializer.Serialize(_allCharactersMissingPhraseTypes, logPath + "MissingTagsByCharacter.json");
+
+
             if (_noMp3Phrases.Count > 0)
             {
-                Serializer.Serialize(_noMp3Phrases, logPath + "MissingMp3Phrases.json");
+                Serializer.Serialize(_noMp3Phrases, logPath + "MissingMp3Files.json");
             }
 
             if (_problemPhrases.Count > 0)
             {
                 Serializer.Serialize(_problemPhrases, logPath + "BadPhraseWeights.json");
             }
+            mLogger.Info("Deleted old session logs, writing new WizardList.json, DialogModelList.json, CharacterList.json and other logs.");
+            mLogger.Info("Total dialog model count across all dialog model groups: " + _dialogModelsTakenFromArrays.Count);
         }
     }
 }

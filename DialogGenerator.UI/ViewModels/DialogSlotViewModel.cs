@@ -225,7 +225,7 @@ namespace DialogGenerator.UI.ViewModels
 
             _jsonObjectTypesList.DialogModels.Add(new ModelDialogInfo
             {
-                ModelsCollectionName = "Custom Dialogs",
+                ModelsCollectionName = _dialogNameBase + "Collection",
                 ArrayOfDialogModels = new List<ModelDialog>(),
                 Editable = true,
                 FileName = _dialogNameBase + ".json"
