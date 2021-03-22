@@ -91,7 +91,7 @@ namespace DialogGenerator
 
             IList<string> errors;            
             var _JSONObjectTypesList = mDialogDataRepository.LoadFromDirectory(ApplicationData.Instance.DataDirectory,out errors);
-
+            mDialogDataRepository.LogSessionJsonStatsAndErrors(ApplicationData.Instance.DataDirectory, _JSONObjectTypesList);
             foreach(var error in errors)
             {
                 mUserLogger.Error(error);

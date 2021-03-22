@@ -6,6 +6,8 @@ using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.IO;
+using System.Linq;
+
 
 namespace DialogGenerator.DataAccess
 {
@@ -157,32 +159,91 @@ namespace DialogGenerator.DataAccess
                     }
                 }
             }
+            return _JSONObjectTypesList;
+        }
 
-            //  var logPath =   "${USERPROFILE}\Documents\DialogGenerator\Log\"; // can't use what log4net uses with {USERPROFILE} to get to log folder path
+        public void LogSessionJsonStatsAndErrors(string _directoryPath, JSONObjectsTypesList _JSONObjectTypesList)
+        {
             var logPath = ApplicationData.Instance.AppDataDirectory + "\\Log\\";  // perhaps this should be done in applicationdata.cs or perhaps we should use log4nets folder
-                        
+
             File.Delete(logPath + "WizardsList.json");
             File.Delete(logPath + "DialogModelsList.json");
             File.Delete(logPath + "CharactersList.json");
             File.Delete(logPath + "PotentialDialogModelProblems.json");
             File.Delete(logPath + "BadPhraseWeights.json");
             File.Delete(logPath + "MissingMp3Phrases.json");
+            File.Delete(logPath + "TotalTagWeights.json");
 
             Serializer.Serialize(_JSONObjectTypesList.Wizards, logPath + "WizardsList.json");
-            Serializer.Serialize(_JSONObjectTypesList.DialogModels, logPath + "DialogModelsList.json");
             Serializer.Serialize(_JSONObjectTypesList.Characters, logPath + "CharactersList.json");
+            mLogger.Info("Deleted old session logs, writing new WizardList.json, DialogModelList.json, CharacterList.json logs.");
 
-            List<ModelDialog> _problemDialgModels = new List<ModelDialog>();
+            var _totalTagWeights = new Dictionary<string, double>();
+
+            string _filePath = ApplicationData.Instance.DataDirectory + "\\Phrases.cfg";
+            try
+            {
+                using (var _reader = new StreamReader(_filePath))
+                {
+                    string _jsonString = _reader.ReadToEnd();
+                    var _phraseKeysCollection = Serializer.Deserialize<PhraseKeysCollection>(_jsonString);
+                    if (_phraseKeysCollection != null && _phraseKeysCollection.Phrases.Count() > 0)
+                    {
+                        foreach (var _phraseKey in _phraseKeysCollection.Phrases)
+                        {
+                            if (_phraseKey == null || _phraseKey.Name == "" || _phraseKey.Name == null)
+                            {
+                                mLogger.Error("Phrases.cfg contains empty entry");
+                                continue;
+                            }
+                            if (_totalTagWeights.ContainsKey(_phraseKey.Name))
+                            {
+                                mLogger.Error("phrases.cfg contains duplicate entry " + _phraseKey.Name);
+                                continue;
+                            }
+                            _totalTagWeights.Add(_phraseKey.Name, 0.0);
+                        }
+                    }
+                }
+            }
+            catch (Exception e)
+            {
+                mLogger.Error(e.Message);
+            }
+
+            var _problemDialgModels = new List<ModelDialog>();
+            var _dialogModelsTakenFromArrays = new List<ModelDialog>();
             foreach (var modelDialogGroup in _JSONObjectTypesList.DialogModels)
             {
                 foreach (var modelDialog in modelDialogGroup.ArrayOfDialogModels)
                 {
+                    _dialogModelsTakenFromArrays.Add(modelDialog);
                     if (modelDialog.PhraseTypeSequence.Count < 2 || modelDialog.Popularity < 0.999 || modelDialog.Popularity > 99)
                     {
                         _problemDialgModels.Add(modelDialog);
                     }
+                    // we want to add up how popular each generic phraseType in Phrases.cfg is within the currently active dialogModel set
+                    bool _phraseTypeSequenceIsAllGeneric = true;
+                    foreach (var _phraseType in modelDialog.PhraseTypeSequence)
+                    {
+                        if (!_totalTagWeights.ContainsKey(_phraseType))
+                        {
+                            _phraseTypeSequenceIsAllGeneric = false;
+                            continue;  // this PhraseTypeSequence is not all generic so don't score its popularity to generic tags it uses
+                        }
+                    }
+                    if (_phraseTypeSequenceIsAllGeneric)
+                    {
+                        foreach (var _phraseType in modelDialog.PhraseTypeSequence)
+                        {
+                             _totalTagWeights[_phraseType] += modelDialog.Popularity;
+                        }
+                    }
                 }
             }
+
+            Serializer.Serialize(_dialogModelsTakenFromArrays, logPath + "DialogModelsList.json");
+            Serializer.Serialize(_totalTagWeights, logPath + "TotalTagWeights.json");
 
             // TODO this generates an exception that gets sent out to the user's debug screen in the error window object missing version
             if (_problemDialgModels.Count > 0)
@@ -199,10 +260,10 @@ namespace DialogGenerator.DataAccess
                     string _phraseFileName = $"{character.CharacterPrefix}_{phrase.FileName}.mp3";
                     string _phraseFileAbsolutePath = Path.Combine(ApplicationData.Instance.AudioDirectory, _phraseFileName);
                     foreach (var weight in phrase.PhraseWeights.Values)
-                    if (weight < 0.999 || weight > 99)
-                    {
-                        _problemPhrases.Add(phrase);
-                    }
+                        if (weight < 0.999 || weight > 99)
+                        {
+                            _problemPhrases.Add(phrase);
+                        }
                     if (!File.Exists(_phraseFileAbsolutePath))
                     {
                         _noMp3Phrases.Add(phrase);
@@ -219,8 +280,6 @@ namespace DialogGenerator.DataAccess
             {
                 Serializer.Serialize(_problemPhrases, logPath + "BadPhraseWeights.json");
             }
-
-            return _JSONObjectTypesList;
         }
     }
 }
