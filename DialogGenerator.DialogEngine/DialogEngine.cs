@@ -217,7 +217,7 @@ namespace DialogGenerator.DialogEngine
                 mWorkflow.Fire(Triggers.PrepareDialogParameters);
             }
 
-            if(obj != null)
+            if(obj != null && mContext.CharactersList.Any())
             {
                 mLogger.Info("_onSelectedCharactersPairChanged character 1 set to " + obj.Character1Index + " " + 
                     mContext.CharactersList[obj.Character1Index].CharacterName  + " character 2 set to "
