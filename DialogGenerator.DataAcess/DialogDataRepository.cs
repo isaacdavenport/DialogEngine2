@@ -106,6 +106,14 @@ namespace DialogGenerator.DataAccess
             }
         }
 
+        public void LogRedundantDialogModelsInDataFolder(string _directoryPath, JSONObjectsTypesList _JSONObjectTypesList)
+        {
+            // perhaps this should be done in applicationdata.cs or perhaps we should use log4nets folder
+            var logPath = ApplicationData.Instance.AppDataDirectory + "\\Log\\";              
+            File.Delete(logPath + "DialogModelsWithDuplicates.json");
+            Serializer.Serialize(_JSONObjectTypesList.DialogModels, logPath + "DialogModelsWithDuplicates.json");
+        }
+
         public JSONObjectsTypesList LoadFromDirectory(string _directoryPath, out IList<string> _errorsList)
         {
             var _JSONObjectTypesList = new JSONObjectsTypesList();
@@ -163,7 +171,7 @@ namespace DialogGenerator.DataAccess
         }
 
         public void LogSessionJsonStatsAndErrors(string _directoryPath, JSONObjectsTypesList _JSONObjectTypesList)
-        {
+        {   //TODO Isaac break this long method into helper methods
             var logPath = ApplicationData.Instance.AppDataDirectory + "\\Log\\";  // perhaps this should be done in applicationdata.cs or perhaps we should use log4nets folder
 
             File.Delete(logPath + "WizardsList.json");

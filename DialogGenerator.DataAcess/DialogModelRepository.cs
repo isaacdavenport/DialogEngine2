@@ -48,13 +48,7 @@ namespace DialogGenerator.DataAccess
             } catch (Exception)
             {
                 return null;
-            }
-            
-            //var _dialogModelInfo = Session.Get<ObservableCollection<ModelDialogInfo>>(Constants.DIALOG_MODELS)
-            //    .Where(dm => dm.ModelsCollectionName.Equals(name))
-            //    .FirstOrDefault();
-
-            
+            }           
         }
     }
 }

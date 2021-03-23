@@ -81,7 +81,6 @@ namespace DialogGenerator
                 .OnEntry(_setInitialValues);
         }
 
-
         private  void _loadData()
         {
             mLogger.Info("-------------------- Starting DialogEngine Version " +                 
@@ -91,6 +90,8 @@ namespace DialogGenerator
 
             IList<string> errors;            
             var _JSONObjectTypesList = mDialogDataRepository.LoadFromDirectory(ApplicationData.Instance.DataDirectory,out errors);
+            mDialogDataRepository.LogRedundantDialogModelsInDataFolder(ApplicationData.Instance.DataDirectory, _JSONObjectTypesList);
+            _removeDuplicateDialogModelsFromCollection(_JSONObjectTypesList.DialogModels);
             mDialogDataRepository.LogSessionJsonStatsAndErrors(ApplicationData.Instance.DataDirectory, _JSONObjectTypesList);
             foreach(var error in errors)
             {
@@ -113,9 +114,53 @@ namespace DialogGenerator
             mWorkflow.Fire(Triggers.InitializeDialogEngine);
         }
 
+        private bool _testValueEqualityOnStringLists(List<string> a, List<string> b)
+        {
+            if(a.Count != b.Count)
+            {
+                return false;  //no need to check individual strings
+            }
+            for (int i = 0; i < a.Count; i++)
+            {
+                if (!a[i].Equals(b[i]))
+                {
+                    return false;
+                }
+            }
+            return true;
+        }
+        private void _removeDuplicateDialogModelsFromCollection(ObservableCollection<ModelDialogInfo> DialogModelCollections)
+        {
+            var _modelsToBeRemoved = new List<int[]>();
+            var _alreadySeenDialogModelTagLists = new List<List<string>>();
+            for (int i = 0; i < DialogModelCollections.Count; i++)
+                {
+                for (int j = 0; j < DialogModelCollections[i].ArrayOfDialogModels.Count; j++)
+                { // if the phraseType list in this dialog model matches a previous, delete this dialog model from collection
+                    var _curentTags = DialogModelCollections[i].ArrayOfDialogModels[j].PhraseTypeSequence;
+                    foreach (var _tagList in _alreadySeenDialogModelTagLists)
+                    {
+                        if (_testValueEqualityOnStringLists(_tagList, _curentTags))  // if already in the list mark for removal
+                        {
+                            var _indexPair = new int[2];
+                            _indexPair[0] = i;
+                            _indexPair[1] = j;
+                            _modelsToBeRemoved.Add(_indexPair);
+                            break;
+                        }
+                    }
+                    _alreadySeenDialogModelTagLists.Add(_curentTags);
+                }
+            }
+            for ( int t = 0; t < _modelsToBeRemoved.Count; t++)
+            {  //TODO Isaac this probably fails because the locations in the arrayofDialogModels is actually a list and the indexes move after some RemoveAt commands
+                DialogModelCollections[_modelsToBeRemoved[t][0]].ArrayOfDialogModels.RemoveAt(_modelsToBeRemoved[t][1]);
+            }
+
+        }
         private void _checkForMultipleRadioAssignments(ObservableCollection<Character> _Characters)
         {
-            Dictionary<int, bool> _radioCheck = new Dictionary<int, bool>();
+            var _radioCheck = new Dictionary<int, bool>();
             for(int i = 0; i < ApplicationData.Instance.NumberOfRadios; i++)
             {
                 _radioCheck.Add(i, false);            
