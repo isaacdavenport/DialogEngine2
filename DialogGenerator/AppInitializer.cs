@@ -154,7 +154,8 @@ namespace DialogGenerator
             }
             for ( int t = 0; t < _modelsToBeRemoved.Count; t++)
             {  //TODO Isaac this probably fails because the locations in the arrayofDialogModels is actually a list and the indexes move after some RemoveAt commands
-                DialogModelCollections[_modelsToBeRemoved[t][0]].ArrayOfDialogModels.RemoveAt(_modelsToBeRemoved[t][1]);
+                //probably we need a linq operation that removes all of the called out indexes at once from each of the first index in the _modelsToBeRemoved
+                //DialogModelCollections[_modelsToBeRemoved[t][0]].ArrayOfDialogModels.RemoveAt(_modelsToBeRemoved[t][1]);
             }
 
         }
