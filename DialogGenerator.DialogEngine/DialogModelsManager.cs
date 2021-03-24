@@ -542,8 +542,8 @@ namespace DialogGenerator.DialogEngine
                 mLogger.Error("PickAWeightedPhrase " + ex.Message);
             }
             mLogger.Info("PickAWeightedPhrase for character " + mContext.CharactersList[_speakingCharacter].CharacterName + 
-                " used " + k.ToString() + " retries to select a " + _currentPhraseType + " of " +
-                (_selectedPhrase.DialogStr.Length <= 18 ? _selectedPhrase.DialogStr : _selectedPhrase.DialogStr.Substring(0, 16)) );
+                " used " + k.ToString() + " retries to select a " + _currentPhraseType + " of:  -" +
+                (_selectedPhrase.DialogStr.Length <= 18 ? _selectedPhrase.DialogStr : _selectedPhrase.DialogStr.Substring(0, 16)) + "...");
 
             return _selectedPhrase;
         }
