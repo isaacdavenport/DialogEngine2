@@ -91,8 +91,8 @@ namespace DialogGenerator
             IList<string> errors;            
             var _JSONObjectTypesList = mDialogDataRepository.LoadFromDirectory(ApplicationData.Instance.DataDirectory,out errors);
             mDialogDataRepository.LogRedundantDialogModelsInDataFolder(ApplicationData.Instance.DataDirectory, _JSONObjectTypesList);
-            _removeDuplicateDialogModelsFromCollection(_JSONObjectTypesList.DialogModels);
-            mDialogDataRepository.LogSessionJsonStatsAndErrors(ApplicationData.Instance.DataDirectory, _JSONObjectTypesList);
+            var _dialogModelListPreFilter = _removeDuplicateDialogModelsFromCollection(_JSONObjectTypesList.DialogModels);
+            mDialogDataRepository.LogSessionJsonStatsAndErrors(ApplicationData.Instance.DataDirectory, _JSONObjectTypesList, _dialogModelListPreFilter);
             foreach(var error in errors)
             {
                 mUserLogger.Error(error);
@@ -129,7 +129,7 @@ namespace DialogGenerator
             }
             return true;
         }
-        private void _removeDuplicateDialogModelsFromCollection(ObservableCollection<ModelDialogInfo> DialogModelCollections)
+        private List<List<string>> _removeDuplicateDialogModelsFromCollection(ObservableCollection<ModelDialogInfo> DialogModelCollections)
         {
             var _modelsToBeRemoved = new List<int[]>();
             var _alreadySeenDialogModelTagLists = new List<List<string>>();
@@ -164,6 +164,7 @@ namespace DialogGenerator
             {
                 mLogger.Error("Error in _removeDuplicateDialogModelsFromCollection " + e.Message);
             }
+            return _alreadySeenDialogModelTagLists;
         }
         private void _checkForMultipleRadioAssignments(ObservableCollection<Character> _Characters)
         {

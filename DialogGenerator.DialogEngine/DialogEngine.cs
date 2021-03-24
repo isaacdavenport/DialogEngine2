@@ -287,7 +287,7 @@ namespace DialogGenerator.DialogEngine
                 StartedTime = DateTime.Now
             });
 
-            mLogger.Info(mContext.CharactersList[_speakingCharacter].CharacterName + ": " + _selectedPhrase.DialogStr);
+            mLogger.Info("==" + mContext.CharactersList[_speakingCharacter].CharacterName + ": " + _selectedPhrase.DialogStr);
             mUserLogger.Info(mContext.CharactersList[_speakingCharacter].CharacterName + ": " + _selectedPhrase.DialogStr);
         }
 

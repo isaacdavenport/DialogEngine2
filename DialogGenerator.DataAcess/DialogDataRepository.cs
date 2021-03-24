@@ -170,7 +170,7 @@ namespace DialogGenerator.DataAccess
             return _JSONObjectTypesList;
         }
 
-        public void LogSessionJsonStatsAndErrors(string _directoryPath, JSONObjectsTypesList _JSONObjectTypesList)
+        public void LogSessionJsonStatsAndErrors(string _directoryPath, JSONObjectsTypesList _JSONObjectTypesList, List<List<string>> _dialogModelListPreFilter)
         {   //TODO Isaac break this long method into helper methods
             var logPath = ApplicationData.Instance.AppDataDirectory + "\\Log\\";  // perhaps this should be done in applicationdata.cs or perhaps we should use log4nets folder
 
@@ -182,9 +182,11 @@ namespace DialogGenerator.DataAccess
             File.Delete(logPath + "MissingMp3Files.json");
             File.Delete(logPath + "TotalTagWeights.json");
             File.Delete(logPath + "MissingTagsByCharacter.json");
+            File.Delete(logPath + "DialogModelListPreFilter.json");
 
             Serializer.Serialize(_JSONObjectTypesList.Wizards, logPath + "WizardsList.json");
             Serializer.Serialize(_JSONObjectTypesList.Characters, logPath + "CharactersList.json");
+            Serializer.Serialize(_dialogModelListPreFilter, logPath + "DialogModelListPreFilter.json");
 
             var _totalTagWeights = new Dictionary<string, double>();
             var _listOfPhraseTypeTags = new List<string>();
