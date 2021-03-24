@@ -133,31 +133,37 @@ namespace DialogGenerator
         {
             var _modelsToBeRemoved = new List<int[]>();
             var _alreadySeenDialogModelTagLists = new List<List<string>>();
-            for (int i = 0; i < DialogModelCollections.Count; i++)
+            try
+            {
+
+                for (int i = 0; i < DialogModelCollections.Count; i++)
                 {
-                for (int j = 0; j < DialogModelCollections[i].ArrayOfDialogModels.Count; j++)
-                { // if the phraseType list in this dialog model matches a previous, delete this dialog model from collection
-                    var _curentTags = DialogModelCollections[i].ArrayOfDialogModels[j].PhraseTypeSequence;
-                    foreach (var _tagList in _alreadySeenDialogModelTagLists)
-                    {
-                        if (_testValueEqualityOnStringLists(_tagList, _curentTags))  // if already in the list mark for removal
+                    for (int j = 0; j < DialogModelCollections[i].ArrayOfDialogModels.Count; j++)
+                    { // if the phraseType list in this dialog model matches a previous, delete this dialog model from collection
+                        var _curentTags = DialogModelCollections[i].ArrayOfDialogModels[j].PhraseTypeSequence;
+                        foreach (var _tagList in _alreadySeenDialogModelTagLists)
                         {
-                            var _indexPair = new int[2];
-                            _indexPair[0] = i;
-                            _indexPair[1] = j;
-                            _modelsToBeRemoved.Add(_indexPair);
-                            break;
+                            if (_testValueEqualityOnStringLists(_tagList, _curentTags))  // if already in the list mark for removal
+                            {
+                                var _indexPair = new int[2];
+                                _indexPair[0] = i;
+                                _indexPair[1] = j;
+                                _modelsToBeRemoved.Add(_indexPair);
+                                break;
+                            }
                         }
+                        _alreadySeenDialogModelTagLists.Add(_curentTags);
                     }
-                    _alreadySeenDialogModelTagLists.Add(_curentTags);
+                }
+                for (int t = _modelsToBeRemoved.Count - 1; t >= 0; t--)
+                {  //Isaac this goes backwards because the locations in the arrayofDialogModels is actually a list and the indexes shift after RemoveAt commands
+                    DialogModelCollections[_modelsToBeRemoved[t][0]].ArrayOfDialogModels.RemoveAt(_modelsToBeRemoved[t][1]);
                 }
             }
-            for ( int t = 0; t < _modelsToBeRemoved.Count; t++)
-            {  //TODO Isaac this probably fails because the locations in the arrayofDialogModels is actually a list and the indexes move after some RemoveAt commands
-                //probably we need a linq operation that removes all of the called out indexes at once from each of the first index in the _modelsToBeRemoved
-                //DialogModelCollections[_modelsToBeRemoved[t][0]].ArrayOfDialogModels.RemoveAt(_modelsToBeRemoved[t][1]);
+            catch (Exception e)
+            {
+                mLogger.Error("Error in _removeDuplicateDialogModelsFromCollection " + e.Message);
             }
-
         }
         private void _checkForMultipleRadioAssignments(ObservableCollection<Character> _Characters)
         {
