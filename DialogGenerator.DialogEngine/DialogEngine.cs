@@ -431,16 +431,25 @@ namespace DialogGenerator.DialogEngine
                     if (mRunningDialogIndex != 0 && mRunningDialogIndex % ApplicationData.Instance.CharacterSwapInterval == 0)
                     {
                         mLogger.Info("_startDialog is swapping characters after CharacterSwapInterval reached");
-                        mFirstCharacterSpeaking = !mFirstCharacterSpeaking;
+                        mUserLogger.Info("_startDialog is swapping characters after CharacterSwapInterval reached");
+                        //mFirstCharacterSpeaking = !mFirstCharacterSpeaking;
+                        int _first = mCharacterPairSelectionDataCached.Character1Index;
+                        int _second = mCharacterPairSelectionDataCached.Character2Index;
+                        mCharacterPairSelectionDataCached.Character1Index = _second;
+                        mCharacterPairSelectionDataCached.Character2Index = _first;
+                        mRunningDialogIndex = 0;
+
+                        return Triggers.PrepareDialogParameters;
                     }
                 }
-                
+
                 mRunningDialogIndex++;
-                
-                var _speakingCharacter = mFirstCharacterSpeaking ? mContext.Character1Num : mContext.Character2Num;
+
+                //var _speakingCharacter = mFirstCharacterSpeaking ? mContext.Character1Num : mContext.Character2Num;
+                var _speakingCharacter = mContext.Character1Num;
                 var _selectedPhrase = mContext.CharactersList[_speakingCharacter].Phrases[0]; //initialize to unused placeholder phrase
 
-                string _debugMessage = "_startDialog " + mContext.CharactersList[mContext.Character1Num].CharacterPrefix + " and " +
+                string _debugMessage = mRunningDialogIndex + ". _startDialog " + mContext.CharactersList[mContext.Character1Num].CharacterPrefix + " and " +
                     mContext.CharactersList[mContext.Character2Num].CharacterPrefix + " " + string.Join("; --,",
                     mContext.DialogModelsList[mIndexOfCurrentDialogModel].PhraseTypeSequence.ToArray());
 
