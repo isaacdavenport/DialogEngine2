@@ -714,7 +714,7 @@ namespace DialogGenerator.DialogEngine
 
                 Running = false;
                 Console.WriteLine(Thread.CurrentThread.Name + " stopped!");
-                mLogger.Debug(Thread.CurrentThread.Name + " stopped!");
+                mLogger.Info(Thread.CurrentThread.Name + " stopped!");
 
             });
         }
@@ -733,7 +733,8 @@ namespace DialogGenerator.DialogEngine
             if (mCurrentState != States.DialogFinished)
                 mWorkflow.Fire(Triggers.FinishDialog);
 
-            System.Console.WriteLine("Dialog Engine Stopped");
+            System.Console.WriteLine(Thread.CurrentThread.Name + " Stopped requested");
+            mLogger.Info(Thread.CurrentThread.Name + " stop requested");
         }
 
         #endregion
