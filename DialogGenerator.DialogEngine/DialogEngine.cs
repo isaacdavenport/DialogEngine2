@@ -362,19 +362,29 @@ namespace DialogGenerator.DialogEngine
                 token.ThrowIfCancellationRequested();
 
                 if (mCharacterPairSelectionDataCached == null)
+                {
+                    mLogger.Info($"_prepareDialogParameters received mCharacterPairSelectionDataCached == null");
                     return Triggers.PrepareDialogParameters;
+                }
 
                 if (mCharacterPairSelectionDataCached.Character1Index == -1 || mCharacterPairSelectionDataCached.Character2Index == -1)
+                {
+                    mLogger.Info($"_prepareDialogParameters received mCharacterPairSelectionDataCached == -1");
                     return Triggers.PrepareDialogParameters;
+                }
 
                 if (Session.Get<bool>(Constants.NEEDS_RESTART) || Session.Get<bool>(Constants.CANCEL_DIALOG))
                 {
+                    mLogger.Info($"_prepareDialogParameters got cancellation request");
                     Session.Set(Constants.CANCEL_DIALOG, false);
                     return Triggers.PrepareDialogParameters;
                 }
 
                 if (!_setNextCharacters())
+                {
+                    mLogger.Info($"_prepareDialogParameters was not able to _setNextCharacters");
                     return Triggers.PrepareDialogParameters;
+                }
 
                 token.ThrowIfCancellationRequested();
 
@@ -393,6 +403,7 @@ namespace DialogGenerator.DialogEngine
             }
             catch (OperationCanceledException)
             {
+                mLogger.Info($"_prepareDialogParameters received exception request for cancellation");
                 return Triggers.FinishDialog;
             }
             catch (Exception ex)
