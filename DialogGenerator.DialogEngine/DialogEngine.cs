@@ -410,6 +410,7 @@ namespace DialogGenerator.DialogEngine
             {
                 mLogger.Error("_prepareDialogParameters " + ex.Message);
             }
+            mLogger.Info($"_prepareDialogParameters did not terminate with an event re-triggering");
 
             return Triggers.PrepareDialogParameters;
         }
@@ -422,11 +423,14 @@ namespace DialogGenerator.DialogEngine
             try
             {
                 System.Console.WriteLine("Dialog {0} started", mIndexOfCurrentDialogModel);
+                mLogger.Info("Dialog started number " + mIndexOfCurrentDialogModel);
+
 
                 if (ApplicationData.Instance.ForceCharacterSwap)
                 {
                     if (mRunningDialogIndex != 0 && mRunningDialogIndex % ApplicationData.Instance.CharacterSwapInterval == 0)
                     {
+                        mLogger.Info("_startDialog is swapping characters after CharacterSwapInterval reached");
                         mFirstCharacterSpeaking = !mFirstCharacterSpeaking;
                     }
                 }
