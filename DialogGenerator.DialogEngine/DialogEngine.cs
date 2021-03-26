@@ -254,7 +254,9 @@ namespace DialogGenerator.DialogEngine
                 if (_playSuccess != 0)
                 {
                     mUserLogger.Error("MP3 Play Error  ---  " + _playSuccess);
-                    mLogger.Info("MP3 Play Error  ---  " + _playSuccess);
+                } else
+                {
+                    mLogger.Info("MP3 _playAudio played " + _pathAndFileName);
                 }
 
                 do
@@ -424,8 +426,8 @@ namespace DialogGenerator.DialogEngine
             try
             {
                 System.Console.WriteLine("Dialog {0} started", mIndexOfCurrentDialogModel);
-                mLogger.Info("Dialog started number " + mIndexOfCurrentDialogModel + " " + 
-                    mContext.DialogModelsList[mIndexOfCurrentDialogModel].PhraseTypeSequence.ToArray());
+                mLogger.Info("Dialog started number " + mIndexOfCurrentDialogModel + " " +
+                    String.Join(" ", mContext.DialogModelsList[mIndexOfCurrentDialogModel].PhraseTypeSequence.ToArray()));
 
 
                 if (ApplicationData.Instance.ForceCharacterSwap)
@@ -452,7 +454,7 @@ namespace DialogGenerator.DialogEngine
                 var _selectedPhrase = mContext.CharactersList[_speakingCharacter].Phrases[0]; //initialize to unused placeholder phrase
 
                 string _debugMessage = mRunningDialogIndex + ". _startDialog " + mContext.CharactersList[mContext.Character1Num].CharacterPrefix
-                    + " and " + mContext.CharactersList[mContext.Character2Num].CharacterPrefix + " " + string.Join(" ---",
+                    + " and " + mContext.CharactersList[mContext.Character2Num].CharacterPrefix + " ++" + string.Join(" ++",
                     mContext.DialogModelsList[mIndexOfCurrentDialogModel].PhraseTypeSequence.ToArray());
 
                 mLogger.Debug(_debugMessage,ApplicationData.Instance.DialogLoggerKey);
@@ -490,7 +492,7 @@ namespace DialogGenerator.DialogEngine
 
                         _selectedPhrase = mDialogModelsManager.PickAWeightedPhrase(_speakingCharacter, _currentPhraseType);
 
-                        if (_selectedPhrase == null)
+                        if (_selectedPhrase == null || _selectedPhrase.DialogStr == " .... ")
                         {
                             mUserLogger.Warning("Phrase type " + _currentPhraseType + " was not found.");
                             mLogger.Info("Phrase type " + _currentPhraseType + " was not found.");

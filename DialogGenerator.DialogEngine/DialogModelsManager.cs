@@ -358,6 +358,7 @@ namespace DialogGenerator.DialogEngine
                     mContext.DialogModelsList.Add(_dialogModel);
                 }
             }
+            mLogger.Info("DialogModelsList initialized mDialogModelPopularitySum = " + mDialogModelPopularitySum.ToString());
         }
 
         // PickAWeightedDialog and PickAWeightedPhrase use a statistical approach to randomly select DialogModels and 
