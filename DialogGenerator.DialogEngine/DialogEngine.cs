@@ -364,6 +364,7 @@ namespace DialogGenerator.DialogEngine
                 if (mCharacterPairSelectionDataCached == null)
                 {
                     mLogger.Info($"_prepareDialogParameters received mCharacterPairSelectionDataCached == null");
+                    Thread.Sleep(200);  // prevents log from filling up with this message when other threads not ready
                     return Triggers.PrepareDialogParameters;
                 }
 
@@ -423,7 +424,8 @@ namespace DialogGenerator.DialogEngine
             try
             {
                 System.Console.WriteLine("Dialog {0} started", mIndexOfCurrentDialogModel);
-                mLogger.Info("Dialog started number " + mIndexOfCurrentDialogModel);
+                mLogger.Info("Dialog started number " + mIndexOfCurrentDialogModel + " " + 
+                    mContext.DialogModelsList[mIndexOfCurrentDialogModel].PhraseTypeSequence.ToArray());
 
 
                 if (ApplicationData.Instance.ForceCharacterSwap)
@@ -449,8 +451,8 @@ namespace DialogGenerator.DialogEngine
                 var _speakingCharacter = mContext.Character1Num;
                 var _selectedPhrase = mContext.CharactersList[_speakingCharacter].Phrases[0]; //initialize to unused placeholder phrase
 
-                string _debugMessage = mRunningDialogIndex + ". _startDialog " + mContext.CharactersList[mContext.Character1Num].CharacterPrefix + " and " +
-                    mContext.CharactersList[mContext.Character2Num].CharacterPrefix + " " + string.Join("; --,",
+                string _debugMessage = mRunningDialogIndex + ". _startDialog " + mContext.CharactersList[mContext.Character1Num].CharacterPrefix
+                    + " and " + mContext.CharactersList[mContext.Character2Num].CharacterPrefix + " " + string.Join(" ---",
                     mContext.DialogModelsList[mIndexOfCurrentDialogModel].PhraseTypeSequence.ToArray());
 
                 mLogger.Debug(_debugMessage,ApplicationData.Instance.DialogLoggerKey);
