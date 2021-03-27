@@ -57,7 +57,8 @@ namespace DialogGenerator.DialogEngine
         {            
             if (obj != null && mContext.DialogModelsList.Any())
             {
-                if(obj.Character1Index != -1 && obj.Character2Index != -1)
+                if(obj.Character1Index >= 0 && obj.Character2Index >= 0 && obj.Character1Index 
+                    <= mContext.CharactersList.Count && obj.Character2Index <= mContext.CharactersList.Count)
                 {
                     mContext.PossibleDialogModelsList = _preparePossibleDialogModelsList(obj.Character1Index, obj.Character2Index);
                     if(mContext.PossibleDialogModelsList.Count > 0 && mContext.NoDialogs)
@@ -78,6 +79,8 @@ namespace DialogGenerator.DialogEngine
 
         private List<ModelDialog> _preparePossibleDialogModelsList(int character1Index, int character2Index)
         {
+            mLogger.Info("_preparePossibleDialogModelsList " + mContext.CharactersList[character1Index].CharacterName
+                + " " + mContext.CharactersList[character2Index].CharacterName);
 
             var _possibleList = mContext.DialogModelsList
                 .Where(dlg => dlg.PhraseTypeSequence
@@ -406,14 +409,14 @@ namespace DialogGenerator.DialogEngine
                 }
             }
 
-            if (mContext.PossibleDialogModelsList == null || !mContext.PossibleDialogModelsList.Any())
-            {
+            // TODO Isaac, somehow we were getting possibleDIalogModelsLists that didn't match current characters.  Why?
+            //if (mContext.PossibleDialogModelsList == null || !mContext.PossibleDialogModelsList.Any())
+            //{
                 mLogger.Info("PossibleDialogModelsList empty calling  _preparePossibleDialogModelsList " + 
                     mContext.CharactersList[mContext.Character1Num].CharacterName + " " +
                     mContext.CharactersList[mContext.Character2Num].CharacterName);
-                mContext.PossibleDialogModelsList =
-                    _preparePossibleDialogModelsList(mContext.Character1Num, mContext.Character2Num);
-            }
+                mContext.PossibleDialogModelsList = _preparePossibleDialogModelsList(mContext.Character1Num, mContext.Character2Num);
+            //}
 
             if(mContext.PossibleDialogModelsList.Count == 0)
             {
@@ -495,6 +498,9 @@ namespace DialogGenerator.DialogEngine
 
             try
             {
+                mLogger.Info("PickAWeightedPhrase starting for  " + mContext.CharactersList[_speakingCharacter].CharacterName +
+               " " + _currentPhraseType);
+
                 _selectedPhrase = new PhraseEntry
                 {
                     DialogStr = " .... ",
@@ -543,7 +549,7 @@ namespace DialogGenerator.DialogEngine
             }
             mLogger.Info("PickAWeightedPhrase for character " + mContext.CharactersList[_speakingCharacter].CharacterName + 
                 " used " + k.ToString() + " retries to select a " + _currentPhraseType + " of:  -" +
-                (_selectedPhrase.DialogStr.Length <= 18 ? _selectedPhrase.DialogStr : _selectedPhrase.DialogStr.Substring(0, 16)) + "...");
+                (_selectedPhrase.DialogStr.Length <= 128 ? _selectedPhrase.DialogStr : _selectedPhrase.DialogStr.Substring(0, 126)) + "...");
 
             return _selectedPhrase;
         }

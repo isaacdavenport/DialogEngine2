@@ -285,8 +285,8 @@ namespace DialogGenerator.DialogEngine
                 StartedTime = DateTime.Now
             });
 
-            mLogger.Info("==" + mContext.CharactersList[_speakingCharacter].CharacterName + ": " + _selectedPhrase.DialogStr);
-            mUserLogger.Info(mContext.CharactersList[_speakingCharacter].CharacterName + ": " + _selectedPhrase.DialogStr);
+            mLogger.Info(mContext.CharactersList[_speakingCharacter].CharacterName + ": history add " +
+                 (_selectedPhrase.DialogStr.Length <= 18 ? _selectedPhrase.DialogStr : _selectedPhrase.DialogStr.Substring(0, 16)) + "...");
         }
 
         private void _addDialogModelToHistory(int _dialogModelIndex, int _ch1, int _ch2)
@@ -395,6 +395,7 @@ namespace DialogGenerator.DialogEngine
 
                 token.ThrowIfCancellationRequested();
 
+                // TODO Isaac.  Why is this turnary here if it always resolves to -1 and always does PickAWeightedDialog?
                 mIndexOfCurrentDialogModel = Session.Get<int>(Constants.SELECTED_DLG_MODEL) >= 0
                                             ? Session.Get<int>(Constants.SELECTED_DLG_MODEL)
                                             : mDialogModelsManager.PickAWeightedDialog();
@@ -425,7 +426,10 @@ namespace DialogGenerator.DialogEngine
         private  async Task<Triggers> _startDialog(CancellationToken token)
         {
             if (mIndexOfCurrentDialogModel < 0 || mIndexOfCurrentDialogModel >= mContext.DialogModelsList.Count)
+            {
+                mLogger.Info("_startDialog has invalid mIndexOfCurrentDialogModel " + mIndexOfCurrentDialogModel);
                 return Triggers.FinishDialog;
+            }
             
             try
             {
@@ -457,9 +461,9 @@ namespace DialogGenerator.DialogEngine
                 var _speakingCharacter = mContext.Character1Num;
                 var _selectedPhrase = mContext.CharactersList[_speakingCharacter].Phrases[0]; //initialize to unused placeholder phrase
 
-                string _debugMessage = mRunningDialogIndex + ". _startDialog " + mContext.CharactersList[mContext.Character1Num].CharacterPrefix
-                    + " and " + mContext.CharactersList[mContext.Character2Num].CharacterPrefix + " ++" + string.Join(" ++",
-                    mContext.DialogModelsList[mIndexOfCurrentDialogModel].PhraseTypeSequence.ToArray());
+                string _debugMessage = "_startDialog " + mContext.CharactersList[mContext.Character1Num].CharacterPrefix
+                    + " and " + mContext.CharactersList[mContext.Character2Num].CharacterPrefix + " dialog count " + mRunningDialogIndex + 
+                    " +++" + string.Join(" +++", mContext.DialogModelsList[mIndexOfCurrentDialogModel].PhraseTypeSequence.ToArray());
 
                 mLogger.Debug(_debugMessage,ApplicationData.Instance.DialogLoggerKey);
                 mUserLogger.Info(_debugMessage);
@@ -494,6 +498,9 @@ namespace DialogGenerator.DialogEngine
                             throw (new OperationCanceledException());
                         }
 
+                        mLogger.Info(mRunningDialogIndex + ".. " + mContext.CharactersList[_speakingCharacter] + " selecting a " 
+                            + _currentPhraseType);
+
                         _selectedPhrase = mDialogModelsManager.PickAWeightedPhrase(_speakingCharacter, _currentPhraseType);
 
                         if (_selectedPhrase == null || _selectedPhrase.DialogStr == " .... ")
@@ -526,6 +533,9 @@ namespace DialogGenerator.DialogEngine
                             throw (new OperationCanceledException());
                         }
 
+                        mUserLogger.Info(mContext.CharactersList[_speakingCharacter].CharacterName + ":: " + 
+                            _currentPhraseType + ": " + _selectedPhrase.DialogStr);
+                        
                         _addPhraseToHistory(_selectedPhrase, _speakingCharacter);
 
                         var _pathAndFileName = Path.Combine(ApplicationData.Instance.AudioDirectory,
@@ -550,9 +560,13 @@ namespace DialogGenerator.DialogEngine
                             _speakingCharacter = mContext.Character2Num;
                         else
                             _speakingCharacter = mContext.Character1Num;
+                    } else
+                    {
+                        mLogger.Info(mContext.CharactersList[_speakingCharacter].CharacterName + " missing a " 
+                            + _currentPhraseType);
                     }
 
-                    if(mContext.HistoricalDialogs.Count > 0)
+                    if (mContext.HistoricalDialogs.Count > 0)
                     {
                         mContext.HistoricalDialogs[mContext.HistoricalDialogs.Count - 1].Completed = true;
                     }
@@ -675,15 +689,9 @@ namespace DialogGenerator.DialogEngine
                         {
                             Session.Set(Constants.BLE_MODE_ON, false);
                             mCharacterSelection = mCharacterSelectionFactory.Create(SelectionMode.ArenaModel);
-
                         }
 
                         mEventAggregator.GetEvent<CharacterSelectionModelChangedEvent>().Publish();
-                        //if(!Session.Get<bool>(Constants.BLE_MODE_ON))
-                        //{
-                        //    Session.Set(Constants.NEXT_CH_1, -1);
-                        //    Session.Set(Constants.NEXT_CH_2, -1);
-                        //}
                         _characterSelectionTask = mCharacterSelection.StartCharacterSelection();
                         Session.Set(Constants.NEEDS_RESTART, false);
                     }
