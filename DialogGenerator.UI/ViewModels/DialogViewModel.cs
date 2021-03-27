@@ -632,7 +632,9 @@ namespace DialogGenerator.UI.ViewModels
                 IsDialogStarted = true;
                 IsStopBtnEnabled = true;
                 mEventAggregator.GetEvent<CharacterSelectionActionChangedEvent>().Publish(true);
+                mLogger.Info("_startDialogCommand_Execute start thread StartDialogEngine");
                 await mDialogEngine.StartDialogEngine();
+                mLogger.Info("_startDialogCommand_Execute end thread StartDialogEngine");
 
                 IsDialogStarted = false;
                 mEventAggregator.GetEvent<CharacterSelectionActionChangedEvent>().Publish(false);

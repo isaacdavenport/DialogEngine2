@@ -309,6 +309,7 @@ namespace DialogGenerator.DialogEngine
                 || args.Character2Index < 0 || args.Character2Index >= mContext.CharactersList.Count /* ||
                 args.Character1Index == args.Character2Index *//* Sinisa 02/05/2020 - DLGEN-438 */)
             {
+                mLogger.Info($"_setNextCharacters could not set characters from cached values");
                 return false;
             }
 
@@ -319,11 +320,18 @@ namespace DialogGenerator.DialogEngine
             var _tempChar2 = mContext.Character2Num;
 
             if (_tempChar1 >= mContext.CharactersList.Count || _tempChar2 >= mContext.CharactersList.Count)
-                return false;
+                return false;  //this appears redundant to the first check of args
 
             mContext.SameCharactersAsLast = (_tempChar1 == mPriorCharacter1Num || _tempChar1 == mPriorCharacter2Num)
                                             && (_tempChar2 == mPriorCharacter1Num || _tempChar2 == mPriorCharacter2Num);
 
+            if (mContext.SameCharactersAsLast) {
+                mLogger.Info($"_setNextCharacters are same pair as before, potentially in a different order");
+            } else
+            {
+                mLogger.Info($"_setNextCharacters set to a different pair of characters");
+
+            }
             mContext.Character1Num = _tempChar1;
             mContext.Character2Num = _tempChar2;
             mPriorCharacter1Num = mContext.Character1Num;
