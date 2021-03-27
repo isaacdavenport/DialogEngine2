@@ -339,6 +339,7 @@ namespace DialogGenerator.DialogEngine
             var _tempCh1 = mContext.Character1Num;
             mContext.Character1Num = mContext.Character2Num;
             mContext.Character2Num = _tempCh1;
+            // TODO I suspect we need to _prepareDialogModel parameters  -isaac
             // it doesn't appear we should update prior characters 1 and 2 here
         }
 
@@ -412,6 +413,9 @@ namespace DialogGenerator.DialogEngine
 
             if (mContext.PossibleDialogModelsList == null || !mContext.PossibleDialogModelsList.Any())
             {
+                mLogger.Info("PossibleDialogModelsList empty calling  _preparePossibleDialogModelsList " + 
+                    mContext.CharactersList[mContext.Character1Num].CharacterName + " " +
+                    mContext.CharactersList[mContext.Character2Num].CharacterName);
                 mContext.PossibleDialogModelsList =
                     _preparePossibleDialogModelsList(mContext.Character1Num, mContext.Character2Num);
             }
