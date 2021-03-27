@@ -23,7 +23,6 @@ namespace DialogGenerator.Core
         private string mImagesDirectory;
         private string mToolsDirectory;
         private string mEditorTempDirectory;
-        private string mBackgroundImage;
 
         static ApplicationData()
         {

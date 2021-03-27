@@ -43,8 +43,6 @@ namespace DialogGenerator.DialogEngine
         private bool mRunning;
         private CancellationTokenSource mPauseCancellationTokenSource;
         private int mRunningDialogIndex = 0;
-        private bool mFirstCharacterSpeaking = true;
-        private bool mForceCharacterSwapping = true;
 
         public event PropertyChangedEventHandler PropertyChanged;
 

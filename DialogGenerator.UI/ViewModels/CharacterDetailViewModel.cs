@@ -395,9 +395,6 @@ namespace DialogGenerator.UI.ViewModels
                 {
                     FileHelper.ClearDirectory(ApplicationData.Instance.TempDirectory);
                     mCharacterDataProvider.Export(Character.Model, ApplicationData.Instance.TempDirectory);
-
-                    // zip content from temp directory
-                    //ZipFile.CreateFromDirectory(ApplicationData.Instance.TempDirectory, _saveFileDialog.FileName);
                     FileHelper.ExportCharacter(ApplicationData.Instance.TempDirectory, _saveFileDialog.FileName);
                 });
 
