@@ -8,13 +8,8 @@ using DialogGenerator.Model.Enum;
 using Prism.Events;
 using System;
 using System.Collections.Generic;
-using System.Diagnostics;
 using System.Linq;
-using System.Net;
 using DialogGenerator.Utilities;
-using DialogGenerator.Utilities.Dialogs;
-using Microsoft.Practices.ObjectBuilder2;
-using System.Windows;
 
 namespace DialogGenerator.DialogEngine
 {

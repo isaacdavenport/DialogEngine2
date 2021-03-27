@@ -8,9 +8,7 @@ using DialogGenerator.Model;
 using DialogGenerator.Model.Enum;
 using DialogGenerator.Utilities;
 using Prism.Events;
-using Prism.Mvvm;
 using System;
-using System.Collections.Generic;
 using System.ComponentModel;
 using System.IO;
 using System.Linq;
@@ -322,7 +320,7 @@ namespace DialogGenerator.DialogEngine
             var _tempChar1 = mContext.Character1Num;
             var _tempChar2 = mContext.Character2Num;
 
-            if (/* _tempChar1 == _tempChar2 || */ /* Sinisa 02/05/2020 - DLGEN-438 */ _tempChar1 >= mContext.CharactersList.Count || _tempChar2 >= mContext.CharactersList.Count)
+            if (_tempChar1 >= mContext.CharactersList.Count || _tempChar2 >= mContext.CharactersList.Count)
                 return false;
 
             mContext.SameCharactersAsLast = (_tempChar1 == mPriorCharacter1Num || _tempChar1 == mPriorCharacter2Num)
