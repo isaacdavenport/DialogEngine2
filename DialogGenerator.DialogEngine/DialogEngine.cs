@@ -490,15 +490,6 @@ namespace DialogGenerator.DialogEngine
                     {
                         mLogger.Info("_startDialog is swapping characters after CharacterSwapInterval reached");
                         mUserLogger.Info("_startDialog is swapping characters after CharacterSwapInterval reached");
-                        ////mFirstCharacterSpeaking = !mFirstCharacterSpeaking;
-                        //int _first = mCharacterPairSelectionDataCached.Character1Index;
-                        //int _second = mCharacterPairSelectionDataCached.Character2Index;
-                        //mCharacterPairSelectionDataCached.Character1Index = _second;
-                        //mCharacterPairSelectionDataCached.Character2Index = _first;
-                        //mRunningDialogIndex = 0;
-
-                        //return Triggers.PrepareDialogParameters;
-
 
                         // Force swapping of the characters
                         mEventAggregator.GetEvent<SelectedCharactersPairChangedEvent>().Publish(new SelectedCharactersPairEventArgs

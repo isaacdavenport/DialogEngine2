@@ -409,7 +409,6 @@ namespace DialogGenerator.DialogEngine
                 }
             }
 
-            // TODO Isaac, somehow we were getting possibleDIalogModelsLists that didn't match current characters.  Why?
             if (mContext.PossibleDialogModelsList == null || !mContext.PossibleDialogModelsList.Any())
             {
                 mLogger.Info("PossibleDialogModelsList empty calling  _preparePossibleDialogModelsList " + 
