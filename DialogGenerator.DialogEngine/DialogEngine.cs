@@ -43,6 +43,7 @@ namespace DialogGenerator.DialogEngine
         private bool mRunning;
         private CancellationTokenSource mPauseCancellationTokenSource;
         private int mRunningDialogIndex = 0;
+        private bool mCharacterSwapRequired = false;
 
         public event PropertyChangedEventHandler PropertyChanged;
 
@@ -203,7 +204,9 @@ namespace DialogGenerator.DialogEngine
 
         private void _onSelectedCharactersPairChanged(SelectedCharactersPairEventArgs obj)
         {
+            mCharacterSwapRequired = false;
             mRunningDialogIndex = 0;
+            mContext.PossibleDialogModelsList.Clear();
             mCharacterPairSelectionDataCached = obj;
             Session.Set(Constants.COMPLETED_DLG_MODELS, 0);
 
@@ -217,7 +220,7 @@ namespace DialogGenerator.DialogEngine
             {
                 mLogger.Info("_onSelectedCharactersPairChanged character 1 set to " + obj.Character1Index + " " + 
                     mContext.CharactersList[obj.Character1Index].CharacterName  + " character 2 set to "
-                    + obj.Character1Index + " " + mContext.CharactersList[obj.Character1Index].CharacterName);
+                    + obj.Character2Index + " " + mContext.CharactersList[obj.Character2Index].CharacterName);
             } else
             {
                 mLogger.Debug("_onSelectedCharactersPairChanged was passed a null pair of selected characters");
@@ -405,7 +408,50 @@ namespace DialogGenerator.DialogEngine
                 if(mIndexOfCurrentDialogModel != -1)
                 {
                     _addDialogModelToHistory(mIndexOfCurrentDialogModel, mContext.Character1Num, mContext.Character2Num);
-                }                
+
+                    // If previous character pair had no common dialogs, cancel the old state and notify GUI.
+                    if(mContext.NoDialogs)
+                    {
+                        mContext.NoDialogs = false;
+                        mEventAggregator.GetEvent<CharactersHaveDialogsEvent>().Publish(true);
+
+                        mLogger.Info($"The characters ({mContext.Character1Num}) and ({mContext.Character2Num}) have dialog models again.");
+                    }
+
+                } else
+                {
+                    if(!mCharacterSwapRequired)
+                    {
+                        // Swap the characters
+                        mLogger.Info($"PREPARE DIALOG PARAMETERS - Trying to force the swapping of characters ({mContext.Character1Num}) and ({mContext.Character2Num})");
+
+                        // swap the characters
+                        mEventAggregator.GetEvent<SelectedCharactersPairChangedEvent>().Publish(new SelectedCharactersPairEventArgs
+                        {
+                            Character1Index = mContext.Character2Num,
+                            Character2Index = mContext.Character1Num
+                        });
+
+                        // set the flag and call the PREPARE DIALOG PARAMETERS AGAIN
+                        mCharacterSwapRequired = true;
+                        return Triggers.PrepareDialogParameters;
+                    } else
+                    {
+                        // Display the warning that the characters have no common dialogs.
+                        if(!mContext.NoDialogs)
+                        {
+                            mContext.NoDialogs = true;
+                            mLogger.Info($"The characters ({mContext.Character1Num}) and ({mContext.Character2Num}) still don't have dialogs after the second swap!");
+                        }
+
+                        // Notify GUI that the characters have no common dialog lines.
+                        mEventAggregator.GetEvent<CharactersHaveDialogsEvent>().Publish(false);
+
+                        // RETURN PREPARE DIALOG PARAMETERS AGAIN.
+                        return Triggers.PrepareDialogParameters;
+
+                    }
+                }
 
                 return Triggers.StartDialog;
             }
@@ -438,19 +484,30 @@ namespace DialogGenerator.DialogEngine
                     String.Join(" ", mContext.DialogModelsList[mIndexOfCurrentDialogModel].PhraseTypeSequence.ToArray()));
 
 
-                if (ApplicationData.Instance.ForceCharacterSwap)
+                if (ApplicationData.Instance.ForceCharacterSwap && !mCharacterSwapRequired)
                 {
                     if (mRunningDialogIndex != 0 && mRunningDialogIndex % ApplicationData.Instance.CharacterSwapInterval == 0)
                     {
                         mLogger.Info("_startDialog is swapping characters after CharacterSwapInterval reached");
                         mUserLogger.Info("_startDialog is swapping characters after CharacterSwapInterval reached");
-                        //mFirstCharacterSpeaking = !mFirstCharacterSpeaking;
-                        int _first = mCharacterPairSelectionDataCached.Character1Index;
-                        int _second = mCharacterPairSelectionDataCached.Character2Index;
-                        mCharacterPairSelectionDataCached.Character1Index = _second;
-                        mCharacterPairSelectionDataCached.Character2Index = _first;
-                        mRunningDialogIndex = 0;
+                        ////mFirstCharacterSpeaking = !mFirstCharacterSpeaking;
+                        //int _first = mCharacterPairSelectionDataCached.Character1Index;
+                        //int _second = mCharacterPairSelectionDataCached.Character2Index;
+                        //mCharacterPairSelectionDataCached.Character1Index = _second;
+                        //mCharacterPairSelectionDataCached.Character2Index = _first;
+                        //mRunningDialogIndex = 0;
 
+                        //return Triggers.PrepareDialogParameters;
+
+
+                        // Force swapping of the characters
+                        mEventAggregator.GetEvent<SelectedCharactersPairChangedEvent>().Publish(new SelectedCharactersPairEventArgs
+                        {
+                            Character1Index = mContext.Character2Num,
+                            Character2Index = mContext.Character1Num
+                        });
+
+                        // return PREPARE DIALOG PARAMETERS
                         return Triggers.PrepareDialogParameters;
                     }
                 }

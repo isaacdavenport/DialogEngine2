@@ -410,37 +410,25 @@ namespace DialogGenerator.DialogEngine
             }
 
             // TODO Isaac, somehow we were getting possibleDIalogModelsLists that didn't match current characters.  Why?
-            //if (mContext.PossibleDialogModelsList == null || !mContext.PossibleDialogModelsList.Any())
-            //{
+            if (mContext.PossibleDialogModelsList == null || !mContext.PossibleDialogModelsList.Any())
+            {
                 mLogger.Info("PossibleDialogModelsList empty calling  _preparePossibleDialogModelsList " + 
                     mContext.CharactersList[mContext.Character1Num].CharacterName + " " +
                     mContext.CharactersList[mContext.Character2Num].CharacterName);
                 mContext.PossibleDialogModelsList = _preparePossibleDialogModelsList(mContext.Character1Num, mContext.Character2Num);
-            //}
+            }
 
             if(mContext.PossibleDialogModelsList.Count == 0)
             {
-                // Ovde ubaciti izmenu karaktera
-                _swapCharactersOneAndTwo();
-                mLogger.Info("No possible dialog models found swapped characters one and two");
-                mContext.PossibleDialogModelsList = _preparePossibleDialogModelsList(mContext.Character1Num, mContext.Character2Num);
-                if(mContext.PossibleDialogModelsList.Count == 0)
-                {
-                    if(!mContext.NoDialogs) {
-                        //MessageBox.Show("Characters have no mutual dialogs!", "Error", MessageBoxButton.OK, MessageBoxImage.Error);
-                        mContext.NoDialogs = true;
-                        mLogger.Info("Still no possible dialog models found after swapping characters one and two, they can not talk to one another");
-                    }
-
-                    mEventAggregator.GetEvent<CharactersHaveDialogsEvent>().Publish(false);
-                    return -1;
-                }
+                mLogger.Info($"PICK A WEIGHTED DIALOG - No possible dialogs for characters {mContext.Character1Num} and {mContext.Character2Num}.");
+                return -1;
             } else
             {
                 if(mContext.NoDialogs)
                 {
                     mContext.NoDialogs = false;
                 }
+
                 mLogger.Info("PossibleDialogModelList entries count " + mContext.PossibleDialogModelsList.Count.ToString());
                 mEventAggregator.GetEvent<CharactersHaveDialogsEvent>().Publish(true);
             }
@@ -608,6 +596,14 @@ namespace DialogGenerator.DialogEngine
         {
             var _itemsToRemove = new List<ModelDialog>();
             ModelDialog _greetingDialog = null;
+
+            int _recentlyUsed = 0;
+            int _requirementsNotMet = 0;
+            int _hasRecentPhrases = 0;
+            int _isOneOfGreetingDialogs = 0;
+            int _isGreetingFirstPhrase = 0;
+
+
             mContext.PossibleDialogModelsList.ForEach(dlg =>
             {
                 bool _removeCriteriaMet = false;
@@ -615,16 +611,19 @@ namespace DialogGenerator.DialogEngine
                 if (_checkIfDialogModelUsedRecently(_idx))
                 {
                     _removeCriteriaMet = true;
+                    _recentlyUsed++;
                 }
 
                 if (!_removeCriteriaMet && !_checkIfDialogPreRequirementMet(_idx))
                 {
                     _removeCriteriaMet = true;
+                    _requirementsNotMet++;
                 }
 
                 if (!_removeCriteriaMet && _checkForRecentPhrases(_idx))
                 {
                     _removeCriteriaMet = true;
+                    _hasRecentPhrases++;
                 }
 
                 if (!_removeCriteriaMet && _isGreetingDialog(_idx))
@@ -632,6 +631,8 @@ namespace DialogGenerator.DialogEngine
                     if (_greetingDialog != null)
                     {
                         _removeCriteriaMet = true;
+                        _isOneOfGreetingDialogs++;
+                        
                     }
                     else
                     {
@@ -639,12 +640,13 @@ namespace DialogGenerator.DialogEngine
                     }
                 }
 
-                if (!_removeCriteriaMet && (_greetingDialog != null || dlg.PhraseTypeSequence.Contains("Greeting")))
+                if (!_removeCriteriaMet && (_greetingDialog != null && dlg.PhraseTypeSequence.Contains("Greeting")))
                 {
 
                     if (mContext.FirstRoundGone)
                     {
                         _removeCriteriaMet = true;
+                        _isGreetingFirstPhrase++;
                     }
                 }
 
@@ -666,6 +668,14 @@ namespace DialogGenerator.DialogEngine
                     _itemsToRemove.Add(_greetingDialog);
                 }
             }
+
+            mLogger.Info($"DIALOGS TO REMOVE - There are {_itemsToRemove.Count} dialogs to be removed from the list.");
+            mLogger.Info($"DIALOGS TO REMOVE - " +
+                $"{_recentlyUsed} recentrly used, " +
+                $"{_requirementsNotMet} requirements not met, " +
+                $"{_hasRecentPhrases} have recent phrases, " +
+                $"{_isOneOfGreetingDialogs} greetins dialogs, " +
+                $"{_isGreetingFirstPhrase} with a greeting as at least one of the phrases.");
 
             return _itemsToRemove;
         }
