@@ -676,13 +676,12 @@ namespace DialogGenerator.DialogEngine
                 }
             }
 
-            mLogger.Info($"DIALOGS TO REMOVE - There are {_itemsToRemove.Count} dialogs to be removed from the list.");
-            mLogger.Info($"DIALOGS TO REMOVE - " +
-                $"{_recentlyUsed} recentrly used, " +
-                $"{_requirementsNotMet} requirements not met, " +
-                $"{_hasRecentPhrases} have recent phrases, " +
-                $"{_isOneOfGreetingDialogs} greetins dialogs, " +
-                $"{_isGreetingFirstPhrase} with a greeting as at least one of the phrases.");
+            mLogger.Info($"DIALOG MODELS TO REMOVE - There are {_itemsToRemove.Count} dialogs to be removed from the list.");
+            mLogger.Info($"OF DIALOG MODELS TO REMOVE - " +
+                $"{_recentlyUsed} recently used, " +
+                $"{_requirementsNotMet} adventures, " +
+                $"{_hasRecentPhrases} use recent PhraseTypes of ch1 or ch2, " +
+                $"{_isOneOfGreetingDialogs + _isGreetingFirstPhrase} have greetings.");
 
             return _itemsToRemove;
         }

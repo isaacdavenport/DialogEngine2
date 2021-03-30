@@ -287,8 +287,8 @@ namespace DialogGenerator.DialogEngine
                 StartedTime = DateTime.Now
             });
 
-            mLogger.Info(mContext.CharactersList[_speakingCharacter].CharacterName + ": history add " +
-                 (_selectedPhrase.DialogStr.Length <= 18 ? _selectedPhrase.DialogStr : _selectedPhrase.DialogStr.Substring(0, 16)) + "...");
+            mLogger.Info("=== " + mContext.CharactersList[_speakingCharacter].CharacterName + ": _addPhraseToHistory - " +
+                 (_selectedPhrase.DialogStr.Length <= 90 ? _selectedPhrase.DialogStr : (_selectedPhrase.DialogStr.Substring(0, 88)) + "..."));
         }
 
         private void _addDialogModelToHistory(int _dialogModelIndex, int _ch1, int _ch2)
@@ -372,7 +372,7 @@ namespace DialogGenerator.DialogEngine
                 if (mCharacterPairSelectionDataCached == null)
                 {
                     mLogger.Info($"_prepareDialogParameters received mCharacterPairSelectionDataCached == null");
-                    Thread.Sleep(200);  // prevents log from filling up with this message when other threads not ready
+                    Thread.Sleep(400);  // prevents log from filling up with this message when other threads not ready
                     return Triggers.PrepareDialogParameters;
                 }
 
@@ -508,7 +508,7 @@ namespace DialogGenerator.DialogEngine
                 var _speakingCharacter = mContext.Character1Num;
                 var _selectedPhrase = mContext.CharactersList[_speakingCharacter].Phrases[0]; //initialize to unused placeholder phrase
 
-                string _debugMessage = "_startDialog " + mContext.CharactersList[mContext.Character1Num].CharacterPrefix
+                string _debugMessage = "___startDialog " + mContext.CharactersList[mContext.Character1Num].CharacterPrefix
                     + " and " + mContext.CharactersList[mContext.Character2Num].CharacterPrefix + " dialog count " + mRunningDialogIndex + 
                     " +++" + string.Join(" +++", mContext.DialogModelsList[mIndexOfCurrentDialogModel].PhraseTypeSequence.ToArray());
 
