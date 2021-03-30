@@ -205,8 +205,7 @@ namespace DialogGenerator.DialogEngine
         private void _onSelectedCharactersPairChanged(SelectedCharactersPairEventArgs obj)
         {
             mCharacterSwapRequired = false;
-            mRunningDialogIndex = 0;
-            mContext.PossibleDialogModelsList.Clear();
+            mRunningDialogIndex = 0;            
             mCharacterPairSelectionDataCached = obj;
             Session.Set(Constants.COMPLETED_DLG_MODELS, 0);
 
