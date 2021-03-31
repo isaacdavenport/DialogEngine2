@@ -629,14 +629,20 @@ namespace DialogGenerator.CharacterSelection
                     Session.Set(Constants.NEXT_CH_1, NextCharacter1);
                     Session.Set(Constants.NEXT_CH_2, NextCharacter2);
 
+                    bool shouldSendEvent = (CurrentCharacter1 != NextCharacter1 || CurrentCharacter2 != NextCharacter2)
+                        && (CurrentCharacter1 != NextCharacter2 && CurrentCharacter2 != NextCharacter1);
+
                     CurrentCharacter1 = NextCharacter1;
                     CurrentCharacter2 = NextCharacter2;
 
-                    mEventAggregator.GetEvent<StopPlayingCurrentDialogLineEvent>().Publish();
+                    if(shouldSendEvent)
+                    {
+                        mEventAggregator.GetEvent<StopPlayingCurrentDialogLineEvent>().Publish();
 
-                    mEventAggregator.GetEvent<SelectedCharactersPairChangedEvent>().
-                        Publish(new SelectedCharactersPairEventArgs { Character1Index = CurrentCharacter1, Character2Index = CurrentCharacter2 });
-                   
+                        mEventAggregator.GetEvent<SelectedCharactersPairChangedEvent>().
+                            Publish(new SelectedCharactersPairEventArgs { Character1Index = CurrentCharacter1, Character2Index = CurrentCharacter2 });
+                    }
+                                       
                     mEventAggregator.GetEvent<HeatMapUpdateEvent>().Publish(new HeatMapData
                     {
                         HeatMap = HeatMap,
