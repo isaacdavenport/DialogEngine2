@@ -71,11 +71,6 @@ namespace DialogGenerator.DialogEngine
                     if((obj.Character1Index != mContext.Character2Num && obj.Character2Index != mContext.Character1Num)
                         && (obj.Character1Index != mContext.Character1Num || obj.Character2Index != mContext.Character2Num))
                     {
-                        mContext.CharactersList[obj.Character1Index].ClearRecentPhrases();
-                        mContext.CharactersList[obj.Character2Index].ClearRecentPhrases();
-                        mContext.HistoricalDialogs.Clear();
-                        mContext.HistoricalPhrases.Clear();
-
                         mContext.FirstRoundGone = false;
                     }
                     // S.Ristic 2021-03-30 - End of change
