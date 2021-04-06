@@ -379,6 +379,7 @@ namespace DialogGenerator.DialogEngine
                 if (mCharacterPairSelectionDataCached.Character1Index == -1 || mCharacterPairSelectionDataCached.Character2Index == -1)
                 {
                     mLogger.Info($"_prepareDialogParameters received mCharacterPairSelectionDataCached == -1");
+                    Thread.Sleep(400);  // prevents log from filling up with this message when other threads not ready
                     return Triggers.PrepareDialogParameters;
                 }
 
