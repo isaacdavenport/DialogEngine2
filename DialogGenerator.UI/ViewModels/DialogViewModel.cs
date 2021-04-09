@@ -684,15 +684,23 @@ namespace DialogGenerator.UI.ViewModels
         private void _dispatchLineToCharacter(object item)
         {
             NewDialogLineEventArgs args = (NewDialogLineEventArgs)item;
-            if(args.Character.CharacterPrefix.Equals(FirstSelectedCharacter.CharacterPrefix))
-            {
-                FirstCharacterDialogLine = args.DialogLine;
-            } 
 
-            if(args.Character.CharacterPrefix.Equals(SecondSelectedCharacter.CharacterPrefix))
+            if(FirstSelectedCharacter != null)
             {
-                SecondCharacterDialogLine = args.DialogLine;
+                if (args.Character.CharacterPrefix.Equals(FirstSelectedCharacter.CharacterPrefix))
+                {
+                    FirstCharacterDialogLine = args.DialogLine;
+                }
+            }            
+
+            if(SecondSelectedCharacter != null)
+            {
+                if (args.Character.CharacterPrefix.Equals(SecondSelectedCharacter.CharacterPrefix))
+                {
+                    SecondCharacterDialogLine = args.DialogLine;
+                }
             }
+            
 
         }
 

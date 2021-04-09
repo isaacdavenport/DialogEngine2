@@ -45,8 +45,8 @@ namespace DialogGenerator.CharacterSelection
                 do
                 {
                     // Both characters are selected.
-                    if (Session.Get<int>(Constants.FORCED_CH_COUNT) == 2)
-                    {
+                    // if (Session.Get<int>(Constants.FORCED_CH_COUNT) == 2)
+                    // {
                         int _char1Index = Session.Get<int>(Constants.NEXT_CH_1);
                         int _char2Index = Session.Get<int>(Constants.NEXT_CH_2);
 
@@ -72,6 +72,8 @@ namespace DialogGenerator.CharacterSelection
 
                             Session.Set(Constants.CANCEL_DIALOG, true);
 
+                            mLogger.Info($"ARENA CHARACTER SELECTION - BEFORE REQUESTING CHARACTER CHANGE");
+                            
                             mEventAggregator.GetEvent<SelectedCharactersPairChangedEvent>().
                             Publish(new SelectedCharactersPairEventArgs
                             {
@@ -79,9 +81,10 @@ namespace DialogGenerator.CharacterSelection
                                 Character2Index = mSecondCharacterIndex
                             });
 
+                            mLogger.Info($"ARENA CHARACTER SELECTION - AFTER REQUESTING CHARACTER CHANGE");
                             
                         }
-                    }
+                    // }
                     
                     DateTime _nowTime = DateTime.Now;
                     DateTime _lastAccessTime = _nowTime;
@@ -94,9 +97,11 @@ namespace DialogGenerator.CharacterSelection
                         mLogger.Info("BLE messages arriving, switch to BLE Mode.");
                         mCancellationTokenSource.Cancel();
                     }
-                                        
-                    Thread.Sleep(1);
+
+                    Thread.Sleep(500);
                 } while (!mCancellationTokenSource.Token.IsCancellationRequested);
+                
+                mLogger.Info($"ARENA CHARACTER SELECTION - Exited from the loop. Request cancellation token requested - {mCancellationTokenSource.Token.IsCancellationRequested}");
                
                 if(_restartRequired)
                 {
@@ -104,7 +109,7 @@ namespace DialogGenerator.CharacterSelection
                     Session.Set(Constants.BLE_MODE_ON, true);
                     Session.Set(Constants.NEEDS_RESTART, true);                    
                 }
-
+                
                 await _BLEDataReaderTask;
             });
         }

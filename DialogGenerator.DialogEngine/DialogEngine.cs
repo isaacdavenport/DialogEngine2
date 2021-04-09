@@ -217,9 +217,17 @@ namespace DialogGenerator.DialogEngine
 
             if(obj != null && mContext.CharactersList.Any())
             {
-                mLogger.Info("_onSelectedCharactersPairChanged character 1 set to " + obj.Character1Index + " " + 
-                    mContext.CharactersList[obj.Character1Index].CharacterName  + " character 2 set to "
-                    + obj.Character2Index + " " + mContext.CharactersList[obj.Character2Index].CharacterName);
+                var char1Name = obj.Character1Index != -1
+                    ? mContext.CharactersList[obj.Character1Index].CharacterName
+                    : "None";
+                
+                var char2Name = obj.Character2Index != -1
+                    ? mContext.CharactersList[obj.Character2Index].CharacterName
+                    : "None";
+                
+                mLogger.Info($"_onSelectedCharacterPairChanged - Character 1 is set to {obj.Character1Index} " +
+                             $" {char1Name}, character 2 is set to {obj.Character2Index} {char2Name}");
+
             } else
             {
                 mLogger.Debug("_onSelectedCharactersPairChanged was passed a null pair of selected characters");
@@ -372,13 +380,14 @@ namespace DialogGenerator.DialogEngine
                 if (mCharacterPairSelectionDataCached == null)
                 {
                     mLogger.Info($"_prepareDialogParameters received mCharacterPairSelectionDataCached == null");
-                    Thread.Sleep(400);  // prevents log from filling up with this message when other threads not ready
+                    Thread.Sleep(500);  // prevents log from filling up with this message when other threads not ready
                     return Triggers.PrepareDialogParameters;
                 }
 
                 if (mCharacterPairSelectionDataCached.Character1Index == -1 || mCharacterPairSelectionDataCached.Character2Index == -1)
                 {
                     mLogger.Info($"_prepareDialogParameters received mCharacterPairSelectionDataCached == -1");
+                    Thread.Sleep(500);
                     return Triggers.PrepareDialogParameters;
                 }
 
