@@ -196,8 +196,7 @@ namespace DialogGenerator.Model
         
         [JsonIgnore]
         public Queue<PhraseEntry> RecentPhrases = new Queue<PhraseEntry>();
-        [JsonIgnore]
-        public const int RecentPhrasesQueueSize = 8;
+
         [JsonIgnore]
         public string FileName { get; set; }
         [JsonIgnore]

@@ -82,7 +82,7 @@ namespace DialogGenerator.DialogEngine
 
             if (character.RecentPhrases.Count == 0)
             {
-                for (var i = 0; i < Character.RecentPhrasesQueueSize && i < character.Phrases.Count / 2; i++)
+                for (var i = 0; i < ApplicationData.Instance.RecentPhrasesQueueSize && i < character.Phrases.Count / 2; i++)
                 {
                     // we always deque after enque so this sets que size
                     character.RecentPhrases.Enqueue(character.Phrases[0]);

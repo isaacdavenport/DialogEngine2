@@ -234,20 +234,36 @@ namespace DialogGenerator.UI.Views.Dialogs
 
         private void UIElement_OnPreviewLostKeyboardFocus(object sender, KeyboardFocusChangedEventArgs e)
         {
-            try
-            {
-                TextBox tb = sender as TextBox;
-                if (tb != null)
+            
+                if (!(sender is TextBox tb)) return;
+                
+                if (tb.Equals(this.CharacterSwapInterval))
                 {
-                    var val = Convert.ToInt16(tb.Text);
-                    if (val <= 0) tb.Text = Convert.ToString(1);
-                    if (val > 10) tb.Text = Convert.ToString(10);
+                    try
+                    {
+                        var val = Convert.ToInt16(tb.Text);
+                        if (val <= 0) tb.Text = Convert.ToString(1);
+                        if (val > 10) tb.Text = Convert.ToString(10);
+                    } catch (Exception)
+                    {
+                        MessageBox.Show("The value must be an integer between 1 and 10!");
+                    }
+                    
                 }
-            }
-            catch (Exception)
-            {
-                MessageBox.Show("The value must be an integer between 1 and 10!");
-            }
+
+                if (tb.Equals(this.RecentPhrasesQueueSize))
+                {
+                    try
+                    {
+                        var val = Convert.ToInt16(tb.Text);
+                        if (val <= 0) tb.Text = Convert.ToString(1);
+                        if (val > 20) tb.Text = Convert.ToString(20);
+                    } catch (Exception)
+                    {
+                        MessageBox.Show("The value must be an integer between 1 and 20!");
+                    }
+                }
+                
         }
     }
 }

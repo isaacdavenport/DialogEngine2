@@ -72,6 +72,7 @@
                     <RowDefinition Height="auto" />
                     <RowDefinition Height="auto" />
                     <RowDefinition Height="auto" />
+                    <RowDefinition Height="auto" />
                     <RowDefinition Height="*" />
 
                 </Grid.RowDefinitions>
@@ -152,8 +153,24 @@
                 <TextBox
                     Grid.Column="2"
                     Grid.Row="11"
+                    x:Name="CharacterSwapInterval"
                     Text="{Binding Settings.CharacterSwapInterval}"
-                    Visibility="{Binding Settings.ForceCharacterSwap, Converter={StaticResource BoolToVisibilityConverter}}" PreviewLostKeyboardFocus="UIElement_OnPreviewLostKeyboardFocus">
+                    Visibility="{Binding Settings.ForceCharacterSwap, Converter={StaticResource BoolToVisibilityConverter}}" 
+                    PreviewLostKeyboardFocus="UIElement_OnPreviewLostKeyboardFocus">
+                </TextBox>
+                
+                <Label 
+                    Grid.Column="0" 
+                    Grid.Row="12" 
+                    HorizontalAlignment="Right">
+                    Recent Phrases Queue Size
+                </Label>
+                <TextBox
+                    Grid.Column="2"
+                    Grid.Row="12"
+                    x:Name="RecentPhrasesQueueSize"
+                    Text="{Binding Settings.RecentPhrasesQueueSize}"
+                    PreviewLostKeyboardFocus="UIElement_OnPreviewLostKeyboardFocus">
                 </TextBox>
                 
             </Grid>

@@ -110,6 +110,20 @@ namespace DialogGenerator.UI.Wrapper
             }
         }
 
+        public int RecentPhrasesQueueSize
+        {
+            get
+            {
+                return getValue<int>();
+            }
+
+            set
+            {
+                setValue(value);
+                validateProperty(nameof(RecentPhrasesQueueSize));
+            }
+        }
+
         public int CharacterSwapInterval
         {
             get

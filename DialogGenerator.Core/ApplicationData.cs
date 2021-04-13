@@ -114,6 +114,11 @@ namespace DialogGenerator.Core
         public bool TextDialogsOn { get; set; } = true;
 
         [Editable(true)]
+        [Description("The size of the queue of the recent phrases")]
+        [DisplayName("Recent phrases queue size:")]
+        public int RecentPhrasesQueueSize { get; set; } = 8;
+
+        [Editable(true)]
         [Description("Override radio signal checking")]
         [DisplayName("Ignore radio signals:")]
         public bool IgnoreRadioSignals { get; set; } = false;
