@@ -10,6 +10,7 @@ using Prism.Mvvm;
 using Prism.Regions;
 using System;
 using System.Collections.Generic;
+using System.ComponentModel;
 using System.Linq;
 using System.Runtime.InteropServices;
 using System.Text;
@@ -63,8 +64,17 @@ namespace DialogGenerator.UI.ViewModels
 
         private void _subscribeEvents()
         {
-            
-        }        
+            DialogModel.PhraseDefinitionModels.CollectionChanged +=
+                (sender, args) => SaveCommand.RaiseCanExecuteChanged();
+        }
+
+        private void DialogModelOnPropertyChanged(object sender, PropertyChangedEventArgs e)
+        {
+            if (e.PropertyName.Equals("DialogName"))
+            {
+                SaveCommand.RaiseCanExecuteChanged();
+            }
+        }
 
         private void _bindCommands()
         {
@@ -91,7 +101,7 @@ namespace DialogGenerator.UI.ViewModels
 
         private bool _saveCanExecute()
         {
-            return true;
+            return !DialogModel.PhraseDefinitionModels.IsEmpty;
         }
 
         private async void _saveExecute()
