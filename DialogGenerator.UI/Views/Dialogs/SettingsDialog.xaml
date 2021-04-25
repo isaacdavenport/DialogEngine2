@@ -223,7 +223,7 @@
 
  
                 <Label Content="Background image:" HorizontalAlignment="Right" Grid.Row="6"/>
-                <Button Command="{Binding SelectBacgroundCommand}" Grid.Row="6" Grid.Column="2" Width="90" HorizontalAlignment="Left">
+                <Button Command="{Binding SelectBackgroundCommand}" Grid.Row="6" Grid.Column="2" Width="90" HorizontalAlignment="Left">
                     <StackPanel Orientation="Horizontal">
                         <Image Source="Resources/openfile24.png" Width="20" Height="20"/>
                         <TextBlock Text="Select"/>
