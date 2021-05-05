@@ -48,7 +48,7 @@ namespace DialogGenerator.UI.ViewModels
         public EditPhraseViewModel(Character _Character
             , PhraseEntry _PhraseEntry
             , ICharacterDataProvider _CharacterDataProvider
-            , IMessageDialogService _MessageDialogService 
+            , IMessageDialogService _MessageDialogService
             , IEventAggregator _EventAggregator
             , ILogger _Logger)
         {
@@ -72,11 +72,11 @@ namespace DialogGenerator.UI.ViewModels
                 File.Delete(EditFileName);
             }
 
-            if(File.Exists(FileName))
+            if (File.Exists(FileName))
             {
                 File.Copy(FileName, EditFileName);
             } else
-            {                
+            {
                 int _counter = 1;
                 string _newFileName = Path.Combine(ApplicationData.Instance.AudioDirectory, _Character.CharacterPrefix + "_" + _Character.CharacterName + _counter + "_edit.mp3");
                 while (File.Exists(_newFileName))
@@ -89,7 +89,7 @@ namespace DialogGenerator.UI.ViewModels
                 EditFileName = _newFileName;
                 FileName = EditFileName.Replace("_edit", string.Empty);
             }
-            
+
             foreach (var entry in mPhraseEntry.PhraseWeights)
             {
                 if (string.IsNullOrEmpty(PhraseWeights)) {
@@ -114,7 +114,7 @@ namespace DialogGenerator.UI.ViewModels
             _bindEvents();
             _bindCommands();
 
-        }        
+        }
 
         #region Properties
 
@@ -197,7 +197,7 @@ namespace DialogGenerator.UI.ViewModels
             {
                 mDialogLineText = value;
                 RaisePropertyChanged();
-                
+
             }
         }
 
@@ -212,7 +212,7 @@ namespace DialogGenerator.UI.ViewModels
             {
                 mFileName = value;
                 RaisePropertyChanged();
-                
+
             }
         }
 
@@ -222,7 +222,7 @@ namespace DialogGenerator.UI.ViewModels
             {
                 return mEditFileName;
             }
-            
+
             set
             {
                 mEditFileName = value;
@@ -238,7 +238,7 @@ namespace DialogGenerator.UI.ViewModels
             }
         }
 
-        public ICollectionView PhraseWeightValues { 
+        public ICollectionView PhraseWeightValues {
             get
             {
                 return mPhraseValuesCollection.View;
@@ -258,29 +258,29 @@ namespace DialogGenerator.UI.ViewModels
         #region Public methods
         public async Task SaveChanges()
         {
-            if(File.Exists(FileName))
+            if (File.Exists(FileName))
             {
                 File.Delete(FileName);
             }
-            
-            if(File.Exists(EditFileName))
+
+            if (File.Exists(EditFileName))
             {
                 File.Copy(EditFileName, FileName);
             }
-            
-            foreach(var _phraseEntry in mCharacter.Phrases)
+
+            foreach (var _phraseEntry in mCharacter.Phrases)
             {
-                if(_phraseEntry.Equals(mPhraseEntry))
+                if (_phraseEntry.Equals(mPhraseEntry))
                 {
                     _phraseEntry.DialogStr = DialogLineText;
                     string[] _tokens = PhraseWeights.Split(',');
-                    if(_tokens.Length > 0)
+                    if (_tokens.Length > 0)
                     {
                         _phraseEntry.PhraseWeights.Clear();
                         foreach (var _token in _tokens)
                         {
                             string[] _parts = _token.Trim(' ').Split('/');
-                            if(_parts.Length == 1)
+                            if (_parts.Length == 1)
                             {
                                 string _key = _parts[0].Trim(' ');
                                 _parts = new string[2];
@@ -290,44 +290,44 @@ namespace DialogGenerator.UI.ViewModels
 
                             _phraseEntry.PhraseWeights.Add(_parts[0].Trim(' '), Double.Parse(_parts[1].Trim(' ')));
                         }
-                    }                    
+                    }
                 }
             }
 
-            await mCharacterDataProvider.SaveAsync(mCharacter);            
+            await mCharacterDataProvider.SaveAsync(mCharacter);
         }
 
         public async Task SaveChanges2()
         {
-            if(File.Exists(FileName))
+            if (File.Exists(FileName))
             {
                 File.Delete(FileName);
             }
-            
-            if(File.Exists(EditFileName))
+
+            if (File.Exists(EditFileName))
             {
                 File.Copy(EditFileName, FileName);
             }
-            
+
             foreach (var _phraseEntry in mCharacter.Phrases)
             {
                 if (_phraseEntry.Equals(mPhraseEntry))
                 {
                     _phraseEntry.DialogStr = DialogLineText;
 
-                    if(mWeights.Count > 0)
+                    if (mWeights.Count > 0)
                     {
                         _phraseEntry.PhraseWeights.Clear();
-                        foreach(var _phraseWeight in mWeights)
+                        foreach (var _phraseWeight in mWeights)
                         {
-                            if(string.IsNullOrEmpty(_phraseWeight.Key.Key))
+                            if (string.IsNullOrEmpty(_phraseWeight.Key.Key))
                             {
                                 continue;
-                            }    
+                            }
 
                             _phraseEntry.PhraseWeights.Add(_phraseWeight.Key.Key, _phraseWeight.Value);
                         }
-                    }                    
+                    }
                 }
             }
 
@@ -342,17 +342,17 @@ namespace DialogGenerator.UI.ViewModels
 
         private void _viewClose_Execute()
         {
-            if(!string.IsNullOrEmpty(EditFileName) && File.Exists(EditFileName))
+            if (!string.IsNullOrEmpty(EditFileName) && File.Exists(EditFileName))
             {
                 File.Delete(EditFileName);
             }
 
             mEventAggregator.GetEvent<RequestTranslationEvent>().Unsubscribe(_onTranslationRequired);
             mEventAggregator.GetEvent<SpeechConvertedEvent>().Unsubscribe(_onSpeechRecognized);
-            
+
             mLogger.Debug($"Edit Phrase View - Closing for character '{mCharacter.CharacterName}'");
         }
-        
+
         private bool _viewClose_CanExecute()
         {
             return (!mIsPlaying && !mIsRecording);
@@ -365,7 +365,7 @@ namespace DialogGenerator.UI.ViewModels
 
         private bool _addPhraseWeight_CanExecute()
         {
-            bool _hasEmptyEntries = mWeights.Where(phw => string.IsNullOrEmpty(phw.Key.Key)).Count() > 0;
+            bool _hasEmptyEntries = mWeights.Where(phw => phw.Key == null || string.IsNullOrEmpty(phw.Key.Key)).Count() > 0;
             return !_hasEmptyEntries;
         }
 
