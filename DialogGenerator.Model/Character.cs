@@ -23,7 +23,8 @@ namespace DialogGenerator.Model
         private bool mHasNoVoice = false;
         private string mVoice = string.Empty;
         private int mSpeechRate = -1;
-        private String mDescription = string.Empty;
+        private string mDescription = string.Empty;
+        private string mInternalRemarks = string.Empty;
 
         #endregion
 
@@ -192,8 +193,23 @@ namespace DialogGenerator.Model
             }
         }
 
+        [JsonProperty("InternalRemarks", NullValueHandling = NullValueHandling.Ignore)]
+        public string InternalRemarks
+        {
+            get
+            {
+                return mInternalRemarks;
+            }
+
+            set
+            {
+                mInternalRemarks = value;
+                OnPropertyChanged("InternalRemarks");
+            }
+        }
+
         // json ignore properties
-        
+
         [JsonIgnore]
         public Queue<PhraseEntry> RecentPhrases = new Queue<PhraseEntry>();
 

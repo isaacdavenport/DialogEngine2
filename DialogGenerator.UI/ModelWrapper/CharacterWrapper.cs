@@ -124,6 +124,20 @@ namespace DialogGenerator.UI.Wrapper
             }
         }
 
+        public string InternalRemarks
+        {
+            get
+            {
+                return getValue<string>();
+            }
+
+            set
+            {
+                setValue(value);
+                validateProperty(nameof(InternalRemarks));
+            }
+        }
+
         public bool HasNoVoice
         {
             get { return getValue<bool>(); }

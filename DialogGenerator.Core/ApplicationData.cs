@@ -111,7 +111,7 @@ namespace DialogGenerator.Core
 
         public int CheckForUpdateInterval { get; set; } = 30; // minutes
 
-        public bool TextDialogsOn { get; set; } = true;
+        public bool TextDialogsOn { get; set; } = true;       
 
         [Editable(true)]
         [Description("The size of the queue of the recent phrases")]

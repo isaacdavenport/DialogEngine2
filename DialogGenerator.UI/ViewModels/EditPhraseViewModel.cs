@@ -512,10 +512,11 @@ namespace DialogGenerator.UI.ViewModels
 
         public PhraseWeight(string _Key, double _Value, ILogger _Logger)
         {
+            mLogger = _Logger;
             _initLists();
             Key = new ComboEntry() {Key = _Key, Description = ""};
             Value = _Value;
-            mLogger = _Logger;
+
         }
 
         public ObservableCollection<ComboEntry> Keys { get; set; } = new ObservableCollection<ComboEntry>();
@@ -549,6 +550,7 @@ namespace DialogGenerator.UI.ViewModels
         private void _initLists()
         {
             string _filePath = ApplicationData.Instance.DataDirectory + "\\Phrases.cfg";
+
             try
             {
                 using (var _reader = new StreamReader(_filePath))
@@ -571,7 +573,8 @@ namespace DialogGenerator.UI.ViewModels
             catch (/* Newtonsoft.Json.JsonReaderException */ Exception e)
             {
                 //MessageBox.Show(e.Message, "Error", System.Windows.MessageBoxButton.OK, System.Windows.MessageBoxImage.Error);
-                mLogger.Error($"PhraseWeight exception in _initLists function - {e.Message}");                
+
+                mLogger.Error($"PhraseWeight exception in _initLists function - {e.Message}");
             }
 
         }
