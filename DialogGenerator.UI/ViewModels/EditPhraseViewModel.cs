@@ -556,14 +556,13 @@ namespace DialogGenerator.UI.ViewModels
                     string _jsonString = _reader.ReadToEnd();
                     var _phraseKeysCollection = Serializer.Deserialize<PhraseKeysCollection>(_jsonString);
 
-                    if (_phraseKeysCollection != null && _phraseKeysCollection.Phrases.Count() > 0)
+                    if (_phraseKeysCollection != null && _phraseKeysCollection.Phrases != null && _phraseKeysCollection.Phrases.Count() > 0)
                     {
                         Keys.AddRange(_phraseKeysCollection.Phrases.Where(p => p != null).Select(p => new ComboEntry
                             { Key = p.Name, Description = p.Description}));
                     }
                 }
 
-                var _phraseWeightValues = new ObservableCollection<double>();
                 for (double i = 0; i < 60; i++)
                 {
                     Values.Add(i);
@@ -572,7 +571,7 @@ namespace DialogGenerator.UI.ViewModels
             catch (/* Newtonsoft.Json.JsonReaderException */ Exception e)
             {
                 //MessageBox.Show(e.Message, "Error", System.Windows.MessageBoxButton.OK, System.Windows.MessageBoxImage.Error);
-                mLogger.Error(e.Message);                
+                mLogger.Error($"PhraseWeight exception in _initLists function - {e.Message}");                
             }
 
         }

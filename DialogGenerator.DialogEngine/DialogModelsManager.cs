@@ -357,7 +357,8 @@ namespace DialogGenerator.DialogEngine
 
                 foreach (ModelDialog _dialogModel in _modelDialogInfo.ArrayOfDialogModels)
                 {
-                    mContext.DialogModelsList.Add(_dialogModel);
+                    if (!mContext.DialogModelsList.Contains(_dialogModel))
+                        mContext.DialogModelsList.Add(_dialogModel);
                 }
             }
             mLogger.Info("DialogModelsList initialized mDialogModelPopularitySum = " + mDialogModelPopularitySum.ToString());
