@@ -38,6 +38,7 @@ namespace DialogGenerator.UI.ViewModels
         private string mCharacterGender = "Female";
         private string mCharacterAuthor = string.Empty;
         private string mCharacterDescription = string.Empty;
+        private string mCharacterNote = string.Empty;
         private int mCharacterAge = 10;
         private int mWizardPassthroughIndex = 0;
         private List<string> mDialogWizards = new List<string>();
@@ -384,6 +385,16 @@ namespace DialogGenerator.UI.ViewModels
             set
             {
                 mCharacterDescription = value;
+                RaisePropertyChanged();
+            }
+        }
+
+        public string CharacterNote
+        {
+            get => mCharacterNote;
+            set
+            {
+                mCharacterNote = value;
                 RaisePropertyChanged();
             }
         }
@@ -803,7 +814,9 @@ namespace DialogGenerator.UI.ViewModels
                  .Permit(Triggers.SetAvatar, States.EnteredSetAvatar)
                  .Permit(Triggers.SetAssignToy, States.EnteredSetAssignToy)
                  .Permit(Triggers.SetAuthor, States.EnteredSetAuthor)
-                 .Permit(Triggers.CheckCounter, States.InCounter)
+                 .Permit(Triggers.SetDescription, States.EnteredSetDescription)
+                 .Permit(Triggers.SetNote, States.EnteredSetNote)
+                 
                  .Permit(Triggers.StartWizard, States.InWizard)
                  .Permit(Triggers.Finish, States.Finished)
                  .Permit(Triggers.Initialize, States.EnteredInitialization);
@@ -817,6 +830,9 @@ namespace DialogGenerator.UI.ViewModels
                  .Permit(Triggers.SetAvatar, States.EnteredSetAvatar)
                  .Permit(Triggers.SetAssignToy, States.EnteredSetAssignToy)
                  .Permit(Triggers.SetAuthor, States.EnteredSetAuthor)
+                 .Permit(Triggers.SetDescription, States.EnteredSetDescription)
+                 .Permit(Triggers.SetNote, States.EnteredSetNote)
+                 .Permit(Triggers.CheckCounter, States.InCounter)
                  .Permit(Triggers.StartWizard, States.InWizard)
                  .Permit(Triggers.Finish, States.Finished);
 
@@ -829,6 +845,9 @@ namespace DialogGenerator.UI.ViewModels
                  .Permit(Triggers.SetAvatar, States.EnteredSetAvatar)
                  .Permit(Triggers.SetAssignToy, States.EnteredSetAssignToy)
                  .Permit(Triggers.SetAuthor, States.EnteredSetAuthor)
+                 .Permit(Triggers.SetDescription, States.EnteredSetDescription)
+                 .Permit(Triggers.SetNote, States.EnteredSetNote)
+                 .Permit(Triggers.CheckCounter, States.InCounter)
                  .Permit(Triggers.StartWizard, States.InWizard)
                  .Permit(Triggers.Finish, States.Finished);
 
@@ -841,6 +860,9 @@ namespace DialogGenerator.UI.ViewModels
                  .Permit(Triggers.SetAvatar, States.EnteredSetAvatar)
                  .Permit(Triggers.SetAssignToy, States.EnteredSetAssignToy)
                  .Permit(Triggers.SetAuthor, States.EnteredSetAuthor)
+                 .Permit(Triggers.SetDescription, States.EnteredSetDescription)
+                 .Permit(Triggers.SetNote, States.EnteredSetNote)
+                 .Permit(Triggers.CheckCounter, States.InCounter)
                  .Permit(Triggers.StartWizard, States.InWizard)
                  .Permit(Triggers.Finish, States.Finished);
 
@@ -853,6 +875,8 @@ namespace DialogGenerator.UI.ViewModels
                  .Permit(Triggers.SetGender, States.EnteredSetGender)
                  .Permit(Triggers.SetAvatar, States.EnteredSetAvatar)
                  .Permit(Triggers.SetAuthor, States.EnteredSetAuthor)
+                 .Permit(Triggers.SetDescription, States.EnteredSetDescription)
+                 .Permit(Triggers.SetNote, States.EnteredSetNote)
                  .Permit(Triggers.CheckCounter, States.InCounter)
                  .Permit(Triggers.Finish, States.Finished);
 
@@ -865,6 +889,8 @@ namespace DialogGenerator.UI.ViewModels
                  .Permit(Triggers.SetGender, States.EnteredSetGender)
                  .Permit(Triggers.SetAssignToy, States.EnteredSetAssignToy)
                  .Permit(Triggers.SetAuthor, States.EnteredSetAuthor)
+                 .Permit(Triggers.SetDescription, States.EnteredSetDescription)
+                 .Permit(Triggers.SetNote, States.EnteredSetNote)
                  .Permit(Triggers.CheckCounter, States.InCounter)
                  .Permit(Triggers.Finish, States.Finished);
 
@@ -878,6 +904,7 @@ namespace DialogGenerator.UI.ViewModels
                  .Permit(Triggers.SetAssignToy, States.EnteredSetAssignToy)
                  .Permit(Triggers.SetAvatar, States.EnteredSetAvatar)
                  .Permit(Triggers.SetDescription, States.EnteredSetDescription)
+                 .Permit(Triggers.SetNote, States.EnteredSetNote)
                  .Permit(Triggers.CheckCounter, States.InCounter)
                  .Permit(Triggers.Finish, States.Finished);
             
@@ -891,8 +918,22 @@ namespace DialogGenerator.UI.ViewModels
                 .Permit(Triggers.SetAssignToy, States.EnteredSetAssignToy)
                 .Permit(Triggers.SetAvatar, States.EnteredSetAvatar)
                 .Permit(Triggers.SetAuthor, States.EnteredSetAuthor)
+                .Permit(Triggers.SetNote, States.EnteredSetNote)
                 .Permit(Triggers.CheckCounter, States.InCounter)
                 .Permit(Triggers.Finish, States.Finished);
+
+            Workflow.Configure(States.EnteredSetNote)
+               .OnEntry(() => _stepEntered("Note"))
+               .OnExit(() => _stepExited("Note"))
+               .Permit(Triggers.SetName, States.EnteredSetName)
+               .Permit(Triggers.SetInitials, States.EnteredSetInitials)
+               .Permit(Triggers.SetAge, States.EnteredSetAge)
+               .Permit(Triggers.SetGender, States.EnteredSetGender)
+               .Permit(Triggers.SetAssignToy, States.EnteredSetAssignToy)
+               .Permit(Triggers.SetAvatar, States.EnteredSetAvatar)
+               .Permit(Triggers.SetDescription, States.EnteredSetDescription)
+               .Permit(Triggers.CheckCounter, States.InCounter)
+               .Permit(Triggers.Finish, States.Finished);
 
             Workflow.Configure(States.InCounter)
                   .OnEntry(() => _stepEntered("CheckCounter"))
@@ -953,6 +994,9 @@ namespace DialogGenerator.UI.ViewModels
                 case "Description":
                     Character.Description = CharacterDescription;
                     NextButtonText = "Next";
+                    break;
+                case "Note":
+                    Character.InternalRemarks = CharacterNote;
                     break;
                 case "AssignToy":
                     if(Session.Get<bool>(Constants.BLE_MODE_ON))
@@ -1054,6 +1098,11 @@ namespace DialogGenerator.UI.ViewModels
                 case "Description":
                     CurrentStepIndex = 7;
                     CharacterDescription = Character.Description;
+                    NextButtonText = "Next";
+                    break;
+                case "Note":
+                    CurrentStepIndex = 8;
+                    CharacterNote = Character.InternalRemarks;
                     NextButtonText = "Save";
                     break;
                 case "CheckCounter":

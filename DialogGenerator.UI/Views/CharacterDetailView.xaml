@@ -46,6 +46,19 @@
             <Style x:Key="MyTextBox" TargetType="{x:Type TextBox}">
                 <Setter Property="Background" Value="#efefef"/>
             </Style>
+            <Style x:Key="TextArea" TargetType="{x:Type TextBox}">
+                <Setter Property="Background" Value="#f8f8f8"/>
+                <Setter Property="BorderBrush" Value="#f8f8f8" />
+                <Setter Property="Effect">
+                    <Setter.Value>
+                        <DropShadowEffect 
+                                    BlurRadius="15" 
+                                    Direction="-90" 
+                                    RenderingBias="Quality" 
+                                    ShadowDepth="2" Color="#efefef"/>
+                    </Setter.Value>
+                </Setter>
+            </Style>
             <Style TargetType="{x:Type Label}">
                 <Setter Property="FontWeight" Value="Bold"/>
                 <Setter Property="Foreground" Value="Gray"/>
@@ -120,7 +133,7 @@
                                 </StackPanel>
                                 <StackPanel Grid.Row="1" Margin="0,20,0,0">
                                     <Label Content="Author:" HorizontalAlignment="Left" Margin="-5,0,0,0"/>
-                                    <TextBox MinWidth="300"
+                                    <TextBox MinWidth="370"
                                                  Margin="0"
                                                  HorizontalAlignment="Left"
                                                  Style="{StaticResource MaterialDesignTextBox}"
@@ -129,12 +142,14 @@
                                                  Text="{Binding Character.Author,Mode=TwoWay,UpdateSourceTrigger=PropertyChanged}"/>
                                 </StackPanel>
                                 <StackPanel Grid.Row="2">
-                                    <Label Content="Description" HorizontalAlignment="Left" Margin="-5,20,0,0"/>
-                                    <TextBox MinWidth="300"
+                                    <Label HorizontalAlignment="Left" Margin="-5,20,0,0">Description others will see when selecting characters to play:</Label>
+                                    <TextBox Width="370"
+                                             Height="100"
                                              Margin="0"
                                              HorizontalAlignment="Left"
                                              materialDesign:HintAssist.Hint="Enter the character description ..."
-                                             Text="{Binding Character.Description, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" TextWrapping="Wrap"
+                                             Text="{Binding Character.Description, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" 
+                                             TextWrapping="Wrap" AcceptsReturn="True" VerticalScrollBarVisibility="Auto" Style="{StaticResource TextArea}"
                                              />
 
                                 </StackPanel>
@@ -268,8 +283,8 @@
                                     <RowDefinition Height="Auto" />
                                 </Grid.RowDefinitions>
                                 <Separator Margin="10, 0, 10, 0" Foreground="Gray"/>
-                                <Label Grid.Row="1" Content="Internal Remarks" Margin="10, 20, 0, 0"/>
-                                <TextBox Style="{StaticResource MyTextBox}" 
+                                <Label Grid.Row="1" Margin="10, 20, 0, 0">Notes for you to remember what traits to include in your character’s lines:</Label>
+                                <TextBox Style="{StaticResource TextArea}" 
                                          Grid.Row="2" 
                                          Text="{Binding Character.InternalRemarks}"
                                          TextWrapping="Wrap" 
