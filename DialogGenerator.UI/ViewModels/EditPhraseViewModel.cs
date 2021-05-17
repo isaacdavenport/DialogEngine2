@@ -515,6 +515,12 @@ namespace DialogGenerator.UI.ViewModels
             mLogger = _Logger;
             _initLists();
             Key = new ComboEntry() {Key = _Key, Description = ""};
+
+            if(!Keys.Contains(Key))
+            {
+                Keys.Add(Key);
+            }
+
             Value = _Value;
 
         }
@@ -580,7 +586,7 @@ namespace DialogGenerator.UI.ViewModels
         }
     }
 
-    public class ComboEntry : Object, IComparable<ComboEntry>
+    public class ComboEntry : Object, IComparable<ComboEntry>, IEquatable<ComboEntry>
     {
         public string Key { get; set; }
         public string Description { get; set; }
@@ -588,6 +594,17 @@ namespace DialogGenerator.UI.ViewModels
         public int CompareTo(ComboEntry other)
         {
             return other.Key.CompareTo(this.Key);
+        }
+
+        public bool Equals(ComboEntry other)
+        {
+            if (!this.Key.Equals(other.Key))
+                return false;
+
+            if (!this.Description.Equals(other.Description))
+                return false;
+
+            return true;
         }
 
         public override string ToString()
