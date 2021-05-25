@@ -394,10 +394,15 @@ namespace DialogGenerator.DialogEngine
                 var _preferredDialog = mContext.DialogModelsList.Where(d => d.Name.Equals(settings.PreferredDialogName)).FirstOrDefault();
                 if(_preferredDialog != null)
                 {
-                    if(_isDialogEgligibleForCharacters(_preferredDialog, mContext.Character1Num, mContext.Character2Num))
+                    int _dialogCompliance = _isDialogEgligibleForCharacters(_preferredDialog, mContext.Character1Num, mContext.Character2Num);
+                    if (_dialogCompliance == 0)
                     {
                         mLogger.Info("PickAWeightedDialog returning preferredDialog " + _preferredDialog.Name);
                         return mContext.DialogModelsList.IndexOf(_preferredDialog);
+                    } else if (_dialogCompliance == 1)
+                    {
+                        // Return -1 and force the dialog engine to swap characters.
+                        return -1;
                     }
                 }
             }
@@ -549,7 +554,7 @@ namespace DialogGenerator.DialogEngine
 
         #region Private Methods
 
-        private bool _isDialogEgligibleForCharacters(ModelDialog preferredDialog, int character1Num, int character2Num)
+        private int _isDialogEgligibleForCharacters(ModelDialog preferredDialog, int character1Num, int character2Num)
         {
 
             bool character1First = false;
@@ -572,7 +577,7 @@ namespace DialogGenerator.DialogEngine
                     .All(pts => mContext.CharactersList[character2Num].Phrases.Any(phrase => phrase.PhraseWeights.Keys.Contains(pts)));
 
                 if (character1First && character2Second)
-                    return true;
+                    return 0;
             }
             else
             {
@@ -588,11 +593,14 @@ namespace DialogGenerator.DialogEngine
                                 .ToList()
                                 .All(pts => mContext.CharactersList[character2Num].Phrases.Any(phrase => phrase.PhraseWeights.Keys.Contains(pts)));
                 if (character1Second && character2First)
-                    return true;
+                {
+                    // Now swap characters.
+                    return 1;
+                }
 
             }
 
-            return false;
+            return 2;
         }
 
         private List<ModelDialog> _dialogsToRemove()
