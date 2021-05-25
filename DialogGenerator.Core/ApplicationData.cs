@@ -140,8 +140,8 @@ namespace DialogGenerator.Core
 
         [Description("Delay between 2 phrases in dialog.")]
         [DisplayName("Delay between phrases:")]
-        [RegularExpression(@"^[0-9]([.,][0-9]{1,3})?$", ErrorMessage = @"Field requires decimal number.")]
-        public double DelayBetweenPhrases { get; set; } = 1.0;
+        [Range(1.0, 15.0, ErrorMessage = @"The entry has to be decimal number form 1 to 15")]
+        public double DelayBetweenPhrases { get; set; } = 1.5;
 
 
         [Editable(true)]

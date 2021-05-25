@@ -86,7 +86,7 @@
                      HorizontalAlignment="Left" Margin="10" Grid.Column="2" materialDesign:ValidationAssist.UsePopup="True" />
 
                 <Label Content="Delay between phrases(seconds):" Grid.Column="0" HorizontalAlignment="Right" Margin="10" Grid.Row="2" />
-                <TextBox Grid.Row="2" MinWidth="75" Text="{Binding Settings.DelayBetweenPhrases,UpdateSourceTrigger=LostFocus,Mode=TwoWay}" 
+                <TextBox Grid.Row="2" MinWidth="75" Text="{Binding Settings.DelayBetweenPhrases,UpdateSourceTrigger=PropertyChanged,Mode=TwoWay}" 
                      HorizontalAlignment="Left" Margin="10" Grid.Column="2" materialDesign:ValidationAssist.UsePopup="True" />
 
                 <Label Content="Ignore Radio Signals:" Margin="10" HorizontalAlignment="Right" Grid.Row="4"/>
