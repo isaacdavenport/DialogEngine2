@@ -42,6 +42,15 @@ namespace DialogGenerator.DataAccess
 
         public void AttachRadioToCharacter(int _RadioNumber, string _CharacterPrefix)
         {
+
+            // Release the old binding
+            var _oldBinding = GetBindingByCharacterPrefix(_CharacterPrefix);
+            if(_oldBinding != null)
+            {
+                DetachRadio(_oldBinding.RadioNumber);
+            }
+
+            // Assigne the new binding
             var _binding = GetBindingByRadioNum(_RadioNumber);
             if(_binding == null)
             {

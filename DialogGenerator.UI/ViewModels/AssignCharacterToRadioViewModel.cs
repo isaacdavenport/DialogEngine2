@@ -147,7 +147,8 @@ namespace DialogGenerator.UI.ViewModels
         private async void _viewLoaded_Execute()
         {
             Characters.Clear();
-            List<Character> _characters = mCharacterRepository.GetAll().Where(c => c.RadioNum == -1).ToList();
+            //List<Character> _characters = mCharacterRepository.GetAll().Where(c => c.RadioNum == -1).ToList();
+            List<Character> _characters = mCharacterRepository.GetAll().ToList();
             foreach (Character _ch in _characters)
             {
                 Characters.Add(_ch);
@@ -228,7 +229,8 @@ namespace DialogGenerator.UI.ViewModels
                 if (_oldChar != null)
                 {
                     MessageDialogResult result = await mMessageDialogService.ShowOKCancelDialogAsync(String.Format("The toy with index {0} is assigned to character {1}. Are You sure that you want to re-asign it?", newVal, _oldChar.CharacterName), "Check");
-                    if (result == MessageDialogResult.OK)
+
+                    if (result ==  MessageDialogResult.OK)
                     {
                         mCharacterRadioBindingRepository.AttachRadioToCharacter(newVal, SelectedCharacter.CharacterPrefix);
                         await mCharacterRadioBindingRepository.SaveAsync();
