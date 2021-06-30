@@ -220,7 +220,7 @@ namespace DialogGenerator.DataAccess
             }
             catch (Exception e)
             {
-                mLogger.Error(e.Message);
+                mLogger.Error("**PROBLEM WITH Phrases.cfg "+ e.Message);
             }
 
             var _problemDialgModels = new List<ModelDialog>();
