@@ -35,7 +35,7 @@ namespace DialogGenerator.DataAccess
             }
 
             var wizards = _jsonObjectsTypesList.Wizards;
-            if (wizards != null)
+            if (wizards != null && wizards.Count > 0)
             {
                 for (int i = 0; i < wizards.Count; i++)
                 {
@@ -225,96 +225,107 @@ namespace DialogGenerator.DataAccess
 
             var _problemDialgModels = new List<ModelDialog>();
             var _dialogModelsTakenFromArrays = new List<ModelDialog>();
-            foreach (var modelDialogGroup in _JSONObjectTypesList.DialogModels)
+            Serializer.Serialize(_problemDialgModels, logPath + "TestDeleteMeDialogDataRepo.cs.Line228.json");
+
+            try
             {
-                foreach (var modelDialog in modelDialogGroup.ArrayOfDialogModels)
+                foreach (var modelDialogGroup in _JSONObjectTypesList.DialogModels)
                 {
-                    _dialogModelsTakenFromArrays.Add(modelDialog);
-                    if (modelDialog.PhraseTypeSequence.Count < 2 || modelDialog.Popularity < 0.999 || modelDialog.Popularity > 99)
+                    foreach (var modelDialog in modelDialogGroup.ArrayOfDialogModels)
                     {
-                        _problemDialgModels.Add(modelDialog);
-                    }
-                    // we want to add up how popular each generic phraseType in Phrases.cfg is within the currently active dialogModel set
-                    bool _phraseTypeSequenceIsAllGeneric = true;
-                    foreach (var _phraseType in modelDialog.PhraseTypeSequence)
-                    {
-                        if (!_totalTagWeights.ContainsKey(_phraseType))
+                        _dialogModelsTakenFromArrays.Add(modelDialog);
+                        if (modelDialog.PhraseTypeSequence.Count < 2 || modelDialog.Popularity < 0.999 || modelDialog.Popularity > 99)
                         {
-                            _phraseTypeSequenceIsAllGeneric = false;
-                            continue;  // this PhraseTypeSequence is not all generic so don't score its popularity to generic tags it uses
+                            _problemDialgModels.Add(modelDialog);
                         }
-                    }
-                    if (_phraseTypeSequenceIsAllGeneric)
-                    {
+                        // we want to add up how popular each generic phraseType in Phrases.cfg is within the currently active dialogModel set
+                        bool _phraseTypeSequenceIsAllGeneric = true;
                         foreach (var _phraseType in modelDialog.PhraseTypeSequence)
                         {
-                             _totalTagWeights[_phraseType] += modelDialog.Popularity;
+                            if (!_totalTagWeights.ContainsKey(_phraseType))
+                            {
+                                _phraseTypeSequenceIsAllGeneric = false;
+                                continue;  // this PhraseTypeSequence is not all generic so don't score its popularity to generic tags it uses
+                            }
+                        }
+                        if (_phraseTypeSequenceIsAllGeneric)
+                        {
+                            foreach (var _phraseType in modelDialog.PhraseTypeSequence)
+                            {
+                                _totalTagWeights[_phraseType] += modelDialog.Popularity;
+                            }
                         }
                     }
                 }
+
+                Serializer.Serialize(_dialogModelsTakenFromArrays, logPath + "DialogModelsList.json");
+                Serializer.Serialize(_totalTagWeights, logPath + "TotalTagWeights.json");
             }
-
-            Serializer.Serialize(_dialogModelsTakenFromArrays, logPath + "DialogModelsList.json");
-            Serializer.Serialize(_totalTagWeights, logPath + "TotalTagWeights.json");
-
-            // TODO this generates an exception that gets sent out to the user's debug screen in the error window object missing version
-            if (_problemDialgModels.Count > 0)
+            catch (Exception e)
             {
-                Serializer.Serialize(_problemDialgModels, logPath + "PotentialDialogModelProblems.json");
+                mLogger.Error("**PROBLEM EXTRACTING AND ANALYZING DIALOG MODELS " + e.Message);
             }
+            // TODO this generates an exception that gets sent out to the user's debug screen in the error window object missing version
+            Serializer.Serialize(_problemDialgModels, logPath + "PotentialDialogModelProblems.json");
 
             List<PhraseEntry> _problemPhrases = new List<PhraseEntry>();
             List<PhraseEntry> _noMp3Phrases = new List<PhraseEntry>();
-            foreach (var character in _JSONObjectTypesList.Characters)
+            try
             {
-                foreach (var phrase in character.Phrases)
+                foreach (var character in _JSONObjectTypesList.Characters)
                 {
-                    string _phraseFileName = $"{character.CharacterPrefix}_{phrase.FileName}.mp3";
-                    string _phraseFileAbsolutePath = Path.Combine(ApplicationData.Instance.AudioDirectory, _phraseFileName);
-                    foreach (var weight in phrase.PhraseWeights.Values)
-                        if (weight < 0.999 || weight > 99)
-                        {
-                            _problemPhrases.Add(phrase);
-                        }
-                    if (!File.Exists(_phraseFileAbsolutePath))
+                    foreach (var phrase in character.Phrases)
                     {
-                        _noMp3Phrases.Add(phrase);
+                        string _phraseFileName = $"{character.CharacterPrefix}_{phrase.FileName}.mp3";
+                        string _phraseFileAbsolutePath = Path.Combine(ApplicationData.Instance.AudioDirectory, _phraseFileName);
+                        foreach (var weight in phrase.PhraseWeights.Values)
+                            if (weight < 0.999 || weight > 99)
+                            {
+                                _problemPhrases.Add(phrase);
+                            }
+                        if (!File.Exists(_phraseFileAbsolutePath))
+                        {
+                            _noMp3Phrases.Add(phrase);
+                        }
                     }
                 }
+                Serializer.Serialize(_noMp3Phrases, logPath + "MissingMp3Files.json");
+            }
+            catch (Exception e)
+            {
+                mLogger.Error("**PROBLEM DETERMINING WHICH PHRASES LACK MP3 FILES OR HAVE BAD POPULARITY NUMBERS " + e.Message);
             }
 
             var _allCharactersMissingPhraseTypes = new List<List<string>>();
-            foreach (var character in _JSONObjectTypesList.Characters)
+            try
             {
-                var _thisCharactersMissingPhraseTypes = new List<string>();
-                _thisCharactersMissingPhraseTypes.Add(character.CharacterPrefix);
-                _thisCharactersMissingPhraseTypes.Add(character.CharacterName);
-                _thisCharactersMissingPhraseTypes.Add(character.FileName);
-                _thisCharactersMissingPhraseTypes.AddRange(_listOfPhraseTypeTags);
-                foreach (var phrase in character.Phrases)
-                {   // start with a complete list of all generic tags from phrases.cfg and remove the ones 
-                    //    called out in character to get a list of whats missing 
-                    foreach (var _phraseTypeTag in phrase.PhraseWeights.Keys)
-                        if (_thisCharactersMissingPhraseTypes.Contains(_phraseTypeTag))
-                        {
-                            _thisCharactersMissingPhraseTypes.Remove(_phraseTypeTag);
-                        }
+                foreach (var character in _JSONObjectTypesList.Characters)
+                {
+                    var _thisCharactersMissingPhraseTypes = new List<string>();
+                    _thisCharactersMissingPhraseTypes.Add(character.CharacterPrefix);
+                    _thisCharactersMissingPhraseTypes.Add(character.CharacterName);
+                    _thisCharactersMissingPhraseTypes.Add(character.FileName);
+                    _thisCharactersMissingPhraseTypes.AddRange(_listOfPhraseTypeTags);
+                    foreach (var phrase in character.Phrases)
+                    {   // start with a complete list of all generic tags from phrases.cfg and remove the ones 
+                        //    called out in character to get a list of whats missing 
+                        foreach (var _phraseTypeTag in phrase.PhraseWeights.Keys)
+                            if (_thisCharactersMissingPhraseTypes.Contains(_phraseTypeTag))
+                            {
+                                _thisCharactersMissingPhraseTypes.Remove(_phraseTypeTag);
+                            }
+                    }
+                    _allCharactersMissingPhraseTypes.Add(_thisCharactersMissingPhraseTypes);
                 }
-                _allCharactersMissingPhraseTypes.Add(_thisCharactersMissingPhraseTypes);
+
+                Serializer.Serialize(_allCharactersMissingPhraseTypes, logPath + "MissingTagsByCharacter.json");
             }
-
-            Serializer.Serialize(_allCharactersMissingPhraseTypes, logPath + "MissingTagsByCharacter.json");
-
-
-            if (_noMp3Phrases.Count > 0)
+            catch (Exception e)
             {
-                Serializer.Serialize(_noMp3Phrases, logPath + "MissingMp3Files.json");
+                mLogger.Error("**PROBLEM LOOKING FOR MISSING PHRASE TYPE TAGS IN CHARACTERS " + e.Message);
             }
 
-            if (_problemPhrases.Count > 0)
-            {
-                Serializer.Serialize(_problemPhrases, logPath + "BadPhraseWeights.json");
-            }
+            Serializer.Serialize(_problemPhrases, logPath + "BadPhraseWeights.json");
             mLogger.Info("Deleted old session logs, writing new WizardList.json, DialogModelsList.json, CharacterList.json and other logs.");
             mLogger.Info("Total dialog model count across all dialog model groups: " + _dialogModelsTakenFromArrays.Count);
         }
