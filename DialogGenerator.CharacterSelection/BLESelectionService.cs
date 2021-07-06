@@ -641,21 +641,17 @@ namespace DialogGenerator.CharacterSelection
 
                         mEventAggregator.GetEvent<SelectedCharactersPairChangedEvent>().
                             Publish(new SelectedCharactersPairEventArgs { Character1Index = CurrentCharacter1, Character2Index = CurrentCharacter2 });
+
+                        mEventAggregator.GetEvent<HeatMapUpdateEvent>().Publish(new HeatMapData
+                        {
+                            HeatMap = HeatMap,
+                            MotionVector = MotionVector,
+                            LastHeatMapUpdateTime = CharactersLastHeatMapUpdateTime,
+                            Character1Index = NextCharacter1,
+                            Character2Index = NextCharacter2
+                        });
                     }
 
-                    mEventAggregator.GetEvent<StopPlayingCurrentDialogLineEvent>().Publish();
-
-                    mEventAggregator.GetEvent<SelectedCharactersPairChangedEvent>().
-                        Publish(new SelectedCharactersPairEventArgs { Character1Index = CurrentCharacter1, Character2Index = CurrentCharacter2 });
-
-                    mEventAggregator.GetEvent<HeatMapUpdateEvent>().Publish(new HeatMapData
-                    {
-                        HeatMap = HeatMap,
-                        MotionVector = MotionVector,
-                        LastHeatMapUpdateTime = CharactersLastHeatMapUpdateTime,
-                        Character1Index = NextCharacter1,
-                        Character2Index = NextCharacter2
-                    });
                 }
             }
             catch (Exception ex)
