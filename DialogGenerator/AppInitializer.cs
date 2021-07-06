@@ -108,8 +108,8 @@ namespace DialogGenerator
             Session.Set(Constants.NEXT_CH_2, -1);
             mEventAggregator.GetEvent<CharacterCollectionLoadedEvent>().Publish();
 
-            mLogger.Info("Finished importing characters: " + _JSONObjectTypesList.Characters.Count + " DialogModelGroups: " + 
-                _JSONObjectTypesList.DialogModels.Count + " Wizards: " + _JSONObjectTypesList.Wizards.Count);
+            mLogger.Info("Finished importing characters:" + _JSONObjectTypesList.Characters.Count + "   DialogModelGroups:" + 
+                _JSONObjectTypesList.DialogModels.Count + "   Wizards:" + _JSONObjectTypesList.Wizards.Count);
 
             mWorkflow.Fire(Triggers.InitializeDialogEngine);
         }
