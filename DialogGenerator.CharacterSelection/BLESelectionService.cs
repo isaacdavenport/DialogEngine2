@@ -630,7 +630,7 @@ namespace DialogGenerator.CharacterSelection
                     Session.Set(Constants.NEXT_CH_2, NextCharacter2);
 
                     bool shouldSendEvent = (CurrentCharacter1 != NextCharacter1 || CurrentCharacter2 != NextCharacter2)
-                        && (CurrentCharacter1 != NextCharacter2 && CurrentCharacter2 != NextCharacter1);
+                        && (CurrentCharacter1 != NextCharacter2 || CurrentCharacter2 != NextCharacter1);
 
                     CurrentCharacter1 = NextCharacter1;
                     CurrentCharacter2 = NextCharacter2;
