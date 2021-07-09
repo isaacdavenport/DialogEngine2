@@ -554,6 +554,11 @@ namespace DialogGenerator.UI.ViewModels
         {
             try
             {                
+                if(mDialogEngine.PauseCancellationTokenSource != null)
+                {
+                    mDialogEngine.PauseCancellationTokenSource.Cancel();
+                }
+
                 mDialogEngine.StopDialogEngine();
             }
             catch (Exception ex)
