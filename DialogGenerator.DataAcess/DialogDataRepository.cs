@@ -225,7 +225,6 @@ namespace DialogGenerator.DataAccess
 
             var _problemDialgModels = new List<ModelDialog>();
             var _dialogModelsTakenFromArrays = new List<ModelDialog>();
-            Serializer.Serialize(_problemDialgModels, logPath + "TestDeleteMeDialogDataRepo.cs.Line228.json");
 
             try
             {
