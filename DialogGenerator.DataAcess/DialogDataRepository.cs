@@ -110,8 +110,8 @@ namespace DialogGenerator.DataAccess
         {
             // perhaps this should be done in applicationdata.cs or perhaps we should use log4nets folder
             var logPath = ApplicationData.Instance.AppDataDirectory + "\\Log\\";              
-            File.Delete(logPath + "DialogModelsWithDuplicates.json");
-            Serializer.Serialize(_JSONObjectTypesList.DialogModels, logPath + "DialogModelsWithDuplicates.json");
+            File.Delete(logPath + "DialogModelsRawAfterLoading.json");
+            Serializer.Serialize(_JSONObjectTypesList.DialogModels, logPath + "DialogModelsRawAfterLoading.json");
         }
 
         public JSONObjectsTypesList LoadFromDirectory(string _directoryPath, out IList<string> _errorsList)
@@ -170,103 +170,10 @@ namespace DialogGenerator.DataAccess
             return _JSONObjectTypesList;
         }
 
-        public void LogSessionJsonStatsAndErrors(string _directoryPath, JSONObjectsTypesList _JSONObjectTypesList, List<List<string>> _dialogModelListPreFilter)
-        {   //TODO Isaac break this long method into helper methods
-            var logPath = ApplicationData.Instance.AppDataDirectory + "\\Log\\";  // perhaps this should be done in applicationdata.cs or perhaps we should use log4nets folder
-
-            File.Delete(logPath + "WizardsList.json");
-            File.Delete(logPath + "DialogModelsList.json");
-            File.Delete(logPath + "CharactersList.json");
-            File.Delete(logPath + "PotentialDialogModelProblems.json");
-            File.Delete(logPath + "BadPhraseWeights.json");
+        private void FindMissingMp3sBadPhraseWeights(string logPath, JSONObjectsTypesList _JSONObjectTypesList)
+        {
             File.Delete(logPath + "MissingMp3Files.json");
-            File.Delete(logPath + "TotalTagWeights.json");
-            File.Delete(logPath + "MissingTagsByCharacter.json");
-            File.Delete(logPath + "DialogModelListPreFilter.json");
-
-            Serializer.Serialize(_JSONObjectTypesList.Wizards, logPath + "WizardsList.json");
-            Serializer.Serialize(_JSONObjectTypesList.Characters, logPath + "CharactersList.json");
-            Serializer.Serialize(_dialogModelListPreFilter, logPath + "DialogModelListPreFilter.json");
-
-            var _totalTagWeights = new Dictionary<string, double>();
-            var _listOfPhraseTypeTags = new List<string>();
-
-            string _filePath = ApplicationData.Instance.DataDirectory + "\\Phrases.cfg";
-            try
-            {
-                using (var _reader = new StreamReader(_filePath))
-                {
-                    string _jsonString = _reader.ReadToEnd();
-                    var _phraseKeysCollection = Serializer.Deserialize<PhraseKeysCollection>(_jsonString);
-                    if (_phraseKeysCollection != null && _phraseKeysCollection.Phrases.Count() > 0)
-                    {
-                        foreach (var _phraseKey in _phraseKeysCollection.Phrases)
-                        {
-                            if (_phraseKey == null || _phraseKey.Name == "" || _phraseKey.Name == null)
-                            {
-                                mLogger.Error("Phrases.cfg contains empty entry");
-                                continue;
-                            }
-                            if (_totalTagWeights.ContainsKey(_phraseKey.Name))
-                            {
-                                mLogger.Error("phrases.cfg contains duplicate entry " + _phraseKey.Name);
-                                continue;
-                            }
-                            _totalTagWeights.Add(_phraseKey.Name, 0.0);
-                            _listOfPhraseTypeTags.Add(_phraseKey.Name);
-                        }
-                    }
-                }
-            }
-            catch (Exception e)
-            {
-                mLogger.Error("**PROBLEM WITH Phrases.cfg "+ e.Message);
-            }
-
-            var _problemDialgModels = new List<ModelDialog>();
-            var _dialogModelsTakenFromArrays = new List<ModelDialog>();
-
-            try
-            {
-                foreach (var modelDialogGroup in _JSONObjectTypesList.DialogModels)
-                {
-                    foreach (var modelDialog in modelDialogGroup.ArrayOfDialogModels)
-                    {
-                        _dialogModelsTakenFromArrays.Add(modelDialog);
-                        if (modelDialog.PhraseTypeSequence.Count < 2 || modelDialog.Popularity < 0.999 || modelDialog.Popularity > 99)
-                        {
-                            _problemDialgModels.Add(modelDialog);
-                        }
-                        // we want to add up how popular each generic phraseType in Phrases.cfg is within the currently active dialogModel set
-                        bool _phraseTypeSequenceIsAllGeneric = true;
-                        foreach (var _phraseType in modelDialog.PhraseTypeSequence)
-                        {
-                            if (!_totalTagWeights.ContainsKey(_phraseType))
-                            {
-                                _phraseTypeSequenceIsAllGeneric = false;
-                                continue;  // this PhraseTypeSequence is not all generic so don't score its popularity to generic tags it uses
-                            }
-                        }
-                        if (_phraseTypeSequenceIsAllGeneric)
-                        {
-                            foreach (var _phraseType in modelDialog.PhraseTypeSequence)
-                            {
-                                _totalTagWeights[_phraseType] += modelDialog.Popularity;
-                            }
-                        }
-                    }
-                }
-
-                Serializer.Serialize(_dialogModelsTakenFromArrays, logPath + "DialogModelsList.json");
-                Serializer.Serialize(_totalTagWeights, logPath + "TotalTagWeights.json");
-            }
-            catch (Exception e)
-            {
-                mLogger.Error("**PROBLEM EXTRACTING AND ANALYZING DIALOG MODELS " + e.Message);
-            }
-            // TODO this generates an exception that gets sent out to the user's debug screen in the error window object missing version
-            Serializer.Serialize(_problemDialgModels, logPath + "PotentialDialogModelProblems.json");
-
+            File.Delete(logPath + "BadPhraseWeights.json");
             List<PhraseEntry> _problemPhrases = new List<PhraseEntry>();
             List<PhraseEntry> _noMp3Phrases = new List<PhraseEntry>();
             try
@@ -289,12 +196,17 @@ namespace DialogGenerator.DataAccess
                     }
                 }
                 Serializer.Serialize(_noMp3Phrases, logPath + "MissingMp3Files.json");
+                Serializer.Serialize(_problemPhrases, logPath + "BadPhraseWeights.json");
             }
             catch (Exception e)
             {
                 mLogger.Error("**PROBLEM DETERMINING WHICH PHRASES LACK MP3 FILES OR HAVE BAD POPULARITY NUMBERS " + e.Message);
             }
+        }
 
+        private void SerializeMissingTagsByCharacter(string logPath, JSONObjectsTypesList _JSONObjectTypesList, List<string> _listOfPhraseTypeTags)
+        {
+            File.Delete(logPath + "MissingTagsByCharacter.json");
             var _allCharactersMissingPhraseTypes = new List<List<string>>();
             try
             {
@@ -316,17 +228,147 @@ namespace DialogGenerator.DataAccess
                     }
                     _allCharactersMissingPhraseTypes.Add(_thisCharactersMissingPhraseTypes);
                 }
-
                 Serializer.Serialize(_allCharactersMissingPhraseTypes, logPath + "MissingTagsByCharacter.json");
             }
             catch (Exception e)
             {
                 mLogger.Error("**PROBLEM LOOKING FOR MISSING PHRASE TYPE TAGS IN CHARACTERS " + e.Message);
             }
+        }
 
-            Serializer.Serialize(_problemPhrases, logPath + "BadPhraseWeights.json");
-            mLogger.Info("Deleted old session logs, writing new WizardList.json, DialogModelsList.json, CharacterList.json and other logs.");
+private void CalculateAndSerializeWeightsAndModels(string logPath, JSONObjectsTypesList _JSONObjectTypesList, 
+    Dictionary<string, double> totalGenericTagWeights, Dictionary<string, int> totalUseCountOfGenericTagsInAllDialogModels)
+        {
+            File.Delete(logPath + "DialogModelsListPostDeDupeAndFilter.json");
+            File.Delete(logPath + "TotalTagWeights.json");
+            File.Delete(logPath + "PotentialDialogModelProblems.json");
+            File.Delete(logPath + "TotalTagCounts.json");            
+
+            var _problemDialogModels = new List<ModelDialog>();
+            var _dialogModelsTakenFromArrays = new List<ModelDialog>();
+            double _genericDialogModelWeightSum = 0.0;
+            double _contextualDialogModelWeightSum = 0.0;
+            int _genericDialogModelCount = 0;
+            int _contextualDialogModelCount = 0;
+
+            try
+            {
+                foreach (var modelDialogGroup in _JSONObjectTypesList.DialogModels)
+                {
+                    foreach (var modelDialog in modelDialogGroup.ArrayOfDialogModels)
+                    {
+                        _dialogModelsTakenFromArrays.Add(modelDialog);
+                        if (modelDialog.PhraseTypeSequence.Count < 2 || modelDialog.Popularity < 0.999 || modelDialog.Popularity > 99)
+                        {
+                            _problemDialogModels.Add(modelDialog);
+                        }
+                        // we want to add up how popular each generic phraseType in Phrases.cfg is within the currently active dialogModel set
+                        bool _phraseTypeSequenceIsAllGeneric = true;
+                        foreach (var _phraseType in modelDialog.PhraseTypeSequence)
+                        {
+                            if (!totalGenericTagWeights.ContainsKey(_phraseType))
+                            {
+                                _phraseTypeSequenceIsAllGeneric = false;
+                                
+                            }
+                            else
+                            {
+                                totalUseCountOfGenericTagsInAllDialogModels[_phraseType]++;
+                            }
+                        }
+                        if (_phraseTypeSequenceIsAllGeneric)
+                        {
+                            _genericDialogModelWeightSum += modelDialog.Popularity;
+                            _genericDialogModelCount++;
+                            foreach (var _phraseType in modelDialog.PhraseTypeSequence)
+                            {
+                                totalGenericTagWeights[_phraseType] += modelDialog.Popularity;
+                            }
+                        }
+                        else
+                        {
+                            _contextualDialogModelCount++;
+                            _contextualDialogModelWeightSum += modelDialog.Popularity;
+                        }
+                    }
+                }
+                mLogger.Info("Generic Dialog Model Weights Sum: " + _genericDialogModelWeightSum.ToString() + 
+                        "   Contextual Dialog Model Weights Sum: " + _contextualDialogModelWeightSum.ToString());
+                mLogger.Info("Generic Dialog Model Count: " + _genericDialogModelCount.ToString() +
+                        "   Contextual Dialog Model Count: " + _contextualDialogModelCount.ToString());
+                Serializer.Serialize(_dialogModelsTakenFromArrays, logPath + "DialogModelsListPostDeDupeAndFilter.json");
+                Serializer.Serialize(totalGenericTagWeights, logPath + "TotalTagWeights.json");
+                Serializer.Serialize(totalUseCountOfGenericTagsInAllDialogModels, logPath + "TotalTagCounts.json"); 
+            }
+            catch (Exception e)
+            {
+                mLogger.Error("**PROBLEM EXTRACTING AND ANALYZING DIALOG MODELS " + e.Message);
+            }
+            // TODO this generates an exception that gets sent out to the user's debug screen in the error window object missing version
+            Serializer.Serialize(_problemDialogModels, logPath + "PotentialDialogModelProblems.json");
             mLogger.Info("Total dialog model count across all dialog model groups: " + _dialogModelsTakenFromArrays.Count);
+        }
+
+        private void GenerateWeightsAndPhraseTypeList(Dictionary<string, double> totalTagWeights, Dictionary<string, int> totalUseCountOfGenericTagsInAllDialogModels, List<string> listOfPhraseTypeTags)
+        {
+            string _filePath = ApplicationData.Instance.DataDirectory + "\\Phrases.cfg";
+            try
+            {
+                using (var _reader = new StreamReader(_filePath))
+                {
+                    string _jsonString = _reader.ReadToEnd();
+                    var _phraseKeysCollection = Serializer.Deserialize<PhraseKeysCollection>(_jsonString);
+                    if (_phraseKeysCollection != null && _phraseKeysCollection.Phrases.Count() > 0)
+                    {
+                        foreach (var _phraseKey in _phraseKeysCollection.Phrases)
+                        {
+                            if (_phraseKey == null || _phraseKey.Name == "" || _phraseKey.Name == null)
+                            {
+                                mLogger.Error("Phrases.cfg contains empty entry");
+                                continue;
+                            }
+                            if (totalTagWeights.ContainsKey(_phraseKey.Name))
+                            {
+                                mLogger.Error("phrases.cfg contains duplicate entry " + _phraseKey.Name);
+                                continue;
+                            }
+                            totalTagWeights.Add(_phraseKey.Name, 0.0);
+                            totalUseCountOfGenericTagsInAllDialogModels.Add(_phraseKey.Name, 0);
+                            listOfPhraseTypeTags.Add(_phraseKey.Name);
+                        }
+                    }
+                }
+            }
+            catch (Exception e)
+            {
+                mLogger.Error("**PROBLEM WITH Phrases.cfg " + e.Message);
+            }
+        }
+
+        public void LogSessionJsonStatsAndErrors(string _directoryPath, JSONObjectsTypesList _JSONObjectTypesList, List<List<string>> _dialogModelListPreFilter)
+        {   
+            var logPath = ApplicationData.Instance.AppDataDirectory + "\\Log\\";  // perhaps this should be done in applicationdata.cs or perhaps we should use log4nets folder
+
+            File.Delete(logPath + "WizardsList.json");
+            File.Delete(logPath + "CharactersList.json");
+            File.Delete(logPath + "DialogModelListDeDupedPreFilter.json");
+
+            Serializer.Serialize(_JSONObjectTypesList.Wizards, logPath + "WizardsList.json");
+            Serializer.Serialize(_JSONObjectTypesList.Characters, logPath + "CharactersList.json");
+            Serializer.Serialize(_dialogModelListPreFilter, logPath + "DialogModelListDeDupedPrePreFilter.json");
+
+            FindMissingMp3sBadPhraseWeights(logPath, _JSONObjectTypesList);
+
+            var totalGenericTagWeights = new Dictionary<string, double>();
+            var totalUseCountOfGenericTagsInAllDialogModels = new Dictionary<string, int>();
+
+            var listOfPhraseTypeTags = new List<string>();
+            GenerateWeightsAndPhraseTypeList(totalGenericTagWeights, totalUseCountOfGenericTagsInAllDialogModels, listOfPhraseTypeTags);
+
+            CalculateAndSerializeWeightsAndModels(logPath, _JSONObjectTypesList, totalGenericTagWeights, totalUseCountOfGenericTagsInAllDialogModels);
+            SerializeMissingTagsByCharacter(logPath, _JSONObjectTypesList, listOfPhraseTypeTags);
+
+            mLogger.Info("Deleted old session logs, wrote new WizardList.json, DialogModelsList.json, CharacterList.json and other json logs.");
         }
     }
 }

@@ -91,8 +91,8 @@ namespace DialogGenerator
             IList<string> errors;            
             var _JSONObjectTypesList = mDialogDataRepository.LoadFromDirectory(ApplicationData.Instance.DataDirectory,out errors);
             mDialogDataRepository.LogRedundantDialogModelsInDataFolder(ApplicationData.Instance.DataDirectory, _JSONObjectTypesList);
-            var _dialogModelListPreFilter = _removeDuplicateDialogModelsFromCollection(_JSONObjectTypesList.DialogModels);
-            mDialogDataRepository.LogSessionJsonStatsAndErrors(ApplicationData.Instance.DataDirectory, _JSONObjectTypesList, _dialogModelListPreFilter);
+            var _dialogModelListDeDupedPreFilter = _removeDuplicateDialogModelsFromCollection(_JSONObjectTypesList.DialogModels);
+            mDialogDataRepository.LogSessionJsonStatsAndErrors(ApplicationData.Instance.DataDirectory, _JSONObjectTypesList, _dialogModelListDeDupedPreFilter);
             foreach(var error in errors)
             {
                 mUserLogger.Error(error);
