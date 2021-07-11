@@ -258,7 +258,7 @@ private void CalculateAndSerializeWeightsAndModels(string logPath, JSONObjectsTy
                     foreach (var modelDialog in modelDialogGroup.ArrayOfDialogModels)
                     {
                         _dialogModelsTakenFromArrays.Add(modelDialog);
-                        if (modelDialog.PhraseTypeSequence.Count < 2 || modelDialog.Popularity < 0.999 || modelDialog.Popularity > 99)
+                        if (modelDialog.PhraseTypeSequence.Count < 2 || modelDialog.Popularity < 0.999 || modelDialog.Popularity > 125)
                         {
                             _problemDialogModels.Add(modelDialog);
                         }
