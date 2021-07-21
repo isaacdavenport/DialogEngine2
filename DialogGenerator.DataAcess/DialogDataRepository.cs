@@ -235,9 +235,13 @@ namespace DialogGenerator.DataAccess
                 mLogger.Error("**PROBLEM LOOKING FOR MISSING PHRASE TYPE TAGS IN CHARACTERS " + e.Message);
             }
         }
-
-private void CalculateAndSerializeWeightsAndModels(string logPath, JSONObjectsTypesList _JSONObjectTypesList, 
-    Dictionary<string, double> totalGenericTagWeights, Dictionary<string, int> totalUseCountOfGenericTagsInAllDialogModels)
+        public class TagOccurancesCounts
+        {
+            public string TagOfInterest { get; set; }
+            public SortedDictionary<string, int> OccursNextToTags { get; set; }
+        }
+        private void CalculateAndSerializeWeightsAndModels(string logPath, JSONObjectsTypesList _JSONObjectTypesList, 
+            Dictionary<string, double> totalGenericTagWeights, Dictionary<string, int> totalUseCountOfGenericTagsInAllDialogModels)
         {
             File.Delete(logPath + "DialogModelsListPostDeDupeAndFilter.json");
             File.Delete(logPath + "TotalTagWeights.json");
@@ -245,11 +249,22 @@ private void CalculateAndSerializeWeightsAndModels(string logPath, JSONObjectsTy
             File.Delete(logPath + "TotalTagCounts.json");            
 
             var _problemDialogModels = new List<ModelDialog>();
-            var _dialogModelsTakenFromArrays = new List<ModelDialog>();
+            var _dialogModelsTakenFromArrays = new List<ModelDialog>();            
+            var _tagHeatMap = new List<TagOccurancesCounts>();
             double _genericDialogModelWeightSum = 0.0;
             double _contextualDialogModelWeightSum = 0.0;
             int _genericDialogModelCount = 0;
             int _contextualDialogModelCount = 0;
+
+            //add the list of generic phraseType tags to a list of lists so we can group together occurances of tags
+            //in generic dialog models.  Each generic phrasetype should occur once in the totalGenericTagWeights dic as a key
+            foreach (var element in totalGenericTagWeights) 
+            {
+                var _currentTag = new TagOccurancesCounts();
+                _currentTag.TagOfInterest = element.Key;
+                _currentTag.OccursNextToTags = new SortedDictionary<string, int>();
+                _tagHeatMap.Add(_currentTag);
+            }
 
             try
             {
@@ -268,8 +283,7 @@ private void CalculateAndSerializeWeightsAndModels(string logPath, JSONObjectsTy
                         {
                             if (!totalGenericTagWeights.ContainsKey(_phraseType))
                             {
-                                _phraseTypeSequenceIsAllGeneric = false;
-                                
+                                _phraseTypeSequenceIsAllGeneric = false;                                
                             }
                             else
                             {
@@ -283,6 +297,17 @@ private void CalculateAndSerializeWeightsAndModels(string logPath, JSONObjectsTy
                             foreach (var _phraseType in modelDialog.PhraseTypeSequence)
                             {
                                 totalGenericTagWeights[_phraseType] += modelDialog.Popularity;
+                            }
+                            foreach (var _phraseDict in _tagHeatMap)
+                            {
+                                if (modelDialog.PhraseTypeSequence.Contains(_phraseDict.TagOfInterest)) 
+                                {
+                                    foreach (var _phraseType in modelDialog.PhraseTypeSequence)
+                                    {
+                                        _phraseDict.OccursNextToTags.TryGetValue(_phraseType, out var currentCount);
+                                        _phraseDict.OccursNextToTags[_phraseType] = currentCount + 1;
+                                    }
+                                }
                             }
                         }
                         else
@@ -298,6 +323,7 @@ private void CalculateAndSerializeWeightsAndModels(string logPath, JSONObjectsTy
                         "   Contextual Dialog Model Count: " + _contextualDialogModelCount.ToString());
                 Serializer.Serialize(_dialogModelsTakenFromArrays, logPath + "DialogModelsListPostDeDupeAndFilter.json");
                 Serializer.Serialize(totalGenericTagWeights, logPath + "TotalTagWeights.json");
+                Serializer.Serialize(_tagHeatMap, logPath + "TagHeatMap.json");
                 Serializer.Serialize(totalUseCountOfGenericTagsInAllDialogModels, logPath + "TotalTagCounts.json"); 
             }
             catch (Exception e)
