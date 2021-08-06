@@ -633,7 +633,7 @@ namespace DialogGenerator.UI.ViewModels
             {
                 Character = Session.Get(Constants.NEW_CHARACTER) as Character;
                 CreateCharacterViewModel createCharacterViewModel = Session.Get(Constants.CREATE_CHARACTER_VIEW_MODEL) as CreateCharacterViewModel;
-                if (_lastWizardState == null || _lastWizardState.Wizard != null || !_lastWizardState.CharacterPrefix.Equals(Character.CharacterPrefix))
+                if (_lastWizardState == null || _lastWizardState.Wizard == null || !_lastWizardState.CharacterPrefix.Equals(Character.CharacterPrefix))
                 {
                     CurrentWizard = mWizardDataProvider.GetByName(createCharacterViewModel.CurrentDialogWizard);
                     _setDataForTutorialStep(CurrentStepIndex);
@@ -660,7 +660,7 @@ namespace DialogGenerator.UI.ViewModels
                         Workflow.Fire(WizardTriggers.ReadyForUserAction);
                         mSpeechSyntesizer.SpeakCompleted += _synth_SpeakCompleted;
                         return;
-                    }
+                    } 
                     
                 } 
                     
@@ -668,6 +668,7 @@ namespace DialogGenerator.UI.ViewModels
                 if (result.HasValue)
                 {
                     CurrentWizard = mWizardDataProvider.GetByIndex(result.Value);
+                    CurrentStepIndex = 0;
 
                     if (_lastWizardState == null)
                     {
