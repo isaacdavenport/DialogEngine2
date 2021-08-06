@@ -324,23 +324,13 @@ namespace DialogGenerator.UI.ViewModels
 
         private void _initPopularityValues()
         {
-            var _values = new double[] { .1, .2, .3, .4, .5, .6, .7, .8, .9 };
+            var _values = new double[] { 2, 10, 40, 60, 80, 100, 120 };
 
             foreach(var _value in _values)
             {
                 PopularityValues.Add(_value);
             }
-
-            for(double i = 1.0; i < 15; i ++)
-            {
-                PopularityValues.Add(i);
-            }
-
-            for(double i = 20; i <= 200; i += 5)
-            {
-                PopularityValues.Add(i);
-            }
-
+            
         }
 
         #endregion
