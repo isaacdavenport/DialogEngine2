@@ -52,6 +52,7 @@ namespace DialogGenerator.UI.ViewModels
         private AssignedRadiosViewModel mAssignedRadiosViewModel;
         private bool mCanPause = false;
         private bool mCanResume = false;
+        private IMP3Player mPlayer;
 
 
         #endregion
@@ -66,7 +67,7 @@ namespace DialogGenerator.UI.ViewModels
             ,ArenaViewModel _ArenaViewModel
             ,AssignedRadiosViewModel _AssignedRadiosViewModel
             ,IDialogModelRepository _DialogModelRepository
-            ,IWizardRepository _WizardRepository)
+            ,IWizardRepository _WizardRepository, IMP3Player _player)
         {
             mLogger = logger;
             mEventAggregator = _eventAggregator;
@@ -78,6 +79,7 @@ namespace DialogGenerator.UI.ViewModels
             mRegionManager = _regionManager;
             mArenaViewModel = _ArenaViewModel;
             mAssignedRadiosViewModel = _AssignedRadiosViewModel;
+            mPlayer = _player;
 
             mEventAggregator.GetEvent<NewDialogLineEvent>().Subscribe(_onNewDialogLine);
             mEventAggregator.GetEvent<ActiveCharactersEvent>().Subscribe(_onNewActiveCharacters);
@@ -378,6 +380,7 @@ namespace DialogGenerator.UI.ViewModels
         public DelegateCommand ResumeCommand { get; set; }
         public DelegateCommand CopyLinesCommand { get; set; }
         public DelegateCommand SelectAllCommand { get; set; }
+        public DelegateCommand SkipLineCommand { get; set; }
 
 
         #endregion
@@ -404,6 +407,17 @@ namespace DialogGenerator.UI.ViewModels
             ResumeCommand = new DelegateCommand(_resumeCommandExecute, _resumeCommandCanExecute);
             CopyLinesCommand = new DelegateCommand(_copyCommand_execute);
             SelectAllCommand = new DelegateCommand(_selectAllCommand_execute);
+            SkipLineCommand = new DelegateCommand(_skipLineCommandExecute, _skipLineCommand_CanExecute);
+        }
+
+        private bool _skipLineCommand_CanExecute()
+        {
+            return mPlayer.IsPlaying();
+        }
+
+        private void _skipLineCommandExecute()
+        {
+            mPlayer.StopPlayingCurrentDialogLine();
         }
 
         private void _selectAllCommand_execute()
