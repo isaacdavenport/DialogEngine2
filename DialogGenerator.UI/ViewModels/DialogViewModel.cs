@@ -200,7 +200,7 @@ namespace DialogGenerator.UI.ViewModels
             set
             {
                 mCanPause = value;
-                OnPropertyChanged();
+                RaisePropertyChanged();               
             }
         }
 
@@ -214,7 +214,7 @@ namespace DialogGenerator.UI.ViewModels
             set
             {
                 mCanResume = value;
-                OnPropertyChanged();
+                RaisePropertyChanged();
             }
         }
 
