@@ -301,34 +301,34 @@ namespace DialogGenerator.DialogEngine
         private bool _checkForRecentPhrases(int dialogModel)
         {
             var dialog = mContext.DialogModelsList[dialogModel];
-            bool result = false;
+            bool result1 = false;
+            bool result2 = false;
 
             // Entries with the even indices.
             dialog.PhraseTypeSequence.Select((entry, i) => new { i, entry }).Where(p => p.i % 2 == 0).Select(e => e.entry).ToList().ForEach(
                 str =>
                 {
-                    if (!result && mContext.CharactersList[mContext.Character1Num].RecentPhrases
+                    if (!result1 && mContext.CharactersList[mContext.Character1Num].RecentPhrases
                         .Any(rp => rp.PhraseWeights.Keys.Contains(str)))
                     {
-                        result = true;
+                        result1 = true;
                     }
                 });
 
             // Entries with the odd indices.
-            if (!result)
-            {
+
                 dialog.PhraseTypeSequence.Select((entry, i) => new { i, entry }).Where(p => p.i % 2 != 0).Select(e => e.entry).ToList().ForEach(
                     str =>
                     {
-                        if (!result && mContext.CharactersList[mContext.Character2Num].RecentPhrases
+                        if (!result2 && mContext.CharactersList[mContext.Character2Num].RecentPhrases
                             .Any(rp => rp.PhraseWeights.Keys.Contains(str)))
                         {
-                            result = true;
+                            result2 = true;
                         }
                     });
-            }
             
-            return result;
+            // Only if both characters have recent phrases we return the positive result - DLGEN-619 
+            return result1 && result2;
         }
 
         #endregion
@@ -536,7 +536,9 @@ namespace DialogGenerator.DialogEngine
                 }
 
                 //eventually overload enque to remove first to keep size same or create a replace
-                mContext.CharactersList[_speakingCharacter].RecentPhrases.Dequeue();
+                if(mContext.CharactersList[_speakingCharacter].RecentPhrases.Count == ApplicationData.Instance.RecentPhrasesQueueSize)
+                    mContext.CharactersList[_speakingCharacter].RecentPhrases.Dequeue();
+
                 mContext.CharactersList[_speakingCharacter].RecentPhrases.Enqueue(_selectedPhrase);
             }
             catch (Exception ex)

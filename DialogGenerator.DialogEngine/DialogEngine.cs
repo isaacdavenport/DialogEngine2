@@ -224,9 +224,17 @@ namespace DialogGenerator.DialogEngine
                 var char2Name = obj.Character2Index != -1
                     ? mContext.CharactersList[obj.Character2Index].CharacterName
                     : "None";
-                
+
+                var recentPhrases1 = obj.Character1Index != 1
+                    ? mContext.CharactersList[obj.Character1Index].RecentPhrases : null;
+
+                var recentPhrases2 = obj.Character2Index != 1
+                    ? mContext.CharactersList[obj.Character2Index].RecentPhrases : null;
+
                 mLogger.Info($"_onSelectedCharacterPairChanged - Character 1 is set to {obj.Character1Index} " +
-                             $" {char1Name}, character 2 is set to {obj.Character2Index} {char2Name}");
+                             $" {char1Name}, with recent phrases count = {recentPhrases1?.Count}," +
+                             $" character 2 is set to {obj.Character2Index} {char2Name}, " +
+                             $"with recent phrases count = {recentPhrases2?.Count}");
 
             } else
             {
