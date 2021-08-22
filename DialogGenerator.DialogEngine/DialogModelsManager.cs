@@ -197,7 +197,7 @@ namespace DialogGenerator.DialogEngine
 
             }
             return _returnIndex; // code for no next adventure continuance found
-        }
+        }        
 
         private bool _isGreetingDialog(int idx)
         {
@@ -228,6 +228,69 @@ namespace DialogGenerator.DialogEngine
                 }
             }
             
+
+            return false;
+        }
+
+        private bool _charactersLackPhrases(int _dialogModel)
+        {
+            var _dlg = mContext.DialogModelsList[_dialogModel];
+
+            var _phraseRepetitions1 = new Dictionary<string, int>();
+            var _phraseRepetitions2 = new Dictionary<string, int>();
+
+            _dlg.PhraseTypeSequence.Select((entry, i) => new { i, entry }).ToList().ForEach(
+                obj =>
+                {
+                    if(obj.i % 2 == 0)
+                    {
+                        if (!_phraseRepetitions1.ContainsKey(obj.entry))
+                        {
+                            _phraseRepetitions1.Add(obj.entry, 0);
+                        }
+                        else
+                        {
+                            _phraseRepetitions1[obj.entry]++;
+                        }
+                    } else
+                    {
+                        if (!_phraseRepetitions2.ContainsKey(obj.entry))
+                        {
+                            _phraseRepetitions2.Add(obj.entry, 0);
+                        }
+                        else
+                        {
+                            _phraseRepetitions2[obj.entry]++;
+                        }
+                    }                    
+                    
+                });
+
+            foreach(KeyValuePair<string, int> entry in _phraseRepetitions1)
+            {
+                var _character = mContext.CharactersList[mContext.Character1Num];
+                
+                var _searchedPhraseCount =_character.Phrases.Select(p =>
+                {
+                    return p.PhraseWeights.Keys.Any(key => key.Equals(entry.Key));
+                }).Count();
+
+                if (_searchedPhraseCount < entry.Value)
+                    return true;
+            }
+
+            foreach (KeyValuePair<string, int> entry in _phraseRepetitions2)
+            {
+                var _character = mContext.CharactersList[mContext.Character2Num];
+
+                var _searchedPhraseCount = _character.Phrases.Select(p =>
+                {
+                    return p.PhraseWeights.Keys.Any(key => key.Equals(entry.Key));
+                }).Count();
+
+                if (_searchedPhraseCount < entry.Value)
+                    return true;
+            }
 
             return false;
         }
@@ -615,6 +678,7 @@ namespace DialogGenerator.DialogEngine
             int _hasRecentPhrases = 0;
             int _isOneOfGreetingDialogs = 0;
             int _isGreetingFirstPhrase = 0;
+            int _dialogsLackingPhrases = 0;
 
 
             mContext.PossibleDialogModelsList.ForEach(dlg =>
@@ -639,6 +703,12 @@ namespace DialogGenerator.DialogEngine
                     _hasRecentPhrases++;
                 }
 
+                if (!_removeCriteriaMet && _charactersLackPhrases(_idx))
+                {
+                    _removeCriteriaMet = true;
+                    _dialogsLackingPhrases++;
+                }
+
                 if (!_removeCriteriaMet && _isGreetingDialog(_idx))
                 {
                     if (_greetingDialog != null)
@@ -651,7 +721,7 @@ namespace DialogGenerator.DialogEngine
                     {
                         _greetingDialog = dlg;
                     }
-                }
+                }                
 
                 if (!_removeCriteriaMet && (_greetingDialog != null && dlg.PhraseTypeSequence.Contains("Greeting")))
                 {
@@ -687,7 +757,8 @@ namespace DialogGenerator.DialogEngine
                 $"{_recentlyUsed} recently used, " +
                 $"{_requirementsNotMet} adventures, " +
                 $"{_hasRecentPhrases} use recent PhraseTypes of ch1 or ch2, " +
-                $"{_isOneOfGreetingDialogs + _isGreetingFirstPhrase} have greetings.");
+                $"{_isOneOfGreetingDialogs + _isGreetingFirstPhrase} have greetings," +
+                $"{_dialogsLackingPhrases} dialogs have more phrases of a certain type than the characters themself.");
 
             return _itemsToRemove;
         }
