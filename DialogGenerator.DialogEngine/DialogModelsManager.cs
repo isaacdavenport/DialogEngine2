@@ -24,6 +24,7 @@ namespace DialogGenerator.DialogEngine
         private DialogContext mContext;
         private Random mRandom;
         private IMessageDialogService mMessageDialogService;
+        private bool mGreetingsDialogGone = false;
 
         #endregion
 
@@ -72,6 +73,7 @@ namespace DialogGenerator.DialogEngine
                         && (obj.Character1Index != mContext.Character1Num || obj.Character2Index != mContext.Character2Num))
                     {
                         mContext.FirstRoundGone = false;
+                        mGreetingsDialogGone = false;
                     }
                     // S.Ristic 2021-03-30 - End of change
                     
@@ -531,6 +533,17 @@ namespace DialogGenerator.DialogEngine
             }
             mLogger.Info("Possible dialog models that can be used filtered down to " + _filteredList.Count.ToString());
 
+            _levelUpGreetingDialog(_filteredList);
+
+            // This way, we will insure that the first dialog when the characters meet will
+            // always be 'Greetings' dialog, if it exists in the list of dialogs for those two
+            // characters.
+            if(!mGreetingsDialogGone)
+            {
+                _dialogModel = mContext.DialogModelsList.IndexOf(_filteredList[0]);
+                mGreetingsDialogGone = true;
+                return _dialogModel;
+            }
 
             var _currentDialogWeightSum = 0.0;
             var _dialogWeightIndex = mRandom.NextDouble();
@@ -548,7 +561,21 @@ namespace DialogGenerator.DialogEngine
 
             return _dialogModel;
         }
-                       
+
+        private void _levelUpGreetingDialog(List<ModelDialog> filteredList)
+        {
+            var _greetingsList = filteredList
+                .Where(dlg => dlg.PhraseTypeSequence.Contains("Greeting"));
+
+            if(_greetingsList.Count() > 0)
+            {
+                var _greetingsDialog = _greetingsList.First();
+                filteredList.Remove(_greetingsDialog);
+                filteredList.Insert(0, _greetingsDialog);                
+            }    
+            
+        }
+
         //  See the comment above PickAWeightedDialog() above since PickAWeightedPhrase works the same way
         public PhraseEntry PickAWeightedPhrase(int _speakingCharacter, string _currentPhraseType)
         {
@@ -689,12 +716,6 @@ namespace DialogGenerator.DialogEngine
                 {
                     _removeCriteriaMet = true;
                     _recentlyUsed++;
-                }
-
-                if (!_removeCriteriaMet && !_checkIfDialogPreRequirementMet(_idx))
-                {
-                    _removeCriteriaMet = true;
-                    _requirementsNotMet++;
                 }
 
                 if (!_removeCriteriaMet && _checkForRecentPhrases(_idx))
