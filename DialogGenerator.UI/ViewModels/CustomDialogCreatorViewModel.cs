@@ -10,10 +10,12 @@ using Prism.Mvvm;
 using Prism.Regions;
 using System;
 using System.Collections.Generic;
+using System.ComponentModel;
 using System.Linq;
 using System.Runtime.InteropServices;
 using System.Text;
 using System.Threading.Tasks;
+using System.Windows.Input;
 
 namespace DialogGenerator.UI.ViewModels
 {
@@ -56,16 +58,40 @@ namespace DialogGenerator.UI.ViewModels
 
         public DelegateCommand SaveCommand { get; set; }
         public DelegateCommand CloseCommand { get; set; }
+        public ICommand ViewLoadedCommand { get; set; }
+        public ICommand ViewUnloadedCommand { get; set; }
+
 
         private void _subscribeEvents()
         {
-            
-        }        
+            DialogModel.PhraseDefinitionModels.CollectionChanged +=
+                (sender, args) => SaveCommand.RaiseCanExecuteChanged();
+        }
+
+        private void DialogModelOnPropertyChanged(object sender, PropertyChangedEventArgs e)
+        {
+            if (e.PropertyName.Equals("DialogName"))
+            {
+                SaveCommand.RaiseCanExecuteChanged();
+            }
+        }
 
         private void _bindCommands()
         {
             SaveCommand = new DelegateCommand(_saveExecute, _saveCanExecute);
             CloseCommand = new DelegateCommand(_closeExecute);
+            ViewLoadedCommand = new DelegateCommand(_viewLoadedExecute);
+            ViewUnloadedCommand = new DelegateCommand(_viewUnloadedExecute);
+        }
+
+        private void _viewUnloadedExecute()
+        {
+            mLogger.Debug($"Custom Dialog Creator View - Loading.");
+        }
+
+        private void _viewLoadedExecute()
+        {
+            mLogger.Debug($"Custom Dialog Creator View - Unloading.");
         }
 
         private void _closeExecute()
@@ -75,7 +101,7 @@ namespace DialogGenerator.UI.ViewModels
 
         private bool _saveCanExecute()
         {
-            return true;
+            return !DialogModel.PhraseDefinitionModels.IsEmpty;
         }
 
         private async void _saveExecute()

@@ -22,6 +22,19 @@
                     <converters:ImageToFullPathValueConverter x:Key="ImageToFullPathValueConverter" />
                     <converters:ImageContentValueConverter x:Key="ImageContentValueConverter" />
                     <converters:IdentifierConverter x:Key="IdentifierConverter"/>
+                    <Style x:Key="TextArea" TargetType="{x:Type TextBox}">
+                        <Setter Property="Background" Value="#f8f8f8"/>
+                        <Setter Property="BorderBrush" Value="#f8f8f8" />
+                        <Setter Property="Effect">
+                            <Setter.Value>
+                                <DropShadowEffect 
+                                    BlurRadius="15" 
+                                    Direction="-90" 
+                                    RenderingBias="Quality" 
+                                    ShadowDepth="2" Color="#efefef"/>
+                            </Setter.Value>
+                        </Setter>
+                    </Style>
 
                     <ControlTemplate x:Key="NameControl">
                         <Grid Background="White">
@@ -188,6 +201,57 @@
                             </Grid.ColumnDefinitions>
                             <Label Grid.Column="1" Height="30" Margin="0, 8, 20, 0" HorizontalAlignment="Right">Author:</Label>
                             <TextBox x:Name="Author" Grid.Column="2" Height="30" Text="{Binding CharacterAuthor}" materialDesign:HintAssist.Hint="Enter Author's Nickname ..."/>
+                        </Grid>
+                    </ControlTemplate>
+                    <ControlTemplate x:Key="DescriptionControl">
+                        <Grid Background="White">
+                            <Grid.RowDefinitions>
+                                <RowDefinition Height="*" />
+                                <RowDefinition Height="Auto" />
+                                <RowDefinition Height="Auto" />
+                                <RowDefinition Height="*" />
+                            </Grid.RowDefinitions>
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="*"/>
+                                <ColumnDefinition Width="Auto" />
+                                <ColumnDefinition Width="*" />
+                            </Grid.ColumnDefinitions>
+
+                            <Label Grid.Row="1" Grid.Column="1" Height="30" Margin="0, 8, 20, 0" HorizontalAlignment="Left">Description others will see when selecting characters to play:</Label>
+                            <TextBox Grid.Column="1" Grid.Row="2" x:Name="Description"                                       
+                                     Height="150" 
+                                     Width="500"
+                                     Text="{Binding CharacterDescription}" 
+                                     materialDesign:HintAssist.Hint="Description others will see when selecting characters to play ..." 
+                                     TextWrapping="Wrap" 
+                                     VerticalScrollBarVisibility="Auto" 
+                                     AcceptsReturn="True" 
+                                     Style="{StaticResource TextArea}"/>
+                        </Grid>
+                    </ControlTemplate>
+                    <ControlTemplate x:Key="NoteControl">
+                        <Grid Background="White">
+                            <Grid.RowDefinitions>
+                                <RowDefinition Height="*" />
+                                <RowDefinition Height="Auto" />
+                                <RowDefinition Height="Auto" />
+                                <RowDefinition Height="*" />
+                            </Grid.RowDefinitions>
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="*"/>
+                                <ColumnDefinition Width="Auto" />
+                                <ColumnDefinition Width="*" />
+                            </Grid.ColumnDefinitions>
+                            <Label  Grid.Row="1" Grid.Column="1" Height="30" Margin="0, 8, 20, 0" HorizontalAlignment="Left">Notes for you to remember what traits to include in your character’s lines:</Label>
+                            <TextBox Grid.Column="1" Grid.Row="2" x:Name="Note"                                       
+                                     Height="150" 
+                                     Width="500"
+                                     Text="{Binding CharacterNote}" 
+                                     materialDesign:HintAssist.Hint="Description others will see when selecting characters to play ..." 
+                                     TextWrapping="Wrap" 
+                                     VerticalScrollBarVisibility="Auto" 
+                                     AcceptsReturn="True" 
+                                     Style="{StaticResource TextArea}"/>
                         </Grid>
                     </ControlTemplate>
                     <ControlTemplate x:Key="AssignToyToCharacterControl">

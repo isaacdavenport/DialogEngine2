@@ -96,6 +96,48 @@ namespace DialogGenerator.UI.Wrapper
 
         }
 
+        public bool ForceCharacterSwap
+        {
+            get
+            {
+                return getValue<bool>();
+            }
+
+            set
+            {
+                setValue(value);
+                validateProperty(nameof(ForceCharacterSwap));
+            }
+        }
+
+        public int RecentPhrasesQueueSize
+        {
+            get
+            {
+                return getValue<int>();
+            }
+
+            set
+            {
+                setValue(value);
+                validateProperty(nameof(RecentPhrasesQueueSize));
+            }
+        }
+
+        public int CharacterSwapInterval
+        {
+            get
+            {
+                return getValue<int>();
+            }
+
+            set
+            {
+                setValue(value);
+                validateProperty(nameof(CharacterSwapInterval));
+            }
+        }
+
         public string BackgroundImage
         {
             get

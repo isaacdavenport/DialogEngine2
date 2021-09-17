@@ -13,6 +13,7 @@ using System.Collections.ObjectModel;
 using System.ComponentModel;
 using System.Diagnostics;
 using System.IO;
+using System.Net.Mime;
 using System.Speech.Synthesis;
 using System.Windows;
 using System.Windows.Controls;
@@ -33,21 +34,23 @@ namespace DialogGenerator.UI.Views.Dialogs
         private ObservableCollection<string> mDialogModels = new ObservableCollection<string>();
         private IDialogModelRepository mDialogModelRepository;
         private string mPreferredDialogName = string.Empty;
+        private ILogger mLogger;
 
 
-        public SettingsDialog(IEventAggregator _EventAggregator, IDialogModelRepository _DialogModelRepository)
+        public SettingsDialog(IEventAggregator _EventAggregator, IDialogModelRepository _DialogModelRepository, ILogger _Logger)
         {
             DataContext = this;
 
             WebsiteCommand = new DelegateCommand(_websiteCommand_Execute);
             CloseCommand = new DelegateCommand(_closeCommand_Execute);
-            SelectBacgroundCommand = new DelegateCommand(_selectBackgroundImage_Execute);
+            SelectBackgroundCommand = new DelegateCommand(_selectBackgroundImage_Execute);
             mEventAggregator = _EventAggregator;
             mDialogModelRepository = _DialogModelRepository;
 
             _initDialogModelsList();
             mDialogs = new CollectionViewSource();
-            mDialogs.Source = mDialogModels;            
+            mDialogs.Source = mDialogModels;
+            mLogger = _Logger;
 
             Settings = new ApplicationDataWrapper(ApplicationData.Instance);
             using(SpeechSynthesizer _speech = new SpeechSynthesizer())
@@ -80,7 +83,7 @@ namespace DialogGenerator.UI.Views.Dialogs
         public ICommand WebsiteCommand { get; set; }
         public ICommand CloseCommand { get; set; }
 
-        public ICommand SelectBacgroundCommand { get; set; }
+        public ICommand SelectBackgroundCommand { get; set; }
 
         private void _websiteCommand_Execute()
         {
@@ -91,6 +94,11 @@ namespace DialogGenerator.UI.Views.Dialogs
         {
             Settings.Model.Save();
             DialogHost.CloseDialogCommand.Execute(null,this.CloseBtn);
+
+            if(Settings.HasPreferredDialog)
+            {
+                mLogger.Debug($"SETTINGS DIALOG - Preferred dialog set to '{Settings.PreferredDialogName}'!");
+            }
         }
 
         private void _selectBackgroundImage_Execute()
@@ -223,6 +231,39 @@ namespace DialogGenerator.UI.Views.Dialogs
                 resultStackBorder.Visibility = Visibility.Visible;
         }
 
-        
+
+        private void UIElement_OnPreviewLostKeyboardFocus(object sender, KeyboardFocusChangedEventArgs e)
+        {
+            
+                if (!(sender is TextBox tb)) return;
+                
+                if (tb.Equals(this.CharacterSwapInterval))
+                {
+                    try
+                    {
+                        var val = Convert.ToInt16(tb.Text);
+                        if (val <= 0) tb.Text = Convert.ToString(1);
+                        if (val > 10) tb.Text = Convert.ToString(10);
+                    } catch (Exception)
+                    {
+                        MessageBox.Show("The value must be an integer between 1 and 10!");
+                    }
+                    
+                }
+
+                if (tb.Equals(this.RecentPhrasesQueueSize))
+                {
+                    try
+                    {
+                        var val = Convert.ToInt16(tb.Text);
+                        if (val <= 0) tb.Text = Convert.ToString(1);
+                        if (val > 20) tb.Text = Convert.ToString(20);
+                    } catch (Exception)
+                    {
+                        MessageBox.Show("The value must be an integer between 1 and 20!");
+                    }
+                }
+                
+        }
     }
 }

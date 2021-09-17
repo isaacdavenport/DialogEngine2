@@ -75,6 +75,22 @@ namespace DialogGenerator.Model
                 StepControl = "AuthorControl"
             }) ;
             
+            mSteps.Add(new CreateCharacterWizardStep
+            {
+                StepIndex = counter++,
+                Key = "Description",
+                StepName = "Set Character Description",
+                StepControl = "DescriptionControl"
+            }) ;
+
+            mSteps.Add(new CreateCharacterWizardStep
+            {
+                StepIndex = counter++,
+                Key = "Note",
+                StepName = "Set Internal Note",
+                StepControl = "NoteControl"
+            });
+            
         }
 
         public List<CreateCharacterWizardStep> Steps

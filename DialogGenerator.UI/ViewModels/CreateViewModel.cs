@@ -77,6 +77,9 @@ namespace DialogGenerator.UI.ViewModels
         public DelegateCommand ImportCharacterCommand { get; set; }
         public DelegateCommand OnlineCharactersCommand { get; set; }
         public DelegateCommand CreateCustomDialogCommand { get; set; }
+        
+        public DelegateCommand ViewLoadedCommand { get; set; }
+        public DelegateCommand ViewUnloadedCommand { get; set; }
 
         #endregion
 
@@ -112,8 +115,20 @@ namespace DialogGenerator.UI.ViewModels
             ImportCharacterCommand = new DelegateCommand(_importCharacterCommand_Execute);
             OnlineCharactersCommand = new DelegateCommand(_onOnlineCharacters_Execute);
             CreateCustomDialogCommand = new DelegateCommand(_onCreateCustomDialog_Execute);
+            ViewLoadedCommand = new DelegateCommand(_onViewLoaded_execute);
+            ViewUnloadedCommand = new DelegateCommand(_onViewUnloaded_execute);
         }
 
+        private void _onViewUnloaded_execute()
+        {
+            mLogger.Debug($"Expert View - Unloaded");
+        }
+
+        private void _onViewLoaded_execute()
+        {
+            mLogger.Debug($"Expert View - Loaded");
+        }
+        
         private void _onCreateCustomDialog_Execute()
         {
             mRegionManager.Regions[Constants.ContentRegion].NavigationService.RequestNavigate("CustomDialogCreatorView");

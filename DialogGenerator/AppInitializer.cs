@@ -81,7 +81,6 @@ namespace DialogGenerator
                 .OnEntry(_setInitialValues);
         }
 
-
         private  void _loadData()
         {
             mLogger.Info("-------------------- Starting DialogEngine Version " +                 
@@ -91,7 +90,9 @@ namespace DialogGenerator
 
             IList<string> errors;            
             var _JSONObjectTypesList = mDialogDataRepository.LoadFromDirectory(ApplicationData.Instance.DataDirectory,out errors);
-
+            mDialogDataRepository.LogRedundantDialogModelsInDataFolder(ApplicationData.Instance.DataDirectory, _JSONObjectTypesList);
+            var _dialogModelListDeDupedPreFilter = _removeDuplicateDialogModelsFromCollection(_JSONObjectTypesList.DialogModels);
+            mDialogDataRepository.LogSessionJsonStatsAndErrors(ApplicationData.Instance.DataDirectory, _JSONObjectTypesList, _dialogModelListDeDupedPreFilter);
             foreach(var error in errors)
             {
                 mUserLogger.Error(error);
@@ -107,15 +108,67 @@ namespace DialogGenerator
             Session.Set(Constants.NEXT_CH_2, -1);
             mEventAggregator.GetEvent<CharacterCollectionLoadedEvent>().Publish();
 
-            mLogger.Info("Finished importing characters: " + _JSONObjectTypesList.Characters.Count + " DialogModelGroups: " + 
-                _JSONObjectTypesList.DialogModels.Count + " Wizards: " + _JSONObjectTypesList.Wizards.Count);
+            mLogger.Info("Finished importing characters:" + _JSONObjectTypesList.Characters.Count + "   DialogModelGroups:" + 
+                _JSONObjectTypesList.DialogModels.Count + "   Wizards:" + _JSONObjectTypesList.Wizards.Count);
 
             mWorkflow.Fire(Triggers.InitializeDialogEngine);
         }
 
+        private bool _testValueEqualityOnStringLists(List<string> a, List<string> b)
+        {
+            if(a.Count != b.Count)
+            {
+                return false;  //no need to check individual strings
+            }
+            for (int i = 0; i < a.Count; i++)
+            {
+                if (!a[i].Equals(b[i]))
+                {
+                    return false;
+                }
+            }
+            return true;
+        }
+        private List<List<string>> _removeDuplicateDialogModelsFromCollection(ObservableCollection<ModelDialogInfo> DialogModelCollections)
+        {
+            var _modelsToBeRemoved = new List<int[]>();
+            var _alreadySeenDialogModelTagLists = new List<List<string>>();
+            try
+            {
+
+                for (int i = 0; i < DialogModelCollections.Count; i++)
+                {
+                    for (int j = 0; j < DialogModelCollections[i].ArrayOfDialogModels.Count; j++)
+                    { // if the phraseType list in this dialog model matches a previous, delete this dialog model from collection
+                        var _curentTags = DialogModelCollections[i].ArrayOfDialogModels[j].PhraseTypeSequence;
+                        foreach (var _tagList in _alreadySeenDialogModelTagLists)
+                        {
+                            if (_testValueEqualityOnStringLists(_tagList, _curentTags))  // if already in the list mark for removal
+                            {
+                                var _indexPair = new int[2];
+                                _indexPair[0] = i;
+                                _indexPair[1] = j;
+                                _modelsToBeRemoved.Add(_indexPair);
+                                break;
+                            }
+                        }
+                        _alreadySeenDialogModelTagLists.Add(_curentTags);
+                    }
+                }
+                for (int t = _modelsToBeRemoved.Count - 1; t >= 0; t--)
+                {  //Isaac this goes backwards because the locations in the arrayofDialogModels is actually a list and the indexes shift after RemoveAt commands
+                    DialogModelCollections[_modelsToBeRemoved[t][0]].ArrayOfDialogModels.RemoveAt(_modelsToBeRemoved[t][1]);
+                }
+            }
+            catch (Exception e)
+            {
+                mLogger.Error("Error in _removeDuplicateDialogModelsFromCollection " + e.Message);
+            }
+            return _alreadySeenDialogModelTagLists;
+        }
         private void _checkForMultipleRadioAssignments(ObservableCollection<Character> _Characters)
         {
-            Dictionary<int, bool> _radioCheck = new Dictionary<int, bool>();
+            var _radioCheck = new Dictionary<int, bool>();
             for(int i = 0; i < ApplicationData.Instance.NumberOfRadios; i++)
             {
                 _radioCheck.Add(i, false);            

@@ -243,10 +243,19 @@ namespace DialogGenerator.UI.ViewModels
 
                 if(_characterIndex1 != -1 && _characterIndex2 != -1)
                 {
-                    int _choice = mRandom.Next();
-                    _choice = _choice % 2;
-                    Session.Set(Constants.NEXT_CH_1, _choice == 0 ?_characterIndex1 : _characterIndex2);
-                    Session.Set(Constants.NEXT_CH_2, _choice == 0 ?_characterIndex2 : _characterIndex1);
+                    //int _choice = mRandom.Next();
+                    //_choice = _choice % 2;                    
+                    //Session.Set(Constants.NEXT_CH_1, _choice == 0 ?_characterIndex1 : _characterIndex2);
+                    //Session.Set(Constants.NEXT_CH_2, _choice == 0 ?_characterIndex2 : _characterIndex1);
+
+                    // S. Ristic 2021-03-30 - DLGEN-479
+                    // The code above is commented because it produces the sequential emission of SelectedCharacterPairChangedEvent 
+                    // even when the characters stay the same.
+                    if(_characterIndex1 != Session.Get<int>(Constants.NEXT_CH_1) || _characterIndex2 != Session.Get<int>(Constants.NEXT_CH_2))
+                    {
+                        Session.Set(Constants.NEXT_CH_1, _characterIndex1);
+                        Session.Set(Constants.NEXT_CH_2, _characterIndex2);
+                    }
                 }
             }
 

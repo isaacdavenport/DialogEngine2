@@ -65,7 +65,7 @@ namespace DialogGenerator.UI.Views
 
         private void CancelDialogButton_Click(object sender, RoutedEventArgs e)
         {
-            DialogHost.CloseDialogCommand.Execute(null, CancelDialogButton);
+            DialogHost.CloseDialogCommand.Execute(null, CancelDialogButton);           
         }
 
     }

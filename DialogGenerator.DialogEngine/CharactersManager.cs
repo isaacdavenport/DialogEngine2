@@ -80,14 +80,17 @@ namespace DialogGenerator.DialogEngine
                 }
             }
 
-            if (character.RecentPhrases.Count == 0)
-            {
-                for (var i = 0; i < Character.RecentPhrasesQueueSize && i < character.Phrases.Count / 2; i++)
-                {
-                    // we always deque after enque so this sets que size
-                    character.RecentPhrases.Enqueue(character.Phrases[0]);
-                }
-            }
+            // No need for this. This can give us the false impression that there are some phrases in the recent phrases
+            // list, which can lead to the rejection of the correct dialog. (S.Ristic 8/21/2021 - DLGEN-619)
+
+            //if (character.RecentPhrases.Count == 0)
+            //{
+            //    for (var i = 0; i < ApplicationData.Instance.RecentPhrasesQueueSize && i < character.Phrases.Count / 2; i++)
+            //    {
+            //        // we always deque after enque so this sets que size
+            //        character.RecentPhrases.Enqueue(character.Phrases[0]); 
+            //    }
+            //}
             
         }
 

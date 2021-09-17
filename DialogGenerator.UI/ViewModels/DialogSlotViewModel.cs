@@ -15,6 +15,7 @@ using System.ComponentModel;
 using System.IO;
 using System.Linq;
 using System.Text;
+using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Data;
@@ -153,6 +154,13 @@ namespace DialogGenerator.UI.ViewModels
                 return false;
             }
 
+            if (!Regex.IsMatch(DialogName, Constants.FILENAME_CHECK_REGEX))
+            {
+                errorMessage = "Dialog name \"" + DialogName + "\" contains illegal characters!";
+                return false;
+            }
+
+
             bool _exists = false;
             foreach (var _modelDialogInfo in mDialogModelRepository.GetAll())
             {
@@ -217,7 +225,7 @@ namespace DialogGenerator.UI.ViewModels
 
             _jsonObjectTypesList.DialogModels.Add(new ModelDialogInfo
             {
-                ModelsCollectionName = "Custom Dialogs",
+                ModelsCollectionName = _dialogNameBase + "Collection",
                 ArrayOfDialogModels = new List<ModelDialog>(),
                 Editable = true,
                 FileName = _dialogNameBase + ".json"
@@ -316,23 +324,13 @@ namespace DialogGenerator.UI.ViewModels
 
         private void _initPopularityValues()
         {
-            var _values = new double[] { .1, .2, .3, .4, .5, .6, .7, .8, .9 };
+            var _values = new double[] { 2, 10, 40, 60, 80, 100, 120 };
 
             foreach(var _value in _values)
             {
                 PopularityValues.Add(_value);
             }
-
-            for(double i = 1.0; i < 15; i ++)
-            {
-                PopularityValues.Add(i);
-            }
-
-            for(double i = 20; i <= 200; i += 5)
-            {
-                PopularityValues.Add(i);
-            }
-
+            
         }
 
         #endregion

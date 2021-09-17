@@ -9,7 +9,6 @@
              xmlns:local="clr-namespace:DialogGenerator.UI.Views"
              mc:Ignorable="d" 
              MinHeight="350"
-             MaxHeight="350"
              d:DesignHeight="850" 
              d:DesignWidth="800" 
              Loaded="UserControl_Loaded" 
@@ -18,8 +17,16 @@
         <converters:ImageToFullPathValueConverter x:Key="ImageToFullPathValueConverter" />
         <converters:ImageContentValueConverter x:Key="ImageContentValueConverter" />
         <converters:BoolToVisibilityConverter x:Key="BoolToVisibilityConverter" />
+        <converters:StringLengthToVisibilityConverter x:Key="StringLengthToVisibilityConverter" />
+        <FrameworkElement x:Key="ProxyElement" DataContext="{Binding}"/>
+        <ImageBrush x:Key="MyImageBrush" ImageSource="{Binding BackgroundImage}" Stretch="UniformToFill" AlignmentY="Center"/>
         <DataTemplate x:Key="AvatarPanel">
-            <materialDesign:Card Width="60" Margin="5" Background="AliceBlue" BorderBrush="Green" BorderThickness="2">
+            <materialDesign:Card Width="60" Margin="5" Background="AliceBlue" BorderBrush="Green" BorderThickness="2" >
+                <materialDesign:Card.ToolTip>
+                    <ToolTip MaxWidth="400" Visibility="{Binding Character.Description, Converter={StaticResource StringIsEmptyVisibilityConverter}}">
+                        <TextBlock Text="{Binding Character.Description}" TextWrapping="Wrap" />
+                    </ToolTip>
+                </materialDesign:Card.ToolTip>
                 <Grid>
                     <Grid.RowDefinitions>
                         <RowDefinition Height="35"/>
@@ -36,7 +43,7 @@
                                Foreground="White"/>
                     </Border>
                     
-                    <Image Width="50" 
+                    <Image Width="50"                            
                            Grid.Row="1" 
                            Source="{Binding Character.CharacterImage, Converter={StaticResource ImageToFullPathValueConverter}}" 
                            Margin="5"/>
@@ -72,6 +79,7 @@
                 <TextBlock Text="The selected character pair has no common dialogs! Please select another pair!" 
                            Foreground="#51cb8c" FontWeight="Bold"  HorizontalAlignment="Center" VerticalAlignment="Center"/>
             </Border>
+            <ContentControl Visibility="Collapsed" Content="{StaticResource ProxyElement}"/>
             <Canvas x:Name="Playground" 
                 Grid.Row="0" 
                 AllowDrop="True" 
@@ -80,12 +88,12 @@
                 MouseLeftButtonUp="Playground_MouseLeftButtonUp" 
                 SizeChanged="Playground_SizeChanged">
                 <Canvas.Style>
-                    <Style>
+                    <Style TargetType="Canvas">
                         <Style.Triggers>
                             <DataTrigger Binding="{Binding HasBackgroundImage}" Value="True">
                                 <Setter Property="Canvas.Background">
                                     <Setter.Value>
-                                        <ImageBrush ImageSource="{Binding BackgroundImage}" Stretch="UniformToFill" AlignmentY="Center" />
+                                        <DynamicResource ResourceKey="MyImageBrush"/>
                                     </Setter.Value>
                                 </Setter>
                             </DataTrigger>

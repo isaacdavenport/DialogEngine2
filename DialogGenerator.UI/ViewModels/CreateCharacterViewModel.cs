@@ -22,6 +22,7 @@ using System.ComponentModel;
 using System.IO;
 using System.Linq;
 using System.Speech.Synthesis;
+using System.Text.RegularExpressions;
 using System.Threading;
 using System.Threading.Tasks;
 using System.Windows.Input;
@@ -30,12 +31,14 @@ namespace DialogGenerator.UI.ViewModels
 {
     public class CreateCharacterViewModel : BindableBase
     {
-        private string mCharacterName = String.Empty;
-        private string mCharacterInitials = String.Empty;
-        private string mCharacterIdentifier = String.Empty;
-        private string mCharacterImage = String.Empty;
+        private string mCharacterName = string.Empty;
+        private string mCharacterInitials = string.Empty;
+        private string mCharacterIdentifier = string.Empty;
+        private string mCharacterImage = string.Empty;
         private string mCharacterGender = "Female";
-        private string mCharacterAuthor = String.Empty;
+        private string mCharacterAuthor = string.Empty;
+        private string mCharacterDescription = string.Empty;
+        private string mCharacterNote = string.Empty;
         private int mCharacterAge = 10;
         private int mWizardPassthroughIndex = 0;
         private List<string> mDialogWizards = new List<string>();
@@ -220,17 +223,27 @@ namespace DialogGenerator.UI.ViewModels
                 RaisePropertyChanged("CharacterName");
                 CharacterInitials = _getCharacterInitials();
                 CharacterIdentifier = _getCharacterIdentifier();
-                NextStepCommand.RaiseCanExecuteChanged();     
-                if((mCharacterName != null && mCharacterName.Length > 0) && (mCharacterName.Length <= 2 || mCharacterName.Length > 30 || char.IsDigit(mCharacterName.Substring(0,1).ToCharArray()[0])))
+                NextStepCommand.RaiseCanExecuteChanged();
+
+                if (!string.IsNullOrEmpty(mCharacterName) 
+                    &&  (mCharacterName.Length <= 2 
+                    || mCharacterName.Length > 30 
+                    || char.IsDigit(mCharacterName.Substring(0,1).ToCharArray()[0]) 
+                    || !Regex.IsMatch(mCharacterName, Constants.FILENAME_CHECK_REGEX)))
                 {
-                    if (mCharacterName.Length <= 2 && !char.IsDigit(mCharacterName.Substring(0, 1).ToCharArray()[0]))
+                    if(!Regex.IsMatch(mCharacterName, Constants.FILENAME_CHECK_REGEX))
+                    {
+                        CharacterNameValidationError = "The name contains the illegal characters!";
+                        CharacterNameHasError = true;
+                    }
+                    else if (mCharacterName.Length <= 2 && !char.IsDigit(mCharacterName.Substring(0, 1).ToCharArray()[0]))
                     {
                         CharacterNameValidationError = "The name must consist of at least 3 characters!";
                         CharacterNameHasError = true;
                     } else if (mCharacterName.Length > 30 ) {
                         CharacterNameValidationError = "The name must not have more than 30 characters!";
                         CharacterNameHasError = true;
-                    }
+                    }                    
                     else
                     {
                         CharacterNameValidationError = "The first character of the name must be a letter!";
@@ -240,7 +253,8 @@ namespace DialogGenerator.UI.ViewModels
                 } else
                 {
                     CharacterNameValidationError = string.Empty;
-                    CharacterNameHasError = false;
+                    CharacterNameHasError = false;                 
+                    
                 }
             }
         }
@@ -361,6 +375,26 @@ namespace DialogGenerator.UI.ViewModels
             set
             {
                 mCharacterAuthor = value;
+                RaisePropertyChanged();
+            }
+        }
+
+        public string CharacterDescription
+        {
+            get => mCharacterDescription;
+            set
+            {
+                mCharacterDescription = value;
+                RaisePropertyChanged();
+            }
+        }
+
+        public string CharacterNote
+        {
+            get => mCharacterNote;
+            set
+            {
+                mCharacterNote = value;
                 RaisePropertyChanged();
             }
         }
@@ -524,7 +558,17 @@ namespace DialogGenerator.UI.ViewModels
         public void nextStep()
         {
             int _currentStepIndex = CurrentStepIndex;
-            Workflow.Fire((Triggers) (++_currentStepIndex));   
+            Workflow.Fire((Triggers) (++_currentStepIndex));
+
+            if (mWizard.Steps.Count == _currentStepIndex)
+            {
+                mLogger.Debug($"Create character view - Saving the initial character info of '{ mCharacterName }'. Moving on to the 'Basic Wizard'.");
+            }
+            else
+            {
+                var _stepName = mWizard.Steps[_currentStepIndex].StepName;
+                mLogger.Debug($"Create character view - Advanced to '{_stepName}' step.");
+            }
         }
 
         public void previousStep()
@@ -533,6 +577,9 @@ namespace DialogGenerator.UI.ViewModels
             {
                 int _currentStepIndex = CurrentStepIndex;
                 Workflow.Fire((Triggers) (--_currentStepIndex));
+                
+                var _stepName = mWizard.Steps[_currentStepIndex].StepName;
+                mLogger.Debug($"Create character view - Back to '{_stepName}' step.");
             }            
         }
 
@@ -612,12 +659,14 @@ namespace DialogGenerator.UI.ViewModels
 
         private void _initEntries()
         {
-            CharacterName = String.Empty;
-            CharacterInitials = String.Empty;
-            CharacterIdentifier = String.Empty;
+            CharacterName = string.Empty;
+            CharacterInitials = string.Empty;
+            CharacterIdentifier = string.Empty;
             CharacterAge = 10;
             CharacterGender = "Male";
             CharacterImage = "Avatar.png";
+            CharacterAuthor = string.Empty;
+            CharacterDescription = string.Empty;
             CharacterHasNoVoice = false;
             if(VoiceCollection.Count > 0)
             {
@@ -721,7 +770,12 @@ namespace DialogGenerator.UI.ViewModels
 
         private bool _nextStep_CanExecute()
         {
-            return !string.IsNullOrEmpty(CharacterName) && CharacterName.Length >= 3;
+            return !string.IsNullOrEmpty(CharacterName) &&
+                CharacterName.Length >= 3 &&
+                CharacterName.Length <= 30 &&
+                !char.IsDigit(mCharacterName.Substring(0, 1).ToCharArray()[0]) &&
+                Regex.IsMatch(CharacterName, Constants.FILENAME_CHECK_REGEX);
+
         }
 
         private void _nextStep_Execute()
@@ -733,11 +787,13 @@ namespace DialogGenerator.UI.ViewModels
         {
             await _checkWizardConfiguration();
             Workflow.Fire(Triggers.Initialize);
+            
+            mLogger.Debug($"Create Character View - Guided character creation loaded!");
         }
 
         private void _viewUnloaded_execute()
         {
-            
+            mLogger.Debug($"Create Character View - Guided character creation exited!");
         }
         
         private void _configureWorkflow()
@@ -758,7 +814,9 @@ namespace DialogGenerator.UI.ViewModels
                  .Permit(Triggers.SetAvatar, States.EnteredSetAvatar)
                  .Permit(Triggers.SetAssignToy, States.EnteredSetAssignToy)
                  .Permit(Triggers.SetAuthor, States.EnteredSetAuthor)
-                 .Permit(Triggers.CheckCounter, States.InCounter)
+                 .Permit(Triggers.SetDescription, States.EnteredSetDescription)
+                 .Permit(Triggers.SetNote, States.EnteredSetNote)
+                 
                  .Permit(Triggers.StartWizard, States.InWizard)
                  .Permit(Triggers.Finish, States.Finished)
                  .Permit(Triggers.Initialize, States.EnteredInitialization);
@@ -772,6 +830,9 @@ namespace DialogGenerator.UI.ViewModels
                  .Permit(Triggers.SetAvatar, States.EnteredSetAvatar)
                  .Permit(Triggers.SetAssignToy, States.EnteredSetAssignToy)
                  .Permit(Triggers.SetAuthor, States.EnteredSetAuthor)
+                 .Permit(Triggers.SetDescription, States.EnteredSetDescription)
+                 .Permit(Triggers.SetNote, States.EnteredSetNote)
+                 .Permit(Triggers.CheckCounter, States.InCounter)
                  .Permit(Triggers.StartWizard, States.InWizard)
                  .Permit(Triggers.Finish, States.Finished);
 
@@ -784,6 +845,9 @@ namespace DialogGenerator.UI.ViewModels
                  .Permit(Triggers.SetAvatar, States.EnteredSetAvatar)
                  .Permit(Triggers.SetAssignToy, States.EnteredSetAssignToy)
                  .Permit(Triggers.SetAuthor, States.EnteredSetAuthor)
+                 .Permit(Triggers.SetDescription, States.EnteredSetDescription)
+                 .Permit(Triggers.SetNote, States.EnteredSetNote)
+                 .Permit(Triggers.CheckCounter, States.InCounter)
                  .Permit(Triggers.StartWizard, States.InWizard)
                  .Permit(Triggers.Finish, States.Finished);
 
@@ -796,6 +860,9 @@ namespace DialogGenerator.UI.ViewModels
                  .Permit(Triggers.SetAvatar, States.EnteredSetAvatar)
                  .Permit(Triggers.SetAssignToy, States.EnteredSetAssignToy)
                  .Permit(Triggers.SetAuthor, States.EnteredSetAuthor)
+                 .Permit(Triggers.SetDescription, States.EnteredSetDescription)
+                 .Permit(Triggers.SetNote, States.EnteredSetNote)
+                 .Permit(Triggers.CheckCounter, States.InCounter)
                  .Permit(Triggers.StartWizard, States.InWizard)
                  .Permit(Triggers.Finish, States.Finished);
 
@@ -808,6 +875,8 @@ namespace DialogGenerator.UI.ViewModels
                  .Permit(Triggers.SetGender, States.EnteredSetGender)
                  .Permit(Triggers.SetAvatar, States.EnteredSetAvatar)
                  .Permit(Triggers.SetAuthor, States.EnteredSetAuthor)
+                 .Permit(Triggers.SetDescription, States.EnteredSetDescription)
+                 .Permit(Triggers.SetNote, States.EnteredSetNote)
                  .Permit(Triggers.CheckCounter, States.InCounter)
                  .Permit(Triggers.Finish, States.Finished);
 
@@ -820,6 +889,8 @@ namespace DialogGenerator.UI.ViewModels
                  .Permit(Triggers.SetGender, States.EnteredSetGender)
                  .Permit(Triggers.SetAssignToy, States.EnteredSetAssignToy)
                  .Permit(Triggers.SetAuthor, States.EnteredSetAuthor)
+                 .Permit(Triggers.SetDescription, States.EnteredSetDescription)
+                 .Permit(Triggers.SetNote, States.EnteredSetNote)
                  .Permit(Triggers.CheckCounter, States.InCounter)
                  .Permit(Triggers.Finish, States.Finished);
 
@@ -832,8 +903,37 @@ namespace DialogGenerator.UI.ViewModels
                  .Permit(Triggers.SetGender, States.EnteredSetGender)
                  .Permit(Triggers.SetAssignToy, States.EnteredSetAssignToy)
                  .Permit(Triggers.SetAvatar, States.EnteredSetAvatar)
+                 .Permit(Triggers.SetDescription, States.EnteredSetDescription)
+                 .Permit(Triggers.SetNote, States.EnteredSetNote)
                  .Permit(Triggers.CheckCounter, States.InCounter)
                  .Permit(Triggers.Finish, States.Finished);
+            
+            Workflow.Configure(States.EnteredSetDescription)
+                .OnEntry(() => _stepEntered("Description"))
+                .OnExit(() => _stepExited("Description"))
+                .Permit(Triggers.SetName, States.EnteredSetName)
+                .Permit(Triggers.SetInitials, States.EnteredSetInitials)
+                .Permit(Triggers.SetAge, States.EnteredSetAge)
+                .Permit(Triggers.SetGender, States.EnteredSetGender)
+                .Permit(Triggers.SetAssignToy, States.EnteredSetAssignToy)
+                .Permit(Triggers.SetAvatar, States.EnteredSetAvatar)
+                .Permit(Triggers.SetAuthor, States.EnteredSetAuthor)
+                .Permit(Triggers.SetNote, States.EnteredSetNote)
+                .Permit(Triggers.CheckCounter, States.InCounter)
+                .Permit(Triggers.Finish, States.Finished);
+
+            Workflow.Configure(States.EnteredSetNote)
+               .OnEntry(() => _stepEntered("Note"))
+               .OnExit(() => _stepExited("Note"))
+               .Permit(Triggers.SetName, States.EnteredSetName)
+               .Permit(Triggers.SetInitials, States.EnteredSetInitials)
+               .Permit(Triggers.SetAge, States.EnteredSetAge)
+               .Permit(Triggers.SetGender, States.EnteredSetGender)
+               .Permit(Triggers.SetAssignToy, States.EnteredSetAssignToy)
+               .Permit(Triggers.SetAvatar, States.EnteredSetAvatar)
+               .Permit(Triggers.SetDescription, States.EnteredSetDescription)
+               .Permit(Triggers.CheckCounter, States.InCounter)
+               .Permit(Triggers.Finish, States.Finished);
 
             Workflow.Configure(States.InCounter)
                   .OnEntry(() => _stepEntered("CheckCounter"))
@@ -890,6 +990,13 @@ namespace DialogGenerator.UI.ViewModels
                 case "Author":
                     Character.Author = CharacterAuthor;
                     NextButtonText = "Next";
+                    break;
+                case "Description":
+                    Character.Description = CharacterDescription;
+                    NextButtonText = "Next";
+                    break;
+                case "Note":
+                    Character.InternalRemarks = CharacterNote;
                     break;
                 case "AssignToy":
                     if(Session.Get<bool>(Constants.BLE_MODE_ON))
@@ -986,6 +1093,16 @@ namespace DialogGenerator.UI.ViewModels
                 case "Author":
                     CurrentStepIndex = 6;
                     CharacterAuthor = Character.Author;
+                    NextButtonText = "Next";
+                    break;
+                case "Description":
+                    CurrentStepIndex = 7;
+                    CharacterDescription = Character.Description;
+                    NextButtonText = "Next";
+                    break;
+                case "Note":
+                    CurrentStepIndex = 8;
+                    CharacterNote = Character.InternalRemarks;
                     NextButtonText = "Save";
                     break;
                 case "CheckCounter":
@@ -1036,6 +1153,8 @@ namespace DialogGenerator.UI.ViewModels
                     {
                         _openCreateSession(Character);                        
                     }
+
+                    mLogger.Debug($"Create character view - Entering wizard");
 
                     // Start the wizard.
                     mRegionManager.Regions[Constants.ContentRegion].NavigationService.RequestNavigate("WizardView");
@@ -1096,10 +1215,13 @@ namespace DialogGenerator.UI.ViewModels
                         Workflow.Fire(Triggers.Finish);
                     }
 
+                    mLogger.Debug($"Create character view - Entering play mode");
+
                     // Call the play window.
                     mRegionManager.Regions[Constants.ContentRegion].NavigationService.RequestNavigate("DialogView");
                     break;
                 case "Finished":
+                    mLogger.Debug($"Create character view - Entering finish");
                     _processFinish();                    
                     break;
                 default:
@@ -1344,7 +1466,7 @@ namespace DialogGenerator.UI.ViewModels
                 //    return;
 
                 System.Windows.Forms.OpenFileDialog _openFileDialog = new System.Windows.Forms.OpenFileDialog();
-                _openFileDialog.Filter = "Image files (*.jpg, *.jpeg, *.jpe, *.jfif, *.png) | *.jpg; *.jpeg; *.jpe; *.jfif; *.png";
+                _openFileDialog.Filter = "Image files (*.jpg, *.jpeg, *.jpe, *.jfif, *.png, *.apng, *.avif, *.gif, *.webp) | *.jpg; *.jpeg; *.jpe; *.jfif; *.png; *.apng; *.avif; *.gif; *.webp";
                 _openFileDialog.InitialDirectory = ApplicationData.Instance.ImagesDirectory;
 
                 if (_openFileDialog.ShowDialog() != System.Windows.Forms.DialogResult.OK)

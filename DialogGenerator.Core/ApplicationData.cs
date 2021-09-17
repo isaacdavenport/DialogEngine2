@@ -23,7 +23,6 @@ namespace DialogGenerator.Core
         private string mImagesDirectory;
         private string mToolsDirectory;
         private string mEditorTempDirectory;
-        private string mBackgroundImage;
 
         static ApplicationData()
         {
@@ -98,7 +97,7 @@ namespace DialogGenerator.Core
 
         [XmlIgnore]
         [Editable(true)]
-        public string PreferredDialogName { get; set; } = string.Empty;
+        public string PreferredDialogName { get; set; } = string.Empty;        
 
         public bool MonitorMessageParseFails { get; set; } = false;
         public string JSONEditorExeFileName { get; set; } = "JSONedit.exe"; 
@@ -112,7 +111,12 @@ namespace DialogGenerator.Core
 
         public int CheckForUpdateInterval { get; set; } = 30; // minutes
 
-        public bool TextDialogsOn { get; set; } = true;
+        public bool TextDialogsOn { get; set; } = true;       
+
+        [Editable(true)]
+        [Description("The size of the queue of the recent phrases")]
+        [DisplayName("Recent phrases queue size:")]
+        public int RecentPhrasesQueueSize { get; set; } = 8;
 
         [Editable(true)]
         [Description("Override radio signal checking")]
@@ -136,8 +140,8 @@ namespace DialogGenerator.Core
 
         [Description("Delay between 2 phrases in dialog.")]
         [DisplayName("Delay between phrases:")]
-        [RegularExpression(@"^[0-9]([.,][0-9]{1,3})?$", ErrorMessage = @"Field requires decimal number.")]
-        public double DelayBetweenPhrases { get; set; } = 1.0;
+        [Range(1.0, 15.0, ErrorMessage = @"The entry has to be decimal number form 1 to 15")]
+        public double DelayBetweenPhrases { get; set; } = 1.5;
 
 
         [Editable(true)]
@@ -171,6 +175,12 @@ namespace DialogGenerator.Core
         [DisplayName("Motion window:")]
         public int MsMotionWindow { get; set; } = 1500;
 
+        [Editable(true)]
+        public bool ForceCharacterSwap { get; set; } = false;
+
+        [Editable(true)]
+        public int CharacterSwapInterval { get; set; } = 4;
+
         [XmlIgnore]
         public string DialogLoggerKey { get; set; } = "LogDialog";
 
@@ -178,7 +188,7 @@ namespace DialogGenerator.Core
         public string BLEVectorsLoggerKey { get; set; } = "BLEVectorsLog";
 
         [XmlIgnore]
-        public string JSONFilesVersion { get; set; } = "1.4";  // updated after removing of the default value for the JSONObjectsTypesList 'Editable' property.
+        public string JSONFilesVersion { get; set; } = "1.5";  // updated after removing of the default value for the JSONObjectsTypesList 'Editable' property.
 
         [XmlIgnore]
         public string RootDirectory

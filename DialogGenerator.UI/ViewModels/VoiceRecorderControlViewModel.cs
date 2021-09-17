@@ -343,7 +343,14 @@ namespace DialogGenerator.UI.ViewModels
         private void _stopPlayingInContext_Execute()
         {
             if (mSoundPlayer.CanStop)
+            {
                 mSoundPlayer.Stop();
+                mLogger.Debug($"Voice Recorder Control - Stops playing the current file.");
+            } else
+            {
+                mLogger.Debug($"Voice Recorder Control - Can't stop playing the current file.");
+            }
+                            
         }
 
         private void _playInContext_Execute()
@@ -355,7 +362,9 @@ namespace DialogGenerator.UI.ViewModels
         {
             try
             {
-                mSoundPlayer.OpenFile(Path.Combine(ApplicationData.Instance.AudioDirectory, CurrentFilePath + ".mp3"));
+                var _fileName = Path.Combine(ApplicationData.Instance.AudioDirectory, CurrentFilePath + ".mp3");
+                mLogger.Debug($"Voice Recorder Control - Start playing of '{_fileName}'");
+                mSoundPlayer.OpenFile(_fileName);
                 mSoundPlayer.Play();
             } catch(Exception e)
             {
@@ -369,7 +378,10 @@ namespace DialogGenerator.UI.ViewModels
         {
             try
             {
-                mSoundPlayer.StartRecording(Path.Combine(ApplicationData.Instance.AudioDirectory, CurrentFilePath + ".mp3"));
+                var _fileName = Path.Combine(ApplicationData.Instance.AudioDirectory, CurrentFilePath + ".mp3");
+                mLogger.Debug($"Voice Recorder Control - Started recording in the file '{_fileName}'");
+
+                mSoundPlayer.StartRecording(_fileName);
                 mRecordingStartedTime = DateTime.Now;
                 mTimer.Change(0, 1000);
             } catch (Exception e)
@@ -433,27 +445,40 @@ namespace DialogGenerator.UI.ViewModels
 
         private void _stopRecorder_Execute()
         {
-            switch (StateMachine.State)
+            try
             {
-                case States.Recording:
+                switch (StateMachine.State)
+                {
+                    case States.Recording:
                     {
                         mTimer.Change(Timeout.Infinite, Timeout.Infinite);
                         mSoundPlayer.StopRecording();                                                    
                         StateMachine.Fire(Triggers.On);
                         if(mSoundRecognizer != null)
                             mSoundRecognizer.RecognizeAsyncStop();
+                        
+                        mLogger.Debug($"Voice Recorder Control - Recording stopped!");
                         break;
                     }
-                case States.Playing:
+                    case States.Playing:
                     {
                         if (mSoundPlayer.CanStop)
+                        {
                             mSoundPlayer.Stop();
+                            mLogger.Debug($"Voice Recorder Control - Playing stopped!");
+                        }
 
                         if (StateMachine.CanFire(Triggers.Stop))
                             StateMachine.Fire(Triggers.Stop);
+
                         break;
                     }
+                }
+            } catch (Exception e)
+            {
+                mLogger.Error("Voice recorder exception - (m)_startRecording_Execute " + e.Message);
             }
+            
         }
 
         #endregion

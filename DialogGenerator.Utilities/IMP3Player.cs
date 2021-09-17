@@ -4,5 +4,7 @@
     {
         int Play(string path);
         bool IsPlaying();
+        void StopPlayingCurrentDialogLine();
+
     }
 }

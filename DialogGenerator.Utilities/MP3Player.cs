@@ -1,4 +1,4 @@
-﻿using DialogGenerator.Core;
+﻿ using DialogGenerator.Core;
 using DialogGenerator.Events;
 using Prism.Events;
 using System;
@@ -221,6 +221,11 @@ namespace DialogGenerator.Utilities
                 mLogger.Error("PlayMp3 error. " + ex.Message);
                 return 1;
             }
+        }
+
+        public void StopPlayingCurrentDialogLine()
+        {
+            _stopImmediatelyPlayingCurrentDialogLine();
         }
 
         #endregion

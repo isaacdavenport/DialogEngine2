@@ -9,15 +9,16 @@ using DialogGenerator.Model.Enum;
 using DialogGenerator.Utilities;
 using Prism.Events;
 using System;
-using System.Collections.Generic;
+using System.ComponentModel;
 using System.IO;
 using System.Linq;
+using System.Runtime.CompilerServices;
 using System.Threading;
 using System.Threading.Tasks;
 
 namespace DialogGenerator.DialogEngine
 {
-    public class DialogEngine:IDialogEngine
+    public class DialogEngine:IDialogEngine 
     {
         #region - fields -
 
@@ -39,6 +40,45 @@ namespace DialogGenerator.DialogEngine
         private SelectedCharactersPairEventArgs mCharacterPairSelectionDataCached;
         private CancellationTokenSource mCancellationTokenSource;
         private CancellationTokenSource mStateMachineTaskTokenSource = new CancellationTokenSource();
+        private bool mRunning;
+        private CancellationTokenSource mPauseCancellationTokenSource;
+        private int mRunningDialogIndex = 0;
+        private bool mCharacterSwapRequired = false;
+
+        public event PropertyChangedEventHandler PropertyChanged;
+
+        #endregion
+
+        #region - properties -
+
+        public int DialogsCountBeforeSwap { get; set; } = 4;
+
+        public CancellationTokenSource PauseCancellationTokenSource
+        {
+            get
+            {
+                return mPauseCancellationTokenSource;
+            }
+
+            set
+            {
+                mPauseCancellationTokenSource = value;
+                OnPropertyChanged();
+            }
+        }
+
+        public bool Running { 
+            get
+            {
+                return mRunning;
+            }
+
+            set
+            {
+                mRunning = value;
+                OnPropertyChanged();
+            }
+        }
 
         #endregion
 
@@ -63,6 +103,9 @@ namespace DialogGenerator.DialogEngine
 
             _configureWorkflow();
             _subscribeForEvents();
+
+            Running = false;
+            PauseCancellationTokenSource = null;
         }
 
         #endregion
@@ -161,6 +204,8 @@ namespace DialogGenerator.DialogEngine
 
         private void _onSelectedCharactersPairChanged(SelectedCharactersPairEventArgs obj)
         {
+            mCharacterSwapRequired = false;
+            mRunningDialogIndex = 0;            
             mCharacterPairSelectionDataCached = obj;
             Session.Set(Constants.COMPLETED_DLG_MODELS, 0);
 
@@ -170,13 +215,31 @@ namespace DialogGenerator.DialogEngine
                 mWorkflow.Fire(Triggers.PrepareDialogParameters);
             }
 
-            if(obj != null)
+            if(obj != null && mContext.CharactersList.Any())
             {
-                mLogger.Debug($"_onSelectedCharactersPairChanged- cached_ch1 - " +
-                    $"{mCharacterPairSelectionDataCached?.Character1Index} cached_ch2-{mCharacterPairSelectionDataCached?.Character2Index} " +
-                    $"- ch1:{obj.Character1Index} ch2: {obj.Character2Index} ", ApplicationData.Instance.DialogLoggerKey);
+                var char1Name = obj.Character1Index != -1
+                    ? mContext.CharactersList[obj.Character1Index].CharacterName
+                    : "None";
+                
+                var char2Name = obj.Character2Index != -1
+                    ? mContext.CharactersList[obj.Character2Index].CharacterName
+                    : "None";
+
+                var recentPhrases1 = obj.Character1Index != 1
+                    ? mContext.CharactersList[obj.Character1Index].RecentPhrases : null;
+
+                var recentPhrases2 = obj.Character2Index != 1
+                    ? mContext.CharactersList[obj.Character2Index].RecentPhrases : null;
+
+                mLogger.Info($"_onSelectedCharacterPairChanged - Character 1 is set to {obj.Character1Index} " +
+                             $" {char1Name}, with recent phrases count = {recentPhrases1?.Count}," +
+                             $" character 2 is set to {obj.Character2Index} {char2Name}, " +
+                             $"with recent phrases count = {recentPhrases2?.Count}");
+
+            } else
+            {
+                mLogger.Debug("_onSelectedCharactersPairChanged was passed a null pair of selected characters");
             }
-            
         }
 
         private void _playAudio(string _pathAndFileName)
@@ -205,7 +268,9 @@ namespace DialogGenerator.DialogEngine
                 if (_playSuccess != 0)
                 {
                     mUserLogger.Error("MP3 Play Error  ---  " + _playSuccess);
-                    mLogger.Info("MP3 Play Error  ---  " + _playSuccess);
+                } else
+                {
+                    mLogger.Info("MP3 _playAudio played " + _pathAndFileName);
                 }
 
                 do
@@ -238,8 +303,8 @@ namespace DialogGenerator.DialogEngine
                 StartedTime = DateTime.Now
             });
 
-            mLogger.Info(mContext.CharactersList[_speakingCharacter].CharacterName + ": " + _selectedPhrase.DialogStr);
-            mUserLogger.Info(mContext.CharactersList[_speakingCharacter].CharacterName + ": " + _selectedPhrase.DialogStr);
+            mLogger.Info("=== " + mContext.CharactersList[_speakingCharacter].CharacterName + ": _addPhraseToHistory - " +
+                 (_selectedPhrase.DialogStr.Length <= 90 ? _selectedPhrase.DialogStr : (_selectedPhrase.DialogStr.Substring(0, 88)) + "..."));
         }
 
         private void _addDialogModelToHistory(int _dialogModelIndex, int _ch1, int _ch2)
@@ -262,6 +327,7 @@ namespace DialogGenerator.DialogEngine
                 || args.Character2Index < 0 || args.Character2Index >= mContext.CharactersList.Count /* ||
                 args.Character1Index == args.Character2Index *//* Sinisa 02/05/2020 - DLGEN-438 */)
             {
+                mLogger.Info($"_setNextCharacters could not set characters from cached values");
                 return false;
             }
 
@@ -271,12 +337,19 @@ namespace DialogGenerator.DialogEngine
             var _tempChar1 = mContext.Character1Num;
             var _tempChar2 = mContext.Character2Num;
 
-            if (/* _tempChar1 == _tempChar2 || */ /* Sinisa 02/05/2020 - DLGEN-438 */ _tempChar1 >= mContext.CharactersList.Count || _tempChar2 >= mContext.CharactersList.Count)
-                return false;
+            if (_tempChar1 >= mContext.CharactersList.Count || _tempChar2 >= mContext.CharactersList.Count)
+                return false;  //this appears redundant to the first check of args
 
             mContext.SameCharactersAsLast = (_tempChar1 == mPriorCharacter1Num || _tempChar1 == mPriorCharacter2Num)
                                             && (_tempChar2 == mPriorCharacter1Num || _tempChar2 == mPriorCharacter2Num);
 
+            if (mContext.SameCharactersAsLast) {
+                mLogger.Info($"_setNextCharacters are same pair as before, potentially in a different order");
+            } else
+            {
+                mLogger.Info($"_setNextCharacters set to a different pair of characters");
+
+            }
             mContext.Character1Num = _tempChar1;
             mContext.Character2Num = _tempChar2;
             mPriorCharacter1Num = mContext.Character1Num;
@@ -313,62 +386,148 @@ namespace DialogGenerator.DialogEngine
                 token.ThrowIfCancellationRequested();
 
                 if (mCharacterPairSelectionDataCached == null)
+                {
+                    mLogger.Info($"_prepareDialogParameters received mCharacterPairSelectionDataCached == null");
+                    Thread.Sleep(500);  // prevents log from filling up with this message when other threads not ready
                     return Triggers.PrepareDialogParameters;
+                }
 
                 if (mCharacterPairSelectionDataCached.Character1Index == -1 || mCharacterPairSelectionDataCached.Character2Index == -1)
+                {
+                    mLogger.Info($"_prepareDialogParameters received mCharacterPairSelectionDataCached == -1");
+                    Thread.Sleep(500);
                     return Triggers.PrepareDialogParameters;
+                }
 
                 if (Session.Get<bool>(Constants.NEEDS_RESTART) || Session.Get<bool>(Constants.CANCEL_DIALOG))
                 {
+                    mLogger.Info($"_prepareDialogParameters got cancellation request");
                     Session.Set(Constants.CANCEL_DIALOG, false);
                     return Triggers.PrepareDialogParameters;
                 }
 
                 if (!_setNextCharacters())
+                {
+                    mLogger.Info($"_prepareDialogParameters was not able to _setNextCharacters");
                     return Triggers.PrepareDialogParameters;
+                }
 
                 token.ThrowIfCancellationRequested();
 
+                // TODO Isaac.  Why is this turnary here if it always resolves to -1 and always does PickAWeightedDialog?
                 mIndexOfCurrentDialogModel = Session.Get<int>(Constants.SELECTED_DLG_MODEL) >= 0
                                             ? Session.Get<int>(Constants.SELECTED_DLG_MODEL)
-                                            : mDialogModelsManager.PickAWeightedDialog2();
+                                            : mDialogModelsManager.PickAWeightedDialog();
 
                 token.ThrowIfCancellationRequested();
 
                 if(mIndexOfCurrentDialogModel != -1)
                 {
                     _addDialogModelToHistory(mIndexOfCurrentDialogModel, mContext.Character1Num, mContext.Character2Num);
-                }                
+
+                    // If previous character pair had no common dialogs, cancel the old state and notify GUI.
+                    if(mContext.NoDialogs)
+                    {
+                        mContext.NoDialogs = false;
+                        mEventAggregator.GetEvent<CharactersHaveDialogsEvent>().Publish(true);
+
+                        mLogger.Info($"The characters ({mContext.Character1Num}) and ({mContext.Character2Num}) have dialog models again.");
+                    }
+
+                } else
+                {
+                    if(!mCharacterSwapRequired)
+                    {
+                        // Swap the characters
+                        mLogger.Info($"PREPARE DIALOG PARAMETERS - Trying to force the swapping of characters ({mContext.Character1Num}) and ({mContext.Character2Num})");
+
+                        // swap the characters
+                        mEventAggregator.GetEvent<SelectedCharactersPairChangedEvent>().Publish(new SelectedCharactersPairEventArgs
+                        {
+                            Character1Index = mContext.Character2Num,
+                            Character2Index = mContext.Character1Num
+                        });
+
+                        // set the flag and call the PREPARE DIALOG PARAMETERS AGAIN
+                        mCharacterSwapRequired = true;
+                        return Triggers.PrepareDialogParameters;
+                    } else
+                    {
+                        // Display the warning that the characters have no common dialogs.
+                        if(!mContext.NoDialogs)
+                        {
+                            mContext.NoDialogs = true;
+                            mLogger.Info($"The characters ({mContext.Character1Num}) and ({mContext.Character2Num}) still don't have dialogs after the second swap!");
+                        }
+
+                        // Notify GUI that the characters have no common dialog lines.
+                        mEventAggregator.GetEvent<CharactersHaveDialogsEvent>().Publish(false);
+
+                        // RETURN PREPARE DIALOG PARAMETERS AGAIN.
+                        return Triggers.PrepareDialogParameters;
+
+                    }
+                }
 
                 return Triggers.StartDialog;
             }
             catch (OperationCanceledException)
             {
+                mLogger.Info($"_prepareDialogParameters received exception request for cancellation");
                 return Triggers.FinishDialog;
             }
             catch (Exception ex)
             {
                 mLogger.Error("_prepareDialogParameters " + ex.Message);
             }
+            mLogger.Info($"_prepareDialogParameters did not terminate with an event re-triggering");
 
             return Triggers.PrepareDialogParameters;
         }
 
-        private  Triggers _startDialog(CancellationToken token)
+        private  async Task<Triggers> _startDialog(CancellationToken token)
         {
             if (mIndexOfCurrentDialogModel < 0 || mIndexOfCurrentDialogModel >= mContext.DialogModelsList.Count)
+            {
+                mLogger.Info("_startDialog has invalid mIndexOfCurrentDialogModel " + mIndexOfCurrentDialogModel);
                 return Triggers.FinishDialog;
-
+            }
+            
             try
             {
                 System.Console.WriteLine("Dialog {0} started", mIndexOfCurrentDialogModel);
+                mLogger.Info("Dialog started number " + mIndexOfCurrentDialogModel + " " +
+                    String.Join(" ", mContext.DialogModelsList[mIndexOfCurrentDialogModel].PhraseTypeSequence.ToArray()));
 
+
+                if (ApplicationData.Instance.ForceCharacterSwap && !mCharacterSwapRequired)
+                {
+                    if (mRunningDialogIndex != 0 && mRunningDialogIndex % ApplicationData.Instance.CharacterSwapInterval == 0)
+                    {
+                        mLogger.Info("_startDialog is swapping characters after CharacterSwapInterval reached");
+                        mUserLogger.Info("_startDialog is swapping characters after CharacterSwapInterval reached");
+
+                        // Force swapping of the characters
+                        mEventAggregator.GetEvent<SelectedCharactersPairChangedEvent>().Publish(new SelectedCharactersPairEventArgs
+                        {
+                            Character1Index = mContext.Character2Num,
+                            Character2Index = mContext.Character1Num
+                        });
+
+                        // return PREPARE DIALOG PARAMETERS
+                        return Triggers.PrepareDialogParameters;
+                    }
+                }
+
+                mRunningDialogIndex++;
+
+                //var _speakingCharacter = mFirstCharacterSpeaking ? mContext.Character1Num : mContext.Character2Num;
                 var _speakingCharacter = mContext.Character1Num;
                 var _selectedPhrase = mContext.CharactersList[_speakingCharacter].Phrases[0]; //initialize to unused placeholder phrase
 
-                string _debugMessage = "_startDialog " + mContext.CharactersList[mContext.Character1Num].CharacterPrefix + " and " +
-                    mContext.CharactersList[mContext.Character2Num].CharacterPrefix + " " + string.Join("; --,",
-                    mContext.DialogModelsList[mIndexOfCurrentDialogModel].PhraseTypeSequence.ToArray());
+                string _debugMessage = "___startDialog " + mContext.CharactersList[mContext.Character1Num].CharacterPrefix
+                    + " and " + mContext.CharactersList[mContext.Character2Num].CharacterPrefix + " dialog count " + mRunningDialogIndex + 
+                    " +++" + string.Join(" +++", mContext.DialogModelsList[mIndexOfCurrentDialogModel].PhraseTypeSequence.ToArray());
 
                 mLogger.Debug(_debugMessage,ApplicationData.Instance.DialogLoggerKey);
                 mUserLogger.Info(_debugMessage);
@@ -403,9 +562,12 @@ namespace DialogGenerator.DialogEngine
                             throw (new OperationCanceledException());
                         }
 
+                        mLogger.Info(mRunningDialogIndex + ".. " + mContext.CharactersList[_speakingCharacter] + " selecting a " 
+                            + _currentPhraseType);
+
                         _selectedPhrase = mDialogModelsManager.PickAWeightedPhrase(_speakingCharacter, _currentPhraseType);
 
-                        if (_selectedPhrase == null)
+                        if (_selectedPhrase == null || _selectedPhrase.DialogStr == " .... ")
                         {
                             mUserLogger.Warning("Phrase type " + _currentPhraseType + " was not found.");
                             mLogger.Info("Phrase type " + _currentPhraseType + " was not found.");
@@ -435,6 +597,9 @@ namespace DialogGenerator.DialogEngine
                             throw (new OperationCanceledException());
                         }
 
+                        mUserLogger.Info(mContext.CharactersList[_speakingCharacter].CharacterName + ":: " + 
+                            _currentPhraseType + ": " + _selectedPhrase.DialogStr);
+                        
                         _addPhraseToHistory(_selectedPhrase, _speakingCharacter);
 
                         var _pathAndFileName = Path.Combine(ApplicationData.Instance.AudioDirectory,
@@ -442,6 +607,12 @@ namespace DialogGenerator.DialogEngine
                                               + "_" + _selectedPhrase.FileName + ".mp3");
 
                         _playAudio(_pathAndFileName); 
+
+                        if(PauseCancellationTokenSource != null)
+                        {
+                            await PauseEngine(PauseCancellationTokenSource.Token);
+                            PauseCancellationTokenSource = null;
+                        }
 
                         if (!_dialogTrackerAndBLESelectedCharactersSame() && Session.Get<bool>(Constants.BLE_MODE_ON))
                         {
@@ -453,9 +624,13 @@ namespace DialogGenerator.DialogEngine
                             _speakingCharacter = mContext.Character2Num;
                         else
                             _speakingCharacter = mContext.Character1Num;
+                    } else
+                    {
+                        mLogger.Info(mContext.CharactersList[_speakingCharacter].CharacterName + " missing a " 
+                            + _currentPhraseType);
                     }
 
-                    if(mContext.HistoricalDialogs.Count > 0)
+                    if (mContext.HistoricalDialogs.Count > 0)
                     {
                         mContext.HistoricalDialogs[mContext.HistoricalDialogs.Count - 1].Completed = true;
                     }
@@ -474,6 +649,7 @@ namespace DialogGenerator.DialogEngine
 
                 int _completedDlgModels = Session.Get<int>(Constants.COMPLETED_DLG_MODELS);
                 Session.Set(Constants.COMPLETED_DLG_MODELS, ++_completedDlgModels);
+                
             }
             catch (OperationCanceledException)
             {
@@ -485,30 +661,7 @@ namespace DialogGenerator.DialogEngine
             }
 
             System.Console.WriteLine("Dialog {0} stopped regularly", mIndexOfCurrentDialogModel);
-
-            //List<string> _allPhrases = new List<string>();
-            //foreach(var _dialogModel in mContext.DialogModelsList)
-            //{
-            //    foreach(var _phrase in _dialogModel.PhraseTypeSequence)
-            //    {
-            //        if(!_allPhrases.Contains(_phrase))
-            //        {
-            //            _allPhrases.Add(_phrase);
-            //        }
-            //    }
-            //}
-
-            //FileStream _fs = File.Create(ApplicationData.Instance.DataDirectory + "\\" + "PhrasesAuto.cfg");
-            //StreamWriter _streamWriter = new StreamWriter(_fs);
-            //string _output = string.Empty;
-            //for(int i = 0; i < _allPhrases.Count; i++) 
-            //{
-            //    _streamWriter.WriteLine(_allPhrases[i]);
-            //}
-
-            //_streamWriter.Flush();
-            //_fs.Close();            
-
+            
             return Triggers.PrepareDialogParameters;
         }
 
@@ -524,7 +677,17 @@ namespace DialogGenerator.DialogEngine
 
         #endregion
 
+        #region - protected functions -
+
+        protected void OnPropertyChanged([CallerMemberName] string name = null)
+        {
+            PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(name));
+        }
+
+        #endregion
+
         #region - public functions -
+
 
         public void Initialize()
         {
@@ -564,6 +727,7 @@ namespace DialogGenerator.DialogEngine
 
             await Task.Run(async() =>
             {
+                Running = true;
                 Thread.CurrentThread.Name = "DialogGeneratorThread";
                 Console.WriteLine(Thread.CurrentThread.Name + " started!");
                 mLogger.Debug(Thread.CurrentThread.Name + " started!");
@@ -589,15 +753,9 @@ namespace DialogGenerator.DialogEngine
                         {
                             Session.Set(Constants.BLE_MODE_ON, false);
                             mCharacterSelection = mCharacterSelectionFactory.Create(SelectionMode.ArenaModel);
-
                         }
 
                         mEventAggregator.GetEvent<CharacterSelectionModelChangedEvent>().Publish();
-                        //if(!Session.Get<bool>(Constants.BLE_MODE_ON))
-                        //{
-                        //    Session.Set(Constants.NEXT_CH_1, -1);
-                        //    Session.Set(Constants.NEXT_CH_2, -1);
-                        //}
                         _characterSelectionTask = mCharacterSelection.StartCharacterSelection();
                         Session.Set(Constants.NEEDS_RESTART, false);
                     }
@@ -623,7 +781,7 @@ namespace DialogGenerator.DialogEngine
                             }
                         case States.DialogStarted:
                             {
-                                Triggers _nextTrigger = _startDialog(mStateMachineTaskTokenSource.Token);
+                                Triggers _nextTrigger = await _startDialog(mStateMachineTaskTokenSource.Token);
                                 string _debugMessage = "Start dialog returned " + _nextTrigger.ToString();
                                 mLogger.Debug(_debugMessage, ApplicationData.Instance.DialogLoggerKey);
 
@@ -658,8 +816,9 @@ namespace DialogGenerator.DialogEngine
 
                 await _characterSelectionTask;
 
+                Running = false;
                 Console.WriteLine(Thread.CurrentThread.Name + " stopped!");
-                mLogger.Debug(Thread.CurrentThread.Name + " stopped!");
+                mLogger.Info(Thread.CurrentThread.Name + " stopped!");
 
             });
         }
@@ -678,9 +837,28 @@ namespace DialogGenerator.DialogEngine
             if (mCurrentState != States.DialogFinished)
                 mWorkflow.Fire(Triggers.FinishDialog);
 
-            System.Console.WriteLine("Dialog Engine Stopped");
+            System.Console.WriteLine(Thread.CurrentThread.Name + " Stopped requested");
+            mLogger.Info(Thread.CurrentThread.Name + " stop requested");
         }
 
         #endregion
+
+        public async Task PauseEngine(CancellationToken cancellationToken)
+        {
+            bool isWaiting = true;
+            Running = false;
+            while(isWaiting)
+            {
+                try
+                {
+                    await Task.Delay(10000, cancellationToken);
+                } 
+                catch(TaskCanceledException)
+                {
+                    isWaiting = false;
+                }
+            }
+            Running = true;
+        }
     }
 }

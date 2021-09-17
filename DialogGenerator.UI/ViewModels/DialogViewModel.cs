@@ -50,6 +50,9 @@ namespace DialogGenerator.UI.ViewModels
         private bool mRadioModeOn = false;
         private ArenaViewModel mArenaViewModel;
         private AssignedRadiosViewModel mAssignedRadiosViewModel;
+        private bool mCanPause = false;
+        private bool mCanResume = false;
+        private IMP3Player mPlayer;
 
 
         #endregion
@@ -64,7 +67,7 @@ namespace DialogGenerator.UI.ViewModels
             ,ArenaViewModel _ArenaViewModel
             ,AssignedRadiosViewModel _AssignedRadiosViewModel
             ,IDialogModelRepository _DialogModelRepository
-            ,IWizardRepository _WizardRepository)
+            ,IWizardRepository _WizardRepository, IMP3Player _player)
         {
             mLogger = logger;
             mEventAggregator = _eventAggregator;
@@ -76,6 +79,7 @@ namespace DialogGenerator.UI.ViewModels
             mRegionManager = _regionManager;
             mArenaViewModel = _ArenaViewModel;
             mAssignedRadiosViewModel = _AssignedRadiosViewModel;
+            mPlayer = _player;
 
             mEventAggregator.GetEvent<NewDialogLineEvent>().Subscribe(_onNewDialogLine);
             mEventAggregator.GetEvent<ActiveCharactersEvent>().Subscribe(_onNewActiveCharacters);
@@ -90,6 +94,38 @@ namespace DialogGenerator.UI.ViewModels
             {
                 IsDebugViewVisible = Visibility.Visible;
             }
+
+            mDialogEngine.PropertyChanged += MDialogEngine_PropertyChanged;
+        }
+
+        public void CopyAndClear()
+        {
+            string strToCopy = string.Empty;
+            foreach(NewDialogLineEventArgs line in DialogLinesCollection)
+            {
+                if(line.Selected)
+                {
+                    if(!string.IsNullOrEmpty(strToCopy))
+                    {
+                        strToCopy += "\n";                        
+                    }
+
+                    strToCopy += line.Character.CharacterName;
+                    strToCopy += " - ";
+                    strToCopy += line.DialogLine;
+                    line.Selected = false;
+                }
+            }
+
+            Clipboard.SetText(strToCopy);
+        }
+
+        private void MDialogEngine_PropertyChanged(object sender, System.ComponentModel.PropertyChangedEventArgs e)
+        {
+            PauseCommand.RaiseCanExecuteChanged();
+            ResumeCommand.RaiseCanExecuteChanged();
+            CanPause = mDialogEngine.Running;
+            CanResume = mDialogEngine.PauseCancellationTokenSource != null;
         }
 
         private void _onCharacterSelectionModelChanged()
@@ -154,6 +190,34 @@ namespace DialogGenerator.UI.ViewModels
         #endregion
 
         #region - properties
+        public bool CanPause
+        {
+            get
+            {
+                return mCanPause;
+            }
+
+            set
+            {
+                mCanPause = value;
+                RaisePropertyChanged();               
+            }
+        }
+
+        public bool CanResume
+        {
+            get
+            {
+                return mCanResume;
+            }
+
+            set
+            {
+                mCanResume = value;
+                RaisePropertyChanged();
+            }
+        }
+
         public ObservableCollection<Character> Characters
         {
             get
@@ -189,7 +253,7 @@ namespace DialogGenerator.UI.ViewModels
                     _idx = mCharacterRepository.IndexOf(mFirstSelectedCharacter);
                 }
                 
-                Session.Set(Constants.NEXT_CH_1, _idx);
+                //Session.Set(Constants.NEXT_CH_1, _idx);
 
                 RaisePropertyChanged();
             }
@@ -225,7 +289,7 @@ namespace DialogGenerator.UI.ViewModels
                     _idx = mCharacterRepository.IndexOf(mSecondSelectedCharacter);
                 }
                 
-                Session.Set(Constants.NEXT_CH_2, _idx);
+                //Session.Set(Constants.NEXT_CH_2, _idx);
 
                 RaisePropertyChanged();
             }
@@ -312,6 +376,12 @@ namespace DialogGenerator.UI.ViewModels
         public DelegateCommand ToggleAssignedRadiosCommand { get; set; }
         public DelegateCommand ShowPDFHelpCommand { get; set; }
 
+        public DelegateCommand PauseCommand { get; set; }
+        public DelegateCommand ResumeCommand { get; set; }
+        public DelegateCommand CopyLinesCommand { get; set; }
+        public DelegateCommand SelectAllCommand { get; set; }
+        public DelegateCommand SkipLineCommand { get; set; }
+
 
         #endregion
 
@@ -333,6 +403,57 @@ namespace DialogGenerator.UI.ViewModels
             ExpertModeCommand = new DelegateCommand(_expertModeExecute, _expertMode_CanExecute);
             ToggleAssignedRadiosCommand = new DelegateCommand(_toggleAssignedRadios_Execute);
             ShowPDFHelpCommand = new DelegateCommand(_showPDFHelpCommand_execute);
+            PauseCommand = new DelegateCommand(_pauseCommandExecute, _pauseCommandCanExecute);
+            ResumeCommand = new DelegateCommand(_resumeCommandExecute, _resumeCommandCanExecute);
+            CopyLinesCommand = new DelegateCommand(_copyCommand_execute);
+            SelectAllCommand = new DelegateCommand(_selectAllCommand_execute);
+            SkipLineCommand = new DelegateCommand(_skipLineCommandExecute, _skipLineCommand_CanExecute);
+        }
+
+        private bool _skipLineCommand_CanExecute()
+        {
+            return mPlayer.IsPlaying();
+        }
+
+        private void _skipLineCommandExecute()
+        {
+            mPlayer.StopPlayingCurrentDialogLine();
+        }
+
+        private void _selectAllCommand_execute()
+        {
+            foreach(NewDialogLineEventArgs line in DialogLinesCollection)
+            {
+                line.Selected = true;
+            }
+        }
+
+        private void _copyCommand_execute()
+        {
+            CopyAndClear();
+        }
+
+        private bool _resumeCommandCanExecute()
+        {
+            return mDialogEngine.PauseCancellationTokenSource != null;
+        }
+
+        private void _resumeCommandExecute()
+        {
+            mDialogEngine.PauseCancellationTokenSource.Cancel();
+            mLogger.Info("Dialog View - (Button Click) Dialog engine resumed");
+        }
+
+        private bool _pauseCommandCanExecute()
+        {
+            return mDialogEngine.Running;                       
+        }
+
+        private void _pauseCommandExecute()
+        {
+            mDialogEngine.PauseCancellationTokenSource = new CancellationTokenSource();
+            CanPause = false;
+            mLogger.Info("Dialog View - (Button Click) Pause Requested");
         }
 
         private void _showPDFHelpCommand_execute()
@@ -358,7 +479,7 @@ namespace DialogGenerator.UI.ViewModels
         }
 
         private async void _expertModeExecute()
-        {            
+        {
             CreateCharacterViewModel createCharacterViewModel = Session.Get(Constants.CREATE_CHARACTER_VIEW_MODEL) as CreateCharacterViewModel;
             if(createCharacterViewModel != null)
             {
@@ -447,6 +568,11 @@ namespace DialogGenerator.UI.ViewModels
         {
             try
             {                
+                if(mDialogEngine.PauseCancellationTokenSource != null)
+                {
+                    mDialogEngine.PauseCancellationTokenSource.Cancel();
+                }
+
                 mDialogEngine.StopDialogEngine();
             }
             catch (Exception ex)
@@ -503,7 +629,7 @@ namespace DialogGenerator.UI.ViewModels
 
         private async void _onOpenSettingsDialog_Execute()
         {
-            await mMessageDialogService.ShowDedicatedDialogAsync<int?>(new SettingsDialog(mEventAggregator, mDialogModelRepository));
+            await mMessageDialogService.ShowDedicatedDialogAsync<int?>(new SettingsDialog(mEventAggregator, mDialogModelRepository, mLogger));
             if(ApplicationData.Instance.DebugModeOn)
             {
                 IsDebugViewVisible = Visibility.Visible;
@@ -515,7 +641,7 @@ namespace DialogGenerator.UI.ViewModels
 
         private async void _configureDialogCommand_Execute()
         {
-            await mMessageDialogService.ShowDedicatedDialogAsync<int?>(new SettingsDialog(mEventAggregator, mDialogModelRepository));
+            await mMessageDialogService.ShowDedicatedDialogAsync<int?>(new SettingsDialog(mEventAggregator, mDialogModelRepository, mLogger));
         }
 
         private async void _startDialogCommand_Execute()
@@ -525,7 +651,9 @@ namespace DialogGenerator.UI.ViewModels
                 IsDialogStarted = true;
                 IsStopBtnEnabled = true;
                 mEventAggregator.GetEvent<CharacterSelectionActionChangedEvent>().Publish(true);
+                mLogger.Info("_startDialogCommand_Execute start thread StartDialogEngine");
                 await mDialogEngine.StartDialogEngine();
+                mLogger.Info("_startDialogCommand_Execute end thread StartDialogEngine");
 
                 IsDialogStarted = false;
                 mEventAggregator.GetEvent<CharacterSelectionActionChangedEvent>().Publish(false);
@@ -575,15 +703,23 @@ namespace DialogGenerator.UI.ViewModels
         private void _dispatchLineToCharacter(object item)
         {
             NewDialogLineEventArgs args = (NewDialogLineEventArgs)item;
-            if(args.Character.CharacterPrefix.Equals(FirstSelectedCharacter.CharacterPrefix))
-            {
-                FirstCharacterDialogLine = args.DialogLine;
-            } 
 
-            if(args.Character.CharacterPrefix.Equals(SecondSelectedCharacter.CharacterPrefix))
+            if(FirstSelectedCharacter != null)
             {
-                SecondCharacterDialogLine = args.DialogLine;
+                if (args.Character.CharacterPrefix.Equals(FirstSelectedCharacter.CharacterPrefix))
+                {
+                    FirstCharacterDialogLine = args.DialogLine;
+                }
+            }            
+
+            if(SecondSelectedCharacter != null)
+            {
+                if (args.Character.CharacterPrefix.Equals(SecondSelectedCharacter.CharacterPrefix))
+                {
+                    SecondCharacterDialogLine = args.DialogLine;
+                }
             }
+            
 
         }
 

@@ -20,7 +20,7 @@
              TextOptions.TextRenderingMode="Auto"
              TextElement.Foreground="{DynamicResource MaterialDesignBody}"
              mc:Ignorable="d" 
-             d:DesignHeight="450" d:DesignWidth="800">
+             d:DesignHeight="450" d:DesignWidth="800" Loaded="UserControl_Loaded">
     
     <UserControl.Resources>
         <ResourceDictionary>
@@ -31,6 +31,7 @@
             <converters:CloneValuesConverter x:Key="CloneValuesConverter" />
             <converters:ImageContentSmallSizeValueConverter x:Key="ImageContentSmallSizeValueConverter" />
             <converters:BoolToVisibilityConverter x:Key="BoolToVisibilityConverter" />
+            <converters:BoolToColorConverter x:Key="BoolToColorConverter" />
             <converters:NotBoolToVisibilityConverter x:Key="NotBoolToVisibilityConverter" />
             <converters:ImageContentValueConverter x:Key="ImageContentValueConverter" />
             <converters:BoolToRowHeightConverter x:Key="BoolToRowHeightConverter"/>
@@ -49,18 +50,21 @@
 
     <Grid Background="White">
         <Grid.RowDefinitions>
+            <RowDefinition Height="*" MinHeight="350"/>
             <RowDefinition Height="Auto"/>
-            <RowDefinition Height="*"/>
+            <RowDefinition x:Name="DialogLinesRowDefinition" Height="200" MinHeight="200"/>
             <RowDefinition Height="Auto" />
             <RowDefinition Height="Auto"/>
             <RowDefinition Height="Auto" />
         </Grid.RowDefinitions>
 
-        <Border Grid.Row="0" BorderBrush="DarkGray" BorderThickness="2" Visibility="{Binding RadioModeOn, Converter={StaticResource NotBoolToVisibilityConverter}}">
-            <view:ArenaView x:Name="ArenaView"  />
+        <Border Grid.Row="0" BorderBrush="DarkGray" BorderThickness="2" Visibility="{Binding RadioModeOn, Converter={StaticResource NotBoolToVisibilityConverter}}" SizeChanged="Border_SizeChanged">
+            <view:ArenaView x:Name="ArenaView" Height="500" />
         </Border>
 
-        <Grid Grid.Row="1" HorizontalAlignment="Stretch">
+        <GridSplitter Grid.Row="1" HorizontalAlignment="Stretch" Height="5"/>
+
+        <Grid Grid.Row="2" HorizontalAlignment="Stretch">
             <Grid.ColumnDefinitions>
                 <ColumnDefinition Width="*"/>
                 <ColumnDefinition Width="5"/>
@@ -90,11 +94,11 @@
                         Background="Yellow"
                         VerticalAlignment="Stretch" 
                         HorizontalAlignment="Stretch"
-                        ItemsSource="{Binding DialogLinesCollection}">
+                        ItemsSource="{Binding DialogLinesCollection}" PreviewMouseLeftButtonDown="TextOutput_MouseLeftButtonDown">
 
                     <ItemsControl.Resources>
                         <DataTemplate DataType="{x:Type eventArgs:NewDialogLineEventArgs }">
-                            <DockPanel HorizontalAlignment="Left" Margin="50,10,20,10">
+                            <DockPanel HorizontalAlignment="Left" Margin="50,10,20,10" PreviewMouseLeftButtonDown="DockPanel_MouseLeftButtonDown" Background="{Binding Selected, Converter={StaticResource BoolToColorConverter}, ConverterParameter=White|Yellow}">
                                 <Grid>
                                     <Grid.ColumnDefinitions>
                                         <ColumnDefinition Width="auto" />
@@ -103,12 +107,13 @@
                                     <materialDesign:ColorZone  Background="Transparent" VerticalAlignment="Stretch" 
                                                       Content="{Binding Character.CharacterImage, Converter={StaticResource ImageContentSmallSizeValueConverter}}" >
                                     </materialDesign:ColorZone>
-                                    <StackPanel Grid.Column="1">
-                                        <TextBlock Padding="8,10,4,4" TextWrapping="Wrap" FontWeight="Bold"
-                                           Text="{Binding Character.CharacterName }" Width="auto" HorizontalAlignment="Left"  />
-                                        <TextBlock Padding="8,4,4,4" TextWrapping="Wrap" Text="{Binding Path=DialogLine }" Width="auto" HorizontalAlignment="Left"  />
-                                    </StackPanel>
-                                </Grid>
+                                <StackPanel Grid.Column="1">
+                                    <TextBlock Padding="8,10,4,4" TextWrapping="Wrap" FontWeight="Bold"
+                                               Text="{Binding Character.CharacterName }" Width="auto" HorizontalAlignment="Left"  />
+                                    <TextBlock Padding="8,4,4,4" TextWrapping="Wrap" Text="{Binding Path=DialogLine }" Width="auto" HorizontalAlignment="Left" />
+                                </StackPanel>
+                            </Grid>
+                                
                             </DockPanel>
                         </DataTemplate>
 
@@ -148,7 +153,17 @@
                                     <materialDesign:PackIcon Kind="DeleteEmpty" Foreground="Red" />
                                 </MenuItem.Icon>
                             </MenuItem>
-                        </ContextMenu>
+                            <MenuItem Header="Select All" FontSize="13" Command="{Binding SelectAllCommand}"   Background="White" >
+                                <MenuItem.Icon>
+                                    <materialDesign:PackIcon Kind="SelectAll" Foreground="Black" />
+                                </MenuItem.Icon>
+                            </MenuItem>
+                            <MenuItem Header="Copy Lines" FontSize="13" Command="{Binding CopyLinesCommand}"   Background="White" >
+                                <MenuItem.Icon>
+                                    <materialDesign:PackIcon Kind="ContentCopy" Foreground="Black" />
+                                </MenuItem.Icon>
+                            </MenuItem>
+                    </ContextMenu>
                     </ItemsControl.ContextMenu>
                 </ItemsControl>
             
@@ -164,18 +179,18 @@
             </GridSplitter>-->
             <Border Grid.Column="2" BorderBrush="LightGray" HorizontalAlignment="Stretch" 
                 Visibility="{Binding IsDebugViewVisible}" VerticalAlignment="Stretch" BorderThickness="1,1,0,0" >
-                <views:DebugView HorizontalAlignment="Stretch" VerticalAlignment="Stretch" Visibility="{Binding IsDebugViewVisible}"/>
+                <views:DebugView HorizontalAlignment="Stretch" VerticalAlignment="Stretch" />
             </Border>
         </Grid>
 
-        <Border  Grid.Row="4" Background="White"   BorderBrush="LightGray" BorderThickness="0,1,0,0">
+        <Border Grid.Row="5" Background="White"   BorderBrush="LightGray" BorderThickness="0,1,0,0">
             <Grid>
                 <Grid.ColumnDefinitions>
                     <ColumnDefinition Width="Auto"/>
                     <ColumnDefinition Width="*" />
                 </Grid.ColumnDefinitions>
 
-                <StackPanel Orientation="Horizontal" VerticalAlignment="Center" Margin="0,0,5,0" HorizontalAlignment="Left" Grid.Column="0">
+                <StackPanel x:Name="ButtonsPanel" Orientation="Horizontal" VerticalAlignment="Center" Margin="0,0,5,0" HorizontalAlignment="Left" Grid.Column="0">
                     <materialDesign:Card Width="150" HorizontalAlignment="Left" VerticalAlignment="Center"  Height="150" Margin="10" Background="Orange" >
                         <Grid Style="{StaticResource CardGrid}">
                             <StackPanel HorizontalAlignment="Center" VerticalAlignment="Center">
@@ -220,6 +235,45 @@
                             <Grid.InputBindings>
                                 <MouseBinding MouseAction="LeftClick"
                                       Command="{Binding ShowPDFHelpCommand}" />
+                            </Grid.InputBindings>
+                        </Grid>
+                    </materialDesign:Card>
+
+                    <materialDesign:Card Width="150" HorizontalAlignment="Left"  Height="150" Margin="10" Background="#51cb8c" Visibility="{Binding CanPause, Converter={StaticResource BoolToVisibilityConverter}}">
+                        <Grid Style="{StaticResource CardGrid}">
+                            <StackPanel HorizontalAlignment="Center" VerticalAlignment="Center">
+                                <materialDesign:PackIcon Kind="Pause" HorizontalAlignment="Center" Height="50" Width="50" Foreground="White" />
+                                <TextBlock Text="Pause" Foreground="White" FontSize="20" HorizontalAlignment="Center" VerticalAlignment="Center" />
+                            </StackPanel>
+                            <Grid.InputBindings>
+                                <MouseBinding MouseAction="LeftClick"
+                                      Command="{Binding PauseCommand}" />
+                            </Grid.InputBindings>
+                        </Grid>
+                    </materialDesign:Card>
+
+                    <materialDesign:Card Width="150" HorizontalAlignment="Left"  Height="150" Margin="10" Background="#51cb8c" Visibility="{Binding CanPause, Converter={StaticResource BoolToVisibilityConverter}}">
+                        <Grid Style="{StaticResource CardGrid}">
+                            <StackPanel HorizontalAlignment="Center" VerticalAlignment="Center">
+                                <materialDesign:PackIcon Kind="SkipNext" HorizontalAlignment="Center" Height="50" Width="50" Foreground="White" />
+                                <TextBlock Text="Skip Line" Foreground="White" FontSize="20" HorizontalAlignment="Center" VerticalAlignment="Center" />
+                            </StackPanel>
+                            <Grid.InputBindings>
+                                <MouseBinding MouseAction="LeftClick"
+                                      Command="{Binding SkipLineCommand}" />
+                            </Grid.InputBindings>
+                        </Grid>
+                    </materialDesign:Card>
+
+                    <materialDesign:Card Width="150" HorizontalAlignment="Left"  Height="150" Margin="10" Background="#51cb8c" Visibility="{Binding CanResume, Converter={StaticResource BoolToVisibilityConverter}}" >
+                        <Grid Style="{StaticResource CardGrid}">
+                            <StackPanel HorizontalAlignment="Center" VerticalAlignment="Center">
+                                <materialDesign:PackIcon Kind="Play" HorizontalAlignment="Center" Height="50" Width="50" Foreground="White" />
+                                <TextBlock Text="Resume" Foreground="White" FontSize="20" HorizontalAlignment="Center" VerticalAlignment="Center" />
+                            </StackPanel>
+                            <Grid.InputBindings>
+                                <MouseBinding MouseAction="LeftClick"
+                                      Command="{Binding ResumeCommand}" />
                             </Grid.InputBindings>
                         </Grid>
                     </materialDesign:Card>

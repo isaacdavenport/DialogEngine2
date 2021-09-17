@@ -27,6 +27,12 @@ namespace DialogGenerator.UI.Controls
             VideoPlayer.MediaEnded += _mediaElement_MediaEnded;
             VideoPlayer.MediaFailed += _mediaElement_MediaFailed;
             VideoPlayer.Loaded += _mediaElement_Loaded;
+            VideoPlayer.Unloaded += _mediaElement_Unloaded;
+        }
+
+        private void _mediaElement_Unloaded(object sender, RoutedEventArgs e)
+        {
+            VideoPlayer.Source = null;
         }
 
         #region - event handlers -

@@ -23,11 +23,13 @@ namespace DialogGenerator.Model
         private bool mHasNoVoice = false;
         private string mVoice = string.Empty;
         private int mSpeechRate = -1;
+        private string mDescription = string.Empty;
+        private string mInternalRemarks = string.Empty;
 
         #endregion
 
         #region - properties -
-
+        
         [JsonIgnore]
         public PhraseEntry PhraseTotals
         {
@@ -69,7 +71,7 @@ namespace DialogGenerator.Model
         [JsonProperty("CharacterPrefix"),Required(ErrorMessage ="Character initials is required.")]
         public string CharacterPrefix { get; set; } = "";
 
-        [FileExtensions(Extensions ="jpg,jpe,jpeg,png",ErrorMessage ="Allowed image file extensions: jpg,jpe,jpeg,png.")]
+        [FileExtensions(Extensions ="jpg,jpe,jpeg,png,gif,jfif,tiff,apng,avif,webp",ErrorMessage ="Allowed image file extensions: jpg,jpe,jpeg,png,gif,jfif,tiff,apng,avif,webp.")]
         [JsonProperty("CharacterImage")]
         public string CharacterImage
         {
@@ -176,12 +178,41 @@ namespace DialogGenerator.Model
             }
         }
 
+        [JsonProperty("Description", NullValueHandling = NullValueHandling.Ignore)]
+        public string Description
+        {
+            get
+            {
+                return mDescription;
+            }
+
+            set
+            {
+                mDescription = value;
+                OnPropertyChanged("Description");
+            }
+        }
+
+        [JsonProperty("InternalRemarks", NullValueHandling = NullValueHandling.Ignore)]
+        public string InternalRemarks
+        {
+            get
+            {
+                return mInternalRemarks;
+            }
+
+            set
+            {
+                mInternalRemarks = value;
+                OnPropertyChanged("InternalRemarks");
+            }
+        }
+
         // json ignore properties
-        
+
         [JsonIgnore]
         public Queue<PhraseEntry> RecentPhrases = new Queue<PhraseEntry>();
-        [JsonIgnore]
-        public const int RecentPhrasesQueueSize = 8;
+
         [JsonIgnore]
         public string FileName { get; set; }
         [JsonIgnore]

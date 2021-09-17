@@ -47,7 +47,7 @@
             <materialDesign:DrawerHost.LeftDrawerContent>
                 <DockPanel  MinWidth="400" Background="White" x:Name="DockPanel">
                     <ToggleButton Style="{StaticResource MaterialDesignHamburgerToggleButton}" DockPanel.Dock="Top"
-                                  HorizontalAlignment="Right" IsChecked="{Binding ElementName=MenuToggleButton, Path=IsChecked, Mode=TwoWay}" />
+                                  HorizontalAlignment="Right"  />
                     <GroupBox   Margin="0,5,0,5"  BorderThickness="0">
                         <GroupBox.Header>
                             <TextBlock Text="Wizard tags with descriptions" Foreground="White" HorizontalAlignment="Center" />
