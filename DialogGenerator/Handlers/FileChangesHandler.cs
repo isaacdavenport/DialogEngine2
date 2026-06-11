@@ -205,21 +205,7 @@ namespace DialogGenerator.Handlers
         private void _validateAllCharacters(IEnumerable<Character> characters,IList<string> errors)
         {
             if (characters == null)
-                return;
-
-            
-
-            //search characters to find is there radio number duplicates
-            var duplicates =characters.GroupBy(ch => ch.RadioNum)
-                                      .Select(ch => ch)
-                                      .ToList();
-
-            foreach(var duplicate in duplicates)
-            {
-                if(duplicate.Count() > 1)
-                    errors.Add($"Characters: '{string.Join(", ", duplicate.Select(ch => ch.CharacterName).ToArray())}' assigned to toy {duplicate.Key}." +
-                        $" Only one character can be assigned to a toy. Please change the value for 'RadioNum' property.");
-            }        
+                return;            
         }
 
         private void _validateCharacter(Character character,IList<string> errors)
@@ -230,20 +216,6 @@ namespace DialogGenerator.Handlers
             {
                 errors.Add($"Changed value for 'CharacterPrefix' property of character '{character.CharacterName}'," +
                     $" but changes are not allowed for 'CharacterPrefix' property.");
-            }
-
-            if (_existingCharacter != null)
-            {                
-                if (character.RadioNum != _existingCharacter.RadioNum)
-                {
-                    var _assignedCharacter = mCharacterRepository.GetByAssignedRadio(character.RadioNum);
-
-                    if (_assignedCharacter != null)
-                    {
-                        errors.Add($"You tried to assign character {character.CharacterName} to toy {character.RadioNum}," +
-                            $" but toy {character.RadioNum} already assigned to character '{_assignedCharacter.CharacterName}'.");
-                    }
-                }
             }
         }
 

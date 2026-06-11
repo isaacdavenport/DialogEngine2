@@ -157,7 +157,6 @@
     <Compile Include="Converters\BoolToRowHeightConverter.cs" />
     <Compile Include="Converters\BoolToVisibilityConverter.cs" />
     <Compile Include="Converters\CharacterGenderValueConverter.cs" />
-    <Compile Include="Converters\CharacterRadioNumberToTextValueConverter.cs" />
     <Compile Include="Converters\CloneValuesConverter.cs" />
     <Compile Include="Converters\DivideBy2ValueConverter.cs" />
     <Compile Include="Converters\IdentifierConverter.cs" />
@@ -173,8 +172,6 @@
     <Compile Include="Converters\IsDialogBtnVisibleValueConverter.cs" />
     <Compile Include="Converters\IsRunOverWizardBtnEnabledValueConverter.cs" />
     <Compile Include="Converters\ListBoxItemTextAndIndexValueConverter.cs" />
-    <Compile Include="Converters\MatrixCellValueToBackgroundColorConverter.cs" />
-    <Compile Include="Converters\MatrixToDataViewConverter.cs" />
     <Compile Include="Converters\MP3RecorderStateToBtnVisibilityValueConverter.cs" />
     <Compile Include="Converters\SaveAndNextBtnContentConverter.cs" />
     <Compile Include="Converters\SkipBtnContentConverter.cs" />
@@ -194,8 +191,6 @@
     <Compile Include="UIModule.cs" />
     <Compile Include="ViewModels\ArenaAvatarViewModel.cs" />
     <Compile Include="ViewModels\ArenaViewModel.cs" />
-    <Compile Include="ViewModels\AssignCharacterToRadioViewModel.cs" />
-    <Compile Include="ViewModels\AssignedRadiosViewModel.cs" />
     <Compile Include="ViewModels\CharacterDetailViewModel.cs" />
     <Compile Include="ViewModels\CharacterDialogLinesViewModel.cs" />
     <Compile Include="ViewModels\CharacterSlotViewModel.cs" />
@@ -213,14 +208,8 @@
     <Compile Include="Views\ArenaAvatarView.xaml.cs">
       <DependentUpon>ArenaAvatarView.xaml</DependentUpon>
     </Compile>
-    <Compile Include="Views\AssignCharacterToRadioView.xaml.cs">
-      <DependentUpon>AssignCharacterToRadioView.xaml</DependentUpon>
-    </Compile>
     <Compile Include="Views\ArenaView.xaml.cs">
       <DependentUpon>ArenaView.xaml</DependentUpon>
-    </Compile>
-    <Compile Include="Views\AssignedRadiosView.xaml.cs">
-      <DependentUpon>AssignedRadiosView.xaml</DependentUpon>
     </Compile>
     <Compile Include="Views\CharacterDataTemplateSelector.cs" />
     <Compile Include="Views\CharacterDetailView.xaml.cs">
@@ -314,15 +303,7 @@
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
-    <Page Include="Views\AssignCharacterToRadioView.xaml">
-      <SubType>Designer</SubType>
-      <Generator>MSBuild:Compile</Generator>
-    </Page>
     <Page Include="Views\ArenaView.xaml">
-      <SubType>Designer</SubType>
-      <Generator>MSBuild:Compile</Generator>
-    </Page>
-    <Page Include="Views\AssignedRadiosView.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>

@@ -1,5 +1,4 @@
-﻿using DialogGenerator.CharacterSelection.Data;
-using DialogGenerator.CharacterSelection.Model;
+﻿using DialogGenerator.CharacterSelection.Model;
 using DialogGenerator.Core;
 using DialogGenerator.Events;
 using DialogGenerator.Events.EventArgs;
@@ -18,16 +17,11 @@ namespace DialogGenerator.CharacterSelection
         private CancellationTokenSource mCancellationTokenSource;
         private int mFirstCharacterIndex = -1;
         private int mSecondCharacterIndex = -1;
-        private IBLEDataProviderFactory mBLEDataProviderFactory;
-        private IBLEDataProvider mCurrentDataProvider;
         private ILogger mLogger;
 
-        public ArenaCharacterSelection( IEventAggregator _eventAggregator, 
-                                        IBLEDataProviderFactory _dataProviderFactory, ILogger _logger)
+        public ArenaCharacterSelection( IEventAggregator _eventAggregator, ILogger _logger)
         {
             mEventAggregator = _eventAggregator;
-            mBLEDataProviderFactory = _dataProviderFactory;
-            mCurrentDataProvider = mBLEDataProviderFactory.Create(BLEDataProviderType.WinBLEWatcher);
             mLogger = _logger;            
         }
 
@@ -38,15 +32,12 @@ namespace DialogGenerator.CharacterSelection
             await Task.Run(async () => 
             {
                 bool _restartRequired = false;
-                Task _BLEDataReaderTask = mCurrentDataProvider.StartReadingData();
                 Thread.CurrentThread.Name = "CharacterBoxesScanningThread";
                 Session.Set(Constants.FORCED_CH_COUNT, 2);
 
                 do
                 {
                     // Both characters are selected.
-                    // if (Session.Get<int>(Constants.FORCED_CH_COUNT) == 2)
-                    // {
                         int _char1Index = Session.Get<int>(Constants.NEXT_CH_1);
                         int _char2Index = Session.Get<int>(Constants.NEXT_CH_2);
 
@@ -84,39 +75,26 @@ namespace DialogGenerator.CharacterSelection
                             mLogger.Info($"ARENA CHARACTER SELECTION - AFTER REQUESTING CHARACTER CHANGE");
                             
                         }
-                    // }
                     
                     DateTime _nowTime = DateTime.Now;
                     DateTime _lastAccessTime = _nowTime;
                     TimeSpan _difference = new TimeSpan(0);
 
-                    BLE_Message message = mCurrentDataProvider.GetMessage();
-                    if (message != null)
-                    {
-                        _restartRequired = true;
-                        mLogger.Info("BLE messages arriving, switch to BLE Mode.");
-                        mCancellationTokenSource.Cancel();
-                    }
 
-                    Thread.Sleep(500);
+                Thread.Sleep(500);
                 } while (!mCancellationTokenSource.Token.IsCancellationRequested);
                 
                 mLogger.Info($"ARENA CHARACTER SELECTION - Exited from the loop. Request cancellation token requested - {mCancellationTokenSource.Token.IsCancellationRequested}");
                
                 if(_restartRequired)
                 {
-                    mCurrentDataProvider.StopReadingData();
-                    Session.Set(Constants.BLE_MODE_ON, true);
                     Session.Set(Constants.NEEDS_RESTART, true);                    
-                }
-                
-                await _BLEDataReaderTask;
+                }                
             });
         }
 
         public void StopCharacterSelection()
         {                        
-            mCurrentDataProvider.StopReadingData();
             mCancellationTokenSource.Cancel();
         }
 

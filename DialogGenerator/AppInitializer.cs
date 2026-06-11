@@ -99,8 +99,6 @@ namespace DialogGenerator
                 mLogger.Error(error);
             }
 
-            _checkForMultipleRadioAssignments(_JSONObjectTypesList.Characters);
-
             Session.Set(Constants.CHARACTERS, _JSONObjectTypesList.Characters);
             Session.Set(Constants.DIALOG_MODELS, _JSONObjectTypesList.DialogModels);
             Session.Set(Constants.WIZARDS, _JSONObjectTypesList.Wizards);
@@ -165,28 +163,6 @@ namespace DialogGenerator
                 mLogger.Error("Error in _removeDuplicateDialogModelsFromCollection " + e.Message);
             }
             return _alreadySeenDialogModelTagLists;
-        }
-        private void _checkForMultipleRadioAssignments(ObservableCollection<Character> _Characters)
-        {
-            var _radioCheck = new Dictionary<int, bool>();
-            for(int i = 0; i < ApplicationData.Instance.NumberOfRadios; i++)
-            {
-                _radioCheck.Add(i, false);            
-            }
-
-            var _charsWithRadios = _Characters.Where(_r => _r.RadioNum != -1);
-            foreach(var _character in _charsWithRadios)
-            {                
-                // If there is already a character with that 
-                // radio number, set the radio number to -1.
-                if(_radioCheck[_character.RadioNum])
-                {
-                    _character.RadioNum = -1;
-                } else
-                {
-                    _radioCheck[_character.RadioNum] = true;
-                }                
-            }
         }
 
         private  void _checkDirectories()

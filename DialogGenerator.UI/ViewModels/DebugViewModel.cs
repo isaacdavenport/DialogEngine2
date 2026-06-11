@@ -21,7 +21,6 @@ namespace DialogGenerator.UI.ViewModels
         private ICharacterDataProvider mCharacterDataProvider;
         private string mCharacter1Prefix;
         private string mCharacter2Prefix;
-        private HeatMapData mHeatMap;
 
         #endregion
 
@@ -36,11 +35,6 @@ namespace DialogGenerator.UI.ViewModels
             mEventAggregator = _eventAggregator;
             mCharacterDataProvider = _characterDataProvider;
 
-            mEventAggregator.GetEvent<HeatMapUpdateEvent>().Subscribe(_onHeatMapUpdate);
-            mHeatMap = new HeatMapData();
-            HeatMap.HeatMap = new int[ApplicationData.Instance.NumberOfRadios, ApplicationData.Instance.NumberOfRadios];
-            HeatMap.MotionVector = new int[ApplicationData.Instance.NumberOfRadios];
-            HeatMap.LastHeatMapUpdateTime = new DateTime[ApplicationData.Instance.NumberOfRadios];
 
             _bindCommands();
         }
@@ -77,36 +71,11 @@ namespace DialogGenerator.UI.ViewModels
             }
         }
 
-        private void _onHeatMapUpdate(HeatMapData data)
-        {
-            var characters = mCharacterDataProvider.GetAll();
-            int _characterCount = mCharacterDataProvider.GetAll().Count;
-            HeatMap = data;
-
-            if(data.Character1Index < _characterCount)
-            {
-                Character1Prefix = characters[data.Character1Index].CharacterPrefix;
-            }
-
-            if(data.Character2Index < _characterCount)
-            {
-                Character2Prefix = characters[data.Character2Index].CharacterPrefix;
-            }            
-        }
 
         #endregion
 
         #region - properties -
 
-        public HeatMapData HeatMap
-        {
-            get { return mHeatMap; }
-            set
-            {
-                mHeatMap = value;
-                RaisePropertyChanged();
-            }
-        }
         
         public string Character1Prefix
         {

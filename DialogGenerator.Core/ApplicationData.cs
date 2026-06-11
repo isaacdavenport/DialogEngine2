@@ -105,7 +105,6 @@ namespace DialogGenerator.Core
         public string TutorialFileName { get; set; } = "tutorial.pdf"; 
 
         public string DefaultImage { get; set; } = "avatar.png";        
-        public int NumberOfRadios { get; set; } = 6;
         
         public string URLToUpdateFile { get; set; } = "https://www.dropbox.com/s/uee58uqcpqrslln/update.xml?dl=1";        
 
@@ -117,11 +116,6 @@ namespace DialogGenerator.Core
         [Description("The size of the queue of the recent phrases")]
         [DisplayName("Recent phrases queue size:")]
         public int RecentPhrasesQueueSize { get; set; } = 8;
-
-        [Editable(true)]
-        [Description("Override radio signal checking")]
-        [DisplayName("Ignore radio signals:")]
-        public bool IgnoreRadioSignals { get; set; } = false;
 
         [Description("Determine how long current dialog can play to finish a line after new characters selected. Value is in seconds.")]
         [DisplayName("Max time past stop to play:")]
@@ -148,33 +142,6 @@ namespace DialogGenerator.Core
         [DisplayName("Debug Mode On:")]
         public bool DebugModeOn { get; set; } = false;
 
-        [Description("Radio's time sensitivity to switch miniatures 0.01-0.99.")]
-        [DisplayName("Time Sensitivity .01-.99:")]
-        [RegularExpression(@"^[0-9]([.,][0-9]{1,3})?$", ErrorMessage = @"Field requires decimal number.")]
-        public double RadioMovesTimeSensitivity { get; set; } = 0.1;
-
-
-        [Description("Radio's signal strength sensitivity to switch miniatures 0.01-0.99.")]
-        [DisplayName("Strength Sensitivity .01-.99:")]
-        [RegularExpression(@"^[0-9]([.,][0-9]{1,3})?$", ErrorMessage = @"Field requires decimal number.")]
-        public double RadioMovesSignalStrengthSensitivity { get; set; } = 0.7;
-
-        [Editable(true)]
-        [DisplayName("Still time required:")]        
-        public int MsOfStillTimeRequired { get; set; } = 300;
-
-        [Editable(true)]
-        [DisplayName("Acc. motion threshold:")]
-        public int AccelerometerMotionThreshold { get; set; } = 40;
-
-        [Editable(true)]
-        [DisplayName("Acc. stillness threshold:")]
-        public int AccelerometerStillnessThreshold { get; set; } = 48;
-
-        [Editable(true)]
-        [DisplayName("Motion window:")]
-        public int MsMotionWindow { get; set; } = 1500;
-
         [Editable(true)]
         public bool ForceCharacterSwap { get; set; } = false;
 
@@ -183,9 +150,6 @@ namespace DialogGenerator.Core
 
         [XmlIgnore]
         public string DialogLoggerKey { get; set; } = "LogDialog";
-
-        [XmlIgnore]
-        public string BLEVectorsLoggerKey { get; set; } = "BLEVectorsLog";
 
         [XmlIgnore]
         public string JSONFilesVersion { get; set; } = "1.5";  // updated after removing of the default value for the JSONObjectsTypesList 'Editable' property.

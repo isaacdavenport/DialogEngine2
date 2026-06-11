@@ -95,11 +95,6 @@ namespace DialogGenerator.UI.Wrapper
         }
 
 
-        public int RadioNum
-        {
-            get { return Model.RadioNum; }
-        }
-
         public string Author
         {
             get { return getValue<string>(); }

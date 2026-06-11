@@ -16,7 +16,6 @@
     <UserControl.Resources>
         <ResourceDictionary>
             <converters:CharacterGenderValueConverter x:Key="CharacterGenderValueConverter"/>
-            <converters:CharacterRadioNumberToTextValueConverter x:Key="CharacterRadioNumberToTextValueConverter" />
             <converters:CloneValuesConverter x:Key="CloneValuesConverter" />
             <converters:ImageToFullPathValueConverter x:Key="ImageToFullPathValueConverter" />
             <converters:InvertValueConverter x:Key="InvertValueConverter" />

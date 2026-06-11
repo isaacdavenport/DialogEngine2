@@ -75,14 +75,12 @@
     <Reference Include="WindowsBase" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="CharacterRadioBindingRepository.cs" />
     <Compile Include="CharacterRepository.cs" />
     <Compile Include="DataAccessModule.cs" />
     <Compile Include="DialogDataRepository.cs" />
     <Compile Include="DialogModelRepository.cs" />
     <Compile Include="Helper\Serializer.cs" />
     <Compile Include="Helper\ValidationHelper.cs" />
-    <Compile Include="ICharacterRadioBindingRepository.cs" />
     <Compile Include="ICharacterRepository.cs" />
     <Compile Include="IDialogDataRepository.cs" />
     <Compile Include="IDialogModelRepository.cs" />

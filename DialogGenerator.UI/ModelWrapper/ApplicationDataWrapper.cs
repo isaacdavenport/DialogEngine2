@@ -37,32 +37,6 @@ namespace DialogGenerator.UI.Wrapper
                             errors.Add("Decimal number required.");
                         break;
                     }
-                case nameof(RadioMovesTimeSensitivity):
-                    {   
-                        if (!_isDecimalFormat(RadioMovesTimeSensitivity.ToString()))
-                            errors.Add("Decimal number required.");
-                        else
-                        {
-                            if(RadioMovesTimeSensitivity < 0.0 || RadioMovesTimeSensitivity > 1.0)
-                            {
-                                errors.Add("The value should be between 0.0 and 1.0");
-                            }
-                        }
-                        break;
-                    }
-                case nameof(RadioMovesSignalStrengthSensitivity):
-                    {
-                        if (!_isDecimalFormat(RadioMovesSignalStrengthSensitivity.ToString()))
-                            errors.Add("Decimal number required.");
-                        else
-                        {
-                            if (RadioMovesTimeSensitivity < 0.0 || RadioMovesTimeSensitivity > 1.0)
-                            {
-                                errors.Add("The value should be between 0.0 and 1.0");
-                            }
-                        }
-                        break;
-                    }
             }
             return errors;
         }
@@ -172,16 +146,6 @@ namespace DialogGenerator.UI.Wrapper
             }
         }
 
-        public bool IgnoreRadioSignals
-        {
-            get { return getValue<bool>(); }
-            set
-            {
-                setValue(value);
-                validateProperty(nameof(IgnoreRadioSignals));
-            }
-        }
-
         public double MaxTimeToPlayFile
         {
             get { return getValue<double>(); }
@@ -209,26 +173,6 @@ namespace DialogGenerator.UI.Wrapper
             {
                 setValue(value);
                 validateProperty(nameof(DelayBetweenPhrases));
-            }
-        }
-
-        public double RadioMovesTimeSensitivity
-        {
-            get { return getValue<double>(); }
-            set
-            {
-                setValue(value);
-                validateProperty(nameof(RadioMovesTimeSensitivity));
-            }
-        }
-
-        public double RadioMovesSignalStrengthSensitivity
-        {
-            get { return getValue<double>(); }
-            set
-            {
-                setValue(value);
-                validateProperty(nameof(RadioMovesSignalStrengthSensitivity));
             }
         }
 

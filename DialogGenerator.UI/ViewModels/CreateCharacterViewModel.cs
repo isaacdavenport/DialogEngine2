@@ -1,8 +1,5 @@
-﻿using DialogGenerator.CharacterSelection;
-using DialogGenerator.CharacterSelection.Data;
-using DialogGenerator.CharacterSelection.Model;
+﻿using DialogGenerator.CharacterSelection.Model;
 using DialogGenerator.Core;
-using DialogGenerator.DataAccess;
 using DialogGenerator.DataAccess.Helper;
 using DialogGenerator.Events;
 using DialogGenerator.Events.EventArgs;
@@ -54,17 +51,13 @@ namespace DialogGenerator.UI.ViewModels
         private IMessageDialogService mMessageDialogService;
         private string mCurrentDialogWizard = String.Empty;
         private string mNextButtonText = "Next";
-        private IBLEDataProviderFactory mBLEDataProviderFactory;
-        private IBLEDataProvider mCurrentDataProvider;
         private CancellationTokenSource mCancellationTokenSource;
-        private string mSelectRadioTitle = Properties.Resources.ShakeRadio;
         private bool mHasNoVoice = false;
         private string mVoice = string.Empty;
         private int mSpeechRate = -1;
 
         private string mCharacterNameValidationError = string.Empty;
         private bool mCharacterNameHasError = false;
-        private ICharacterRadioBindingRepository mCharacterRadionBindingRepository;
 
         private bool mResumePreviousSession = false;
 
@@ -73,26 +66,20 @@ namespace DialogGenerator.UI.ViewModels
             Workflow.Fire((Triggers)index);
         }
 
-        private List<ToyEntry> mRadiosCollection = new List<ToyEntry>();
-        private ToyEntry mSelectedRadio;
 
         public CreateCharacterViewModel(ILogger _logger,
             IEventAggregator _eventAggregator,
             ICharacterDataProvider _characterDataProvider,
             IRegionManager _regionManager,
             IMessageDialogService _messageDialogService,
-            IBLEDataProviderFactory _BLEDataProviderFactory,
-            IWizardDataProvider _WizardDataProvider,
-            ICharacterRadioBindingRepository _CharacterRadioBindingRepository)
+            IWizardDataProvider _WizardDataProvider)
         {
             mLogger = _logger;
             mEventAgregator = _eventAggregator;
             mCharacterDataProvider = _characterDataProvider;
             mRegionManager = _regionManager;
             mMessageDialogService = _messageDialogService;
-            mBLEDataProviderFactory = _BLEDataProviderFactory;
             mWizardDataProvider = _WizardDataProvider;
-            mCharacterRadionBindingRepository = _CharacterRadioBindingRepository;
 
             mWizard = new CreateCharacterWizard();
             CurrentStep = mWizard.Steps[mCurrentStepIndex];            
@@ -102,22 +89,6 @@ namespace DialogGenerator.UI.ViewModels
                 mAgesCollection.Add(i);
             }
 
-            mRadiosCollection.Add(new ToyEntry
-            {
-                Key = -1,
-                Value = "Unassigned"
-            });
-
-            for (int i = 0; i < 6; i++)
-            {
-                mRadiosCollection.Add(new ToyEntry
-                {
-                    Key = i,
-                    Value = i.ToString()
-                });
-            }
-
-            mSelectedRadio = mRadiosCollection.FirstOrDefault(p => p.Key == -1);
 
             Workflow = new CreateCharacterWorkflow(action: () => { });
             Workflow.PropertyChanged += _workflow_PropertyChanged;
@@ -133,51 +104,6 @@ namespace DialogGenerator.UI.ViewModels
 
         public CreateCharacterState State { get; set; } = new CreateCharacterState();
 
-        public List<ToyEntry> RadiosCollection
-        {
-            get
-            {
-                return mRadiosCollection;
-            }
-        }
-
-        public ToyEntry SelectedRadio
-        {
-            get
-            {
-                return mSelectedRadio;
-            }
-
-            set
-            {
-                int _oldVal = mSelectedRadio.Key;
-                mSelectedRadio = value;
-                _selectToyToCharacter(_oldVal);
-                if(mSelectedRadio.Key == -1)
-                {
-                    SelectRadioTitle = Properties.Resources.ShakeRadio;
-                } else
-                {
-                    SelectRadioTitle = Properties.Resources.RadioAttached;
-                }
-
-                RaisePropertyChanged();
-            }
-        }
-
-        public string SelectRadioTitle
-        {
-            get
-            {
-                return mSelectRadioTitle;
-            }
-
-            set
-            {
-                mSelectRadioTitle = value;
-                RaisePropertyChanged();
-            }
-        }       
 
         public int WizardPassthroughIndex
         {
@@ -606,38 +532,6 @@ namespace DialogGenerator.UI.ViewModels
                         
         }
 
-        private async void _selectToyToCharacter(int oldVal = -1)
-        {
-            if (mSelectedRadio.Key == -1)
-                return;
-
-            var _oldChars = mCharacterDataProvider.GetAll().Where(c => c.RadioNum == mSelectedRadio.Key);
-            if (_oldChars.Count() > 0)
-            {
-                var _oldChar = _oldChars.First();
-                _oldChar = mCharacterDataProvider.GetAll().Where(c => c.RadioNum == mSelectedRadio.Key).First();
-                if (_oldChar != null)
-                {
-                    // izbaci message box
-                    MessageDialogResult result = await mMessageDialogService.ShowOKCancelDialogAsync(String.Format("The toy with index {0} is assigned to character {1}. Are You sure that you want to re-asign it?", mSelectedRadio.Key, _oldChar.CharacterName), "Check");
-                    if (result == MessageDialogResult.OK)
-                    {
-                        // settuj na Unassigned ako je Yes
-                        _oldChar.RadioNum = -1;
-                        await mCharacterDataProvider.SaveAsync(_oldChar);
-                    }
-                    else
-                    {
-                        mSelectedRadio = mRadiosCollection.First(p => p.Key == oldVal);
-                        RaisePropertyChanged("SelectedRadio");
-                        SelectRadioTitle = Properties.Resources.ShakeRadio;
-                    }
-                }
-            }
-
-            Character.RadioNum = mSelectedRadio.Key;
-        }
-
         private void _initVoiceCollection()
         {
 
@@ -676,7 +570,6 @@ namespace DialogGenerator.UI.ViewModels
             CurrentStepIndex = 0;
             NextButtonText = "Next";
             WizardPassthroughIndex = 0;
-            SelectedRadio = RadiosCollection[0];
 
             Character = new Character();
             
@@ -998,18 +891,8 @@ namespace DialogGenerator.UI.ViewModels
                 case "Note":
                     Character.InternalRemarks = CharacterNote;
                     break;
-                case "AssignToy":
-                    if(Session.Get<bool>(Constants.BLE_MODE_ON))
-                    {
-                        Character.RadioNum = SelectedRadio.Key;
-                        mCharacterRadionBindingRepository.AttachRadioToCharacter(SelectedRadio.Key, Character.CharacterPrefix);
-                        _stopScanForRadios();
-                    }                    
-                    
-                    break;
                 case "Wizard":
                     
-
                     break;
                 default:
                     break;
@@ -1066,29 +949,6 @@ namespace DialogGenerator.UI.ViewModels
                 case "Avatar":
                     CurrentStepIndex = 4;
                     CharacterImage = Character.CharacterImage;
-                    break;
-                case "AssignToy":
-                    int _oldIndex = CurrentStepIndex;
-                    CurrentStepIndex = 5;
-                    if(Session.Get<bool>(Constants.BLE_MODE_ON) == false)
-                    {
-                        if(_oldIndex < CurrentStepIndex)
-                        {
-                            Workflow.Fire(Triggers.SetAuthor);
-                        } else
-                        {
-                            Workflow.Fire(Triggers.SetAvatar);
-                        }
-                        
-                    } else
-                    {
-                        string _radioText = Character.RadioNum == -1 ? "Unasigned" : Character.RadioNum.ToString();
-                        var _selectedRadio = RadiosCollection.First(r => r.Key == Character.RadioNum);
-                        SelectedRadio = _selectedRadio;
-
-                        _startScanForRadios();
-                    }
-                    
                     break;
                 case "Author":
                     CurrentStepIndex = 6;
@@ -1174,11 +1034,6 @@ namespace DialogGenerator.UI.ViewModels
                         // Notify all interested parties that the collection has new element (has changed).
                         mEventAgregator.GetEvent<CharacterCollectionLoadedEvent>().Publish();
                         
-                        // If the character has the radio assigned notify the interested parties.
-                        if (Character.RadioNum != -1)
-                        {                            
-                            mEventAgregator.GetEvent<RadioAssignedEvent>().Publish(Character.RadioNum);
-                        }
 
                         // Reset the conversation in the case of the new character.
                         //Session.Set(Constants.NEXT_CH_1, -1);
@@ -1228,65 +1083,7 @@ namespace DialogGenerator.UI.ViewModels
                     break;
             }
         }
-
-        private async void _startScanForRadios()
-        {
-            mCancellationTokenSource = new CancellationTokenSource();
-            mCurrentDataProvider = mBLEDataProviderFactory.Create(BLEDataProviderType.WinBLEWatcher);
-            await Task.Run(async () =>
-            {
-                Thread.CurrentThread.Name = "StartCharacterMovingDetection";                
-                Task _BLEDataReaderTask = mCurrentDataProvider.StartReadingData();
-                int _oldIndex = -1;
-                do
-                {
-                    // Read messages
-                    BLE_Message message = mCurrentDataProvider.GetMessage();
-                    if(message != null)
-                    {
-                        int _radioIndex = -1;
-                        string outData = String.Empty;
-                        for (int i = 0; i < ApplicationData.Instance.NumberOfRadios; i++)
-                        {
-                            if (message.msgArray[i] == 0xFF)
-                            {
-                                _radioIndex = i;
-                            }
-                            
-                        }
-
-                        // If motion vector is greater than zero, show message
-                        int _motion = message.msgArray[ApplicationData.Instance.NumberOfRadios];
-                        if(_motion > 10 && _radioIndex > -1)
-                        {
-                            if(_radioIndex != _oldIndex)
-                            {
-                                ToyEntry _tEntry = mRadiosCollection.FirstOrDefault(p => p.Key == _radioIndex);
-                                if(_tEntry != null)
-                                {
-                                    SelectedRadio = _tEntry;
-                                }
-
-                                _oldIndex = _radioIndex;
-                            }
-                        }
-                        
-                    }
-
-                    Thread.Sleep(1);
-                } while (!mCancellationTokenSource.IsCancellationRequested);
-
-                await _BLEDataReaderTask;
-
-            });
-        }
-
-        private void _stopScanForRadios()
-        {
-            mCurrentDataProvider.StopReadingData();
-            mCancellationTokenSource.Cancel();
-        }
-        
+      
         private bool _checkCharacterCreateMode()
         {
             if(Session.Contains(Constants.CHARACTER_EDIT_MODE) && (bool) Session.Get(Constants.CHARACTER_EDIT_MODE) == true)

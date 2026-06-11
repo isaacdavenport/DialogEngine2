@@ -211,7 +211,6 @@ namespace DialogGenerator.UI.ViewModels
                             await mCharacterDataProvider.Remove(_oldCharacter, _imageFileName);
                         }
 
-                        _importedCharacter.RadioNum = -1;
                         _importedCharacter.Editable = true;
                         mCharacterDataProvider.GetAll().Add(_importedCharacter);
                     }

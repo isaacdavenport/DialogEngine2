@@ -90,19 +90,12 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="ArenaCharacterSelection.cs" />
-    <Compile Include="BLEDataProviderFactory.cs" />
     <Compile Include="CharacterSelectionFactory.cs" />
     <Compile Include="CharacterSelectionModule.cs" />
-    <Compile Include="Data\IBLEDataProvider.cs" />
-    <Compile Include="Data\WinBLEWatcherDataProvider.cs" />
-    <Compile Include="Helper\ParseMessageHelper.cs" />
-    <Compile Include="IBLEDataProviderFactory.cs" />
     <Compile Include="ICharacterSelection.cs" />
     <Compile Include="ICharacterSelectionFactory.cs" />
-    <Compile Include="Model\ReceivedMessage.cs" />
     <Compile Include="Model\BLEDataProviderType.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="BLESelectionService.cs" />
     <Compile Include="Workflow\SerialSelectionWorkflow.cs" />
   </ItemGroup>
   <ItemGroup>
@@ -129,6 +122,10 @@
   </ItemGroup>
   <ItemGroup>
     <None Include="packages.config" />
+  </ItemGroup>
+  <ItemGroup>
+    <Folder Include="Data\" />
+    <Folder Include="Helper\" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>

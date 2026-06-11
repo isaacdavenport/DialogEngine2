@@ -49,32 +49,6 @@ namespace DialogGenerator.Tests.DataAccess
             Assert.Null(character);
         }
 
-        [Theory]
-        [InlineData(2)]
-        [InlineData(3)]
-        public void GetByAssignedRadio_ShouldFindCharacter(int _radioNum)
-        {
-            Assert.True(characters.Count == 2);
-
-            characters[0].RadioNum = 2;
-            characters[1].RadioNum = 3;
-
-            var character = mRepository.GetByAssignedRadio(_radioNum);
-
-            Assert.NotNull(character);
-            Assert.Equal(_radioNum, character.RadioNum);
-        }
-
-        [Theory]
-        [InlineData(-1)]
-        [InlineData(20)]
-        public void GetByAssignedRadio_ShouldNotFindCharacter(int _radioNum)
-        {
-            var character = mRepository.GetByAssignedRadio(_radioNum);
-
-            Assert.Null(character);
-        }
-
         [Fact]
         public async void Character_CheckAddExport()
         {

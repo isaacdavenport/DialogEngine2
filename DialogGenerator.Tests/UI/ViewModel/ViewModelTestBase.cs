@@ -52,8 +52,6 @@ namespace DialogGenerator.Tests.UI.ViewModel
         private void _characterDataProviderSetup()
         {
             characterDataProviderMock.Setup(x => x.GetAll()).Returns(() => characters);
-            characterDataProviderMock.Setup(x => x.GetByAssignedRadio(1)).Returns(characters.First());
-            characterDataProviderMock.Setup(x => x.GetByAssignedRadio(-1)).Returns((Character)null);
             characterDataProviderMock.Setup(x => x.SaveAsync(It.IsAny<Character>())).Returns(Task.CompletedTask);
             characterDataProviderMock.Setup(x => x.GetByInitials("ch1")).Returns(characters.First());
             characterDataProviderMock.Setup(x => x.GetByInitials(It.Is<string>(p => string.IsNullOrEmpty(p)))).Returns((Character)null);
@@ -64,13 +62,11 @@ namespace DialogGenerator.Tests.UI.ViewModel
             var character1 = new Character
             {
                 CharacterPrefix = "ch1",
-                RadioNum = 1
             };
 
             var character2 = new Character
             {
                 CharacterPrefix = "ch2",
-                RadioNum = 2
             };
 
             characters.Add(character1);

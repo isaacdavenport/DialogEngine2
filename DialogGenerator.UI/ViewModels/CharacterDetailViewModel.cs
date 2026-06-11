@@ -1,7 +1,4 @@
-﻿using DialogGenerator.CharacterSelection;
-using DialogGenerator.CharacterSelection.Data;
-using DialogGenerator.CharacterSelection.Model;
-using DialogGenerator.Core;
+﻿using DialogGenerator.Core;
 using DialogGenerator.Events;
 using DialogGenerator.Model;
 using DialogGenerator.UI.Data;
@@ -50,8 +47,6 @@ namespace DialogGenerator.UI.ViewModels
         private IMessageDialogService object4;
         private IMP3Player object5;
 
-        private IBLEDataProviderFactory mBLEDataProviderFactory;
-        private IBLEDataProvider mCurrentDataProvider;
         private CancellationTokenSource mCancellationTokenSource;
 
         #endregion
@@ -61,8 +56,7 @@ namespace DialogGenerator.UI.ViewModels
             , ICharacterDataProvider _characterDataProvider
             , IMessageDialogService  _messageDialogService
             , IMP3Player _mp3Player
-            , IRegionManager _regionManager
-            , IBLEDataProviderFactory _BLEDataProviderFactory)
+            , IRegionManager _regionManager)
         {
             mLogger = logger;
             mEventAggregator = _eventAggregator;
@@ -70,7 +64,6 @@ namespace DialogGenerator.UI.ViewModels
             mMessageDialogService = _messageDialogService;
             mMP3Player = _mp3Player;
             mRegionManager = _regionManager;
-            mBLEDataProviderFactory = _BLEDataProviderFactory;
             mPhrasesCollectionViewSource = new CollectionViewSource();
             FilterText = "";
             mPhrasesCollectionViewSource.Filter += _phrases_Filter;
@@ -159,8 +152,7 @@ namespace DialogGenerator.UI.ViewModels
             var character =mRegionManager.Regions[Constants.ContentRegion].Context as Character;
             Load(string.IsNullOrEmpty(character.CharacterPrefix) ? "" : character.CharacterPrefix);
             Session.Set(Constants.SELECTED_CHARACTER, character);
-            mLogger.Debug($"Character Detail View - Loaded for character '{Character.CharacterName}'");
-            await _startRadioScanning();
+            mLogger.Debug($"Character Detail View - Loaded for character '{Character.CharacterName}'");           
         }        
 
         private void _viewClosed_Execute()
@@ -177,87 +169,11 @@ namespace DialogGenerator.UI.ViewModels
             //    ProcessHandler.Remove(Character.Model.FileName);                
             //}
 
-            _stopRadioScanning();
             //Session.Set(Constants.SELECTED_CHARACTER, null);
             mLogger.Debug($"Character Detail View - Unloaded for character '{Character.CharacterName}'");
         }
 
-        private async Task _startRadioScanning()
-        {
-            mCancellationTokenSource = new CancellationTokenSource();
-            mCurrentDataProvider = mBLEDataProviderFactory.Create(BLEDataProviderType.WinBLEWatcher);
-            await Task.Run(async () =>
-            {
-                Thread.CurrentThread.Name = "StartCharacterMovingDetection";
-                Task _BLEDataReaderTask = mCurrentDataProvider.StartReadingData();
-                int _oldIndex = -1;
-                do
-                {
-                    // Read messages
-                    BLE_Message message = mCurrentDataProvider.GetMessage();
-                    if (message != null)
-                    {
-                        int _radioIndex = -1;
-                        string outData = String.Empty;
-                        for (int i = 0; i < ApplicationData.Instance.NumberOfRadios; i++)
-                        {
-                            if (message.msgArray[i] == 0xFF)
-                            {
-                                _radioIndex = i;
-                            }
-
-                        }
-
-                        // If motion vector is greater than zero, show message
-                        int _motion = message.msgArray[ApplicationData.Instance.NumberOfRadios];
-                        if (_motion > 10 && _radioIndex > -1)
-                        {
-                            if (_radioIndex != _oldIndex)
-                            {
-
-                                _selectToyToCharacter(_radioIndex);
-                                _oldIndex = _radioIndex;
-                            }
-                        }
-
-                    }
-
-                    Thread.Sleep(1);
-                } while (!mCancellationTokenSource.IsCancellationRequested);
-
-                await _BLEDataReaderTask;
-
-            });
-        }
-
-        private void _stopRadioScanning()
-        {
-            mCurrentDataProvider.StopReadingData();
-            mCancellationTokenSource.Cancel();
-        }
-
-        private async void _selectToyToCharacter(int newVal)
-        {
-            var _oldChars = mCharacterDataProvider.GetAll().Where(c => c.RadioNum == newVal);
-            if (_oldChars.Count() > 0)
-            {
-                var _oldChar = _oldChars.First();
-                _oldChar = mCharacterDataProvider.GetAll().Where(c => c.RadioNum == newVal).First();
-                if (_oldChar != null)
-                {
-                    // izbaci message box
-                    MessageDialogResult result = await mMessageDialogService.ShowOKCancelDialogAsync(String.Format("The toy with index {0} is assigned to character {1}. Are You sure that you want to re-asign it?", newVal, _oldChar.CharacterName), "Check");
-                    if (result == MessageDialogResult.OK)
-                    {
-                        // settuj na Unassigned ako je Yes
-                        _oldChar.RadioNum = -1;
-                        await mCharacterDataProvider.SaveAsync(_oldChar);
-                        Character.Model.RadioNum = newVal;
-                    }
-                }
-            }            
-        }
-
+ 
         private void _onCharacterStructureChanged()
         {
             Load(string.IsNullOrEmpty(Character.CharacterPrefix) ? "" : Character.CharacterPrefix);

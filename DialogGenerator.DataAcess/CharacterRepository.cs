@@ -322,17 +322,6 @@ namespace DialogGenerator.DataAccess
         }
         
 
-        public Character GetByAssignedRadio(int _radioNum)
-        {
-            if (_radioNum < 0)
-                return null;
-
-            var character = Session.Get<ObservableCollection<Character>>(Constants.CHARACTERS)
-                .Where(c => c.RadioNum == _radioNum)
-                .FirstOrDefault();
-
-            return character;
-        }
 
         public  Task Remove(Character character,string _imageFileName)
         {

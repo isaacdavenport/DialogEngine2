@@ -12,7 +12,6 @@ namespace DialogGenerator.Tests.UI.ViewModel
         private CharacterDetailViewModel mViewModel;
         private Mock<IMP3Player> mMP3PlayerMock = new Mock<IMP3Player>();        
         private Mock<IRegionManager> regionManagerMock = new Mock<IRegionManager>();
-        private Mock<IBLEDataProviderFactory> bleDataProviderFactoryMock = new Mock<IBLEDataProviderFactory>();
 
         public CharacterDetailViewModelTests()
         {
@@ -22,8 +21,7 @@ namespace DialogGenerator.Tests.UI.ViewModel
                 , characterDataProviderMock.Object
                 , messageDialogServiceMock.Object
                 , mMP3PlayerMock.Object
-                , regionManagerMock.Object
-                , bleDataProviderFactoryMock.Object);
+                , regionManagerMock.Object);
             
         }
 

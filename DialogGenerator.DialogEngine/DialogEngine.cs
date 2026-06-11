@@ -702,21 +702,8 @@ namespace DialogGenerator.DialogEngine
             mIsDialogCancelled = false;
             Task _characterSelectionTask;
 
-
-            // S.Ristic 12/15/2019
-            // This additional check is consequence of adding of the new setting according
-            // to request in DLGEN-420.
-            if(!ApplicationData.Instance.IgnoreRadioSignals)
-            {
-                mCharacterSelection = Session.Get<bool>(Constants.BLE_MODE_ON)
-                ? mCharacterSelectionFactory.Create(SelectionMode.BLESelectionMode)
-                : mCharacterSelectionFactory.Create( SelectionMode.ArenaModel);
-            } else
-            {
-                Session.Set(Constants.BLE_MODE_ON, false);
-                mCharacterSelection = mCharacterSelectionFactory.Create(SelectionMode.ArenaModel);
-                
-            }
+            Session.Set(Constants.BLE_MODE_ON, false);
+            mCharacterSelection = mCharacterSelectionFactory.Create(SelectionMode.ArenaModel);
 
             mEventAggregator.GetEvent<CharacterSelectionModelChangedEvent>().Publish();
             
@@ -731,7 +718,6 @@ namespace DialogGenerator.DialogEngine
                 Thread.CurrentThread.Name = "DialogGeneratorThread";
                 Console.WriteLine(Thread.CurrentThread.Name + " started!");
                 mLogger.Debug(Thread.CurrentThread.Name + " started!");
-                mLogger.Info("Starting Dialog Engine", ApplicationData.Instance.BLEVectorsLoggerKey);
 
 
                 _characterSelectionTask = mCharacterSelection.StartCharacterSelection();
@@ -742,18 +728,9 @@ namespace DialogGenerator.DialogEngine
                     {
                         await _characterSelectionTask;
 
-                        bool _radioModeOn = Session.Get<bool>(Constants.BLE_MODE_ON);
-                        if (!ApplicationData.Instance.IgnoreRadioSignals)
-                        {
-                            mCharacterSelection = Session.Get<bool>(Constants.BLE_MODE_ON)
-                            ? mCharacterSelectionFactory.Create(SelectionMode.BLESelectionMode)
-                            : mCharacterSelectionFactory.Create(SelectionMode.ArenaModel);
-                        }
-                        else
-                        {
-                            Session.Set(Constants.BLE_MODE_ON, false);
-                            mCharacterSelection = mCharacterSelectionFactory.Create(SelectionMode.ArenaModel);
-                        }
+                        mCharacterSelection = Session.Get<bool>(Constants.BLE_MODE_ON)
+                        ? mCharacterSelectionFactory.Create(SelectionMode.BLESelectionMode)
+                        : mCharacterSelectionFactory.Create(SelectionMode.ArenaModel);
 
                         mEventAggregator.GetEvent<CharacterSelectionModelChangedEvent>().Publish();
                         _characterSelectionTask = mCharacterSelection.StartCharacterSelection();

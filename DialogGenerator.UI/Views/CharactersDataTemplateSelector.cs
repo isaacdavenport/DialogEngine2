@@ -16,10 +16,7 @@ namespace DialogGenerator.UI.Views
             {
                 Character character = item as Character;
 
-                if (character.RadioNum >= 0)
-                    return element.FindResource("AssignedCharacterTemplate") as DataTemplate;
-                else
-                    return element.FindResource("UnassignedCharacterTemplate") as DataTemplate;
+                return element.FindResource("UnassignedCharacterTemplate") as DataTemplate;
             }
 
             return null;

@@ -16,7 +16,6 @@ namespace DialogGenerator.Model
 
         private string mCharacterName;
         private ObservableCollection<PhraseEntry> mPhrases;
-        private int mRadioNum =-1;
         private PhraseEntry mPhraseTotals;
         private string mCharacterImage = ApplicationData.Instance.DefaultImage;
         private string mAuthor = String.Empty;
@@ -82,25 +81,6 @@ namespace DialogGenerator.Model
                 OnPropertyChanged("CharacterImage");
             }
         }
-
-        /// <summary>
-        /// Radio number assigned to character
-        /// Default value is unassigned ( -1 )
-        /// </summary>
-        [RadioNumRange]
-        //[JsonProperty("RadioNum")]
-        [JsonIgnore]
-        public int RadioNum
-        {
-            get { return mRadioNum; }
-            set
-            {
-                mRadioNum = value;
-                OnPropertyChanged("RadioNum");                
-            }
-        }
-
-
 
         [JsonProperty("Phrases")]
         public ObservableCollection<PhraseEntry> Phrases

@@ -47,9 +47,7 @@ namespace DialogGenerator.UI.ViewModels
         private ObservableCollection<Character> mCharacters;
         private string mFirstCharacterDialogLine;
         private string mSecondCharacterDialogLine;
-        private bool mRadioModeOn = false;
         private ArenaViewModel mArenaViewModel;
-        private AssignedRadiosViewModel mAssignedRadiosViewModel;
         private bool mCanPause = false;
         private bool mCanResume = false;
         private IMP3Player mPlayer;
@@ -65,7 +63,6 @@ namespace DialogGenerator.UI.ViewModels
             ,ICharacterRepository _characterRepository
             ,IRegionManager _regionManager
             ,ArenaViewModel _ArenaViewModel
-            ,AssignedRadiosViewModel _AssignedRadiosViewModel
             ,IDialogModelRepository _DialogModelRepository
             ,IWizardRepository _WizardRepository, IMP3Player _player)
         {
@@ -78,7 +75,6 @@ namespace DialogGenerator.UI.ViewModels
             mWizardRepository = _WizardRepository;
             mRegionManager = _regionManager;
             mArenaViewModel = _ArenaViewModel;
-            mAssignedRadiosViewModel = _AssignedRadiosViewModel;
             mPlayer = _player;
 
             mEventAggregator.GetEvent<NewDialogLineEvent>().Subscribe(_onNewDialogLine);
@@ -86,7 +82,6 @@ namespace DialogGenerator.UI.ViewModels
             mEventAggregator.GetEvent<CharacterCollectionLoadedEvent>().Subscribe(_onCharacterCollectionLoaded);
             mEventAggregator.GetEvent<SelectedCharactersPairChangedEvent>().Subscribe(_onSelectedCharactersPairChangedEvent);
             mEventAggregator.GetEvent<GuidedCharacterCreationModeChangedEvent>().Subscribe(_onGuidedCharacterCreationModeChanged);
-            mEventAggregator.GetEvent<CharacterSelectionModelChangedEvent>().Subscribe(_onCharacterSelectionModelChanged);
 
             _bindCommands();
 
@@ -126,11 +121,6 @@ namespace DialogGenerator.UI.ViewModels
             ResumeCommand.RaiseCanExecuteChanged();
             CanPause = mDialogEngine.Running;
             CanResume = mDialogEngine.PauseCancellationTokenSource != null;
-        }
-
-        private void _onCharacterSelectionModelChanged()
-        {
-            RadioModeOn = Session.Get<bool>(Constants.BLE_MODE_ON);
         }
 
         private void _onGuidedCharacterCreationModeChanged(bool obj)
@@ -325,20 +315,6 @@ namespace DialogGenerator.UI.ViewModels
             }
         }
 
-        public bool RadioModeOn
-        {
-            get
-            {
-                return mRadioModeOn;
-            }
-
-            set
-            {
-                mRadioModeOn = value;
-                RaisePropertyChanged();
-            }
-        }
-
         public ArenaViewModel ArenaViewModel
         {
             get
@@ -347,13 +323,6 @@ namespace DialogGenerator.UI.ViewModels
             }
         }
 
-        public AssignedRadiosViewModel AssignedRadiosViewModel
-        {
-            get
-            {
-                return mAssignedRadiosViewModel;
-            }
-        }
 
         #endregion
 
@@ -373,7 +342,6 @@ namespace DialogGenerator.UI.ViewModels
         public DelegateCommand SelectFirstCharacterCommand { get; set; }
         public DelegateCommand SelectSecondCharacterCommand { get; set; }
         public DelegateCommand ExpertModeCommand { get; set; }
-        public DelegateCommand ToggleAssignedRadiosCommand { get; set; }
         public DelegateCommand ShowPDFHelpCommand { get; set; }
 
         public DelegateCommand PauseCommand { get; set; }
@@ -401,7 +369,6 @@ namespace DialogGenerator.UI.ViewModels
             SelectFirstCharacterCommand = new DelegateCommand(_SelectFirstCharacter_Execute, _selectFirstCharacter_CanExecute);
             SelectSecondCharacterCommand = new DelegateCommand(_SelectSecondCharacter_Execute, _selectSecondCharacter_CanExecute);
             ExpertModeCommand = new DelegateCommand(_expertModeExecute, _expertMode_CanExecute);
-            ToggleAssignedRadiosCommand = new DelegateCommand(_toggleAssignedRadios_Execute);
             ShowPDFHelpCommand = new DelegateCommand(_showPDFHelpCommand_execute);
             PauseCommand = new DelegateCommand(_pauseCommandExecute, _pauseCommandCanExecute);
             ResumeCommand = new DelegateCommand(_resumeCommandExecute, _resumeCommandCanExecute);
@@ -468,10 +435,6 @@ namespace DialogGenerator.UI.ViewModels
             }
         }
 
-        private void _toggleAssignedRadios_Execute()
-        {
-            mMessageDialogService.ShowDedicatedDialogAsync<int?>(new AssignCharacterToRadioView(), "ContentDialogHost");            
-        }
 
         private bool _expertMode_CanExecute()
         {

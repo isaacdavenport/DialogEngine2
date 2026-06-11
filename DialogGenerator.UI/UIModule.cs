@@ -44,7 +44,6 @@ namespace DialogGenerator.UI
 
             mContainer.RegisterType<CreateCharacterViewModel>(new ContainerControlledLifetimeManager());
             mContainer.RegisterType<ArenaViewModel>(new ContainerControlledLifetimeManager());
-            mContainer.RegisterType<AssignedRadiosViewModel>(new ContainerControlledLifetimeManager());            
             mContainer.RegisterType<CharacterDialogLinesViewModel>(new ContainerControlledLifetimeManager());
             mContainer.RegisterType<CustomDialogCreatorViewModel>(new ContainerControlledLifetimeManager());
         }
