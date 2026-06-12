@@ -58,7 +58,7 @@
             <RowDefinition Height="Auto" />
         </Grid.RowDefinitions>
 
-        <Border Grid.Row="0" BorderBrush="DarkGray" BorderThickness="2" Visibility="{Binding RadioModeOn, Converter={StaticResource NotBoolToVisibilityConverter}}" SizeChanged="Border_SizeChanged">
+        <Border Grid.Row="0" BorderBrush="DarkGray" BorderThickness="2" SizeChanged="Border_SizeChanged">
             <view:ArenaView x:Name="ArenaView" Height="500" />
         </Border>
 
@@ -214,18 +214,7 @@
                             </Grid.InputBindings>
                         </Grid>
                     </materialDesign:Card>
-                    <materialDesign:Card Width="150" HorizontalAlignment="Left"  Height="150" Margin="10" Background="#51cb8c" Visibility="{Binding RadioModeOn, Converter={StaticResource BoolToVisibilityConverter}}">
-                        <Grid Style="{StaticResource CardGrid}">
-                            <StackPanel HorizontalAlignment="Center" VerticalAlignment="Center">
-                                <materialDesign:PackIcon Kind="Radio" HorizontalAlignment="Center" Height="50" Width="50" Foreground="White" />
-                                <TextBlock Text="Assign Radio" Foreground="White" FontSize="20" HorizontalAlignment="Center" VerticalAlignment="Center" />
-                            </StackPanel>
-                            <Grid.InputBindings>
-                                <MouseBinding MouseAction="LeftClick"
-                                      Command="{Binding ToggleAssignedRadiosCommand}" />
-                            </Grid.InputBindings>
-                        </Grid>
-                    </materialDesign:Card>
+                    <!-- Assign Radio card removed -->
                     <materialDesign:Card Width="150" HorizontalAlignment="Left"  Height="150" Margin="10" Background="#51cb8c" >
                         <Grid Style="{StaticResource CardGrid}">
                             <StackPanel HorizontalAlignment="Center" VerticalAlignment="Center">

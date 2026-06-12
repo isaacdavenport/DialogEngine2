@@ -11,7 +11,7 @@ namespace DialogGenerator.UI.Workflow.CreateCharacterWorkflow
         EnteredSetAge,
         EnteredSetGender,
         EnteredSetAvatar,
-        EnteredSetAssignToy,
+        // EnteredSetAssignToy removed
         EnteredSetAuthor,
         EnteredSetDescription,
         EnteredSetNote,
@@ -29,7 +29,7 @@ namespace DialogGenerator.UI.Workflow.CreateCharacterWorkflow
         SetAge,
         SetGender,
         SetAvatar,
-        SetAssignToy,
+        // SetAssignToy removed
         SetAuthor,
         SetDescription,
         SetNote,

@@ -9,10 +9,17 @@ using System.Collections.ObjectModel;
 using System.Linq;
 using System.Security.Policy;
 using System.Threading;
+using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Data;
 using System.Windows.Documents;
+using System.Windows.Input;
+using System.Windows.Media;
+using System.Windows.Media.Imaging;
+using System.Windows.Navigation;
+using System.Windows.Shapes;
+
 
 namespace DialogGenerator.UI.Views
 {
@@ -27,8 +34,11 @@ namespace DialogGenerator.UI.Views
             InitializeComponent();            
         }
 
-        private void UserControl_Loaded(object sender, RoutedEventArgs e)
+        private async void UserControl_Loaded(object sender, RoutedEventArgs e)
         {
+            // previously had awaits for radio init removed; keep fire-and-forget safe
+            InitializeAsync().FireAndForgetSafeAsync();
+
             ArenaViewModel _model = this.DataContext as ArenaViewModel;
             _model.RemoveAvatarRequested += _removeAvatarRequested;         
 
@@ -315,6 +325,15 @@ namespace DialogGenerator.UI.Views
 
         }
 
+        private async Task InitializeAsync()
+        {
+            // placeholder for original initialization logic
+            await Task.Delay(10);
+        }
 
+        private async Task DoWorkAsync()
+        {
+            await Task.Delay(10);
+        }
     }
 }

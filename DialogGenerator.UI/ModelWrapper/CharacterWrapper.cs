@@ -6,11 +6,11 @@ using System.Collections.Generic;
 
 namespace DialogGenerator.UI.Wrapper
 {
-    public class CharacterWrapper:ModelWrapper<Character>
+    public class CharacterWrapper : ModelWrapper<Character>
     {
         private ICharacterDataProvider mCharacterDataProvider; 
         public CharacterWrapper(Character character,ICharacterDataProvider _characterDataProvider)
-            :base(character)
+            : base(character)
         {
             mCharacterDataProvider = _characterDataProvider;
             character.PropertyChanged += _character_PropertyChanged;

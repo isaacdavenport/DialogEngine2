@@ -483,30 +483,148 @@ namespace DialogGenerator.UI.ViewModels
 
         public void nextStep()
         {
-            int _currentStepIndex = CurrentStepIndex;
-            Workflow.Fire((Triggers) (++_currentStepIndex));
+            int current = CurrentStepIndex;
+            int nextIndex = current + 1;
 
-            if (mWizard.Steps.Count == _currentStepIndex)
+            // explicit mapping from step index -> trigger
+            var mapping = new Triggers[] {
+                Triggers.SetName,
+                Triggers.SetInitials,
+                Triggers.SetAge,
+                Triggers.SetGender,
+                Triggers.SetAvatar,
+                Triggers.SetAuthor,
+                Triggers.SetDescription,
+                Triggers.SetNote,
+                Triggers.CheckCounter,
+                Triggers.StartWizard,
+                Triggers.GoPlay,
+                Triggers.Finish
+            };
+
+            if (nextIndex < 0 || nextIndex >= mapping.Length)
             {
-                mLogger.Debug($"Create character view - Saving the initial character info of '{ mCharacterName }'. Moving on to the 'Basic Wizard'.");
+                mLogger.Debug($"Create character view - nextIndex {nextIndex} out of mapping range.");
+                return;
+            }
+
+            var desired = mapping[nextIndex];
+            var permitted = Workflow.PermittedTriggers;
+
+            if (permitted.Contains(desired))
+            {
+                Workflow.Fire(desired);
             }
             else
             {
-                var _stepName = mWizard.Steps[_currentStepIndex].StepName;
+                // fallback: try common advancing triggers
+                if (permitted.Contains(Triggers.CheckCounter))
+                    Workflow.Fire(Triggers.CheckCounter);
+                else if (permitted.Contains(Triggers.StartWizard))
+                    Workflow.Fire(Triggers.StartWizard);
+                else if (permitted.Contains(Triggers.Finish))
+                    Workflow.Fire(Triggers.Finish);
+                else if (permitted.Any())
+                    Workflow.Fire(permitted.First());
+                else
+                {
+                    mLogger.Debug($"Create character view - No permitted trigger to advance from step {current}.");
+                    return;
+                }
+            }
+
+            if (mWizard.Steps.Count == nextIndex)
+            {
+                mLogger.Debug($"Create character view - Saving the initial character info of '{ mCharacterName }'. Moving on to the 'Basic Wizard'.");
+            }
+            else if (nextIndex >= 0 && nextIndex < mWizard.Steps.Count)
+            {
+                var _stepName = mWizard.Steps[nextIndex].StepName;
                 mLogger.Debug($"Create character view - Advanced to '{_stepName}' step.");
             }
         }
 
         public void previousStep()
         {
-            if(CurrentStepIndex > 0)
+            if (CurrentStepIndex > 0)
             {
-                int _currentStepIndex = CurrentStepIndex;
-                Workflow.Fire((Triggers) (--_currentStepIndex));
-                
-                var _stepName = mWizard.Steps[_currentStepIndex].StepName;
-                mLogger.Debug($"Create character view - Back to '{_stepName}' step.");
-            }            
+                int current = CurrentStepIndex;
+                int prevIndex = current - 1;
+
+                var mapping = new Triggers[] {
+                    Triggers.SetName,
+                    Triggers.SetInitials,
+                    Triggers.SetAge,
+                    Triggers.SetGender,
+                    Triggers.SetAvatar,
+                    Triggers.SetAuthor,
+                    Triggers.SetDescription,
+                    Triggers.SetNote,
+                    Triggers.CheckCounter,
+                    Triggers.StartWizard,
+                    Triggers.GoPlay,
+                    Triggers.Finish
+                };
+
+                if (prevIndex < 0 || prevIndex >= mapping.Length)
+                {
+                    mLogger.Debug($"Create character view - prevIndex {prevIndex} out of mapping range.");
+                    return;
+                }
+
+                var desired = mapping[prevIndex];
+                var permitted = Workflow.PermittedTriggers;
+                // Ensure using PermittedTriggers property (not method)
+
+                if (permitted.Contains(desired))
+                {
+                    Workflow.Fire(desired);
+                }
+                else
+                {
+                    // fallback: try common backward/advance triggers
+                    var fallbacks = new Triggers[] {
+                        Triggers.SetName,
+                        Triggers.SetInitials,
+                        Triggers.SetAge,
+                        Triggers.SetGender,
+                        Triggers.SetAvatar,
+                        Triggers.SetAuthor,
+                        Triggers.SetDescription,
+                        Triggers.SetNote,
+                        Triggers.CheckCounter,
+                        Triggers.Finish
+                    };
+
+                    bool fired = false;
+                    foreach (var f in fallbacks)
+                    {
+                        if (permitted.Contains(f))
+                        {
+                            Workflow.Fire(f);
+                            fired = true;
+                            break;
+                        }
+                    }
+
+                    if (!fired)
+                    {
+                        if (permitted.Any())
+                            Workflow.Fire(permitted.First());
+                        else
+                        {
+                        mLogger.Debug($"Create character view - No permitted trigger to go back from step {current}.");
+                            return;
+                        }
+                    }
+                }
+
+                if (prevIndex >= 0 && prevIndex < mWizard.Steps.Count)
+                {
+                    var _stepName = mWizard.Steps[prevIndex].StepName;
+                    mLogger.Debug($"Create character view - Back to '{_stepName}' step.");
+                }
+            }
         }
 
         private async void _processFinish()
@@ -705,7 +823,7 @@ namespace DialogGenerator.UI.ViewModels
                  .Permit(Triggers.SetAge, States.EnteredSetAge)
                  .Permit(Triggers.SetGender, States.EnteredSetGender)
                  .Permit(Triggers.SetAvatar, States.EnteredSetAvatar)
-                 .Permit(Triggers.SetAssignToy, States.EnteredSetAssignToy)
+                 // .Permit(Triggers.SetAssignToy, States.EnteredSetAssignToy) -- removed
                  .Permit(Triggers.SetAuthor, States.EnteredSetAuthor)
                  .Permit(Triggers.SetDescription, States.EnteredSetDescription)
                  .Permit(Triggers.SetNote, States.EnteredSetNote)
@@ -721,7 +839,7 @@ namespace DialogGenerator.UI.ViewModels
                  .Permit(Triggers.SetAge, States.EnteredSetAge)
                  .Permit(Triggers.SetGender, States.EnteredSetGender)
                  .Permit(Triggers.SetAvatar, States.EnteredSetAvatar)
-                 .Permit(Triggers.SetAssignToy, States.EnteredSetAssignToy)
+                 // AssignToy transition removed
                  .Permit(Triggers.SetAuthor, States.EnteredSetAuthor)
                  .Permit(Triggers.SetDescription, States.EnteredSetDescription)
                  .Permit(Triggers.SetNote, States.EnteredSetNote)
@@ -736,7 +854,7 @@ namespace DialogGenerator.UI.ViewModels
                  .Permit(Triggers.SetInitials, States.EnteredSetInitials)
                  .Permit(Triggers.SetGender, States.EnteredSetGender)
                  .Permit(Triggers.SetAvatar, States.EnteredSetAvatar)
-                 .Permit(Triggers.SetAssignToy, States.EnteredSetAssignToy)
+                 // AssignToy transition removed
                  .Permit(Triggers.SetAuthor, States.EnteredSetAuthor)
                  .Permit(Triggers.SetDescription, States.EnteredSetDescription)
                  .Permit(Triggers.SetNote, States.EnteredSetNote)
@@ -751,7 +869,7 @@ namespace DialogGenerator.UI.ViewModels
                  .Permit(Triggers.SetInitials, States.EnteredSetInitials)
                  .Permit(Triggers.SetAge, States.EnteredSetAge)
                  .Permit(Triggers.SetAvatar, States.EnteredSetAvatar)
-                 .Permit(Triggers.SetAssignToy, States.EnteredSetAssignToy)
+                 // AssignToy transition removed
                  .Permit(Triggers.SetAuthor, States.EnteredSetAuthor)
                  .Permit(Triggers.SetDescription, States.EnteredSetDescription)
                  .Permit(Triggers.SetNote, States.EnteredSetNote)
@@ -759,19 +877,7 @@ namespace DialogGenerator.UI.ViewModels
                  .Permit(Triggers.StartWizard, States.InWizard)
                  .Permit(Triggers.Finish, States.Finished);
 
-            Workflow.Configure(States.EnteredSetAssignToy)
-                 .OnEntry(() => _stepEntered("AssignToy"))
-                 .OnExit(() => _stepExited("AssignToy"))
-                 .Permit(Triggers.SetName, States.EnteredSetName)
-                 .Permit(Triggers.SetInitials, States.EnteredSetInitials)
-                 .Permit(Triggers.SetAge, States.EnteredSetAge)
-                 .Permit(Triggers.SetGender, States.EnteredSetGender)
-                 .Permit(Triggers.SetAvatar, States.EnteredSetAvatar)
-                 .Permit(Triggers.SetAuthor, States.EnteredSetAuthor)
-                 .Permit(Triggers.SetDescription, States.EnteredSetDescription)
-                 .Permit(Triggers.SetNote, States.EnteredSetNote)
-                 .Permit(Triggers.CheckCounter, States.InCounter)
-                 .Permit(Triggers.Finish, States.Finished);
+            // EnteredSetAssignToy block removed
 
             Workflow.Configure(States.EnteredSetAvatar)
                  .OnEntry(() => _stepEntered("Avatar"))
@@ -780,7 +886,7 @@ namespace DialogGenerator.UI.ViewModels
                  .Permit(Triggers.SetInitials, States.EnteredSetInitials)
                  .Permit(Triggers.SetAge, States.EnteredSetAge)
                  .Permit(Triggers.SetGender, States.EnteredSetGender)
-                 .Permit(Triggers.SetAssignToy, States.EnteredSetAssignToy)
+                 // AssignToy transition removed
                  .Permit(Triggers.SetAuthor, States.EnteredSetAuthor)
                  .Permit(Triggers.SetDescription, States.EnteredSetDescription)
                  .Permit(Triggers.SetNote, States.EnteredSetNote)
@@ -794,7 +900,7 @@ namespace DialogGenerator.UI.ViewModels
                  .Permit(Triggers.SetInitials, States.EnteredSetInitials)
                  .Permit(Triggers.SetAge, States.EnteredSetAge)
                  .Permit(Triggers.SetGender, States.EnteredSetGender)
-                 .Permit(Triggers.SetAssignToy, States.EnteredSetAssignToy)
+                 // AssignToy transition removed
                  .Permit(Triggers.SetAvatar, States.EnteredSetAvatar)
                  .Permit(Triggers.SetDescription, States.EnteredSetDescription)
                  .Permit(Triggers.SetNote, States.EnteredSetNote)
@@ -808,7 +914,7 @@ namespace DialogGenerator.UI.ViewModels
                 .Permit(Triggers.SetInitials, States.EnteredSetInitials)
                 .Permit(Triggers.SetAge, States.EnteredSetAge)
                 .Permit(Triggers.SetGender, States.EnteredSetGender)
-                .Permit(Triggers.SetAssignToy, States.EnteredSetAssignToy)
+                // AssignToy transition removed
                 .Permit(Triggers.SetAvatar, States.EnteredSetAvatar)
                 .Permit(Triggers.SetAuthor, States.EnteredSetAuthor)
                 .Permit(Triggers.SetNote, States.EnteredSetNote)
@@ -822,7 +928,7 @@ namespace DialogGenerator.UI.ViewModels
                .Permit(Triggers.SetInitials, States.EnteredSetInitials)
                .Permit(Triggers.SetAge, States.EnteredSetAge)
                .Permit(Triggers.SetGender, States.EnteredSetGender)
-               .Permit(Triggers.SetAssignToy, States.EnteredSetAssignToy)
+               // AssignToy transition removed
                .Permit(Triggers.SetAvatar, States.EnteredSetAvatar)
                .Permit(Triggers.SetDescription, States.EnteredSetDescription)
                .Permit(Triggers.CheckCounter, States.InCounter)

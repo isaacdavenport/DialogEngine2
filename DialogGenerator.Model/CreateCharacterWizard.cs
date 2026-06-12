@@ -59,13 +59,7 @@ namespace DialogGenerator.Model
                 StepControl = "AvatarControl"
             });
 
-            mSteps.Add(new CreateCharacterWizardStep
-            {
-                StepIndex = counter++,
-                Key = "AssignToy",
-                StepName = "Assign Toy To Character",
-                StepControl = "AssignToyToCharacterControl"
-            });
+            // AssignToy step removed
             
             mSteps.Add(new CreateCharacterWizardStep
             {

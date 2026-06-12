@@ -117,10 +117,5 @@
   <resheader name="writer">
     <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
   </resheader>
-  <data name="RadioAttached" xml:space="preserve">
-    <value>The radio is attached to this character. If you would like to change this choice please shake another radio.</value>
-  </data>
-  <data name="ShakeRadio" xml:space="preserve">
-    <value>Please shake the radio in order to attach it to the character </value>
-  </data>
+  <!-- Radio-related strings removed -->
 </root>

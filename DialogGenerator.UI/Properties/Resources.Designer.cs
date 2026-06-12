@@ -60,22 +60,6 @@ namespace DialogGenerator.UI.Properties {
             }
         }
         
-        /// <summary>
-        ///   Looks up a localized string similar to The radio is attached to this character. If you would like to change this choice please shake another radio..
-        /// </summary>
-        internal static string RadioAttached {
-            get {
-                return ResourceManager.GetString("RadioAttached", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   Looks up a localized string similar to Please shake the radio in order to attach it to the character .
-        /// </summary>
-        internal static string ShakeRadio {
-            get {
-                return ResourceManager.GetString("ShakeRadio", resourceCulture);
-            }
-        }
+        // Radio-related resources removed from .resx
     }
 }

@@ -125,11 +125,7 @@
                                     <RowDefinition Height="Auto" />
                                     <RowDefinition Height="Auto" />
                                 </Grid.RowDefinitions>
-                                <StackPanel Grid.Row="0">
-                                    <Label Content="Assigned toy (shake a radio to change it):" HorizontalAlignment="Left" Margin="-5,15,0,0" />
-                                    <TextBlock Text="{Binding Character.RadioNum, Converter={StaticResource CharacterRadioNumberToTextValueConverter}}" 
-                                            HorizontalAlignment="Left" Margin="0" />
-                                </StackPanel>
+                                <!-- Assigned toy removed -->
                                 <StackPanel Grid.Row="1" Margin="0,20,0,0">
                                     <Label Content="Author:" HorizontalAlignment="Left" Margin="-5,0,0,0"/>
                                     <TextBox MinWidth="370"

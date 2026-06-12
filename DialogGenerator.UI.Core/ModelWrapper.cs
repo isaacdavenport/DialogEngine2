@@ -1,66 +1,86 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
+using System.ComponentModel;
+using System.Linq;
+using System.Runtime.CompilerServices;
+using System.Runtime.Serialization;
+using System.Text;
+using System.Threading.Tasks;
+using System.Reflection;
+using System.Runtime.CompilerServices;
 using System.ComponentModel.DataAnnotations;
+using System.Runtime.InteropServices;
+using System.Runtime.Serialization.Formatters.Binary;
+using System.Diagnostics;
+using System.Runtime.Versioning;
+using System.Runtime.ExceptionServices;
+using System.Runtime;
+//using System.Runtime.Loader;
+using System.Windows.Input;
+using System.Windows;
+using System.Runtime.Serialization.Json;
+using System.Runtime.Serialization;
+using System.Collections.ObjectModel;
+using System.Runtime.Serialization.Formatters;
 using System.Runtime.CompilerServices;
 
 namespace DialogGenerator.UI.Core
 {
-    public class ModelWrapper<T> : NotifyDataErrorInfoBase
+    public abstract class ModelWrapper<T> : INotifyPropertyChanged where T: class
     {
-        public ModelWrapper(T model)
+        public T Model { get; private set; }
+
+        protected ModelWrapper(T model)
         {
             Model = model;
         }
 
-        private void _validatePropertyInternal(string _propertyName, object _currentValue)
+        public event PropertyChangedEventHandler PropertyChanged;
+
+        protected void RaisePropertyChanged([CallerMemberName] string name = null)
         {
-            clearErrors(_propertyName);
-
-            _validateDataAnnotations(_propertyName, _currentValue);
-
-            _validateCustomErrors(_propertyName);
-        }
-
-        private void _validateDataAnnotations(string _propertyName, object _currentValue)
-        {
-            var results = new List<ValidationResult>();
-            var context = new ValidationContext(Model) { MemberName = _propertyName };
-            Validator.TryValidateProperty(_currentValue, context, results);
-
-            foreach (var result in results)
-            {
-                addErrors(_propertyName, result.ErrorMessage);
-            }
-        }
-
-        private void _validateCustomErrors(string _propertyName)
-        {
-            var errors = validateProperty(_propertyName);
-            if (errors != null)
-            {
-                foreach (var error in errors)
-                {
-                    addErrors(_propertyName, error);
-                }
-            }
-        }
-
-        protected virtual IEnumerable<string> validateProperty(string _propertyName)
-        {
-            return null;
-        }
-
-        protected virtual void setValue<TValue>(TValue value, [CallerMemberName]string _propertyName = null)
-        {
-            typeof(T).GetProperty(_propertyName).SetValue(Model, value);
-            RaisePropertyChanged(_propertyName);
-            _validatePropertyInternal(_propertyName, value);
+            PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(name));
         }
 
         protected virtual TValue getValue<TValue>([CallerMemberName]string _propertyName = null)
         {
-            return (TValue)typeof(T).GetProperty(_propertyName).GetValue(Model);
+            var prop = typeof(T).GetProperty(_propertyName);
+            if (prop == null)
+                throw new InvalidOperationException($"Property '{_propertyName}' not found on type '{typeof(T).FullName}'.");
+
+            return (TValue)prop.GetValue(Model);
         }
 
-        public T Model { get; }
+        protected virtual void setValue<TValue>(TValue _value, [CallerMemberName] string _propertyName = null)
+        {
+            var prop = typeof(T).GetProperty(_propertyName);
+            if (prop == null)
+                throw new InvalidOperationException($"Property '{_propertyName}' not found on type '{typeof(T).FullName}'.");
+
+            prop.SetValue(Model, _value);
+            RaisePropertyChanged(_propertyName);
+        }
+
+        protected abstract IEnumerable<string> validateProperty(string _propertyName);
+
+        public IEnumerable<string> GetErrors(string _propertyName)
+        {
+            return validateProperty(_propertyName);
+        }
+
+        public bool HasErrors
+        {
+            get
+            {
+                var props = typeof(T).GetProperties();
+                foreach(var p in props)
+                {
+                    var err = validateProperty(p.Name);
+                    if (err != null && err.Any()) return true;
+                }
+
+                return false;
+            }
+        }
     }
 }

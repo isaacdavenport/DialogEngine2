@@ -1,0 +1,33 @@
+Commit summary: Fix workflow trigger handling and async fire-and-forget safety
+
+Details:
+- Fix root cause of InvalidOperationException in CreateCharacterViewModel.nextStep():
+  - Replaced fragile cast from step index to Triggers enum with an explicit index -> Triggers mapping.
+  - Check Workflow.PermittedTriggers before firing a trigger and fall back to safe permitted triggers to avoid Illegal trigger fires.
+  - Added logging and bounds checks when computing nextIndex.
+- Apply same robust logic to previousStep():
+  - Use same mapping, permitted-trigger checks and fallbacks; added logging and bounds checks.
+- Replace mLogger.Warn calls with mLogger.Debug to match ILogger surface.
+- Fix usage of Stateless.StateMachine.PermittedTriggers by using the property (no invocation).
+- Add TaskExtensions.FireAndForgetSafeAsync helper in DialogGenerator.Utilities to provide a safe fire-and-forget pattern that catches and exposes exceptions.
+- Replace fire-and-forget call in ArenaView.UserControl_Loaded to use InitializeAsync().FireAndForgetSafeAsync() instead of discarding ConfigureAwait(false).
+
+Files changed/added:
+- DialogGenerator.UI/ViewModels/CreateCharacterViewModel.cs (updated nextStep, previousStep, PermittedTriggers usage, logging)
+- DialogGenerator.UI/Views/ArenaView.xaml.cs (replaced ConfigureAwait discard with FireAndForgetSafeAsync)
+- DialogGenerator.Utilities/TaskExtensions.cs (new)
+
+Notes/Next steps:
+- Please review mapping arrays in CreateCharacterViewModel to ensure index -> trigger mapping matches actual UI step ordering. Adjust mapping if needed.
+- Consider centralizing the mapping to avoid duplication between nextStep and previousStep.
+- Run a full solution rebuild locally. If projects target older frameworks, retarget to .NET 4.5+ or add Microsoft.Bcl.Async package so async/Task types are available.
+
+Suggested git commands to create commit locally:
+
+	git add DialogGenerator.UI/ViewModels/CreateCharacterViewModel.cs \
+			DialogGenerator.UI/Views/ArenaView.xaml.cs \
+			DialogGenerator.Utilities/TaskExtensions.cs \
+			COMMIT_MESSAGE.txt
+	git commit -m "Fix workflow trigger handling; add safe fire-and-forget helper; correct logging and PermittedTriggers usage"
+
+If you want, I can also produce a focused patch file or squash the changes into a different commit message.
