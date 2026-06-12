@@ -1,13 +1,10 @@
-﻿using DialogGenerator.CharacterSelection.Model;
-using DialogGenerator.Core;
+﻿using DialogGenerator.Core;
 using DialogGenerator.Events;
 using DialogGenerator.Events.EventArgs;
-using DialogGenerator.Model;
 using Prism.Events;
 using System;
 using System.Threading;
 using System.Threading.Tasks;
-using System.Windows.Threading;
 
 namespace DialogGenerator.CharacterSelection
 {

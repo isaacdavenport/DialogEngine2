@@ -22,7 +22,7 @@
                     <converters:ImageToFullPathValueConverter x:Key="ImageToFullPathValueConverter" />
                     <converters:ImageContentValueConverter x:Key="ImageContentValueConverter" />
 
-                    <view:CharacterDataTemplateSelector x:Key="CharacterDataTemplateSelector" />
+
 
                     <DataTemplate x:Key="CreateNewCharacterTemplate">
                         <materialDesign:Card Width="200" Margin="10" Height="220" Background="#51cb8c" >
@@ -141,7 +141,7 @@
         <ScrollViewer Grid.Row="1"  HorizontalAlignment="Stretch" Background="#f2f2f2"  
                       VerticalAlignment="Stretch" ScrollViewer.VerticalScrollBarVisibility="Auto">
             <ItemsControl Grid.Row="1" HorizontalAlignment="Center" 
-                          ItemTemplateSelector="{StaticResource CharacterDataTemplateSelector}" ItemsSource="{Binding CharactersViewSource}">
+                          ItemTemplate="{StaticResource RegularCharacterTemplate}" ItemsSource="{Binding CharactersViewSource}">
                 <ItemsControl.ItemsPanel>
                     <ItemsPanelTemplate>
                         <WrapPanel />

@@ -1,5 +1,4 @@
-﻿using DialogGenerator.CharacterSelection.Model;
-using DialogGenerator.Core;
+﻿using DialogGenerator.Core;
 using DialogGenerator.DataAccess.Helper;
 using DialogGenerator.Events;
 using DialogGenerator.Events.EventArgs;
@@ -1147,27 +1146,6 @@ namespace DialogGenerator.UI.ViewModels
 
                     }
 
-                    if(Session.Get<bool>(Constants.BLE_MODE_ON))
-                    {
-                        Session.Set(Constants.NEXT_CH_1, _idx);
-                        int _idx2 = Session.Get<int>(Constants.NEXT_CH_2);
-                        mEventAgregator.GetEvent<StopPlayingCurrentDialogLineEvent>().Publish();
-
-                        if (_idx != -1 && _idx2 != -1)
-                        {
-                            mEventAgregator.GetEvent<SelectedCharactersPairChangedEvent>().
-                            Publish(new SelectedCharactersPairEventArgs
-                            {
-                                Character1Index = _idx,
-                                Character2Index = _idx2
-                            });
-                        }
-                        else
-                        {
-                            mEventAgregator.GetEvent<SelectedCharactersPairChangedEvent>()
-                                .Publish(null);
-                        }
-                    }
 
                     // Check if we have reached the end?
                     if (mWizardPassthroughIndex == mDialogWizards.Count)
@@ -1400,19 +1378,6 @@ namespace DialogGenerator.UI.ViewModels
             {
                 mLogger.Error("_chooseImage_Execute " + ex.Message);
             }
-        }
-    }
-
-
-    public class ToyEntry
-    {
-        public int Key { get; set; }
-        public string Value { get; set; }
-
-        override
-        public string ToString()
-        {
-            return Value;
         }
     }
 

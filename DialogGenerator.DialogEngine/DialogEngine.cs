@@ -209,11 +209,6 @@ namespace DialogGenerator.DialogEngine
             mCharacterPairSelectionDataCached = obj;
             Session.Set(Constants.COMPLETED_DLG_MODELS, 0);
 
-            if (Session.Get<bool>(Constants.BLE_MODE_ON) && mCurrentState != States.PreparingDialogParameters)
-            {
-                mStateMachineTaskTokenSource.Cancel();
-                mWorkflow.Fire(Triggers.PrepareDialogParameters);
-            }
 
             if(obj != null && mContext.CharactersList.Any())
             {
@@ -614,11 +609,6 @@ namespace DialogGenerator.DialogEngine
                             PauseCancellationTokenSource = null;
                         }
 
-                        if (!_dialogTrackerAndBLESelectedCharactersSame() && Session.Get<bool>(Constants.BLE_MODE_ON))
-                        {
-                            mContext.SameCharactersAsLast = false;
-                            return Triggers.PrepareDialogParameters; 
-                        }
                         //Toggle character
                         if (_speakingCharacter == mContext.Character1Num) //toggle which character is speaking next
                             _speakingCharacter = mContext.Character2Num;
@@ -702,7 +692,6 @@ namespace DialogGenerator.DialogEngine
             mIsDialogCancelled = false;
             Task _characterSelectionTask;
 
-            Session.Set(Constants.BLE_MODE_ON, false);
             mCharacterSelection = mCharacterSelectionFactory.Create(SelectionMode.ArenaModel);
 
             mEventAggregator.GetEvent<CharacterSelectionModelChangedEvent>().Publish();
@@ -728,9 +717,7 @@ namespace DialogGenerator.DialogEngine
                     {
                         await _characterSelectionTask;
 
-                        mCharacterSelection = Session.Get<bool>(Constants.BLE_MODE_ON)
-                        ? mCharacterSelectionFactory.Create(SelectionMode.BLESelectionMode)
-                        : mCharacterSelectionFactory.Create(SelectionMode.ArenaModel);
+                        mCharacterSelectionFactory.Create(SelectionMode.ArenaModel);
 
                         mEventAggregator.GetEvent<CharacterSelectionModelChangedEvent>().Publish();
                         _characterSelectionTask = mCharacterSelection.StartCharacterSelection();

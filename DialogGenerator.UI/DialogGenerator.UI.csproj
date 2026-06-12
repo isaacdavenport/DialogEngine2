@@ -211,14 +211,12 @@
     <Compile Include="Views\ArenaView.xaml.cs">
       <DependentUpon>ArenaView.xaml</DependentUpon>
     </Compile>
-    <Compile Include="Views\CharacterDataTemplateSelector.cs" />
     <Compile Include="Views\CharacterDetailView.xaml.cs">
       <DependentUpon>CharacterDetailView.xaml</DependentUpon>
     </Compile>
     <Compile Include="Views\CharacterDialogLinesView.xaml.cs">
       <DependentUpon>CharacterDialogLinesView.xaml</DependentUpon>
     </Compile>
-    <Compile Include="Views\CharactersDataTemplateSelector.cs" />
     <Compile Include="Views\CreateCharacterView.xaml.cs">
       <DependentUpon>CreateCharacterView.xaml</DependentUpon>
     </Compile>

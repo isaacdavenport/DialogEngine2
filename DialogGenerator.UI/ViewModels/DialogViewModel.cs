@@ -159,24 +159,6 @@ namespace DialogGenerator.UI.ViewModels
             Characters = mCharacterRepository.GetAll();
         }
 
-        private void _onRestartDialogEngineRecquired()
-        {
-            if(!Session.Get<bool>(Constants.BLE_MODE_ON))
-            {                
-                int startIndex = 1;
-                if(FirstSelectedCharacter == null)
-                {
-                    FirstSelectedCharacter = mCharacterRepository.GetAll()[startIndex++];
-                }
-
-                if(SecondSelectedCharacter == null)
-                {
-                    SecondSelectedCharacter = mCharacterRepository.GetAll()[startIndex];
-                }
-                
-            }
-        }
-
         #endregion
 
         #region - properties
