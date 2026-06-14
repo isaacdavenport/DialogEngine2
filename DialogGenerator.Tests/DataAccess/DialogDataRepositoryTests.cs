@@ -23,8 +23,6 @@ namespace DialogGenerator.Tests.DataAccess
         [Fact]
         public async void LoadAsync_ShouldLoadData()
         {
-            //    var _JSONObjectsTypesList = await mDialogDataRepository.LoadAsync(ApplicationDataHelper.DataDirectory);
-
             IList<string> errors;
             var _JSONObjectsTypesList = mDialogDataRepository.LoadFromDirectory(ApplicationDataHelper.DataDirectory, out errors);
 

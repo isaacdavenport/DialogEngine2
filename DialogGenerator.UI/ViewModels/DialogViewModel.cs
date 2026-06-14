@@ -226,8 +226,6 @@ namespace DialogGenerator.UI.ViewModels
                     _idx = mCharacterRepository.IndexOf(mFirstSelectedCharacter);
                 }
 
-                //Session.Set(Constants.NEXT_CH_1, _idx);
-
                 RaisePropertyChanged();
             }
         }
@@ -261,8 +259,6 @@ namespace DialogGenerator.UI.ViewModels
                 {
                     _idx = mCharacterRepository.IndexOf(mSecondSelectedCharacter);
                 }
-
-                //Session.Set(Constants.NEXT_CH_2, _idx);
 
                 RaisePropertyChanged();
             }
@@ -623,7 +619,6 @@ namespace DialogGenerator.UI.ViewModels
 
         private void _onNewActiveCharacters(string info)
         {
-            //_processDialogItem(info);
         }
 
         private void _processDialogItem(object item)

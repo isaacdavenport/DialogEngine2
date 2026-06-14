@@ -29,8 +29,6 @@ namespace DialogGenerator.UI.Views
             _model.PropertyChanged += EditPhraseView_PropertyChanged;
 
             _model.MediaRecorderControlViewModel.FilePath = _model.EditFileName;
-
-            //SoundRecorder.FilePath = ((EditPhraseViewModel)this.DataContext).EditFileName;
         }
 
         private void EditPhraseView_PropertyChanged(object sender, System.ComponentModel.PropertyChangedEventArgs e)

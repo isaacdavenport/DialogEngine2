@@ -61,14 +61,8 @@ namespace DialogGenerator.Model
 
         public bool Equals(ModelDialog other)
         {
-            //if (!AddedOnDateTime.Equals(other.AddedOnDateTime))
-            //    return false;
-
             if (!Adventure.Equals(other.Adventure))
                 return false;
-
-            //if (!Name.Equals(other.Name))
-            //    return false;
 
             if (PhraseTypeSequence.Count != other.PhraseTypeSequence.Count)
             {

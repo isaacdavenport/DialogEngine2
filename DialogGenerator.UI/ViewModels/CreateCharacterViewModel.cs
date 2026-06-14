@@ -50,7 +50,6 @@ namespace DialogGenerator.UI.ViewModels
         private IMessageDialogService mMessageDialogService;
         private string mCurrentDialogWizard = String.Empty;
         private string mNextButtonText = "Next";
-        private CancellationTokenSource mCancellationTokenSource;
         private bool mHasNoVoice = false;
         private string mVoice = string.Empty;
         private int mSpeechRate = -1;
@@ -431,7 +430,6 @@ namespace DialogGenerator.UI.ViewModels
             set
             {
                 mCurrentStep = value;
-                //handleStepChange();
                 RaisePropertyChanged();
             }
         }
@@ -641,12 +639,6 @@ namespace DialogGenerator.UI.ViewModels
             }
 
             _initEntries();
-            //Session.Set(Constants.LAST_WIZARD_STATE, new CreateCharacterState
-            //{
-            //    WizardName = string.Empty,
-            //    StepIndex = 0,
-            //    CharacterPrefix = string.Empty
-            //});
             Character = new Character();
             Workflow.Fire(Triggers.SetName);
 
@@ -825,7 +817,6 @@ namespace DialogGenerator.UI.ViewModels
                  .Permit(Triggers.SetAge, States.EnteredSetAge)
                  .Permit(Triggers.SetGender, States.EnteredSetGender)
                  .Permit(Triggers.SetAvatar, States.EnteredSetAvatar)
-                 // .Permit(Triggers.SetAssignToy, States.EnteredSetAssignToy) -- removed
                  .Permit(Triggers.SetAuthor, States.EnteredSetAuthor)
                  .Permit(Triggers.SetDescription, States.EnteredSetDescription)
                  .Permit(Triggers.SetNote, States.EnteredSetNote)
@@ -1145,11 +1136,6 @@ namespace DialogGenerator.UI.ViewModels
                         // Notify all interested parties that the collection has new element (has changed).
                         mEventAgregator.GetEvent<CharacterCollectionLoadedEvent>().Publish();
 
-
-                        // Reset the conversation in the case of the new character.
-                        //Session.Set(Constants.NEXT_CH_1, -1);
-                        //Session.Set(Constants.NEXT_CH_2, -1);
-
                     }
 
 
@@ -1351,9 +1337,6 @@ namespace DialogGenerator.UI.ViewModels
         {
             try
             {
-                //if (!_chooseImage_CanExecute())
-                //    return;
-
                 System.Windows.Forms.OpenFileDialog _openFileDialog = new System.Windows.Forms.OpenFileDialog();
                 _openFileDialog.Filter = "Image files (*.jpg, *.jpeg, *.jpe, *.jfif, *.png, *.apng, *.avif, *.gif, *.webp) | *.jpg; *.jpeg; *.jpe; *.jfif; *.png; *.apng; *.avif; *.gif; *.webp";
                 _openFileDialog.InitialDirectory = ApplicationData.Instance.ImagesDirectory;

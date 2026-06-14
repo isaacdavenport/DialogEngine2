@@ -257,8 +257,6 @@ namespace DialogGenerator.UI.ViewModels
         {
             VoiceRecorderControlViewModel.StateMachine.PropertyChanged += _vrc_stateMachine_PropertyChanged;
             MediaPlayerControlViewModel.StateMachine.PropertyChanged += _mpc_stateMachine_PropertyChanged;
-
-            //mLogger.Debug($"Wizard View - Wizard '{ mCurrentWizard.WizardName}' started!");
         }
 
         private void _bindCommands()

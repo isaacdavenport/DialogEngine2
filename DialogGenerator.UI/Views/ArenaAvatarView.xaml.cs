@@ -65,10 +65,6 @@ namespace DialogGenerator.UI.Views
                         }
                         else
                         {
-                            //if(_model.AboutToRemove)
-                            //{
-                            //    _model.AboutToRemove = false;
-                            //}                            
                         }
                     }
 

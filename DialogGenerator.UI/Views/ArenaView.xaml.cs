@@ -61,7 +61,7 @@ namespace DialogGenerator.UI.Views
                 _avatarView.SetValue(Canvas.TopProperty, (double)_am.Top);
 
                 _setBindings(_avatarView, _am);
-                _am.StartAnimation();
+                _ = _am.StartAnimation();
                 Thread.Sleep(200);
 
                 this.Playground.Children.Add(_avatarView);
@@ -131,10 +131,6 @@ namespace DialogGenerator.UI.Views
         {
             if (e.LeftButton == System.Windows.Input.MouseButtonState.Pressed)
             {
-                //Card _ic = (Card)sender;
-                //ArenaAvatarViewModel model = (ArenaAvatarViewModel)_ic.DataContext;
-                //DataObject dragData = new DataObject(typeof(ArenaAvatarViewModel), model);
-                //DragDrop.DoDragDrop(_ic, dragData, DragDropEffects.Copy);
             }
         }
 
@@ -154,7 +150,7 @@ namespace DialogGenerator.UI.Views
                 if (_am != null)
                 {
                     ArenaViewModel _model = this.DataContext as ArenaViewModel;
-                    if (/* !_model.PlaygroundAvatars.Contains(_am) */ _canAdd(_am))
+                    if (_canAdd(_am))
                     {
                         Point pos = e.GetPosition(sender as IInputElement);
                         ArenaAvatarView _aView = new ArenaAvatarView();
@@ -167,7 +163,7 @@ namespace DialogGenerator.UI.Views
 
                         this.Playground.Children.Add(_aView);
                         _model.PlaygroundAvatars.Add(_am);
-                        _am.StartAnimation();
+                        _ = _am.StartAnimation();
 
 
                         if (this.Playground.Children.Count > 6)

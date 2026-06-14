@@ -37,7 +37,6 @@ namespace DialogGenerator
             Container.RegisterType<AppInitializer>(new ContainerControlledLifetimeManager());
             Container.RegisterType<ShellViewModel>(new ContainerControlledLifetimeManager());
             Container.RegisterType<Shell>(new ContainerControlledLifetimeManager());
-            //Container.RegisterType<FileChangesHandler>(new ContainerControlledLifetimeManager());
             Container.RegisterType<UpdatesHandler>(new ContainerControlledLifetimeManager());
             Container.RegisterType<Random>(new ContainerControlledLifetimeManager());
 

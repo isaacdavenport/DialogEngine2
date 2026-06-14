@@ -371,7 +371,6 @@ namespace DialogGenerator.UI.ViewModels
             }
             catch (Exception e)
             {
-                //MessageBox.Show(e.Message, "Playback Error", MessageBoxButton.OK, MessageBoxImage.Error);
                 mLogger.Error("Voice recorder exception - (m)_startPlaying " + e.Message);
             }
 
@@ -390,7 +389,6 @@ namespace DialogGenerator.UI.ViewModels
             }
             catch (Exception e)
             {
-                //MessageBox.Show(e.Message, "Recording Error", MessageBoxButton.OK, MessageBoxImage.Error);
                 mLogger.Error("Voice recorder exception - (m)_startRecording " + e.Message);
             }
 
@@ -404,7 +402,6 @@ namespace DialogGenerator.UI.ViewModels
             }
             catch (Exception e)
             {
-                //MessageBox.Show(e.Message, "Start Playing Error", MessageBoxButton.OK, MessageBoxImage.Error);
                 mLogger.Error("Voice recorder exception - (m)_startPlaying_Execute " + e.Message);
             }
 
@@ -435,7 +432,6 @@ namespace DialogGenerator.UI.ViewModels
             }
             catch (Exception e)
             {
-                //MessageBox.Show(e.Message, "Start Recording Error", MessageBoxButton.OK, MessageBoxImage.Error);
                 mLogger.Error("Voice recorder exception - (m)_startRecording_Execute " + e.Message);
             }
 

@@ -523,7 +523,6 @@ namespace DialogGenerator.DialogEngine
 
                 mRunningDialogIndex++;
 
-                //var _speakingCharacter = mFirstCharacterSpeaking ? mContext.Character1Num : mContext.Character2Num;
                 var _speakingCharacter = mContext.Character1Num;
                 var _selectedPhrase = mContext.CharactersList[_speakingCharacter].Phrases[0]; //initialize to unused placeholder phrase
 

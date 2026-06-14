@@ -18,7 +18,6 @@ namespace DialogGenerator
     public partial class App : Application
     {
         private static Mutex msMutex = null;
-        //private FileChangesHandler mFileChangesHandler;
         private UpdatesHandler mUpdatesHandler;
 
         protected override void OnStartup(StartupEventArgs e)
@@ -40,7 +39,6 @@ namespace DialogGenerator
             bootstrapper.Run();
 
             bootstrapper.Container.Resolve<CharacterDetailViewModel>();
-            //mFileChangesHandler = bootstrapper.Container.Resolve<FileChangesHandler>();
             mUpdatesHandler = bootstrapper.Container.Resolve<UpdatesHandler>();
             bootstrapper.Container.Resolve<Shell>().MessageDialogService = bootstrapper.Container.Resolve<IMessageDialogService>();
 
@@ -56,7 +54,6 @@ namespace DialogGenerator
             Current.MainWindow.Show();
             FocusHelper.RequestFocus();
 
-            //mFileChangesHandler.StartWatching(ApplicationData.Instance.EditorTempDirectory,"*.json");
             mUpdatesHandler.CheckForUpdates();
         }
     }

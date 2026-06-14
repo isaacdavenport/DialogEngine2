@@ -19,10 +19,6 @@ namespace DialogGenerator.UI.Views
 
         private void _characterDetailView_SizeChanged(object sender, SizeChangedEventArgs e)
         {
-            //if(TabControl.SelectedIndex == 1) 
-            //{
-            //    PhrasesItemsControl.Items.Refresh();
-            //}
         }
 
         private void _characterDetailView_Loaded(object sender, RoutedEventArgs e)

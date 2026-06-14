@@ -110,7 +110,6 @@ namespace DialogGenerator.UI.ViewModels
         private void _bindCommands()
         {
             CreateNewCharacterCommand = new DelegateCommand(_createNewCharacterCommand_Execute);
-            //ImportCharacterCommand = new DelegateCommand(_importCharacterCommand_Execute);
             OnlineCharactersCommand = new DelegateCommand(_onOnlineCharacters_Execute);
             CreateCustomDialogCommand = new DelegateCommand(_onCreateCustomDialog_Execute);
             ViewLoadedCommand = new DelegateCommand(_onViewLoaded_execute);
@@ -134,7 +133,6 @@ namespace DialogGenerator.UI.ViewModels
 
         private void _onOnlineCharacters_Execute()
         {
-            //await mMessageDialogService.ShowDedicatedDialogAsync<bool>(mOnlineCharactersDialog);
         }
 
 

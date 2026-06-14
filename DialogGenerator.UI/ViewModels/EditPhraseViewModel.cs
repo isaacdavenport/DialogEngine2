@@ -423,11 +423,6 @@ namespace DialogGenerator.UI.ViewModels
             }
         }
 
-        //public void UnbindEvents()
-        //{
-        //    mEventAggregator.GetEvent<RequestTranslationEvent>().Unsubscribe(_onTranslationRequired);
-        //}
-
         private void MediaRecorderControlViewModel_PropertyChanged(object sender, PropertyChangedEventArgs e)
         {
             if (e.PropertyName.Equals("IsPlaying") || e.PropertyName.Equals("IsRecording"))
@@ -583,8 +578,6 @@ namespace DialogGenerator.UI.ViewModels
             }
             catch (/* Newtonsoft.Json.JsonReaderException */ Exception e)
             {
-                //MessageBox.Show(e.Message, "Error", System.Windows.MessageBoxButton.OK, System.Windows.MessageBoxImage.Error);
-
                 mLogger.Error($"PhraseWeight exception in _initLists function - {e.Message}");
             }
 

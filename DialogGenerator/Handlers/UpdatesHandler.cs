@@ -22,9 +22,6 @@ namespace DialogGenerator.Handlers
             mcTimer.Tick += _mcTimer_Tick;
             AutoUpdater.CheckForUpdateEvent += _autoUpdater_CheckForUpdateEvent;
             AutoUpdater.ReportErrors = true;
-
-            //mcTimer.Start();
-            //AutoUpdater.Start(ApplicationData.Instance.URLToUpdateFile);
         }
 
         private void _mcTimer_Tick(object sender, EventArgs e)
@@ -69,15 +66,11 @@ namespace DialogGenerator.Handlers
                 }
                 else
                 {
-                    //await mMessageDialogService.ShowMessage(@"No update available", @"There is no update available please try again later.");
                     mLogger.Error("AUTOUPDATER : There is no update available please try again later.");
                 }
             }
             else
             {
-                //await mMessageDialogService.ShowMessage(
-                //    @"Update check failed"
-                //    , @"There is a problem reaching update server please check your internet connection and try again later.");
                 mLogger.Error("AUTOUPDATER : There is a problem connecting to update server -  " + ApplicationData.Instance.URLToUpdateFile);
             }
         }
