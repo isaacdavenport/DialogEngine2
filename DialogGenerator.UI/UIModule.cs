@@ -34,7 +34,6 @@ namespace DialogGenerator.UI
             mContainer.RegisterType<WizardViewModel>(new ContainerControlledLifetimeManager());
             mContainer.RegisterType<CharacterDetailViewModel>(new ContainerControlledLifetimeManager());
 
-            //mRegionManager.RegisterViewWithRegion(Constants.MenuRegion, typeof(MenuView));
             mRegionManager.RegisterViewWithRegion(Constants.ContentRegion, typeof(DialogView));
             mRegionManager.RegisterViewWithRegion(Constants.ContentRegion, typeof(CreateView));
             mRegionManager.RegisterViewWithRegion(Constants.ContentRegion, typeof(WizardView));

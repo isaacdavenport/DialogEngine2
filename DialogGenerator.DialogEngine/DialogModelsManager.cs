@@ -513,7 +513,6 @@ namespace DialogGenerator.DialogEngine
             var _filteredList = new List<ModelDialog>();
             if (_itemsToRemove.Count > 0)
             {
-                //var _resetHistory = _itemsToRemove.Count == mContext.PossibleDialogModelsList.Count ? true : false;
                 if (mContext.PossibleDialogModelsList.Count == _itemsToRemove.Count)
                 {
                     mContext.HistoricalDialogs.Clear();

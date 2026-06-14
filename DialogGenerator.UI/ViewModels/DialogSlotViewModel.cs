@@ -122,14 +122,6 @@ namespace DialogGenerator.UI.ViewModels
             }
         }
 
-        //public ICollectionView PopularityValues
-        //{
-        //    get
-        //    {
-        //        return mPopularityValues.View;
-        //    }
-        //}
-
         public ObservableCollection<double> PopularityValues { get; set; } = new ObservableCollection<double>();
 
         #endregion

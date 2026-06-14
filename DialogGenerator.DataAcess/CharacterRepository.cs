@@ -189,8 +189,6 @@ namespace DialogGenerator.DataAccess
             {
                 ObservableCollection<ModelDialogInfo> _dlgModels = Session.Get(Constants.DIALOG_MODELS) as ObservableCollection<ModelDialogInfo>;
 
-                //var _testList = _dlgModels?.Where(dm => dm.ModelsCollectionName.Equals("Custom Dialogs")).ToList();
-
                 if (_dlgModels != null && _dlgModels.Count > 0)
                 {
                     foreach (var _dlginfo in _dlgModels)

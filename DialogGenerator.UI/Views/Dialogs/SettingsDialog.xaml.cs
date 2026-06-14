@@ -198,7 +198,6 @@ namespace DialogGenerator.UI.Views.Dialogs
 
             block.MouseLeftButtonUp += (sender, e) =>
             {
-                //textBox.Text = (sender as TextBlock).Text;
                 Settings.PreferredDialogName = (sender as TextBlock).Text;
             };
 
