@@ -26,9 +26,9 @@ namespace DialogGenerator.UI.Views
 
         private void _textOutput_CollectionChanged(object sender, NotifyCollectionChangedEventArgs e)
         {
-            if(e.Action == NotifyCollectionChangedAction.Add)
+            if (e.Action == NotifyCollectionChangedAction.Add)
             {
-                if(mScrollViewer == null)
+                if (mScrollViewer == null)
                     mScrollViewer = VisualTreeHelper.GetChild(TextOutput, 0) as ScrollViewer;
 
                 mScrollViewer.ScrollToBottom();
@@ -60,9 +60,9 @@ namespace DialogGenerator.UI.Views
         private void DockPanel_MouseLeftButtonDown(object sender, System.Windows.Input.MouseButtonEventArgs e)
         {
             DialogViewModel dvm = this.DataContext as DialogViewModel;
-            if(!Keyboard.IsKeyDown(Key.LeftCtrl))
+            if (!Keyboard.IsKeyDown(Key.LeftCtrl))
             {
-                foreach(NewDialogLineEventArgs line in dvm.DialogLinesCollection)
+                foreach (NewDialogLineEventArgs line in dvm.DialogLinesCollection)
                 {
                     line.Selected = false;
                 }
@@ -80,15 +80,15 @@ namespace DialogGenerator.UI.Views
 
         private void TextOutput_MouseLeftButtonDown(object sender, MouseButtonEventArgs e)
         {
-            if(e.OriginalSource.GetType() != typeof(TextBlock))
+            if (e.OriginalSource.GetType() != typeof(TextBlock))
             {
                 DialogViewModel dvm = this.DataContext as DialogViewModel;
-                foreach(NewDialogLineEventArgs line in dvm.DialogLinesCollection)
+                foreach (NewDialogLineEventArgs line in dvm.DialogLinesCollection)
                 {
                     line.Selected = false;
                 }
             }
-                
+
         }
     }
 }

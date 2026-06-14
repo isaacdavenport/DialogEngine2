@@ -2,7 +2,7 @@
 
 namespace DialogGenerator.Model
 {
-    public class FileItem:INotifyPropertyChanged
+    public class FileItem : INotifyPropertyChanged
     {
         private bool mIsChecked;
 

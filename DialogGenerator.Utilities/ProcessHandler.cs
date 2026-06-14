@@ -28,7 +28,7 @@ namespace DialogGenerator.Utilities
             {
                 string key = Path.GetFileName(arguments);
                 msDictionary.Remove(key);
-                File.Delete(Path.Combine(ApplicationData.Instance.EditorTempDirectory,key));
+                File.Delete(Path.Combine(ApplicationData.Instance.EditorTempDirectory, key));
             }
         }
 
@@ -38,7 +38,7 @@ namespace DialogGenerator.Utilities
                 return;
 
             var process = Get(key);
-            if(!process.HasExited)
+            if (!process.HasExited)
                 process.Kill();
         }
 
@@ -71,7 +71,7 @@ namespace DialogGenerator.Utilities
 
         public static void ClearAll()
         {
-            foreach(var _processKey in msDictionary.Keys)
+            foreach (var _processKey in msDictionary.Keys)
             {
                 Remove(_processKey);
             }

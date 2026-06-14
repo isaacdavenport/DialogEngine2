@@ -11,15 +11,15 @@ namespace DialogGenerator.Model
         public string Version { get; set; } = ApplicationData.Instance.JSONFilesVersion;
 
         [JsonProperty("Editable", Required = Required.Default)]
-        public bool Editable { get; set; } 
+        public bool Editable { get; set; }
 
-        [JsonProperty("Wizards",DefaultValueHandling = DefaultValueHandling.Ignore)]
+        [JsonProperty("Wizards", DefaultValueHandling = DefaultValueHandling.Ignore)]
         public List<Wizard> Wizards { get; set; } = new List<Wizard>();
 
-        [JsonProperty("Characters",DefaultValueHandling = DefaultValueHandling.Ignore)]
+        [JsonProperty("Characters", DefaultValueHandling = DefaultValueHandling.Ignore)]
         public ObservableCollection<Character> Characters { get; set; } = new ObservableCollection<Character>();
 
-        [JsonProperty("DialogModels",DefaultValueHandling = DefaultValueHandling.Ignore)]
+        [JsonProperty("DialogModels", DefaultValueHandling = DefaultValueHandling.Ignore)]
         public ObservableCollection<ModelDialogInfo> DialogModels { get; set; } = new ObservableCollection<ModelDialogInfo>();
     }
 }

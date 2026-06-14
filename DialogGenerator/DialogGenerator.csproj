@@ -127,7 +127,6 @@
     <Compile Include="AppInitializer.cs" />
     <Compile Include="Bootstrapper.cs" />
     <Compile Include="FocusHelper.cs" />
-    <Compile Include="Handlers\FileChangesHandler.cs" />
     <Compile Include="Handlers\UpdatesHandler.cs" />
     <Compile Include="ViewModels\SplashScreenViewModel.cs" />
     <Compile Include="Views\Shell.xaml.cs">

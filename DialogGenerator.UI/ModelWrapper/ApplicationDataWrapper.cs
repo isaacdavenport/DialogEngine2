@@ -7,7 +7,7 @@ namespace DialogGenerator.UI.Wrapper
 {
     public class ApplicationDataWrapper : ModelWrapper<ApplicationData>
     {
-        public ApplicationDataWrapper(ApplicationData _applicationData): 
+        public ApplicationDataWrapper(ApplicationData _applicationData) :
             base(_applicationData)
         {
 
@@ -187,6 +187,6 @@ namespace DialogGenerator.UI.Wrapper
             }
         }
         // Accelerometer-related properties removed: accelerometers were part of removed radios
-        
+
     }
 }

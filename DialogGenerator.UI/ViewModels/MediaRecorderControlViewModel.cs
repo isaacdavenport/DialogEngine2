@@ -31,8 +31,8 @@ namespace DialogGenerator.UI.ViewModels
 
 
         public MediaRecorderControlViewModel(NAudioEngine _Player
-            ,IMessageDialogService _MessageDialogService
-            ,IEventAggregator _EventAggregator)
+            , IMessageDialogService _MessageDialogService
+            , IEventAggregator _EventAggregator)
         {
             SoundPlayer = _Player;
             SoundPlayer.PropertyChanged += SoundPlayer_PropertyChanged;
@@ -49,7 +49,7 @@ namespace DialogGenerator.UI.ViewModels
             StopRecordingBtnVisibility = Visibility.Collapsed;
 
             _bindCommands();
-        }        
+        }
 
         #region properties
 
@@ -110,7 +110,7 @@ namespace DialogGenerator.UI.ViewModels
             get
             {
                 return mPlayBtnVisibility;
-            } 
+            }
 
             set
             {
@@ -177,7 +177,7 @@ namespace DialogGenerator.UI.ViewModels
                 mFilePath = value;
                 RaisePropertyChanged(nameof(HasFileName));
                 ((DelegateCommand)StartPlayingFileCommand)?.RaiseCanExecuteChanged();
-                ((DelegateCommand)StartRecordingCommand)?.RaiseCanExecuteChanged();                
+                ((DelegateCommand)StartRecordingCommand)?.RaiseCanExecuteChanged();
             }
         }
 
@@ -202,13 +202,13 @@ namespace DialogGenerator.UI.ViewModels
             {
                 case nameof(SoundPlayer.IsPlaying):
                 case nameof(SoundPlayer.IsRecording):
-                    {                        
+                    {
                         PlayBtnVisibility = SoundPlayer.IsPlaying || SoundPlayer.IsRecording ? Visibility.Collapsed : Visibility.Visible;
                         StopBtnVisibility = SoundPlayer.IsPlaying && !SoundPlayer.IsRecording ? Visibility.Visible : Visibility.Collapsed;
                         StartRecordingBtnVisibility = SoundPlayer.IsPlaying || SoundPlayer.IsRecording ? Visibility.Collapsed : Visibility.Visible;
                         StopRecordingBtnVisibility = !SoundPlayer.IsPlaying && SoundPlayer.IsRecording ? Visibility.Visible : Visibility.Collapsed;
                         IsPlaying = SoundPlayer.IsPlaying;
-                        IsRecording = SoundPlayer.IsRecording;                        
+                        IsRecording = SoundPlayer.IsRecording;
                         break;
                     }
             }
@@ -239,7 +239,7 @@ namespace DialogGenerator.UI.ViewModels
         }
 
         private void MSpeechRecognizer_AudioLevelUpdated(object sender, AudioLevelUpdatedEventArgs e)
-        {            
+        {
             Console.WriteLine("Audio level is {0}", e.AudioLevel);
         }
 
@@ -271,7 +271,8 @@ namespace DialogGenerator.UI.ViewModels
             {
                 mSpeechRecognizer.RecognizeAsync(RecognizeMode.Multiple);
                 SoundPlayer.StartRecording(FilePath);
-            } else
+            }
+            else
             {
                 mEventAggregator.GetEvent<RequestTranslationEvent>().Publish(this.GetType().Name);
             }

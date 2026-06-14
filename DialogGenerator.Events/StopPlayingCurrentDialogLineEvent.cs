@@ -2,7 +2,7 @@
 
 namespace DialogGenerator.Events
 {
-    public class StopPlayingCurrentDialogLineEvent:PubSubEvent
+    public class StopPlayingCurrentDialogLineEvent : PubSubEvent
     {
     }
 }

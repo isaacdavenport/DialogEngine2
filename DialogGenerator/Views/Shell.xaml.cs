@@ -41,9 +41,9 @@ namespace DialogGenerator.Views
             if (ProcessHandler.HasActiveProcess)
             {
                 MessageDialogResult result = await MessageDialogService
-                    .ShowOKCancelDialogAsync("JSON editor didn't closed. If you made changes, please save and close editor.","Warning","Close message","Close editor");
+                    .ShowOKCancelDialogAsync("JSON editor didn't closed. If you made changes, please save and close editor.", "Warning", "Close message", "Close editor");
 
-                if(result == MessageDialogResult.Cancel)
+                if (result == MessageDialogResult.Cancel)
                 {
                     ProcessHandler.ClearAll();
                     e.Cancel = false;
@@ -55,7 +55,7 @@ namespace DialogGenerator.Views
                 e.Cancel = false;
                 Application.Current.Shutdown();
             }
-            
+
         }
 
         private void _onGoToPage(object sender, ExecutedRoutedEventArgs e)
@@ -71,7 +71,7 @@ namespace DialogGenerator.Views
                 //    return;
                 //}
 
-                if(parameters.Length == 3)
+                if (parameters.Length == 3)
                 {
                     mRegionManager.Regions[Constants.ContentRegion].Context = parameters[2] as Character;
                 }

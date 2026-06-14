@@ -12,9 +12,9 @@ namespace DialogGenerator.DataAccess
         int IndexOf(Character character);
         Character GetByInitials(string initials);
         Task AddAsync(Character character);
-        void Export(Character character,string _directoryPath);
+        void Export(Character character, string _directoryPath);
         Task SaveAsync(Character character);
-        Task Remove(Character character,string _imageFileName);
+        Task Remove(Character character, string _imageFileName);
         void RemovePhrase(Character character, PhraseEntry phrase);
     }
 }

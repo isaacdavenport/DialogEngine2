@@ -25,9 +25,9 @@ namespace DialogGenerator.UI.Views
             //}
         }
 
-        private void _characterDetailView_Loaded(object sender,RoutedEventArgs e)
+        private void _characterDetailView_Loaded(object sender, RoutedEventArgs e)
         {
-            
+
         }
     }
 }

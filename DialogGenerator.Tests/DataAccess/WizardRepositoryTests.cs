@@ -7,14 +7,14 @@ namespace DialogGenerator.Tests.DataAccess
     public class WizardRepositoryTests : RepositoryTestBase
     {
         public WizardRepository mRepository;
-        
+
         public WizardRepositoryTests()
         {
             mRepository = new WizardRepository();
             testSetup();
         }
 
-        [Fact] 
+        [Fact]
         public void GetAll_ShouldReturnData()
         {
             var _wizards = mRepository.GetAll();

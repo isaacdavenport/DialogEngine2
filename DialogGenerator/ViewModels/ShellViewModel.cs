@@ -7,7 +7,7 @@ using Prism.Regions;
 
 namespace DialogGenerator.ViewModels
 {
-    public class ShellViewModel:BindableBase
+    public class ShellViewModel : BindableBase
     {
         #region - fields -
 
@@ -18,7 +18,7 @@ namespace DialogGenerator.ViewModels
 
         #region - constructor -
 
-        public ShellViewModel(IRegionManager _regionManager,IEventAggregator _eventAggregator)
+        public ShellViewModel(IRegionManager _regionManager, IEventAggregator _eventAggregator)
         {
             mRegionManager = _regionManager;
             mEventAggregator = _eventAggregator;
@@ -58,7 +58,7 @@ namespace DialogGenerator.ViewModels
         {
             var _activeView = mRegionManager.Regions[Constants.ContentRegion].GetView(typeof(CharacterDetailView).FullName);
 
-            if(_activeView == null)
+            if (_activeView == null)
             {
                 mRegionManager.RequestNavigate(Constants.ContentRegion, typeof(CharacterDetailView).FullName);
             }

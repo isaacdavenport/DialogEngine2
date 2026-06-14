@@ -7,10 +7,10 @@ using Xunit;
 
 namespace DialogGenerator.Tests.UI.ViewModel
 {
-    public class CharacterDetailViewModelTests:ViewModelTestBase
+    public class CharacterDetailViewModelTests : ViewModelTestBase
     {
         private CharacterDetailViewModel mViewModel;
-        private Mock<IMP3Player> mMP3PlayerMock = new Mock<IMP3Player>();        
+        private Mock<IMP3Player> mMP3PlayerMock = new Mock<IMP3Player>();
         private Mock<IRegionManager> regionManagerMock = new Mock<IRegionManager>();
 
         public CharacterDetailViewModelTests()
@@ -22,7 +22,7 @@ namespace DialogGenerator.Tests.UI.ViewModel
                 , messageDialogServiceMock.Object
                 , mMP3PlayerMock.Object
                 , regionManagerMock.Object);
-            
+
         }
 
 

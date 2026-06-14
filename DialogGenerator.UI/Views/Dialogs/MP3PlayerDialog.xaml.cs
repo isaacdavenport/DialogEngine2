@@ -13,7 +13,7 @@ namespace DialogGenerator.UI.Views.Dialogs
     /// <summary>
     /// Interaction logic for MP3PlayerDialog.xaml
     /// </summary>
-    public partial class MP3PlayerDialog : UserControl,INotifyPropertyChanged
+    public partial class MP3PlayerDialog : UserControl, INotifyPropertyChanged
     {
         #region - fields -
 
@@ -34,7 +34,7 @@ namespace DialogGenerator.UI.Views.Dialogs
 
             SoundPlayer = NAudioEngine.Instance;
             SoundPlayer.PropertyChanged += _soundPlayer_PropertyChanged;
-            StartPlayingFileCommand = new DelegateCommand(_startPlayingFile_Execute,_startPlayingFile_CanExecute);
+            StartPlayingFileCommand = new DelegateCommand(_startPlayingFile_Execute, _startPlayingFile_CanExecute);
             StopPlayingFileCommand = new DelegateCommand(_stopPlayingFile_Execute);
             CloseDialogCommand = new DelegateCommand(_closeDialog_Execute);
             FilePath = _filePath;
@@ -58,9 +58,9 @@ namespace DialogGenerator.UI.Views.Dialogs
             {
                 case nameof(SoundPlayer.IsPlaying):
                     {
-                        StopBtnVisibility = SoundPlayer.IsPlaying ? Visibility.Visible : Visibility.Collapsed;                    
+                        StopBtnVisibility = SoundPlayer.IsPlaying ? Visibility.Visible : Visibility.Collapsed;
                         break;
-                    }                                    
+                    }
             }
         }
 
@@ -70,7 +70,7 @@ namespace DialogGenerator.UI.Views.Dialogs
 
         private void _stopPlayingFile_Execute()
         {
-            if(SoundPlayer.CanStop)
+            if (SoundPlayer.CanStop)
                 SoundPlayer.Stop();
         }
 
@@ -127,14 +127,14 @@ namespace DialogGenerator.UI.Views.Dialogs
             }
         }
 
-        
+
 
         public string FilePath
         {
             get { return mFilePath; }
             set
             {
-                mFilePath = value;                
+                mFilePath = value;
                 ((DelegateCommand)StartPlayingFileCommand)?.RaiseCanExecuteChanged();
             }
         }

@@ -60,22 +60,22 @@ namespace DialogGenerator.Model
             });
 
             // AssignToy step removed
-            
+
             mSteps.Add(new CreateCharacterWizardStep
             {
                 StepIndex = counter++,
                 Key = "Author",
                 StepName = "Set Author Nickname",
                 StepControl = "AuthorControl"
-            }) ;
-            
+            });
+
             mSteps.Add(new CreateCharacterWizardStep
             {
                 StepIndex = counter++,
                 Key = "Description",
                 StepName = "Set Character Description",
                 StepControl = "DescriptionControl"
-            }) ;
+            });
 
             mSteps.Add(new CreateCharacterWizardStep
             {
@@ -84,7 +84,7 @@ namespace DialogGenerator.Model
                 StepName = "Set Internal Note",
                 StepControl = "NoteControl"
             });
-            
+
         }
 
         public List<CreateCharacterWizardStep> Steps

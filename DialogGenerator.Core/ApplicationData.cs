@@ -64,7 +64,7 @@ namespace DialogGenerator.Core
                 {
                     lock (msLocker)
                     {
-                        string path = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.UserProfile),"Documents", "DialogGenerator", msFileName);
+                        string path = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.UserProfile), "Documents", "DialogGenerator", msFileName);
 
                         if (File.Exists(path))
                         {
@@ -97,20 +97,20 @@ namespace DialogGenerator.Core
 
         [XmlIgnore]
         [Editable(true)]
-        public string PreferredDialogName { get; set; } = string.Empty;        
+        public string PreferredDialogName { get; set; } = string.Empty;
 
         public bool MonitorMessageParseFails { get; set; } = false;
-        public string JSONEditorExeFileName { get; set; } = "JSONedit.exe"; 
+        public string JSONEditorExeFileName { get; set; } = "JSONedit.exe";
         public string WebsiteUrl { get; set; } = "www.toys2life.org";
-        public string TutorialFileName { get; set; } = "tutorial.pdf"; 
+        public string TutorialFileName { get; set; } = "tutorial.pdf";
 
-        public string DefaultImage { get; set; } = "avatar.png";        
-        
-        public string URLToUpdateFile { get; set; } = "https://www.dropbox.com/s/uee58uqcpqrslln/update.xml?dl=1";        
+        public string DefaultImage { get; set; } = "avatar.png";
+
+        public string URLToUpdateFile { get; set; } = "https://www.dropbox.com/s/uee58uqcpqrslln/update.xml?dl=1";
 
         public int CheckForUpdateInterval { get; set; } = 30; // minutes
 
-        public bool TextDialogsOn { get; set; } = true;       
+        public bool TextDialogsOn { get; set; } = true;
 
         [Editable(true)]
         [Description("The size of the queue of the recent phrases")]
@@ -175,7 +175,7 @@ namespace DialogGenerator.Core
             {
                 if (mAppDataDirectory == null)
                 {
-                    mAppDataDirectory = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.UserProfile),"Documents","DialogGenerator");
+                    mAppDataDirectory = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.UserProfile), "Documents", "DialogGenerator");
                 }
 
                 return mAppDataDirectory;
@@ -210,7 +210,7 @@ namespace DialogGenerator.Core
             }
         }
 
-        [XmlIgnore]   
+        [XmlIgnore]
         public string VideoDirectory
         {
             get

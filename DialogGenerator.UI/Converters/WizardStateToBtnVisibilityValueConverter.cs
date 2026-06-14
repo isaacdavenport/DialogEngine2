@@ -15,9 +15,9 @@ namespace DialogGenerator.UI.Converters
                 WizardStates _currentState = (WizardStates)value;
                 WizardStates _expectedState = (WizardStates)parameter;
 
-                return _currentState == _expectedState ?Visibility.Visible : Visibility.Collapsed;
+                return _currentState == _expectedState ? Visibility.Visible : Visibility.Collapsed;
             }
-            catch (Exception){}
+            catch (Exception) { }
 
             return Visibility.Collapsed;
         }

@@ -4,12 +4,12 @@ using System.Windows.Threading;
 
 namespace DialogGenerator.ViewModels
 {
-    public class SplashScreenViewModel:BindableBase, IDisposable
+    public class SplashScreenViewModel : BindableBase, IDisposable
     {
         private string mMessage;
         public SplashScreenViewModel()
         {
-                
+
         }
 
         ~SplashScreenViewModel()
@@ -39,7 +39,7 @@ namespace DialogGenerator.ViewModels
         {
             if (disposing)
             {
-                if(Dispatcher != null)
+                if (Dispatcher != null)
                 {
                     Dispatcher.InvokeShutdown();
                     Dispatcher = null;

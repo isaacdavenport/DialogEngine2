@@ -27,7 +27,7 @@ namespace DialogGenerator.UI.Controls
         public MediaRecorderControl()
         {
             InitializeComponent();
-            
+
         }
     }
 }

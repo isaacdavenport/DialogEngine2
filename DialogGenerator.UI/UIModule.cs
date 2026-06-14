@@ -15,7 +15,7 @@ namespace DialogGenerator.UI
         private IUnityContainer mContainer;
         private IRegionManager mRegionManager;
 
-        public UIModule(IUnityContainer _unityContainer,IRegionManager _regionManager)
+        public UIModule(IUnityContainer _unityContainer, IRegionManager _regionManager)
         {
             mContainer = _unityContainer;
             mRegionManager = _regionManager;
@@ -29,7 +29,7 @@ namespace DialogGenerator.UI
             mContainer.RegisterType<object, CreateView>(typeof(CreateView).FullName);
             mContainer.RegisterType<object, CharacterDetailView>(typeof(CharacterDetailView).FullName);
             mContainer.RegisterType<object, DialogView>(typeof(DialogView).FullName);
-            mContainer.RegisterType<object, WizardView>(typeof(WizardView).FullName,new ContainerControlledLifetimeManager());
+            mContainer.RegisterType<object, WizardView>(typeof(WizardView).FullName, new ContainerControlledLifetimeManager());
 
             mContainer.RegisterType<WizardViewModel>(new ContainerControlledLifetimeManager());
             mContainer.RegisterType<CharacterDetailViewModel>(new ContainerControlledLifetimeManager());

@@ -2,7 +2,7 @@
 
 namespace DialogGenerator.Events
 {
-    public class InitializeDialogModelEvent:PubSubEvent
+    public class InitializeDialogModelEvent : PubSubEvent
     {
     }
 }

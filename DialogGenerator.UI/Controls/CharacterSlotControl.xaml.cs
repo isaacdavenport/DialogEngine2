@@ -24,7 +24,7 @@ namespace DialogGenerator.UI.Controls
         {
             InitializeComponent();
             var _context = this.DataContext;
-            this.DataContextChanged += CharacterSlotControl_DataContextChanged;            
+            this.DataContextChanged += CharacterSlotControl_DataContextChanged;
         }
 
         private void CharacterSlotControl_DataContextChanged(object sender, DependencyPropertyChangedEventArgs e)

@@ -3,7 +3,7 @@ using Prism.Modularity;
 
 namespace DialogGenerator.Core
 {
-    public class CoreModule:IModule
+    public class CoreModule : IModule
     {
         private IUnityContainer mContainer;
 
@@ -14,7 +14,7 @@ namespace DialogGenerator.Core
 
         public void Initialize()
         {
-            mContainer.RegisterType<ILogger,Logger>(new ContainerControlledLifetimeManager());
+            mContainer.RegisterType<ILogger, Logger>(new ContainerControlledLifetimeManager());
         }
     }
 }

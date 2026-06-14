@@ -53,11 +53,11 @@ namespace DialogGenerator.UI.Views
                         {
                             double _difference = _model.Left + this.ActualWidth - Session.Get<double>(Constants.ARENA_WIDTH);
                             _model.Left -= ((int)_difference + 5);
-                            if(!_model.AboutToRemove)
+                            if (!_model.AboutToRemove)
                             {
                                 _model.AboutToRemove = true;
                             }
-                            
+
                         }
                         else if (_model.Left < 0)
                         {
@@ -85,30 +85,30 @@ namespace DialogGenerator.UI.Views
                             _model.Top = 0;
                         }
                     }
-                    
+
                 });
             }
             catch (System.Threading.Tasks.TaskCanceledException) { }
-                                                    
+
         }
 
         private void UserControl_MouseDown(object sender, MouseButtonEventArgs e)
         {
-            if(e.LeftButton == MouseButtonState.Pressed)
+            if (e.LeftButton == MouseButtonState.Pressed)
             {
                 mMouseLeftPosition = e.GetPosition(sender as IInputElement).X;
                 mMouseTopPosition = e.GetPosition(sender as IInputElement).Y;
                 Mouse.Capture(sender as IInputElement);
             }
 
-            if(e.RightButton == MouseButtonState.Pressed &&
+            if (e.RightButton == MouseButtonState.Pressed &&
                e.LeftButton != MouseButtonState.Pressed &&
                e.MiddleButton != MouseButtonState.Pressed)
             {
                 DataObject dragData = new DataObject(typeof(ArenaAvatarView), sender as ArenaAvatarView);
                 DragDrop.DoDragDrop(sender as ArenaAvatarView, dragData, DragDropEffects.Copy);
             }
-            
+
         }
 
         private void UserControl_MouseUp(object sender, MouseButtonEventArgs e)
@@ -128,7 +128,7 @@ namespace DialogGenerator.UI.Views
                 _top += _deltaY;
 
                 ((ArenaAvatarViewModel)DataContext).Left = (int)_left;
-                ((ArenaAvatarViewModel)DataContext).Top = (int)_top;           
+                ((ArenaAvatarViewModel)DataContext).Top = (int)_top;
             }
         }
 
@@ -145,7 +145,7 @@ namespace DialogGenerator.UI.Views
             _newLeft += this.ActualWidth;
             _newTop += this.ActualHeight;
 
-            if(_newLeft > Session.Get<double>(Constants.ARENA_TOTAL_WIDTH) ||
+            if (_newLeft > Session.Get<double>(Constants.ARENA_TOTAL_WIDTH) ||
                 _newTop > Session.Get<double>(Constants.ARENA_TOTAL_HEIGHT))
             {
                 return false;

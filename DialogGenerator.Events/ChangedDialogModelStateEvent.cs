@@ -3,7 +3,7 @@
 
 namespace DialogGenerator.Events
 {
-    public class ChangedDialogModelStateEvent:PubSubEvent
+    public class ChangedDialogModelStateEvent : PubSubEvent
     {
     }
 }

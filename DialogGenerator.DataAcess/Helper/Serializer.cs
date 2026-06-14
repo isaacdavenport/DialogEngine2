@@ -5,7 +5,7 @@ namespace DialogGenerator.DataAccess.Helper
 {
     public static class Serializer
     {
-        public static void Serialize(object data,string path)
+        public static void Serialize(object data, string path)
         {
             var settings = new JsonSerializerSettings
             {
@@ -22,17 +22,18 @@ namespace DialogGenerator.DataAccess.Helper
             File.WriteAllText(path, _jsonLocal);
         }
 
-        public static T Deserialize<T>(string content) 
+        public static T Deserialize<T>(string content)
         {
             try
             {
                 var obj = JsonConvert.DeserializeObject<T>(content);
                 return obj;
-            } catch (Newtonsoft.Json.JsonReaderException e)
+            }
+            catch (Newtonsoft.Json.JsonReaderException e)
             {
                 throw (e);
             }
-            
+
         }
     }
 }

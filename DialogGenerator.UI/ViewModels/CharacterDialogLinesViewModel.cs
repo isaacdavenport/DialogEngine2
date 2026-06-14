@@ -49,7 +49,7 @@ namespace DialogGenerator.UI.ViewModels
             mEventAggregator.GetEvent<CharacterSavedEvent>().Subscribe(_onCharacterSaved);
 
             _bindCommands();
-        }        
+        }
 
         public Character Character
         {
@@ -61,7 +61,7 @@ namespace DialogGenerator.UI.ViewModels
             set
             {
                 mCharacter = value;
-                mPhrasesCollectionViewSource.Source = mCharacter.Phrases;               
+                mPhrasesCollectionViewSource.Source = mCharacter.Phrases;
                 RaisePropertyChanged();
                 RaisePropertyChanged("PhrasesViewSource");
             }
@@ -79,8 +79,8 @@ namespace DialogGenerator.UI.ViewModels
 
         public DelegateCommand ViewLoadedCommand { get; set; }
         public DelegateCommand<string> PlayDialogLineCommand { get; set; }
-        public DelegateCommand<PhraseEntry>DeletePhraseCommand { get; set; }
-        public DelegateCommand<PhraseEntry>EditPhraseCommand { get; set; }
+        public DelegateCommand<PhraseEntry> DeletePhraseCommand { get; set; }
+        public DelegateCommand<PhraseEntry> EditPhraseCommand { get; set; }
         public DelegateCommand GoBackCommand { get; set; }
 
         public ICollectionView PhrasesViewSource
@@ -111,11 +111,12 @@ namespace DialogGenerator.UI.ViewModels
         private void _goBackCommand_execute()
         {
             mLogger.Debug($"Character Dialog Lines View - exited for character '{Character.CharacterName}'.");
-            if(mIsFromWizard)
+            if (mIsFromWizard)
             {
                 mIsFromWizard = false;
                 mRegionManager.RequestNavigate("ContentRegion", "DialogGenerator.UI.Views.WizardView");
-            } else
+            }
+            else
             {
                 mRegionManager.RequestNavigate("ContentRegion", "DialogGenerator.UI.Views.CharacterDetailView");
             }
@@ -130,7 +131,7 @@ namespace DialogGenerator.UI.ViewModels
                 {
                     Character = _char;
                 });
-                
+
             }
         }
 
@@ -140,7 +141,7 @@ namespace DialogGenerator.UI.ViewModels
         }
 
         private async void _editPhrase_Execute(PhraseEntry _phraseEntry)
-        {            
+        {
             EditPhraseViewModel _editPhraseViewModel = new EditPhraseViewModel(Character, _phraseEntry, mCharacterDataProvider, mMessageDialogService, mEventAggregator, mLogger);
             EditPhraseView _editPhraseView = new EditPhraseView();
             _editPhraseView.DataContext = _editPhraseViewModel;
@@ -167,7 +168,7 @@ namespace DialogGenerator.UI.ViewModels
                 mCharacterDataProvider.RemovePhrase(Character, _phrase);
                 await mCharacterDataProvider.SaveAsync(Character);
                 string _audioFileName = ApplicationData.Instance.AudioDirectory + "\\" + Character.CharacterPrefix + "_" + _phrase.FileName + ".mp3";
-                if(File.Exists(_audioFileName))
+                if (File.Exists(_audioFileName))
                 {
                     File.Delete(_audioFileName);
                 }
@@ -197,20 +198,21 @@ namespace DialogGenerator.UI.ViewModels
         }
 
         private void _viewLoadedExecute()
-        
-        {
-            var _character = Session.Get<Character>(Constants.SELECTED_CHARACTER);            
 
-            if(_character == null || Session.Get<bool>(Constants.CHARACTER_EDIT_MODE))
+        {
+            var _character = Session.Get<Character>(Constants.SELECTED_CHARACTER);
+
+            if (_character == null || Session.Get<bool>(Constants.CHARACTER_EDIT_MODE))
             {
                 CreateCharacterViewModel _cvm = Session.Get<CreateCharacterViewModel>(Constants.CREATE_CHARACTER_VIEW_MODEL);
                 Character = _cvm.Character;
                 mIsFromWizard = true;
-            } else
+            }
+            else
             {
                 Character = _character;
             }
-            
+
             mLogger.Debug($"Character Dialog Lines View - Loaded");
         }
 

@@ -4,7 +4,7 @@ using Prism.Modularity;
 
 namespace DialogGenerator.DialogEngine
 {
-    public class DialogEngineModule:IModule
+    public class DialogEngineModule : IModule
     {
         private IUnityContainer mContainer;
 

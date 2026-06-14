@@ -26,7 +26,7 @@ using System.Runtime.CompilerServices;
 
 namespace DialogGenerator.UI.Core
 {
-    public abstract class ModelWrapper<T> : INotifyPropertyChanged where T: class
+    public abstract class ModelWrapper<T> : INotifyPropertyChanged where T : class
     {
         public T Model { get; private set; }
 
@@ -42,7 +42,7 @@ namespace DialogGenerator.UI.Core
             PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(name));
         }
 
-        protected virtual TValue getValue<TValue>([CallerMemberName]string _propertyName = null)
+        protected virtual TValue getValue<TValue>([CallerMemberName] string _propertyName = null)
         {
             var prop = typeof(T).GetProperty(_propertyName);
             if (prop == null)
@@ -73,7 +73,7 @@ namespace DialogGenerator.UI.Core
             get
             {
                 var props = typeof(T).GetProperties();
-                foreach(var p in props)
+                foreach (var p in props)
                 {
                     var err = validateProperty(p.Name);
                     if (err != null && err.Any()) return true;

@@ -4,7 +4,7 @@ using DialogGenerator.Core;
 
 namespace DialogGenerator.Model.Attributes
 {
-    public class ValidCharacterPrefixAttribute:ValidationAttribute
+    public class ValidCharacterPrefixAttribute : ValidationAttribute
     {
         private const string mcPattern = Constants.FILENAME_CHECK_REGEX;
         public ValidCharacterPrefixAttribute()

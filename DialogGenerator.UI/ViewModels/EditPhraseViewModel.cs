@@ -75,7 +75,8 @@ namespace DialogGenerator.UI.ViewModels
             if (File.Exists(FileName))
             {
                 File.Copy(FileName, EditFileName);
-            } else
+            }
+            else
             {
                 int _counter = 1;
                 string _newFileName = Path.Combine(ApplicationData.Instance.AudioDirectory, _Character.CharacterPrefix + "_" + _Character.CharacterName + _counter + "_edit.mp3");
@@ -92,9 +93,11 @@ namespace DialogGenerator.UI.ViewModels
 
             foreach (var entry in mPhraseEntry.PhraseWeights)
             {
-                if (string.IsNullOrEmpty(PhraseWeights)) {
+                if (string.IsNullOrEmpty(PhraseWeights))
+                {
                     PhraseWeights = "";
-                } else
+                }
+                else
                 {
                     PhraseWeights += ", ";
                 }
@@ -238,7 +241,8 @@ namespace DialogGenerator.UI.ViewModels
             }
         }
 
-        public ICollectionView PhraseWeightValues {
+        public ICollectionView PhraseWeightValues
+        {
             get
             {
                 return mPhraseValuesCollection.View;
@@ -372,13 +376,13 @@ namespace DialogGenerator.UI.ViewModels
         private void _addPhraseWeight_Execute()
         {
             var _phraseWeight = new PhraseWeight(string.Empty, 10, mLogger);
-            
+
             _phraseWeight.PropertyChanged += _phraseWeight_PropertyChanged;
             mWeights.Add(_phraseWeight);
             mPhraseWeightsCollection.View?.Refresh();
             AddPhraseWeightCommand.RaiseCanExecuteChanged();
             RemovePhraseWeightCommand.RaiseCanExecuteChanged();
-        }        
+        }
 
         private void _removePhraseWeight_Execute(PhraseWeight _phraseWeight)
         {
@@ -413,7 +417,7 @@ namespace DialogGenerator.UI.ViewModels
 
         private void _onSpeechRecognized(string _recognizedText)
         {
-            if(string.IsNullOrEmpty(DialogLineText))
+            if (string.IsNullOrEmpty(DialogLineText))
             {
                 DialogLineText = _recognizedText;
             }
@@ -434,7 +438,7 @@ namespace DialogGenerator.UI.ViewModels
 
         private void _onTranslationRequired(string _Caller)
         {
-            if(_Caller.Equals("MediaRecorderControlViewModel"))
+            if (_Caller.Equals("MediaRecorderControlViewModel"))
             {
                 if (!string.IsNullOrEmpty(DialogLineText))
                 {
@@ -449,7 +453,7 @@ namespace DialogGenerator.UI.ViewModels
 
                 }
             }
-            
+
         }
 
         private void _phraseWeight_PropertyChanged(object sender, PropertyChangedEventArgs e)
@@ -479,7 +483,7 @@ namespace DialogGenerator.UI.ViewModels
                 }
 
                 string _outfile_original = MediaRecorderControlViewModel.FilePath;
-                
+
                 MemoryStream _ms = new MemoryStream();
                 _synth.SetOutputToWaveStream(_ms);
                 _synth.Speak(value);
@@ -495,7 +499,7 @@ namespace DialogGenerator.UI.ViewModels
                 }
 
                 MediaRecorderControlViewModel.StartPlayingFileCommand.RaiseCanExecuteChanged();
-                
+
             }
 
         }
@@ -508,15 +512,15 @@ namespace DialogGenerator.UI.ViewModels
         private ComboEntry mKey;
         private ILogger mLogger;
         public event PropertyChangedEventHandler PropertyChanged;
-        
+
 
         public PhraseWeight(string _Key, double _Value, ILogger _Logger)
         {
             mLogger = _Logger;
             _initLists();
-            Key = new ComboEntry() {Key = _Key, Description = ""};
+            Key = new ComboEntry() { Key = _Key, Description = "" };
 
-            if(!Keys.Contains(Key))
+            if (!Keys.Contains(Key))
             {
                 Keys.Add(Key);
             }
@@ -528,7 +532,8 @@ namespace DialogGenerator.UI.ViewModels
         public ObservableCollection<ComboEntry> Keys { get; set; } = new ObservableCollection<ComboEntry>();
         public ObservableCollection<double> Values { get; set; } = new ObservableCollection<double>();
 
-        public ComboEntry Key { 
+        public ComboEntry Key
+        {
             get
             {
                 return mKey;
@@ -547,11 +552,11 @@ namespace DialogGenerator.UI.ViewModels
 
         private void OnNofityPropertyChanged(string _PropertyName)
         {
-            if(PropertyChanged != null)
+            if (PropertyChanged != null)
             {
                 PropertyChanged.Invoke(this, new PropertyChangedEventArgs(_PropertyName));
             }
-        }        
+        }
 
         private void _initLists()
         {
@@ -567,7 +572,7 @@ namespace DialogGenerator.UI.ViewModels
                     if (_phraseKeysCollection != null && _phraseKeysCollection.Phrases != null && _phraseKeysCollection.Phrases.Count() > 0)
                     {
                         Keys.AddRange(_phraseKeysCollection.Phrases.Where(p => p != null).Select(p => new ComboEntry
-                            { Key = p.Name, Description = p.Description}));
+                        { Key = p.Name, Description = p.Description }));
                     }
                 }
 

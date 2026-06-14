@@ -5,7 +5,7 @@ using System.Windows.Input;
 namespace DialogGenerator.UI.Workflow.CreateCharacterWorkflow
 {
     public enum States
-    {        
+    {
         EnteredSetName,
         EnteredSetInitials,
         EnteredSetAge,
@@ -23,7 +23,7 @@ namespace DialogGenerator.UI.Workflow.CreateCharacterWorkflow
     }
 
     public enum Triggers
-    {               
+    {
         SetName,
         SetInitials,
         SetAge,
@@ -53,7 +53,7 @@ namespace DialogGenerator.UI.Workflow.CreateCharacterWorkflow
                 OnPropertyChanged("State");
                 CommandManager.InvalidateRequerySuggested();
             });
-            
+
         }
 
         private void OnPropertyChanged(string propertyName)

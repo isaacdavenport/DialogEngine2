@@ -22,14 +22,14 @@ namespace DialogGenerator.UI.Views
     public partial class CustomDialogCreatorView : UserControl
     {
         public CustomDialogCreatorView()
-        {            
-            InitializeComponent();            
+        {
+            InitializeComponent();
         }
 
         private void CustomDialogCreatorView_DataContextChanged(object sender, DependencyPropertyChangedEventArgs e)
         {
             CustomDialogCreatorViewModel _model = this.DataContext as CustomDialogCreatorViewModel;
-            if(_model != null)
+            if (_model != null)
             {
                 this.LeftCharacterSlot.DataContext = _model.LeftCharacterModel;
                 this.RightSlot.DataContext = _model.RightCharacterModel;
@@ -46,7 +46,7 @@ namespace DialogGenerator.UI.Views
                 this.LeftCharacterSlot.DataContext = _model.LeftCharacterModel;
                 this.RightSlot.DataContext = _model.RightCharacterModel;
                 _model.DialogModel.Popularity = 10;
-                this.DialogSlot.DataContext = _model.DialogModel;                
+                this.DialogSlot.DataContext = _model.DialogModel;
             }
 
             this.DataContextChanged += CustomDialogCreatorView_DataContextChanged;

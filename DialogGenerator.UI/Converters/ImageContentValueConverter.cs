@@ -17,7 +17,7 @@ namespace DialogGenerator.UI.Converters
             string _imagePath = value.ToString();
             string _imageFullPath = System.IO.Path.Combine(ApplicationData.Instance.ImagesDirectory, _imagePath);
 
-            if (_imagePath.Equals(ApplicationData.Instance.DefaultImage) 
+            if (_imagePath.Equals(ApplicationData.Instance.DefaultImage)
                 || !File.Exists(_imageFullPath))
             {
                 PackIcon icon = new PackIcon();
@@ -40,7 +40,7 @@ namespace DialogGenerator.UI.Converters
                 ImageBrush image = new ImageBrush();
                 image.Stretch = Stretch.UniformToFill;
                 image.ImageSource = _imageSource;
-                
+
 
                 Ellipse ellipse = new Ellipse();
                 ellipse.Height = 110;

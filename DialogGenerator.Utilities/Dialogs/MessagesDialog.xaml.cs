@@ -9,7 +9,7 @@ namespace DialogGenerator.Utilities.Dialogs
     /// </summary>
     public partial class MessagesDialog : UserControl
     {
-        public MessagesDialog(string tittle,string message, IList<string> messages,string _okBtnContent,bool _isOKCancelBtn, string _cancelBtnContent)
+        public MessagesDialog(string tittle, string message, IList<string> messages, string _okBtnContent, bool _isOKCancelBtn, string _cancelBtnContent)
         {
             InitializeComponent();
             DataContext = this;

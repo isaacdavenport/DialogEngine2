@@ -3,7 +3,7 @@ using Prism.Modularity;
 
 namespace DialogGenerator.Utilities
 {
-    public class UtilitiesModule:IModule
+    public class UtilitiesModule : IModule
     {
         private IUnityContainer mContainer;
 

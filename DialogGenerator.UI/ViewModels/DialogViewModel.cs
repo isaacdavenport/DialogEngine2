@@ -25,7 +25,7 @@ using System.Windows.Input;
 
 namespace DialogGenerator.UI.ViewModels
 {
-    public class DialogViewModel:BindableBase
+    public class DialogViewModel : BindableBase
     {
         #region - fields -
 
@@ -57,14 +57,14 @@ namespace DialogGenerator.UI.ViewModels
 
         #region - constructor -
 
-        public DialogViewModel(ILogger logger,IEventAggregator _eventAggregator
-            ,IDialogEngine _dialogEngine
-            ,IMessageDialogService _messageDialogService
-            ,ICharacterRepository _characterRepository
-            ,IRegionManager _regionManager
-            ,ArenaViewModel _ArenaViewModel
-            ,IDialogModelRepository _DialogModelRepository
-            ,IWizardRepository _WizardRepository, IMP3Player _player)
+        public DialogViewModel(ILogger logger, IEventAggregator _eventAggregator
+            , IDialogEngine _dialogEngine
+            , IMessageDialogService _messageDialogService
+            , ICharacterRepository _characterRepository
+            , IRegionManager _regionManager
+            , ArenaViewModel _ArenaViewModel
+            , IDialogModelRepository _DialogModelRepository
+            , IWizardRepository _WizardRepository, IMP3Player _player)
         {
             mLogger = logger;
             mEventAggregator = _eventAggregator;
@@ -85,7 +85,7 @@ namespace DialogGenerator.UI.ViewModels
 
             _bindCommands();
 
-            if(ApplicationData.Instance.DebugModeOn)
+            if (ApplicationData.Instance.DebugModeOn)
             {
                 IsDebugViewVisible = Visibility.Visible;
             }
@@ -96,13 +96,13 @@ namespace DialogGenerator.UI.ViewModels
         public void CopyAndClear()
         {
             string strToCopy = string.Empty;
-            foreach(NewDialogLineEventArgs line in DialogLinesCollection)
+            foreach (NewDialogLineEventArgs line in DialogLinesCollection)
             {
-                if(line.Selected)
+                if (line.Selected)
                 {
-                    if(!string.IsNullOrEmpty(strToCopy))
+                    if (!string.IsNullOrEmpty(strToCopy))
                     {
-                        strToCopy += "\n";                        
+                        strToCopy += "\n";
                     }
 
                     strToCopy += line.Character.CharacterName;
@@ -130,15 +130,16 @@ namespace DialogGenerator.UI.ViewModels
 
         private void _onSelectedCharactersPairChangedEvent(SelectedCharactersPairEventArgs obj)
         {
-            if(obj == null)
+            if (obj == null)
             {
                 return;
             }
 
-            if(obj.Character1Index != -1)
+            if (obj.Character1Index != -1)
             {
                 FirstSelectedCharacter = mCharacterRepository.GetAll()[obj.Character1Index];
-            } else
+            }
+            else
             {
                 FirstSelectedCharacter = null;
             }
@@ -151,7 +152,7 @@ namespace DialogGenerator.UI.ViewModels
             {
                 SecondSelectedCharacter = null;
             }
-           
+
         }
 
         private void _onCharacterCollectionLoaded()
@@ -172,7 +173,7 @@ namespace DialogGenerator.UI.ViewModels
             set
             {
                 mCanPause = value;
-                RaisePropertyChanged();               
+                RaisePropertyChanged();
             }
         }
 
@@ -194,7 +195,7 @@ namespace DialogGenerator.UI.ViewModels
         {
             get
             {
-                if(mCharacters == null)
+                if (mCharacters == null)
                 {
                     mCharacters = new ObservableCollection<Character>();
                 }
@@ -220,11 +221,11 @@ namespace DialogGenerator.UI.ViewModels
             {
                 mFirstSelectedCharacter = value;
                 int _idx = -1;
-                if(mFirstSelectedCharacter != null)
+                if (mFirstSelectedCharacter != null)
                 {
                     _idx = mCharacterRepository.IndexOf(mFirstSelectedCharacter);
                 }
-                
+
                 //Session.Set(Constants.NEXT_CH_1, _idx);
 
                 RaisePropertyChanged();
@@ -256,11 +257,11 @@ namespace DialogGenerator.UI.ViewModels
             {
                 mSecondSelectedCharacter = value;
                 int _idx = -1;
-                if(mSecondSelectedCharacter != null)
+                if (mSecondSelectedCharacter != null)
                 {
                     _idx = mCharacterRepository.IndexOf(mSecondSelectedCharacter);
                 }
-                
+
                 //Session.Set(Constants.NEXT_CH_2, _idx);
 
                 RaisePropertyChanged();
@@ -312,7 +313,7 @@ namespace DialogGenerator.UI.ViewModels
 
         public ICommand StartDialogCommand { get; set; }
         public ICommand StopDialogCommand { get; set; }
-        public ICommand ConfigureDialogCommand { get; set; } 
+        public ICommand ConfigureDialogCommand { get; set; }
         public ICommand ClearAllMessagesCommand { get; set; }
         public ICommand OpenSettingsDialogCommand { get; set; }
         public DelegateCommand<object> ChangeDebugVisibilityCommand { get; set; }
@@ -371,7 +372,7 @@ namespace DialogGenerator.UI.ViewModels
 
         private void _selectAllCommand_execute()
         {
-            foreach(NewDialogLineEventArgs line in DialogLinesCollection)
+            foreach (NewDialogLineEventArgs line in DialogLinesCollection)
             {
                 line.Selected = true;
             }
@@ -395,7 +396,7 @@ namespace DialogGenerator.UI.ViewModels
 
         private bool _pauseCommandCanExecute()
         {
-            return mDialogEngine.Running;                       
+            return mDialogEngine.Running;
         }
 
         private void _pauseCommandExecute()
@@ -426,13 +427,14 @@ namespace DialogGenerator.UI.ViewModels
         private async void _expertModeExecute()
         {
             CreateCharacterViewModel createCharacterViewModel = Session.Get(Constants.CREATE_CHARACTER_VIEW_MODEL) as CreateCharacterViewModel;
-            if(createCharacterViewModel != null)
+            if (createCharacterViewModel != null)
             {
                 var _lastWizardState = Session.Get<CreateCharacterState>(Constants.LAST_WIZARD_STATE);
                 if (_lastWizardState != null && _lastWizardState.Wizard != null)
                 {
                     createCharacterViewModel.Workflow.Fire(Triggers.CheckCounter);
-                } else
+                }
+                else
                 {
                     string _nextWizardName = createCharacterViewModel.NextWizardName;
                     if (!_nextWizardName.Equals("Finished"))
@@ -454,12 +456,13 @@ namespace DialogGenerator.UI.ViewModels
                         createCharacterViewModel.Workflow.Fire(Triggers.Finish);
                     }
                 }
-                
-            } else
+
+            }
+            else
             {
                 mRegionManager.Regions[Constants.ContentRegion].NavigationService.RequestNavigate("CreateCharacterView");
             }
-            
+
         }
 
         private bool _selectSecondCharacter_CanExecute()
@@ -492,18 +495,18 @@ namespace DialogGenerator.UI.ViewModels
 
         private bool _goBackToWizard_CanExecute()
         {
-            if(Session.Contains(Constants.CHARACTER_EDIT_MODE) && Session.Get<bool>(Constants.CHARACTER_EDIT_MODE))
+            if (Session.Contains(Constants.CHARACTER_EDIT_MODE) && Session.Get<bool>(Constants.CHARACTER_EDIT_MODE))
             {
                 return true;
             }
-            
+
             return false;
         }
 
         private void _goBackToWizard_Execute()
         {
             CreateCharacterViewModel ccViewModel = Session.Get<CreateCharacterViewModel>(Constants.CREATE_CHARACTER_VIEW_MODEL);
-            if(ccViewModel != null)
+            if (ccViewModel != null)
             {
                 ccViewModel.Workflow.Fire(Triggers.CheckCounter);
             }
@@ -512,8 +515,8 @@ namespace DialogGenerator.UI.ViewModels
         private void _viewUnloaded_Execute()
         {
             try
-            {                
-                if(mDialogEngine.PauseCancellationTokenSource != null)
+            {
+                if (mDialogEngine.PauseCancellationTokenSource != null)
                 {
                     mDialogEngine.PauseCancellationTokenSource.Cancel();
                 }
@@ -531,14 +534,14 @@ namespace DialogGenerator.UI.ViewModels
             try
             {
                 CanGoBackToWizard = GoBackToWizardCommand.CanExecute();
-                if(mWizardRepository.GetAll().Count == 0 || mDialogModelRepository.GetAll().Count == 0)
+                if (mWizardRepository.GetAll().Count == 0 || mDialogModelRepository.GetAll().Count == 0)
                 {
                     await mMessageDialogService.ShowMessage("Error", "There has to be a problem with your installation. Your data folder is empty. Please close the application and re-install it properly!");
-                    return;                    
+                    return;
                 }
 
                 await mDialogEngine.StartDialogEngine();
-                
+
             }
             catch (Exception ex)
             {
@@ -555,7 +558,7 @@ namespace DialogGenerator.UI.ViewModels
                 : Visibility.Visible;
 
             // workaround for hiding debugView in dialogView 
-            if(IsDebugViewVisible == Visibility.Collapsed)
+            if (IsDebugViewVisible == Visibility.Collapsed)
                 (_itemsControl.Parent as Grid).RowDefinitions[2].Height = new GridLength(0);
             else
                 (_itemsControl.Parent as Grid).RowDefinitions[2].Height = new GridLength(150);
@@ -575,10 +578,11 @@ namespace DialogGenerator.UI.ViewModels
         private async void _onOpenSettingsDialog_Execute()
         {
             await mMessageDialogService.ShowDedicatedDialogAsync<int?>(new SettingsDialog(mEventAggregator, mDialogModelRepository, mLogger));
-            if(ApplicationData.Instance.DebugModeOn)
+            if (ApplicationData.Instance.DebugModeOn)
             {
                 IsDebugViewVisible = Visibility.Visible;
-            } else
+            }
+            else
             {
                 IsDebugViewVisible = Visibility.Collapsed;
             }
@@ -649,22 +653,22 @@ namespace DialogGenerator.UI.ViewModels
         {
             NewDialogLineEventArgs args = (NewDialogLineEventArgs)item;
 
-            if(FirstSelectedCharacter != null)
+            if (FirstSelectedCharacter != null)
             {
                 if (args.Character.CharacterPrefix.Equals(FirstSelectedCharacter.CharacterPrefix))
                 {
                     FirstCharacterDialogLine = args.DialogLine;
                 }
-            }            
+            }
 
-            if(SecondSelectedCharacter != null)
+            if (SecondSelectedCharacter != null)
             {
                 if (args.Character.CharacterPrefix.Equals(SecondSelectedCharacter.CharacterPrefix))
                 {
                     SecondCharacterDialogLine = args.DialogLine;
                 }
             }
-            
+
 
         }
 

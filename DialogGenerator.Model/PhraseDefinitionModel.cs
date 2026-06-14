@@ -16,7 +16,7 @@ namespace DialogGenerator.Model
 
         public bool Equals(PhraseDefinitionModel other)
         {
-            if(this.Text != other.Text)
+            if (this.Text != other.Text)
             {
                 return false;
             }
@@ -31,12 +31,12 @@ namespace DialogGenerator.Model
                 return false;
             }
 
-            if(this.Character != other.Character)
+            if (this.Character != other.Character)
             {
                 return false;
             }
 
-            if(this.SlotNumber != other.SlotNumber)
+            if (this.SlotNumber != other.SlotNumber)
             {
                 return false;
             }

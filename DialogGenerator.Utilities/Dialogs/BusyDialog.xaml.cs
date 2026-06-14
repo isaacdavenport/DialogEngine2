@@ -6,7 +6,7 @@ namespace DialogGenerator.Utilities.Dialogs
     /// <summary>
     /// Interaction logic for BusyDialog.xaml
     /// </summary>
-    public partial class BusyDialog : UserControl,INotifyPropertyChanged
+    public partial class BusyDialog : UserControl, INotifyPropertyChanged
     {
         private string mMessage;
 
@@ -28,7 +28,7 @@ namespace DialogGenerator.Utilities.Dialogs
             }
         }
 
-        public  void OnPropertyChanged(string _propertyName)
+        public void OnPropertyChanged(string _propertyName)
         {
             PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(_propertyName));
         }

@@ -1,4 +1,4 @@
-﻿ using DialogGenerator.Core;
+﻿using DialogGenerator.Core;
 using DialogGenerator.Events;
 using Prism.Events;
 using System;
@@ -40,10 +40,10 @@ namespace DialogGenerator.Utilities
         /// <summary>
         /// Creates instance of MP3Player
         /// </summary>
-        public MP3Player(IEventAggregator _eventAggregator,ILogger logger)
+        public MP3Player(IEventAggregator _eventAggregator, ILogger logger)
         {
             mLogger = logger;
-            mEventAggregator = _eventAggregator;            
+            mEventAggregator = _eventAggregator;
 
             mEventAggregator.GetEvent<StopPlayingCurrentDialogLineEvent>().Subscribe(_stopPlayingCurrentDialogLine);
             mEventAggregator.GetEvent<StopImmediatelyPlayingCurrentDialogLIne>().Subscribe(_stopImmediatelyPlayingCurrentDialogLine);
@@ -96,7 +96,8 @@ namespace DialogGenerator.Utilities
             catch (Exception ex)
             {
                 mLogger.Error("VolumeTimer. " + ex.Message);
-            };
+            }
+            ;
         }
 
         private void _player_MediaFailed(object sender, ExceptionEventArgs e)
@@ -199,10 +200,10 @@ namespace DialogGenerator.Utilities
                 mIsLoaded = false;
                 mTimer.Change(Timeout.Infinite, Timeout.Infinite);
                 mVolumeTimer.Change(Timeout.Infinite, Timeout.Infinite);
-                
+
                 Player.Dispatcher.Invoke(() =>
                 {
-                    if(Player.Source != null)
+                    if (Player.Source != null)
                     {
                         if (Player.Source.OriginalString.Equals(path))
                             mIsLoaded = true;
@@ -213,7 +214,7 @@ namespace DialogGenerator.Utilities
                 });
 
                 mStartedTime = DateTime.Now.TimeOfDay;
-                return 0;     
+                return 0;
             }
             catch (Exception ex)
             {

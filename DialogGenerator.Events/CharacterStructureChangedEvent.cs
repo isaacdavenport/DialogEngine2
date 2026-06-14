@@ -13,7 +13,7 @@ namespace DialogGenerator.Events
     /// Author:     S.Ristic.
     /// Date:       10/17/2019.
     /// </summary>
-    public class CharacterStructureChangedEvent:PubSubEvent
+    public class CharacterStructureChangedEvent : PubSubEvent
     {
     }
 }

@@ -12,7 +12,7 @@ using Prism.Mvvm;
 
 namespace DialogGenerator.UI.ViewModels
 {
-    public class DebugViewModel:BindableBase
+    public class DebugViewModel : BindableBase
     {
         #region - fields -
 
@@ -26,9 +26,9 @@ namespace DialogGenerator.UI.ViewModels
 
         #region - constructor -
 
-        public DebugViewModel(ILogger logger,IUserLogger _userLogger
-            ,IEventAggregator _eventAggregator
-            ,ICharacterDataProvider _characterDataProvider)
+        public DebugViewModel(ILogger logger, IUserLogger _userLogger
+            , IEventAggregator _eventAggregator
+            , ICharacterDataProvider _characterDataProvider)
         {
             mLogger = logger;
             UserLogger = _userLogger;
@@ -58,7 +58,7 @@ namespace DialogGenerator.UI.ViewModels
         {
             try
             {
-                if (e.AddedItems.Count > 0 && e.AddedItems[0] is TabItem 
+                if (e.AddedItems.Count > 0 && e.AddedItems[0] is TabItem
                     && (e.AddedItems[0] as TabItem).Content is ListView)
                 {
                     var column = (((e.AddedItems[0] as TabItem).Content as ListView).View as GridView).Columns[0];
@@ -76,7 +76,7 @@ namespace DialogGenerator.UI.ViewModels
 
         #region - properties -
 
-        
+
         public string Character1Prefix
         {
             get { return mCharacter1Prefix; }

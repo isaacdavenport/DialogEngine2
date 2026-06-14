@@ -35,8 +35,8 @@ namespace DialogGenerator
 
         #region - constructor -
 
-        public AppInitializer(ILogger logger,IUserLogger _userLogger, IDialogDataRepository _dialogRepository,
-            IDialogEngine _dialogEngine,ICharacterRepository _characterRepository, IEventAggregator _eventAggregator)
+        public AppInitializer(ILogger logger, IUserLogger _userLogger, IDialogDataRepository _dialogRepository,
+            IDialogEngine _dialogEngine, ICharacterRepository _characterRepository, IEventAggregator _eventAggregator)
         {
             mLogger = logger;
             mUserLogger = _userLogger;
@@ -81,19 +81,19 @@ namespace DialogGenerator
                 .OnEntry(_setInitialValues);
         }
 
-        private  void _loadData()
+        private void _loadData()
         {
-            mLogger.Info("-------------------- Starting DialogEngine Version " +                 
-                $"{ FileVersionInfo.GetVersionInfo(Path.Combine(ApplicationData.Instance.RootDirectory, "DialogGenerator.exe")).FileVersion.ToString()}" + 
+            mLogger.Info("-------------------- Starting DialogEngine Version " +
+                $"{FileVersionInfo.GetVersionInfo(Path.Combine(ApplicationData.Instance.RootDirectory, "DialogGenerator.exe")).FileVersion.ToString()}" +
                 " -----------------------");
             _checkDirectories();
 
-            IList<string> errors;            
-            var _JSONObjectTypesList = mDialogDataRepository.LoadFromDirectory(ApplicationData.Instance.DataDirectory,out errors);
+            IList<string> errors;
+            var _JSONObjectTypesList = mDialogDataRepository.LoadFromDirectory(ApplicationData.Instance.DataDirectory, out errors);
             mDialogDataRepository.LogRedundantDialogModelsInDataFolder(ApplicationData.Instance.DataDirectory, _JSONObjectTypesList);
             var _dialogModelListDeDupedPreFilter = _removeDuplicateDialogModelsFromCollection(_JSONObjectTypesList.DialogModels);
             mDialogDataRepository.LogSessionJsonStatsAndErrors(ApplicationData.Instance.DataDirectory, _JSONObjectTypesList, _dialogModelListDeDupedPreFilter);
-            foreach(var error in errors)
+            foreach (var error in errors)
             {
                 mUserLogger.Error(error);
                 mLogger.Error(error);
@@ -106,7 +106,7 @@ namespace DialogGenerator
             Session.Set(Constants.NEXT_CH_2, -1);
             mEventAggregator.GetEvent<CharacterCollectionLoadedEvent>().Publish();
 
-            mLogger.Info("Finished importing characters:" + _JSONObjectTypesList.Characters.Count + "   DialogModelGroups:" + 
+            mLogger.Info("Finished importing characters:" + _JSONObjectTypesList.Characters.Count + "   DialogModelGroups:" +
                 _JSONObjectTypesList.DialogModels.Count + "   Wizards:" + _JSONObjectTypesList.Wizards.Count);
 
             mWorkflow.Fire(Triggers.InitializeDialogEngine);
@@ -114,7 +114,7 @@ namespace DialogGenerator
 
         private bool _testValueEqualityOnStringLists(List<string> a, List<string> b)
         {
-            if(a.Count != b.Count)
+            if (a.Count != b.Count)
             {
                 return false;  //no need to check individual strings
             }
@@ -165,7 +165,7 @@ namespace DialogGenerator
             return _alreadySeenDialogModelTagLists;
         }
 
-        private  void _checkDirectories()
+        private void _checkDirectories()
         {
             if (Directory.Exists(ApplicationData.Instance.TempDirectory))
             {
@@ -215,7 +215,7 @@ namespace DialogGenerator
         {
             var characters = mCharacterRepository.GetAll();
 
-            
+
             Session.Set(Constants.NEXT_CH_1, -1);
             Session.Set(Constants.NEXT_CH_2, -1);
             Session.Set(Constants.DIALOG_SPEED, 1000); // ms

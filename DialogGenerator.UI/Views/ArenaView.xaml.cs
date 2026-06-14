@@ -28,10 +28,10 @@ namespace DialogGenerator.UI.Views
     /// </summary>
     public partial class ArenaView : UserControl
     {
-        
+
         public ArenaView()
         {
-            InitializeComponent();            
+            InitializeComponent();
         }
 
         private async void UserControl_Loaded(object sender, RoutedEventArgs e)
@@ -40,20 +40,20 @@ namespace DialogGenerator.UI.Views
             InitializeAsync().FireAndForgetSafeAsync();
 
             ArenaViewModel _model = this.DataContext as ArenaViewModel;
-            _model.RemoveAvatarRequested += _removeAvatarRequested;         
+            _model.RemoveAvatarRequested += _removeAvatarRequested;
 
-            if(this.Playground.Children.Count > 0)
+            if (this.Playground.Children.Count > 0)
             {
-                foreach(var _arenaAvatarView in this.Playground.Children)
+                foreach (var _arenaAvatarView in this.Playground.Children)
                 {
                     ArenaAvatarViewModel _aaVM = ((ArenaAvatarView)_arenaAvatarView).DataContext as ArenaAvatarViewModel;
                     _aaVM.StopAnimation();
                 }
-                
+
             }
             this.Playground.Children.Clear();
 
-            foreach(ArenaAvatarViewModel _am in _model.PlaygroundAvatars)
+            foreach (ArenaAvatarViewModel _am in _model.PlaygroundAvatars)
             {
                 ArenaAvatarView _avatarView = new ArenaAvatarView();
                 _avatarView.DataContext = _am;
@@ -63,7 +63,7 @@ namespace DialogGenerator.UI.Views
                 _setBindings(_avatarView, _am);
                 _am.StartAnimation();
                 Thread.Sleep(200);
-                
+
                 this.Playground.Children.Add(_avatarView);
             }
 
@@ -75,19 +75,19 @@ namespace DialogGenerator.UI.Views
         {
             List<ArenaAvatarView> _itemsToRemove = new List<ArenaAvatarView>();
             ArenaAvatarViewModel _avatarViewModel = e.AvatarModel;
-            foreach(var _item in this.Playground.Children)
+            foreach (var _item in this.Playground.Children)
             {
-                if(_item is ArenaAvatarView)
+                if (_item is ArenaAvatarView)
                 {
                     ArenaAvatarView _aav = (ArenaAvatarView)_item;
-                    if(((ArenaAvatarViewModel)_aav.DataContext).Equals(_avatarViewModel))
+                    if (((ArenaAvatarViewModel)_aav.DataContext).Equals(_avatarViewModel))
                     {
                         _itemsToRemove.Add(_aav);
                     }
                 }
             }
 
-            foreach(var _item in _itemsToRemove)
+            foreach (var _item in _itemsToRemove)
             {
                 _removeAvatarFromPlayground(_item);
             }
@@ -148,13 +148,13 @@ namespace DialogGenerator.UI.Views
 
         private async void Playground_Drop(object sender, DragEventArgs e)
         {
-            if(e.Data.GetDataPresent(typeof(ArenaAvatarViewModel)))
+            if (e.Data.GetDataPresent(typeof(ArenaAvatarViewModel)))
             {
                 ArenaAvatarViewModel _am = e.Data.GetData(typeof(ArenaAvatarViewModel)) as ArenaAvatarViewModel;
-                if(_am != null)
+                if (_am != null)
                 {
                     ArenaViewModel _model = this.DataContext as ArenaViewModel;
-                    if(/* !_model.PlaygroundAvatars.Contains(_am) */ _canAdd(_am) )
+                    if (/* !_model.PlaygroundAvatars.Contains(_am) */ _canAdd(_am))
                     {
                         Point pos = e.GetPosition(sender as IInputElement);
                         ArenaAvatarView _aView = new ArenaAvatarView();
@@ -164,21 +164,22 @@ namespace DialogGenerator.UI.Views
                         _setBindings(_aView, _am);
                         _am.Left = (int)pos.X;
                         _am.Top = (int)pos.Y;
-                        
+
                         this.Playground.Children.Add(_aView);
                         _model.PlaygroundAvatars.Add(_am);
                         _am.StartAnimation();
-                        
 
-                        if(this.Playground.Children.Count > 6)
+
+                        if (this.Playground.Children.Count > 6)
                         {
                             _removeClosest(_aView);
                         }
-                    } else
+                    }
+                    else
                     {
                         MessageDialogService _dialogService = new MessageDialogService();
                         await _dialogService.ShowMessage("Error", string.Format("Playground already contains maximum count of '{0}' avatars!", _am.Character.CharacterName));
-                    }                    
+                    }
                 }
             }
         }
@@ -186,7 +187,7 @@ namespace DialogGenerator.UI.Views
         private bool _canAdd(ArenaAvatarViewModel am)
         {
             ArenaViewModel _model = (ArenaViewModel)this.DataContext;
-            if(_model.PlaygroundAvatars.Where(_avm => _avm.Character.CharacterPrefix.Equals(am.Character.CharacterPrefix)).Count() > 1)
+            if (_model.PlaygroundAvatars.Where(_avm => _avm.Character.CharacterPrefix.Equals(am.Character.CharacterPrefix)).Count() > 1)
             {
                 return false;
             }
@@ -204,7 +205,7 @@ namespace DialogGenerator.UI.Views
 
             foreach (ArenaAvatarView _aav in this.Playground.Children)
             {
-                if(_aav.Equals(_Aav))
+                if (_aav.Equals(_Aav))
                 {
                     continue;
                 }
@@ -219,7 +220,7 @@ namespace DialogGenerator.UI.Views
                 }
             }
 
-            if(_closest != null)
+            if (_closest != null)
             {
                 ArenaAvatarViewModel _avModel = _closest.DataContext as ArenaAvatarViewModel;
                 _avModel.StopAnimation();
@@ -230,7 +231,7 @@ namespace DialogGenerator.UI.Views
 
         private void Playground_DragEnter(object sender, DragEventArgs e)
         {
-            if(!e.Data.GetDataPresent(typeof(ArenaAvatarViewModel)))
+            if (!e.Data.GetDataPresent(typeof(ArenaAvatarViewModel)))
             {
                 e.Effects = DragDropEffects.None;
             }
@@ -239,7 +240,7 @@ namespace DialogGenerator.UI.Views
         private void Playground_MouseLeftButtonUp(object sender, System.Windows.Input.MouseButtonEventArgs e)
         {
             ArenaViewModel _model = this.DataContext as ArenaViewModel;
-            AvatarPair _avatarPair = _model.FindClosestAvatarPair();         
+            AvatarPair _avatarPair = _model.FindClosestAvatarPair();
         }
 
 
@@ -277,7 +278,7 @@ namespace DialogGenerator.UI.Views
             if (e.Data.GetDataPresent(typeof(ArenaAvatarView)))
             {
                 ArenaAvatarView _aaV = e.Data.GetData(typeof(ArenaAvatarView)) as ArenaAvatarView;
-                _removeAvatarFromPlayground(_aaV);             
+                _removeAvatarFromPlayground(_aaV);
             }
         }
 

@@ -25,7 +25,7 @@ namespace DialogGenerator.DataAccess
                 .Select(dm => dm)
                 .OrderBy(dm => dm.JsonArrayIndex);
 
-            return  new ObservableCollection<ModelDialogInfo>(result);
+            return new ObservableCollection<ModelDialogInfo>(result);
         }
 
         public ObservableCollection<ModelDialogInfo> GetAllByState(ModelDialogState state)
@@ -40,15 +40,17 @@ namespace DialogGenerator.DataAccess
         public ModelDialogInfo GetByName(string name)
         {
             var _collection = Session.Get<ObservableCollection<ModelDialogInfo>>(Constants.DIALOG_MODELS);
-            try {
+            try
+            {
                 var _dialogModelInfo = _collection
                 .Where(dm => dm.ModelsCollectionName.Equals(name))
                 .FirstOrDefault();
                 return _dialogModelInfo;
-            } catch (Exception)
+            }
+            catch (Exception)
             {
                 return null;
-            }           
+            }
         }
     }
 }

@@ -3,7 +3,7 @@ using Prism.Events;
 
 namespace DialogGenerator.Events
 {
-    public class NewDialogLineEvent:PubSubEvent<NewDialogLineEventArgs>
+    public class NewDialogLineEvent : PubSubEvent<NewDialogLineEventArgs>
     {
     }
 }

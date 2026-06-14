@@ -9,7 +9,7 @@ using System.Threading;
 
 namespace DialogGenerator.Web
 {
-    public class GoogleDriveContentProvider :IContentProvider
+    public class GoogleDriveContentProvider : IContentProvider
     {
         static string[] Scopes = { DriveService.Scope.Drive };
         private string ApplicationName = "DialogGenerator";

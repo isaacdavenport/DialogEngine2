@@ -8,7 +8,7 @@ using System.Threading.Tasks;
 
 namespace DialogGenerator.Events
 {
-    public class AddingPhraseModelToDialogEvent:PubSubEvent<PhraseDefinitionModel>
+    public class AddingPhraseModelToDialogEvent : PubSubEvent<PhraseDefinitionModel>
     {
     }
 }

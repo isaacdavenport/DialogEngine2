@@ -30,9 +30,9 @@ namespace DialogGenerator.DialogEngine
 
         #region - constructor -
 
-        public DialogModelsManager(ILogger logger,IEventAggregator _eventAggregator
-            ,IDialogModelRepository _dialogModelRepository
-            ,DialogContext context, Random _Random, IMessageDialogService _messageDialogService)
+        public DialogModelsManager(ILogger logger, IEventAggregator _eventAggregator
+            , IDialogModelRepository _dialogModelRepository
+            , DialogContext context, Random _Random, IMessageDialogService _messageDialogService)
         {
             mLogger = logger;
             mEventAggregator = _eventAggregator;
@@ -55,30 +55,30 @@ namespace DialogGenerator.DialogEngine
         }
 
         private void _onSelectedCharactersPairChanged(SelectedCharactersPairEventArgs obj)
-        {            
+        {
             if (obj != null && mContext.DialogModelsList.Any())
             {
-                if(obj.Character1Index >= 0 && obj.Character2Index >= 0 && obj.Character1Index 
+                if (obj.Character1Index >= 0 && obj.Character2Index >= 0 && obj.Character1Index
                     <= mContext.CharactersList.Count && obj.Character2Index <= mContext.CharactersList.Count)
                 {
                     mContext.PossibleDialogModelsList = _preparePossibleDialogModelsList(obj.Character1Index, obj.Character2Index);
-                    if(mContext.PossibleDialogModelsList.Count > 0 && mContext.NoDialogs)
+                    if (mContext.PossibleDialogModelsList.Count > 0 && mContext.NoDialogs)
                     {
                         mContext.NoDialogs = false;
                     }
 
                     // S.Ristic 2021-03-30 - DLGEN-588
                     // Only if we really have a different pair of characters.
-                    if((obj.Character1Index != mContext.Character2Num && obj.Character2Index != mContext.Character1Num)
+                    if ((obj.Character1Index != mContext.Character2Num && obj.Character2Index != mContext.Character1Num)
                         && (obj.Character1Index != mContext.Character1Num || obj.Character2Index != mContext.Character2Num))
                     {
                         mContext.FirstRoundGone = false;
                         mGreetingsDialogGone = false;
                     }
                     // S.Ristic 2021-03-30 - End of change
-                    
-                } 
-               
+
+                }
+
             }
         }
 
@@ -166,7 +166,7 @@ namespace DialogGenerator.DialogEngine
             //              only recent adventure dialogs loop to finish, which won't be long considering the fact that this 
             //              loop can have max 6 dialogs.
 
-            for (int _i = 0; _i < mContext.DialogModelsList.Count; _i ++)
+            for (int _i = 0; _i < mContext.DialogModelsList.Count; _i++)
             {
                 var _dialog = mContext.DialogModelsList[_i];
                 _recentAdventureDialogs.Where(r => r.Adventure == _dialog.Adventure).ToList().ForEach(rad =>
@@ -185,7 +185,7 @@ namespace DialogGenerator.DialogEngine
                                 if (_ch2First)
                                     _swapCharactersOneAndTwo();
 
-                                if(_returnIndex == -1)
+                                if (_returnIndex == -1)
                                 {
                                     _returnIndex = _i;
                                 }
@@ -194,12 +194,12 @@ namespace DialogGenerator.DialogEngine
                     });
                 });
 
-                if(_returnIndex != -1)
-                    break;                
+                if (_returnIndex != -1)
+                    break;
 
             }
             return _returnIndex; // code for no next adventure continuance found
-        }        
+        }
 
         private bool _isGreetingDialog(int idx)
         {
@@ -214,7 +214,7 @@ namespace DialogGenerator.DialogEngine
 
         private bool _checkIfDialogModelUsedRecently(int _dialogModel)
         {
-            if(mContext.HistoricalDialogs.Count > 0)
+            if (mContext.HistoricalDialogs.Count > 0)
             {
                 int _depth = Math.Min(DialogEngineConstants.RecentDialogsQueSize, mContext.HistoricalDialogs.Count);
                 for (int _k = 0; _k < _depth; _k++)
@@ -229,7 +229,7 @@ namespace DialogGenerator.DialogEngine
                     }
                 }
             }
-            
+
 
             return false;
         }
@@ -244,7 +244,7 @@ namespace DialogGenerator.DialogEngine
             _dlg.PhraseTypeSequence.Select((entry, i) => new { i, entry }).ToList().ForEach(
                 obj =>
                 {
-                    if(obj.i % 2 == 0)
+                    if (obj.i % 2 == 0)
                     {
                         if (!_phraseRepetitions1.ContainsKey(obj.entry))
                         {
@@ -254,7 +254,8 @@ namespace DialogGenerator.DialogEngine
                         {
                             _phraseRepetitions1[obj.entry]++;
                         }
-                    } else
+                    }
+                    else
                     {
                         if (!_phraseRepetitions2.ContainsKey(obj.entry))
                         {
@@ -264,15 +265,15 @@ namespace DialogGenerator.DialogEngine
                         {
                             _phraseRepetitions2[obj.entry]++;
                         }
-                    }                    
-                    
+                    }
+
                 });
 
-            foreach(KeyValuePair<string, int> entry in _phraseRepetitions1)
+            foreach (KeyValuePair<string, int> entry in _phraseRepetitions1)
             {
                 var _character = mContext.CharactersList[mContext.Character1Num];
-                
-                var _searchedPhraseCount =_character.Phrases.Select(p =>
+
+                var _searchedPhraseCount = _character.Phrases.Select(p =>
                 {
                     return p.PhraseWeights.Keys.Any(key => key.Equals(entry.Key));
                 }).Count();
@@ -382,16 +383,16 @@ namespace DialogGenerator.DialogEngine
 
             // Entries with the odd indices.
 
-                dialog.PhraseTypeSequence.Select((entry, i) => new { i, entry }).Where(p => p.i % 2 != 0).Select(e => e.entry).ToList().ForEach(
-                    str =>
+            dialog.PhraseTypeSequence.Select((entry, i) => new { i, entry }).Where(p => p.i % 2 != 0).Select(e => e.entry).ToList().ForEach(
+                str =>
+                {
+                    if (!result2 && mContext.CharactersList[mContext.Character2Num].RecentPhrases
+                        .Any(rp => rp.PhraseWeights.Keys.Contains(str)))
                     {
-                        if (!result2 && mContext.CharactersList[mContext.Character2Num].RecentPhrases
-                            .Any(rp => rp.PhraseWeights.Keys.Contains(str)))
-                        {
-                            result2 = true;
-                        }
-                    });
-            
+                        result2 = true;
+                    }
+                });
+
             // Only if both characters have recent phrases we return the positive result - DLGEN-619 
             return result1 && result2;
         }
@@ -454,17 +455,18 @@ namespace DialogGenerator.DialogEngine
 
             var settings = ApplicationData.Instance;
 
-            if(settings.HasPreferredDialog)
+            if (settings.HasPreferredDialog)
             {
                 var _preferredDialog = mContext.DialogModelsList.Where(d => d.Name.Equals(settings.PreferredDialogName)).FirstOrDefault();
-                if(_preferredDialog != null)
+                if (_preferredDialog != null)
                 {
                     int _dialogCompliance = _isDialogEgligibleForCharacters(_preferredDialog, mContext.Character1Num, mContext.Character2Num);
                     if (_dialogCompliance == 0)
                     {
                         mLogger.Info("PickAWeightedDialog returning preferredDialog " + _preferredDialog.Name);
                         return mContext.DialogModelsList.IndexOf(_preferredDialog);
-                    } else if (_dialogCompliance == 1)
+                    }
+                    else if (_dialogCompliance == 1)
                     {
                         // Return -1 and force the dialog engine to swap characters.
                         return -1;
@@ -485,19 +487,20 @@ namespace DialogGenerator.DialogEngine
 
             if (mContext.PossibleDialogModelsList == null || !mContext.PossibleDialogModelsList.Any())
             {
-                mLogger.Info("PossibleDialogModelsList empty calling  _preparePossibleDialogModelsList " + 
+                mLogger.Info("PossibleDialogModelsList empty calling  _preparePossibleDialogModelsList " +
                     mContext.CharactersList[mContext.Character1Num].CharacterName + " " +
                     mContext.CharactersList[mContext.Character2Num].CharacterName);
                 mContext.PossibleDialogModelsList = _preparePossibleDialogModelsList(mContext.Character1Num, mContext.Character2Num);
             }
 
-            if(mContext.PossibleDialogModelsList.Count == 0)
+            if (mContext.PossibleDialogModelsList.Count == 0)
             {
                 mLogger.Info($"PICK A WEIGHTED DIALOG - No possible dialogs for characters {mContext.Character1Num} and {mContext.Character2Num}.");
                 return -1;
-            } else
+            }
+            else
             {
-                if(mContext.NoDialogs)
+                if (mContext.NoDialogs)
                 {
                     mContext.NoDialogs = false;
                 }
@@ -508,10 +511,10 @@ namespace DialogGenerator.DialogEngine
 
             var _itemsToRemove = _dialogsToRemove();
             var _filteredList = new List<ModelDialog>();
-            if(_itemsToRemove.Count > 0)
+            if (_itemsToRemove.Count > 0)
             {
                 //var _resetHistory = _itemsToRemove.Count == mContext.PossibleDialogModelsList.Count ? true : false;
-                if(mContext.PossibleDialogModelsList.Count == _itemsToRemove.Count)
+                if (mContext.PossibleDialogModelsList.Count == _itemsToRemove.Count)
                 {
                     mContext.HistoricalDialogs.Clear();
                     mContext.CharactersList[mContext.Character1Num].ClearRecentPhrases();
@@ -522,12 +525,13 @@ namespace DialogGenerator.DialogEngine
                         // Leave at least one dialog.
                         _itemsToRemove.RemoveAt(0);
                     }
-                    
+
                 }
 
                 _filteredList = mContext.PossibleDialogModelsList.Except(_itemsToRemove).ToList();
-                
-            } else
+
+            }
+            else
             {
                 _filteredList = mContext.PossibleDialogModelsList;
             }
@@ -538,7 +542,7 @@ namespace DialogGenerator.DialogEngine
             // This way, we will insure that the first dialog when the characters meet will
             // always be 'Greetings' dialog, if it exists in the list of dialogs for those two
             // characters.
-            if(!mGreetingsDialogGone)
+            if (!mGreetingsDialogGone)
             {
                 _dialogModel = mContext.DialogModelsList.IndexOf(_filteredList[0]);
                 mGreetingsDialogGone = true;
@@ -567,13 +571,13 @@ namespace DialogGenerator.DialogEngine
             var _greetingsList = filteredList
                 .Where(dlg => dlg.PhraseTypeSequence.Contains("Greeting"));
 
-            if(_greetingsList.Count() > 0)
+            if (_greetingsList.Count() > 0)
             {
                 var _greetingsDialog = _greetingsList.First();
                 filteredList.Remove(_greetingsDialog);
-                filteredList.Insert(0, _greetingsDialog);                
-            }    
-            
+                filteredList.Insert(0, _greetingsDialog);
+            }
+
         }
 
         //  See the comment above PickAWeightedDialog() above since PickAWeightedPhrase works the same way
@@ -626,7 +630,7 @@ namespace DialogGenerator.DialogEngine
                 }
 
                 //eventually overload enque to remove first to keep size same or create a replace
-                if(mContext.CharactersList[_speakingCharacter].RecentPhrases.Count == ApplicationData.Instance.RecentPhrasesQueueSize)
+                if (mContext.CharactersList[_speakingCharacter].RecentPhrases.Count == ApplicationData.Instance.RecentPhrasesQueueSize)
                     mContext.CharactersList[_speakingCharacter].RecentPhrases.Dequeue();
 
                 mContext.CharactersList[_speakingCharacter].RecentPhrases.Enqueue(_selectedPhrase);
@@ -635,7 +639,7 @@ namespace DialogGenerator.DialogEngine
             {
                 mLogger.Error("PickAWeightedPhrase " + ex.Message);
             }
-            mLogger.Info("PickAWeightedPhrase for character " + mContext.CharactersList[_speakingCharacter].CharacterName + 
+            mLogger.Info("PickAWeightedPhrase for character " + mContext.CharactersList[_speakingCharacter].CharacterName +
                 " used " + k.ToString() + " retries to select a " + _currentPhraseType + " of:  -" +
                 (_selectedPhrase.DialogStr.Length <= 128 ? _selectedPhrase.DialogStr : _selectedPhrase.DialogStr.Substring(0, 126)) + "...");
 
@@ -736,13 +740,13 @@ namespace DialogGenerator.DialogEngine
                     {
                         _removeCriteriaMet = true;
                         _isOneOfGreetingDialogs++;
-                        
+
                     }
                     else
                     {
                         _greetingDialog = dlg;
                     }
-                }                
+                }
 
                 if (!_removeCriteriaMet && (_greetingDialog != null && dlg.PhraseTypeSequence.Contains("Greeting")))
                 {

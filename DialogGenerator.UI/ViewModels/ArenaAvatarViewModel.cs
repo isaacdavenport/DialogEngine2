@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace DialogGenerator.UI.ViewModels
 {
-    public class ArenaAvatarViewModel : BindableBase,IEquatable<ArenaAvatarViewModel>
+    public class ArenaAvatarViewModel : BindableBase, IEquatable<ArenaAvatarViewModel>
     {
         private Character mCharacter;
         private int mLeft;
@@ -15,7 +15,7 @@ namespace DialogGenerator.UI.ViewModels
         private bool mInPlayground = false;
         private CancellationTokenSource mCancellationTokenSource;
         private const int mMaxIterationsCount = 3;
-        private const int mStep = 3;        
+        private const int mStep = 3;
         private int mDecision = 1;
         private int mSleepInterval = 50;
         private string mCharacterName;
@@ -45,8 +45,8 @@ namespace DialogGenerator.UI.ViewModels
             }
 
             set
-            {                
-                mCharacter = value;                          
+            {
+                mCharacter = value;
                 RaisePropertyChanged();
                 CharacterName = mCharacter.CharacterName;
             }
@@ -61,14 +61,15 @@ namespace DialogGenerator.UI.ViewModels
 
             set
             {
-                if(value.Length > 30)
+                if (value.Length > 30)
                 {
                     mCharacterName = value.Substring(0, 30);
-                } else
+                }
+                else
                 {
                     mCharacterName = value;
                 }
-                
+
                 RaisePropertyChanged();
             }
         }
@@ -129,8 +130,8 @@ namespace DialogGenerator.UI.ViewModels
             }
         }
 
-        public Random Random { get;set; }
-        
+        public Random Random { get; set; }
+
         public ArenaAvatarViewModel Clone()
         {
             ArenaAvatarViewModel _clone = new ArenaAvatarViewModel
@@ -149,19 +150,19 @@ namespace DialogGenerator.UI.ViewModels
 
         public async Task StartAnimation()
         {
-            mCancellationTokenSource = new CancellationTokenSource();            
-            mDecision = Random.Next() % 4;            
+            mCancellationTokenSource = new CancellationTokenSource();
+            mDecision = Random.Next() % 4;
 
             await Task.Run(() =>
             {
                 do
                 {
-                    if(mDecision == 4)
+                    if (mDecision == 4)
                     {
                         mDecision = 0;
                     }
 
-                    switch(mDecision)
+                    switch (mDecision)
                     {
                         case 0: // up
                             for (int i = 0; i < mStep; i++)
@@ -185,12 +186,12 @@ namespace DialogGenerator.UI.ViewModels
                             }
                             break;
                         case 3: // left
-                            for(int i = 0; i < mStep; i++)
+                            for (int i = 0; i < mStep; i++)
                             {
                                 Left--;
                                 Thread.Sleep(50);
                             }
-                            
+
                             break;
                     }
 

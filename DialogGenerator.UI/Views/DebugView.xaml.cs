@@ -16,12 +16,12 @@ namespace DialogGenerator.UI.Views
 
         private void _debugView_VisibleChanged(object sender, DependencyPropertyChangedEventArgs e)
         {
-            if((bool)e.NewValue)
+            if ((bool)e.NewValue)
             {
-                if(this.LoggerMessagesTabControl.SelectedContent is ListView)
+                if (this.LoggerMessagesTabControl.SelectedContent is ListView)
                 {
-                   var _listView = this.LoggerMessagesTabControl.SelectedContent as ListView;
-                   var _gridView = _listView.View as GridView;
+                    var _listView = this.LoggerMessagesTabControl.SelectedContent as ListView;
+                    var _gridView = _listView.View as GridView;
 
                     BindingOperations.GetBindingExpression(_gridView.Columns[0], GridViewColumn.WidthProperty)?.UpdateTarget();
                 }

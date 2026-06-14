@@ -26,7 +26,7 @@ namespace DialogGenerator.UI.Views.Dialogs
     /// <summary>
     /// Interaction logic for SettingsDialog.xaml
     /// </summary>
-    public partial class SettingsDialog : UserControl,INotifyPropertyChanged
+    public partial class SettingsDialog : UserControl, INotifyPropertyChanged
     {
         private ApplicationDataWrapper mSettings;
         private IEventAggregator mEventAggregator;
@@ -53,9 +53,9 @@ namespace DialogGenerator.UI.Views.Dialogs
             mLogger = _Logger;
 
             Settings = new ApplicationDataWrapper(ApplicationData.Instance);
-            using(SpeechSynthesizer _speech = new SpeechSynthesizer())
+            using (SpeechSynthesizer _speech = new SpeechSynthesizer())
             {
-                foreach(var _voiceType in _speech.GetInstalledVoices())
+                foreach (var _voiceType in _speech.GetInstalledVoices())
                 {
                     VoiceTypesCollection.Add(_voiceType.VoiceInfo.Name);
                 }
@@ -65,15 +65,15 @@ namespace DialogGenerator.UI.Views.Dialogs
 
             _handleDialogNameEntry(textBox.Text);
             resultStackBorder.Visibility = Visibility.Collapsed;
-            
-        }        
+
+        }
 
         private void _initDialogModelsList()
         {
-            
+
             foreach (var _dlgInfo in mDialogModelRepository.GetAll())
             {
-                foreach( var _dialog in _dlgInfo.ArrayOfDialogModels)
+                foreach (var _dialog in _dlgInfo.ArrayOfDialogModels)
                 {
                     mDialogModels.Add(_dialog.Name);
                 }
@@ -93,9 +93,9 @@ namespace DialogGenerator.UI.Views.Dialogs
         private void _closeCommand_Execute()
         {
             Settings.Model.Save();
-            DialogHost.CloseDialogCommand.Execute(null,this.CloseBtn);
+            DialogHost.CloseDialogCommand.Execute(null, this.CloseBtn);
 
-            if(Settings.HasPreferredDialog)
+            if (Settings.HasPreferredDialog)
             {
                 mLogger.Debug($"SETTINGS DIALOG - Preferred dialog set to '{Settings.PreferredDialogName}'!");
             }
@@ -105,7 +105,7 @@ namespace DialogGenerator.UI.Views.Dialogs
         {
             OpenFileDialog openFileDialog = new OpenFileDialog();
             openFileDialog.InitialDirectory = ApplicationData.Instance.ImagesDirectory;
-            if(openFileDialog.ShowDialog() == true)
+            if (openFileDialog.ShowDialog() == true)
             {
                 Settings.BackgroundImage = openFileDialog.FileName;
                 mEventAggregator.GetEvent<ArenaBackgroundChangedEvent>().Publish();
@@ -144,7 +144,7 @@ namespace DialogGenerator.UI.Views.Dialogs
 
         public string Version
         {
-            get { return $"v: { FileVersionInfo.GetVersionInfo(Path.Combine(ApplicationData.Instance.RootDirectory, "DialogGenerator.exe")).FileVersion.ToString()}"; }
+            get { return $"v: {FileVersionInfo.GetVersionInfo(Path.Combine(ApplicationData.Instance.RootDirectory, "DialogGenerator.exe")).FileVersion.ToString()}"; }
         }
 
         public event PropertyChangedEventHandler PropertyChanged;
@@ -179,10 +179,11 @@ namespace DialogGenerator.UI.Views.Dialogs
                 }
             }
 
-            if(resultStack.Children.Count == 0)
+            if (resultStack.Children.Count == 0)
             {
                 border.Visibility = Visibility.Collapsed;
-            } else
+            }
+            else
             {
                 border.Visibility = Visibility.Visible;
             }
@@ -218,9 +219,9 @@ namespace DialogGenerator.UI.Views.Dialogs
 
         private void textBox_GotFocus(object sender, RoutedEventArgs e)
         {
-            if(resultStackBorder.Visibility == Visibility.Collapsed)
+            if (resultStackBorder.Visibility == Visibility.Collapsed)
                 resultStackBorder.Visibility = Visibility.Visible;
-            
+
         }
 
         private void textBox_MouseLeftButtonDown(object sender, MouseButtonEventArgs e)
@@ -234,36 +235,38 @@ namespace DialogGenerator.UI.Views.Dialogs
 
         private void UIElement_OnPreviewLostKeyboardFocus(object sender, KeyboardFocusChangedEventArgs e)
         {
-            
-                if (!(sender is TextBox tb)) return;
-                
-                if (tb.Equals(this.CharacterSwapInterval))
+
+            if (!(sender is TextBox tb)) return;
+
+            if (tb.Equals(this.CharacterSwapInterval))
+            {
+                try
                 {
-                    try
-                    {
-                        var val = Convert.ToInt16(tb.Text);
-                        if (val <= 0) tb.Text = Convert.ToString(1);
-                        if (val > 10) tb.Text = Convert.ToString(10);
-                    } catch (Exception)
-                    {
-                        MessageBox.Show("The value must be an integer between 1 and 10!");
-                    }
-                    
+                    var val = Convert.ToInt16(tb.Text);
+                    if (val <= 0) tb.Text = Convert.ToString(1);
+                    if (val > 10) tb.Text = Convert.ToString(10);
+                }
+                catch (Exception)
+                {
+                    MessageBox.Show("The value must be an integer between 1 and 10!");
                 }
 
-                if (tb.Equals(this.RecentPhrasesQueueSize))
+            }
+
+            if (tb.Equals(this.RecentPhrasesQueueSize))
+            {
+                try
                 {
-                    try
-                    {
-                        var val = Convert.ToInt16(tb.Text);
-                        if (val <= 0) tb.Text = Convert.ToString(1);
-                        if (val > 20) tb.Text = Convert.ToString(20);
-                    } catch (Exception)
-                    {
-                        MessageBox.Show("The value must be an integer between 1 and 20!");
-                    }
+                    var val = Convert.ToInt16(tb.Text);
+                    if (val <= 0) tb.Text = Convert.ToString(1);
+                    if (val > 20) tb.Text = Convert.ToString(20);
                 }
-                
+                catch (Exception)
+                {
+                    MessageBox.Show("The value must be an integer between 1 and 20!");
+                }
+            }
+
         }
     }
 }

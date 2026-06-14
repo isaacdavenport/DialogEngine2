@@ -11,7 +11,7 @@ namespace DialogGenerator.Utilities.Dialogs
     /// <summary>
     /// Interaction logic for ExpirationDialog.xaml
     /// </summary>
-    public partial class ExpirationDialog : UserControl,INotifyPropertyChanged
+    public partial class ExpirationDialog : UserControl, INotifyPropertyChanged
     {
         private readonly TimeSpan mExpirationTime;
         private readonly DispatcherTimer mTimer;
@@ -20,7 +20,7 @@ namespace DialogGenerator.Utilities.Dialogs
         public event PropertyChangedEventHandler PropertyChanged;
 
         public ExpirationDialog(TimeSpan _exprationTime, string message, string tittle, string _okBtnContent, string _cancelBtnContent)
-        {           
+        {
             InitializeComponent();
             DataContext = this;
 
@@ -41,7 +41,7 @@ namespace DialogGenerator.Utilities.Dialogs
             mTimer.Start();
         }
 
-        public ICommand CancelCommand { get; set; } 
+        public ICommand CancelCommand { get; set; }
         public ICommand ContinueCommand { get; set; }
 
         private void _timer_Tick(object sender, EventArgs e)

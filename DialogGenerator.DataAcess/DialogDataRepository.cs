@@ -16,7 +16,7 @@ namespace DialogGenerator.DataAccess
         private ILogger mLogger;
         private IUserLogger mUserLogger;
 
-        public DialogDataRepository(ILogger logger,IUserLogger _userLogger)
+        public DialogDataRepository(ILogger logger, IUserLogger _userLogger)
         {
             mLogger = logger;
             mUserLogger = _userLogger;
@@ -30,7 +30,7 @@ namespace DialogGenerator.DataAccess
                 for (int i = 0; i < characters.Count; i++)
                 {
                     characters[i].FileName = _fileName;
-                    characters[i].JsonArrayIndex = i;                    
+                    characters[i].JsonArrayIndex = i;
                 }
             }
 
@@ -56,12 +56,12 @@ namespace DialogGenerator.DataAccess
         }
 
 
-        public void Save(JSONObjectsTypesList _JSONObjectsTypesList,string path)
+        public void Save(JSONObjectsTypesList _JSONObjectsTypesList, string path)
         {
             Serializer.Serialize(_JSONObjectsTypesList, path);
         }
 
-        public JSONObjectsTypesList LoadFromFile(string _filePath,out IList<string> errors)
+        public JSONObjectsTypesList LoadFromFile(string _filePath, out IList<string> errors)
         {
             var _jsonObjectsTypesList = new JSONObjectsTypesList();
             using (var reader = new StreamReader(_filePath)) //creates new streamerader for fs stream. Could also construct with filename...
@@ -75,7 +75,7 @@ namespace DialogGenerator.DataAccess
                 _jsonObjectsTypesList = Serializer.Deserialize<JSONObjectsTypesList>(_jsonString);
                 if (_jsonObjectsTypesList != null)
                 {
-                    _validateLoadedData(_jsonObjectsTypesList,out errors);
+                    _validateLoadedData(_jsonObjectsTypesList, out errors);
                     if (errors.Count > 0)
                         return null;
 
@@ -86,12 +86,12 @@ namespace DialogGenerator.DataAccess
             return _jsonObjectsTypesList;
         }
 
-        private void _validateLoadedData(JSONObjectsTypesList _jsonObjectsTypesList,out IList<string> errors)
+        private void _validateLoadedData(JSONObjectsTypesList _jsonObjectsTypesList, out IList<string> errors)
         {
             errors = new List<string>();
-            if(_jsonObjectsTypesList.Characters != null)
+            if (_jsonObjectsTypesList.Characters != null)
             {
-                foreach(var character in _jsonObjectsTypesList.Characters)
+                foreach (var character in _jsonObjectsTypesList.Characters)
                 {
                     var context = new ValidationContext(character);
                     var results = new List<ValidationResult>();
@@ -109,7 +109,7 @@ namespace DialogGenerator.DataAccess
         public void LogRedundantDialogModelsInDataFolder(string _directoryPath, JSONObjectsTypesList _JSONObjectTypesList)
         {
             // perhaps this should be done in applicationdata.cs or perhaps we should use log4nets folder
-            var logPath = ApplicationData.Instance.AppDataDirectory + "\\Log\\";              
+            var logPath = ApplicationData.Instance.AppDataDirectory + "\\Log\\";
             File.Delete(logPath + "DialogModelsRawAfterLoading.json");
             Serializer.Serialize(_JSONObjectTypesList.DialogModels, logPath + "DialogModelsRawAfterLoading.json");
         }
@@ -240,16 +240,16 @@ namespace DialogGenerator.DataAccess
             public string TagOfInterest { get; set; }
             public SortedDictionary<string, int> OccursNextToTags { get; set; }
         }
-        private void CalculateAndSerializeWeightsAndModels(string logPath, JSONObjectsTypesList _JSONObjectTypesList, 
+        private void CalculateAndSerializeWeightsAndModels(string logPath, JSONObjectsTypesList _JSONObjectTypesList,
             Dictionary<string, double> totalGenericTagWeights, Dictionary<string, int> totalUseCountOfGenericTagsInAllDialogModels)
         {
             File.Delete(logPath + "DialogModelsListPostDeDupeAndFilter.json");
             File.Delete(logPath + "TotalTagWeights.json");
             File.Delete(logPath + "PotentialDialogModelProblems.json");
-            File.Delete(logPath + "TotalTagCounts.json");            
+            File.Delete(logPath + "TotalTagCounts.json");
 
             var _problemDialogModels = new List<ModelDialog>();
-            var _dialogModelsTakenFromArrays = new List<ModelDialog>();            
+            var _dialogModelsTakenFromArrays = new List<ModelDialog>();
             var _tagHeatMap = new List<TagOccurancesCounts>();
             double _genericDialogModelWeightSum = 0.0;
             double _contextualDialogModelWeightSum = 0.0;
@@ -258,7 +258,7 @@ namespace DialogGenerator.DataAccess
 
             //add the list of generic phraseType tags to a list of lists so we can group together occurances of tags
             //in generic dialog models.  Each generic phrasetype should occur once in the totalGenericTagWeights dic as a key
-            foreach (var element in totalGenericTagWeights) 
+            foreach (var element in totalGenericTagWeights)
             {
                 var _currentTag = new TagOccurancesCounts();
                 _currentTag.TagOfInterest = element.Key;
@@ -283,7 +283,7 @@ namespace DialogGenerator.DataAccess
                         {
                             if (!totalGenericTagWeights.ContainsKey(_phraseType))
                             {
-                                _phraseTypeSequenceIsAllGeneric = false;                                
+                                _phraseTypeSequenceIsAllGeneric = false;
                             }
                             else
                             {
@@ -300,7 +300,7 @@ namespace DialogGenerator.DataAccess
                             }
                             foreach (var _phraseDict in _tagHeatMap)
                             {
-                                if (modelDialog.PhraseTypeSequence.Contains(_phraseDict.TagOfInterest)) 
+                                if (modelDialog.PhraseTypeSequence.Contains(_phraseDict.TagOfInterest))
                                 {
                                     foreach (var _phraseType in modelDialog.PhraseTypeSequence)
                                     {
@@ -317,14 +317,14 @@ namespace DialogGenerator.DataAccess
                         }
                     }
                 }
-                mLogger.Info("Generic Dialog Model Weights Sum: " + _genericDialogModelWeightSum.ToString() + 
+                mLogger.Info("Generic Dialog Model Weights Sum: " + _genericDialogModelWeightSum.ToString() +
                         "   Contextual Dialog Model Weights Sum: " + _contextualDialogModelWeightSum.ToString());
                 mLogger.Info("Generic Dialog Model Count: " + _genericDialogModelCount.ToString() +
                         "   Contextual Dialog Model Count: " + _contextualDialogModelCount.ToString());
                 Serializer.Serialize(_dialogModelsTakenFromArrays, logPath + "DialogModelsListPostDeDupeAndFilter.json");
                 Serializer.Serialize(totalGenericTagWeights, logPath + "TotalTagWeights.json");
                 Serializer.Serialize(_tagHeatMap, logPath + "TagHeatMap.json");
-                Serializer.Serialize(totalUseCountOfGenericTagsInAllDialogModels, logPath + "TotalTagCounts.json"); 
+                Serializer.Serialize(totalUseCountOfGenericTagsInAllDialogModels, logPath + "TotalTagCounts.json");
             }
             catch (Exception e)
             {
@@ -372,7 +372,7 @@ namespace DialogGenerator.DataAccess
         }
 
         public void LogSessionJsonStatsAndErrors(string _directoryPath, JSONObjectsTypesList _JSONObjectTypesList, List<List<string>> _dialogModelListPreFilter)
-        {   
+        {
             var logPath = ApplicationData.Instance.AppDataDirectory + "\\Log\\";  // perhaps this should be done in applicationdata.cs or perhaps we should use log4nets folder
 
             File.Delete(logPath + "WizardsList.json");

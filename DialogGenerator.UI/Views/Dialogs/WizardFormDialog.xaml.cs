@@ -14,20 +14,20 @@ namespace DialogGenerator.UI.Views.Dialogs
     /// <summary>
     /// Interaction logic for WizardFormDialog.xaml
     /// </summary>
-    public partial class WizardFormDialog : UserControl,INotifyPropertyChanged
+    public partial class WizardFormDialog : UserControl, INotifyPropertyChanged
     {
         private IWizardDataProvider mWizardDataProvider;
         private int mSelectedWizardIndex;
         private ILogger mLogger;
 
         public WizardFormDialog(IWizardDataProvider _wizardDataProvider, ILogger _Logger)
-        {            
+        {
             InitializeComponent();
             DataContext = this;
             Loaded += _wizardFormDialog_Loaded;
 
             mWizardDataProvider = _wizardDataProvider;
-            mLogger = _Logger;            
+            mLogger = _Logger;
 
             StartWizardCommand = new DelegateCommand(_startWizard_Execute, _startWizard_CanExecute);
         }
@@ -44,11 +44,12 @@ namespace DialogGenerator.UI.Views.Dialogs
                 {
                     mLogger.Info(string.Format("Loaded wizards count is {0}!", Wizards.Count));
                 }
-            } catch (Exception exp)
+            }
+            catch (Exception exp)
             {
                 mLogger.Info(exp.Message);
             }
-            
+
 
             this.WizardTypesCbx.Items.Refresh();
             SelectedWizardIndex = Wizards.Count > 0 ? 0 : -1;
@@ -62,7 +63,7 @@ namespace DialogGenerator.UI.Views.Dialogs
 
         private void _startWizard_Execute()
         {
-            if(StartWizardCommand.CanExecute(null))
+            if (StartWizardCommand.CanExecute(null))
                 DialogHost.CloseDialogCommand.Execute(SelectedWizardIndex, this.StartBtn);
         }
 

@@ -30,7 +30,7 @@ namespace DialogGenerator.UI.ViewModels
         CollectionViewSource mPhraseDefinitionModels;
         CollectionViewSource mCharacters;
         string mPhraseDescription;
-        PhraseDefinitionModel mSelectedModel;        
+        PhraseDefinitionModel mSelectedModel;
         bool mCharacterSelectionEnabled = true;
 
         public CharacterSlotViewModel(ICharacterDataProvider _CharacterDataProvider
@@ -79,8 +79,8 @@ namespace DialogGenerator.UI.ViewModels
                 _initPhraseDefinitionModels();
                 RaisePropertyChanged();
             }
-        }    
-        
+        }
+
         public ICollectionView Characters
         {
             get
@@ -111,7 +111,7 @@ namespace DialogGenerator.UI.ViewModels
                 RaisePropertyChanged();
                 AddPhraseToDialogCommand.RaiseCanExecuteChanged();
             }
-        }        
+        }
 
         public string PhraseDescription
         {
@@ -141,10 +141,11 @@ namespace DialogGenerator.UI.ViewModels
 
         private void _modelAdded(int _count)
         {
-            if(_count > 0)
+            if (_count > 0)
             {
                 CharacterSelectionEnabled = false;
-            } else
+            }
+            else
             {
                 CharacterSelectionEnabled = true;
             }
@@ -181,12 +182,12 @@ namespace DialogGenerator.UI.ViewModels
         {
             // Empty old collection if not empty.
             var _collection = mPhraseDefinitionModels.Source as ObservableCollection<PhraseDefinitionModel>;
-            if(_collection != null)
+            if (_collection != null)
             {
                 _collection.Clear();
-            }            
+            }
 
-            if(SelectedCharacter == null || SelectedCharacter.CharacterName.Equals("GENERIC"))
+            if (SelectedCharacter == null || SelectedCharacter.CharacterName.Equals("GENERIC"))
             {
                 string _filePath = ApplicationData.Instance.DataDirectory + "\\Phrases.cfg";
                 try
@@ -197,7 +198,7 @@ namespace DialogGenerator.UI.ViewModels
                         var _phraseKeysCollection = Serializer.Deserialize<PhraseKeysCollection>(_jsonString);
                         if (_phraseKeysCollection != null && _phraseKeysCollection.Phrases.Count() > 0)
                         {
-                            foreach(var _phraseKey in _phraseKeysCollection.Phrases)
+                            foreach (var _phraseKey in _phraseKeysCollection.Phrases)
                             {
                                 if (_phraseKey == null)
                                     continue;
@@ -206,14 +207,14 @@ namespace DialogGenerator.UI.ViewModels
                                     Text = _phraseKey.Name,
                                     PhraseEntry = null,
                                     Description = _phraseKey.Description,
-                                    Character = null, 
+                                    Character = null,
                                     SlotNumber = SlotNumber
                                 };
 
                                 _collection.Add(_phraseDefinitionModel);
-                                
+
                             }
-                                        
+
                         }
                     }
                 }
@@ -221,15 +222,17 @@ namespace DialogGenerator.UI.ViewModels
                 {
                     mLogger.Error(e.Message);
                 }
-            } else
+            }
+            else
             {
-                foreach(var _phrase in SelectedCharacter.Phrases)
+                foreach (var _phrase in SelectedCharacter.Phrases)
                 {
                     string _excerpt = string.Empty;
-                    if(_phrase.DialogStr.Length > 50)
+                    if (_phrase.DialogStr.Length > 50)
                     {
                         _excerpt = _phrase.DialogStr.Substring(0, 50) + "...";
-                    } else
+                    }
+                    else
                     {
                         _excerpt = _phrase.DialogStr;
                     }
@@ -237,7 +240,7 @@ namespace DialogGenerator.UI.ViewModels
                     var _phraseDefinitionModel = new PhraseDefinitionModel
                     {
                         Text = _excerpt,
-                        PhraseEntry = _phrase,     
+                        PhraseEntry = _phrase,
                         Character = SelectedCharacter,
                         SlotNumber = SlotNumber
                     };
@@ -257,11 +260,12 @@ namespace DialogGenerator.UI.ViewModels
             {
                 _characters = mCharacters.Source as ObservableCollection<Character>;
                 _characters.Clear();
-            } else
+            }
+            else
             {
                 mCharacters = new CollectionViewSource();
             }
-                        
+
             _characters.Add(new Character
             {
                 CharacterName = "GENERIC",
@@ -271,7 +275,7 @@ namespace DialogGenerator.UI.ViewModels
             _characters.AddRange(mCharacterDataProvider.GetAll());
             mCharacters.Source = _characters;
             mCharacters.View?.Refresh();
-        }       
+        }
 
         private void _bindCommands()
         {
@@ -302,11 +306,11 @@ namespace DialogGenerator.UI.ViewModels
         private void _viewLoaded_Execute()
         {
             ObservableCollection<Character> _characters = mCharacters.Source as ObservableCollection<Character>;
-            if(_characters != null)
+            if (_characters != null)
             {
                 SelectedCharacter = _characters[0];
             }
-            
+
         }
 
         #endregion

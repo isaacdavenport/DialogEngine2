@@ -7,7 +7,7 @@ namespace DialogGenerator.Events
     /// Event that notifies the auditorium that the content and definition 
     /// of a character has changed.
     /// </summary>
-    public class CharacterUpdatedEvent:PubSubEvent
+    public class CharacterUpdatedEvent : PubSubEvent
     {
     }
 }

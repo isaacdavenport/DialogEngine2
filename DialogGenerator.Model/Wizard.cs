@@ -36,7 +36,7 @@ namespace DialogGenerator.Model
             };
 
             _wizard.TutorialSteps = new List<TutorialStep>();
-            foreach(var _tutorialStep in TutorialSteps)
+            foreach (var _tutorialStep in TutorialSteps)
             {
                 TutorialStep _clonedTutorialStep = (TutorialStep)_tutorialStep.Clone();
                 _wizard.TutorialSteps.Add(_clonedTutorialStep);

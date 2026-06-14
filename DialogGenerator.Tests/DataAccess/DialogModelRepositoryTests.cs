@@ -3,7 +3,7 @@ using Xunit;
 
 namespace DialogGenerator.Tests.DataAccess
 {
-    public class DialogModelRepositoryTests:RepositoryTestBase
+    public class DialogModelRepositoryTests : RepositoryTestBase
     {
         private DialogModelRepository mRepository;
 
@@ -30,10 +30,10 @@ namespace DialogGenerator.Tests.DataAccess
 
             Assert.NotEmpty(_dialogModels);
 
-            foreach(var _dialogModel in _dialogModels)
+            foreach (var _dialogModel in _dialogModels)
             {
                 Assert.Equal(_fileName, _dialogModel.FileName);
-            }              
+            }
         }
 
         [Theory]

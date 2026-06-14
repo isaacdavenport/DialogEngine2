@@ -4,7 +4,7 @@ using DialogGenerator.Model;
 
 namespace DialogGenerator.UI.Data
 {
-    public class WizardDataProvider:IWizardDataProvider
+    public class WizardDataProvider : IWizardDataProvider
     {
         private IWizardRepository mWizardRepository;
 

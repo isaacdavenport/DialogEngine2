@@ -70,12 +70,13 @@ namespace DialogGenerator.Model
             //if (!Name.Equals(other.Name))
             //    return false;
 
-            if(PhraseTypeSequence.Count != other.PhraseTypeSequence.Count)
+            if (PhraseTypeSequence.Count != other.PhraseTypeSequence.Count)
             {
                 return false;
-            } else
+            }
+            else
             {
-                for(int i = 0; i < PhraseTypeSequence.Count; i++)
+                for (int i = 0; i < PhraseTypeSequence.Count; i++)
                 {
                     if (!PhraseTypeSequence[i].Equals(other.PhraseTypeSequence[i]))
                         return false;
@@ -124,7 +125,7 @@ namespace DialogGenerator.Model
                 PhraseTypeSequence = this.PhraseTypeSequence,
                 Popularity = this.Popularity,
                 Provides = this.Provides,
-                Requires = this.Requires,                
+                Requires = this.Requires,
             };
 
             return _modelDialog;

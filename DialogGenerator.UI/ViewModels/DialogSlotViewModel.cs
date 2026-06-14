@@ -53,7 +53,7 @@ namespace DialogGenerator.UI.ViewModels
             _bindCommands();
         }
 
-        
+
 
         #region Properties
         public string DialogName
@@ -238,7 +238,7 @@ namespace DialogGenerator.UI.ViewModels
             string _filePath = Path.Combine(ApplicationData.Instance.DataDirectory, _dialogNameBase + ".json");
 
             // Save dialog to file.
-            Serializer.Serialize(_jsonObjectTypesList, _filePath );
+            Serializer.Serialize(_jsonObjectTypesList, _filePath);
 
             // Save character changes.
             foreach (var _character in _charactersForSaving)
@@ -276,7 +276,7 @@ namespace DialogGenerator.UI.ViewModels
 
         private void _viewLoaded()
         {
-            
+
         }
 
         private bool _removePhraseFromList_CanExecute()
@@ -302,13 +302,13 @@ namespace DialogGenerator.UI.ViewModels
         private void _wantToAddPhraseModel(PhraseDefinitionModel _phraseModel)
         {
             var _phraseDefinitionModels = mPhraseDefinitionModels.Source as ObservableCollection<PhraseDefinitionModel>;
-            if(_phraseDefinitionModels != null)
+            if (_phraseDefinitionModels != null)
             {
-                if(_phraseDefinitionModels.Count() > 0)
+                if (_phraseDefinitionModels.Count() > 0)
                 {
                     var _lastAddedPhraseModel = _phraseDefinitionModels.Last();
                     if (_lastAddedPhraseModel.SlotNumber == _phraseModel.SlotNumber)
-                    {                        
+                    {
                         mMessageDialogService.ShowMessage("Wrong parameter", "This character can't add two consequtive phrases! Plase add the prase from the other character!");
                         return;
                     }
@@ -326,11 +326,11 @@ namespace DialogGenerator.UI.ViewModels
         {
             var _values = new double[] { 2, 10, 40, 60, 80, 100, 120 };
 
-            foreach(var _value in _values)
+            foreach (var _value in _values)
             {
                 PopularityValues.Add(_value);
             }
-            
+
         }
 
         #endregion

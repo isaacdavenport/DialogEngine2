@@ -7,7 +7,7 @@ using System.Threading.Tasks;
 
 namespace DialogGenerator.Events
 {
-    public class CharacterSavedEvent:PubSubEvent<string>
+    public class CharacterSavedEvent : PubSubEvent<string>
     {
     }
 }

@@ -31,7 +31,7 @@ namespace DialogGenerator.CharacterSelection.Workflow
     {
         public event PropertyChangedEventHandler PropertyChanged;
 
-        public BLESelectionWorkflow(Action action):base(States.Waiting)
+        public BLESelectionWorkflow(Action action) : base(States.Waiting)
         {
             OnTransitioned
             (

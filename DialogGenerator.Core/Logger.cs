@@ -18,28 +18,28 @@ namespace DialogGenerator.Core
         // returns logger depends on type
         private ILog _getLogger(string type)
         {
-                return mcDefaultLog;
+            return mcDefaultLog;
         }
 
-        public void Error(string message, string _loggerType = null, 
+        public void Error(string message, string _loggerType = null,
             [CallerFilePath] string _file = "", [CallerLineNumber] int _line = 0)
         {
             _getLogger(_loggerType)?.Error(message);
         }
 
-        public void Info(string message, string _loggerType = null, 
+        public void Info(string message, string _loggerType = null,
             [CallerFilePath] string _file = "", [CallerLineNumber] int _line = 0)
         {
             _getLogger(_loggerType)?.Info(message);
         }
 
-        public void Warning(string message, string _loggerType = null, 
+        public void Warning(string message, string _loggerType = null,
             [CallerFilePath] string _file = "", [CallerLineNumber] int _line = 0)
         {
             _getLogger(_loggerType)?.Warn(message);
         }
 
-        public void Debug(string message, string _loggerType = null, 
+        public void Debug(string message, string _loggerType = null,
             [CallerFilePath] string _file = "", [CallerLineNumber] int _line = 0)
         {
             _getLogger(_loggerType)?.Debug(message);

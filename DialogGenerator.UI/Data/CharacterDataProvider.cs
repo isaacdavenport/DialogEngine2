@@ -11,7 +11,7 @@ namespace DialogGenerator.UI.Data
         private ILogger mLogger;
         private ICharacterRepository mCharacterRepository;
 
-        public CharacterDataProvider(ILogger logger,ICharacterRepository _characterRepository)
+        public CharacterDataProvider(ILogger logger, ICharacterRepository _characterRepository)
         {
             mLogger = logger;
             mCharacterRepository = _characterRepository;
@@ -22,9 +22,9 @@ namespace DialogGenerator.UI.Data
             return mCharacterRepository.AddAsync(character);
         }
 
-        public void Export(Character character,string _directoryPath)
+        public void Export(Character character, string _directoryPath)
         {
-            mCharacterRepository.Export(character,_directoryPath);
+            mCharacterRepository.Export(character, _directoryPath);
             mLogger.Info("export character: " + character.CharacterName);
 
         }
@@ -44,9 +44,9 @@ namespace DialogGenerator.UI.Data
             return mCharacterRepository.GetByInitials(initials);
         }
 
-        public Task Remove(Character character,string _imageFileName)
+        public Task Remove(Character character, string _imageFileName)
         {
-            return mCharacterRepository.Remove(character,_imageFileName);
+            return mCharacterRepository.Remove(character, _imageFileName);
         }
 
         public void RemovePhrase(Character character, PhraseEntry phrase)

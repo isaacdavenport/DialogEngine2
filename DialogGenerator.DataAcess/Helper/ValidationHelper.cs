@@ -32,12 +32,12 @@ namespace DialogGenerator.DataAccess.Helper
 
                 return _jObject.IsValid(msSchema, out messages);
             }
-            catch(Newtonsoft.Json.JsonReaderException e)
+            catch (Newtonsoft.Json.JsonReaderException e)
             {
                 messages = new List<string>();
                 messages.Add(e.Message);
             }
-            catch(Exception e)
+            catch (Exception e)
             {
                 messages = new List<string>();
                 messages.Add(e.Message);

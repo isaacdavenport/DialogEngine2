@@ -2,7 +2,7 @@
 
 namespace DialogGenerator.Events
 {
-    public class CharacterSelectionActionChangedEvent:PubSubEvent<bool>
+    public class CharacterSelectionActionChangedEvent : PubSubEvent<bool>
     {
     }
 }

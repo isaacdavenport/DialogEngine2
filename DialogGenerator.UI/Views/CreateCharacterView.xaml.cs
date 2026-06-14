@@ -19,9 +19,9 @@ namespace DialogGenerator.UI.Views
         private void CreateCharacterView_PropertyChanged(object sender, System.ComponentModel.PropertyChangedEventArgs e)
         {
             CreateCharacterViewModel _viewModel = sender as CreateCharacterViewModel;
-            if(sender != null)
+            if (sender != null)
             {
-                if(e.PropertyName.Equals("CurrentStep"))
+                if (e.PropertyName.Equals("CurrentStep"))
                 {
                     this.ContentControl.Template = Resources[_viewModel.CurrentStep.StepControl] as ControlTemplate;
                 }

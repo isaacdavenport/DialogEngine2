@@ -12,7 +12,7 @@ namespace DialogGenerator.Utilities
         {
             if (Application.Current == null)
                 return;
-            
+
             if (Application.Current.Dispatcher.CheckAccess())
             {
                 if (ErrorsCollection.Count > 150)
@@ -36,7 +36,7 @@ namespace DialogGenerator.Utilities
         {
             if (Application.Current.Dispatcher == null)
                 return;
-            
+
             if (Application.Current.Dispatcher.CheckAccess())
             {
                 if (InformationsCollection.Count > 150)
@@ -60,7 +60,7 @@ namespace DialogGenerator.Utilities
         {
             if (Application.Current.Dispatcher == null)
                 return;
-            
+
             if (Application.Current.Dispatcher.CheckAccess())
             {
                 if (WarningsCollection.Count > 150)

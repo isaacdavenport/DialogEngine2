@@ -37,7 +37,7 @@ namespace DialogGenerator.UI.ViewModels
         //          [ "WZ_SkylarGreeting1", "USR_CurrentLine" ],
         //          [ "USR_CurrentLine", "WZ_BjornGreeting1" ]
         //       ]
-        private const string mcCurrentLineName = "USR_CurrentLine"; 
+        private const string mcCurrentLineName = "USR_CurrentLine";
 
         #endregion
 
@@ -70,14 +70,14 @@ namespace DialogGenerator.UI.ViewModels
 
         #region - constructor -
 
-        public WizardViewModel(ILogger logger,IUserLogger _userLogger
-            ,IEventAggregator _eventAggregator
-            ,IWizardDataProvider _wizardDataProvider
-            ,ICharacterDataProvider _characterDataProvider
-            ,IDialogModelDataProvider _dialogModelDataProvider
-            ,IMessageDialogService _messageDialogService
-            ,WizardFormDialog _wizardFormDialog
-            ,IRegionManager _regionManager)
+        public WizardViewModel(ILogger logger, IUserLogger _userLogger
+            , IEventAggregator _eventAggregator
+            , IWizardDataProvider _wizardDataProvider
+            , ICharacterDataProvider _characterDataProvider
+            , IDialogModelDataProvider _dialogModelDataProvider
+            , IMessageDialogService _messageDialogService
+            , WizardFormDialog _wizardFormDialog
+            , IRegionManager _regionManager)
         {
             mLogger = logger;
             mUserLogger = _userLogger;
@@ -88,12 +88,12 @@ namespace DialogGenerator.UI.ViewModels
             mDialogModelDataProvider = _dialogModelDataProvider;
             mRegionManager = _regionManager;
             mEventAggregator = _eventAggregator;
-            
+
             Workflow = new WizardWorkflow(action: () => { });
             MediaPlayerControlViewModel = new MediaPlayerControlViewModel(Workflow, mLogger);
 
             mLogger.Info("Before creating of VoiceRecorderControlViewModel");
-            VoiceRecorderControlViewModel = new VoiceRecorderControlViewModel(NAudioEngine.Instance,Workflow,mMessageDialogService, _eventAggregator, logger);
+            VoiceRecorderControlViewModel = new VoiceRecorderControlViewModel(NAudioEngine.Instance, Workflow, mMessageDialogService, _eventAggregator, logger);
             mLogger.Info("After creating of VoiceRecorderControlViewModel");
 
             mLogger.Info("Before calling of the speech synthesizer");
@@ -106,7 +106,7 @@ namespace DialogGenerator.UI.ViewModels
             _bindEvents();
             _bindCommands();
 
-            
+
         }
 
 
@@ -136,13 +136,13 @@ namespace DialogGenerator.UI.ViewModels
             {
                 case UI.Workflow.VideoPlayerStateMachine.States.Playing:
                     {
-                        if(Workflow.CanFire(WizardTriggers.UserStartedAction))
+                        if (Workflow.CanFire(WizardTriggers.UserStartedAction))
                             Workflow.Fire(WizardTriggers.UserStartedAction);
                         break;
                     }
                 case UI.Workflow.VideoPlayerStateMachine.States.Ready:
                     {
-                        if(Workflow.CanFire(WizardTriggers.ReadyForUserAction))
+                        if (Workflow.CanFire(WizardTriggers.ReadyForUserAction))
                             Workflow.Fire(WizardTriggers.ReadyForUserAction);
                         break;
                     }
@@ -210,7 +210,7 @@ namespace DialogGenerator.UI.ViewModels
         private void _configureWorkflow()
         {
             Workflow.Configure(WizardStates.Started)
-                .OnExit(() =>_startExited())
+                .OnExit(() => _startExited())
                 .Permit(WizardTriggers.ShowChooseWizardDialog, WizardStates.ChooseWizardDialogShown);
 
             Workflow.Configure(WizardStates.ChooseWizardDialogShown)
@@ -224,7 +224,7 @@ namespace DialogGenerator.UI.ViewModels
                 .Permit(WizardTriggers.LeaveWizard, WizardStates.LeavingWizard)
                 .Permit(WizardTriggers.UserStartedAction, WizardStates.UserActionStarted)
                 .Permit(WizardTriggers.ShowChooseWizardDialog, WizardStates.ChooseWizardDialogShown)
-                .Permit(WizardTriggers.PlayInContext,WizardStates.PlayingInContext);
+                .Permit(WizardTriggers.PlayInContext, WizardStates.PlayingInContext);
 
             Workflow.Configure(WizardStates.PlayingInContext)
                 .Permit(WizardTriggers.ReadyForUserAction, WizardStates.WaitingForUserAction);
@@ -263,13 +263,13 @@ namespace DialogGenerator.UI.ViewModels
 
         private void _bindCommands()
         {
-            DialogHostLoaded = new DelegateCommand(() => { Workflow.Fire(WizardTriggers.ShowChooseWizardDialog);});
+            DialogHostLoaded = new DelegateCommand(() => { Workflow.Fire(WizardTriggers.ShowChooseWizardDialog); });
             DialogHostUnloaded = new DelegateCommand(_view_Unloaded);
-            SaveAndNext = new DelegateCommand(() => { Workflow.Fire(WizardTriggers.SaveAndLoadNextStep); },_saveAndNext_CanExecute);
-            SkipStep = new DelegateCommand(() => { Workflow.Fire(WizardTriggers.LoadNextStep); },_skipStep_CanExecute);
-            PlayInContext = new DelegateCommand(_playDialogLineInContext_Execute,_playInContext_CanExecute);
+            SaveAndNext = new DelegateCommand(() => { Workflow.Fire(WizardTriggers.SaveAndLoadNextStep); }, _saveAndNext_CanExecute);
+            SkipStep = new DelegateCommand(() => { Workflow.Fire(WizardTriggers.LoadNextStep); }, _skipStep_CanExecute);
+            PlayInContext = new DelegateCommand(_playDialogLineInContext_Execute, _playInContext_CanExecute);
             StopPlayingInContext = new DelegateCommand(_stopPlayingDialogLineInContext_Execute, _stopPlayingDialogLineInContext_CanExecute);
-            Cancel = new DelegateCommand(() => { Workflow.Fire(WizardTriggers.LeaveWizard); },_cancel_CanExecute);
+            Cancel = new DelegateCommand(() => { Workflow.Fire(WizardTriggers.LeaveWizard); }, _cancel_CanExecute);
         }
 
 
@@ -282,15 +282,15 @@ namespace DialogGenerator.UI.ViewModels
 
         private void _onSpeechRecognized(string _recognizedText)
         {
-            if(string.IsNullOrEmpty(DialogStr))
+            if (string.IsNullOrEmpty(DialogStr))
             {
                 DialogStr = _recognizedText;
             }
         }
 
         private async void _onTranslationRequired(string _Caller)
-        {            
-            if(_Caller.Equals("VoiceRecorderControlViewModel"))
+        {
+            if (_Caller.Equals("VoiceRecorderControlViewModel"))
             {
                 if (!string.IsNullOrEmpty(DialogStr))
                 {
@@ -304,7 +304,7 @@ namespace DialogGenerator.UI.ViewModels
                 {
                     await mMessageDialogService.ShowMessage("Error", "Since the recording was disabled, the text box should contain some meaningfull text which will be converted to speech and must not be empty!");
                 }
-            }            
+            }
         }
 
         private bool _stopPlayingDialogLineInContext_CanExecute()
@@ -340,7 +340,8 @@ namespace DialogGenerator.UI.ViewModels
                 return Workflow.State == WizardStates.WaitingForUserAction
                        && VoiceRecorderControlViewModel.StartPlayingCommand.CanExecute();
             }
-            catch (Exception exp){
+            catch (Exception exp)
+            {
                 mLogger.Error("Playing in context can execute exception - " + exp.Message);
             }
 
@@ -354,7 +355,8 @@ namespace DialogGenerator.UI.ViewModels
                 return (CurrentWizard != null && CurrentStepIndex < CurrentWizard.TutorialSteps.Count - 1)
                         && Workflow.State == WizardStates.WaitingForUserAction && (!mIsRunningCommandWizard || !CurrentTutorialStep.CollectUserInput) && !TimerBlock;
             }
-            catch (Exception exp) {
+            catch (Exception exp)
+            {
                 mLogger.Error("Skip step can exception - " + exp.Message);
             }
 
@@ -402,7 +404,7 @@ namespace DialogGenerator.UI.ViewModels
                     mCancellationTokenSource = new CancellationTokenSource();
                     var dialogs = CurrentTutorialStep.PlayUserRecordedAudioInContext;
 
-                    for(int i=0;i<dialogs.Count;i++)
+                    for (int i = 0; i < dialogs.Count; i++)
                     {
                         mCancellationTokenSource.Token.ThrowIfCancellationRequested();
 
@@ -428,15 +430,16 @@ namespace DialogGenerator.UI.ViewModels
                                         MediaPlayerControlViewModel.CurrentVideoFilePath =
                                        Path.Combine(ApplicationData.Instance.VideoDirectory, _dialogLine);
                                     });
-                                    
+
                                 }
                                 else
                                 {
-                                    Application.Current.Dispatcher.Invoke(() => {
+                                    Application.Current.Dispatcher.Invoke(() =>
+                                    {
                                         MediaPlayerControlViewModel.CurrentVideoFilePath =
                                            Path.Combine(ApplicationData.Instance.VideoDirectory, _dialogLine + ".avi");
                                     });
-                                    
+
                                 }
                                 Application.Current.Dispatcher.Invoke(() =>
                                 {
@@ -447,7 +450,7 @@ namespace DialogGenerator.UI.ViewModels
                                         MediaPlayerControlViewModel.PlayInContextCommand.Execute(null);
                                         mLogger.Info(string.Format("Playing in context - {0} playing!", MediaPlayerControlViewModel.CurrentVideoFilePath));
                                     }
-                                        
+
                                 });
                             }
 
@@ -461,7 +464,7 @@ namespace DialogGenerator.UI.ViewModels
                                     await Task.Delay(500);
                                 }
                             }
-                            while (VoiceRecorderControlViewModel.StateMachine.State == UI.Workflow.MP3RecorderStateMachine.States.Playing 
+                            while (VoiceRecorderControlViewModel.StateMachine.State == UI.Workflow.MP3RecorderStateMachine.States.Playing
                                   || MediaPlayerControlViewModel.StateMachine.State == UI.Workflow.VideoPlayerStateMachine.States.Playing);
 
                             Thread.Sleep(500);
@@ -470,7 +473,7 @@ namespace DialogGenerator.UI.ViewModels
                         if (i < dialogs.Count - 1)
                             Thread.Sleep(500);
                     }
-                }                
+                }
                 catch (OperationCanceledException)
                 {
                     mLogger.Debug("_playDialogLineInContext method cancelled");
@@ -482,7 +485,7 @@ namespace DialogGenerator.UI.ViewModels
             });
 
             CurrentTutorialStep = CurrentWizard.TutorialSteps[CurrentStepIndex];
-            if(Path.HasExtension(CurrentTutorialStep.VideoFileName))
+            if (Path.HasExtension(CurrentTutorialStep.VideoFileName))
             {
                 MediaPlayerControlViewModel.CurrentVideoFilePath =
                     Path.Combine(ApplicationData.Instance.VideoDirectory, CurrentTutorialStep.VideoFileName);
@@ -498,12 +501,12 @@ namespace DialogGenerator.UI.ViewModels
         private PhraseEntry _findPhraseInCharacterForTutorialStep(TutorialStep _tutorialStep)
         {
             string _tagName = _tutorialStep.PhraseWeights.Keys.First();
-            PhraseEntry phrase =Character.Phrases.Where(p => p.PhraseWeights.Keys.First().Equals(_tagName))
+            PhraseEntry phrase = Character.Phrases.Where(p => p.PhraseWeights.Keys.First().Equals(_tagName))
                                                  .FirstOrDefault();
 
             return phrase;
         }
-        
+
         private void _setDataForTutorialStep(int _currentStepIndex)
         {
             try
@@ -557,11 +560,12 @@ namespace DialogGenerator.UI.ViewModels
 
                 VoiceRecorderControlViewModel.
                     CurrentFilePath = $"{Character.CharacterPrefix}_{CurrentTutorialStep.PhraseWeights.Keys.First()}_{DateTime.Now.ToString("yyyy-dd-MM-HH-mm-ss")}";
-            } catch (Exception e)
+            }
+            catch (Exception e)
             {
                 mLogger.Error("WizardViewModel::_setDataForTutorialStep" + e.Message);
             }
-            
+
         }
 
         #endregion
@@ -581,7 +585,7 @@ namespace DialogGenerator.UI.ViewModels
         private void _leaveWizard()
         {
             try
-            {                
+            {
                 VoiceRecorderControlViewModel.StateMachine.PropertyChanged -= _vrc_stateMachine_PropertyChanged;
                 MediaPlayerControlViewModel.StateMachine.PropertyChanged -= _mpc_stateMachine_PropertyChanged;
                 var _contentRegion = mRegionManager.Regions[Constants.ContentRegion];
@@ -603,19 +607,21 @@ namespace DialogGenerator.UI.ViewModels
                     // <<
                     // End of commented part                    
 
-                    if(mIsFinished)
+                    if (mIsFinished)
                     {
                         viewModel.Workflow.Fire(Triggers.GoPlay);
-                        
-                    } else
+
+                    }
+                    else
                     {
                         viewModel.Workflow.Fire(Triggers.Finish);
                         mRegionManager.Regions[Constants.ContentRegion].NavigationService.RequestNavigate("DialogView");
                     }
-                    
-                } else
-                {                    
-                    _contentRegion.NavigationService.Journal.GoBack();                    
+
+                }
+                else
+                {
+                    _contentRegion.NavigationService.Journal.GoBack();
                 }
 
                 Workflow.Fire(WizardTriggers.Start);
@@ -637,33 +643,35 @@ namespace DialogGenerator.UI.ViewModels
                 {
                     CurrentWizard = mWizardDataProvider.GetByName(createCharacterViewModel.CurrentDialogWizard);
                     _setDataForTutorialStep(CurrentStepIndex);
-                } else
+                }
+                else
                 {
                     CurrentWizard = _lastWizardState.Wizard;
                     CurrentStepIndex = _lastWizardState.StepIndex;
-                    _setDataForTutorialStep(CurrentStepIndex);                    
+                    _setDataForTutorialStep(CurrentStepIndex);
                 }
 
                 Workflow.Fire(WizardTriggers.ReadyForUserAction);
-                
+
                 mLogger.Debug($"Wizard View - Wizard '{mCurrentWizard.WizardName}' loaded from Guided Creation Mode!");
-            } else
+            }
+            else
             {
                 Character = mRegionManager.Regions[Constants.ContentRegion].Context as Character;
                 if (_lastWizardState != null && _lastWizardState.Wizard != null && _lastWizardState.CharacterPrefix.Equals(Character.CharacterPrefix))
                 {
                     MessageDialogResult _result = await mMessageDialogService.ShowOKCancelDialogAsync("Resume previous session?", "Question", "Yes", "No");
-                    if(_result.Equals(MessageDialogResult.OK))
+                    if (_result.Equals(MessageDialogResult.OK))
                     {
                         CurrentWizard = _lastWizardState.Wizard;
                         _setDataForTutorialStep(_lastWizardState.StepIndex);
                         Workflow.Fire(WizardTriggers.ReadyForUserAction);
                         mSpeechSyntesizer.SpeakCompleted += _synth_SpeakCompleted;
                         return;
-                    } 
-                    
-                } 
-                    
+                    }
+
+                }
+
                 var result = await mMessageDialogService.ShowDedicatedDialogAsync<int?>(mWizardFormDialog);
                 if (result.HasValue)
                 {
@@ -690,28 +698,28 @@ namespace DialogGenerator.UI.ViewModels
 
                     _setDataForTutorialStep(CurrentStepIndex);
                     Workflow.Fire(WizardTriggers.ReadyForUserAction);
-                    
+
                     mLogger.Debug($"Wizard View - Wizard '{mCurrentWizard.WizardName}' loaded from Expert Mode!");
                 }
                 else
                 {
-                    Session.Set(Constants.LAST_WIZARD_STATE, null);                                        
+                    Session.Set(Constants.LAST_WIZARD_STATE, null);
                     Workflow.Fire(WizardTriggers.LeaveWizard);
                 }
             }
 
             mSpeechSyntesizer.SpeakCompleted += _synth_SpeakCompleted;
-            
+
         }
 
         private void _view_Unloaded()
         {
             mSpeechSyntesizer.SpeakCompleted -= _synth_SpeakCompleted;
-            if(!Session.Get<bool>(Constants.CHARACTER_EDIT_MODE))
+            if (!Session.Get<bool>(Constants.CHARACTER_EDIT_MODE))
             {
                 mEventAggregator.GetEvent<CharacterUpdatedEvent>().Publish();
             }
-            
+
         }
 
         private void _nextStep()
@@ -735,7 +743,7 @@ namespace DialogGenerator.UI.ViewModels
             TimerBlock = true;
             SkipStep.RaiseCanExecuteChanged();
             mTimer = new Timer(_preventSkip, null, 500, -1);
-            
+
             Workflow.Fire(WizardTriggers.ReadyForUserAction);
         }
 
@@ -768,7 +776,7 @@ namespace DialogGenerator.UI.ViewModels
                 }
             }
 
-            if(mRecordingAttempted == false)
+            if (mRecordingAttempted == false)
             {
                 var result = await mMessageDialogService.
                    ShowOKCancelDialogAsync("You didn't record the the dialog line. If you don't do it, the line will not be saved? Are you sure about this?"
@@ -783,12 +791,13 @@ namespace DialogGenerator.UI.ViewModels
                 if (CurrentStepIndex >= CurrentWizard.TutorialSteps.Count - 1)
                 {
                     Workflow.Fire(WizardTriggers.Finish);
-                    
-                } else
+
+                }
+                else
                 {
                     Workflow.Fire(WizardTriggers.LoadNextStep);
                 }
-                
+
                 return;
             }
 
@@ -796,7 +805,7 @@ namespace DialogGenerator.UI.ViewModels
             string _fileName = string.Empty;
 
             // DLGEN-524 - Quick fix.
-            if(_fileNameParts.Length == 3)
+            if (_fileNameParts.Length == 3)
             {
                 for (int i = 0; i < _fileNameParts.Length; i++)
                 {
@@ -810,7 +819,8 @@ namespace DialogGenerator.UI.ViewModels
                         _fileName += _fileNameParts[i];
                     }
                 }
-            } else
+            }
+            else
             {
                 for (int i = 0; i < _fileNameParts.Length; i++)
                 {
@@ -825,7 +835,7 @@ namespace DialogGenerator.UI.ViewModels
                     }
                 }
             }
-            
+
 
             var _phraseEntry = new PhraseEntry
             {
@@ -835,34 +845,34 @@ namespace DialogGenerator.UI.ViewModels
                 FileName = /* $"{_fileNameParts[_fileNameParts.Length-2]}_{_fileNameParts.Last()}" */ _fileName
             };
 
-            foreach(KeyValuePair<string, double> entry in CurrentTutorialStep.PhraseWeights)
+            foreach (KeyValuePair<string, double> entry in CurrentTutorialStep.PhraseWeights)
             {
                 _phraseEntry.PhraseWeights.Add(entry.Key, entry.Value);
             }
 
             //by adding the mp3 filename for a phrase as a phraseweight we can access an exact phrase
             // from an existing character without editing that character, for instance a built in character
-            if(string.IsNullOrEmpty(mCurrentWizard.Commands))
+            if (string.IsNullOrEmpty(mCurrentWizard.Commands))
             {
                 _phraseEntry.PhraseWeights.Add(mCharacter.CharacterPrefix + "_" + _phraseEntry.FileName, 1.0);
             }
-            
+
             mCharacter.Phrases.Add(_phraseEntry);
 
             await mCharacterDataProvider.SaveAsync(Character);
 
-            if (CurrentStepIndex >= CurrentWizard.TutorialSteps.Count - 1)  
+            if (CurrentStepIndex >= CurrentWizard.TutorialSteps.Count - 1)
             {
                 Workflow.Fire(WizardTriggers.Finish);
                 return;
             }
-            
+
             mLogger.Debug($"Wizard View - The wizard step {CurrentStepIndex} of '{CurrentWizard.WizardName}' saved and finished.");
-            
+
             Workflow.Fire(WizardTriggers.LoadNextStep);
         }
 
-        private async  void _finish()
+        private async void _finish()
         {
 
             // Reset session data.
@@ -874,7 +884,7 @@ namespace DialogGenerator.UI.ViewModels
 
             if (_checkIsCreateCharacterSession())
             {
-                await mMessageDialogService.ShowMessage("Info", "Character successfully updated!" );
+                await mMessageDialogService.ShowMessage("Info", "Character successfully updated!");
 
                 CreateCharacterViewModel cvwModel = Session.Get<CreateCharacterViewModel>(Constants.CREATE_CHARACTER_VIEW_MODEL);
                 if (cvwModel != null)
@@ -883,8 +893,9 @@ namespace DialogGenerator.UI.ViewModels
                 }
 
                 mIsFinished = true;
-                Workflow.Fire(WizardTriggers.LeaveWizard);                
-            } else
+                Workflow.Fire(WizardTriggers.LeaveWizard);
+            }
+            else
             {
                 var result = await mMessageDialogService.ShowOKCancelDialogAsync("Character successfully updated!", "Info",
                 "Run another wizard", "Close wizard");
@@ -902,7 +913,7 @@ namespace DialogGenerator.UI.ViewModels
             }
 
             mLogger.Debug($"Wizard View - Wizard successfully finished!");
-                        
+
         }
 
         private bool _checkIsCreateCharacterSession()
@@ -923,7 +934,7 @@ namespace DialogGenerator.UI.ViewModels
 
         public CreateCharacterState LastState { get; set; }
 
-        public WizardWorkflow Workflow { get; set; }     
+        public WizardWorkflow Workflow { get; set; }
 
         public TutorialStep CurrentTutorialStep
         {
@@ -949,7 +960,7 @@ namespace DialogGenerator.UI.ViewModels
                 RaisePropertyChanged();
             }
         }
-        
+
         public int CurrentStepIndex
         {
             get { return mCurrentStepIndex; }
@@ -966,7 +977,7 @@ namespace DialogGenerator.UI.ViewModels
             set
             {
                 mCharacter = value;
-                VoiceRecorderControlViewModel.EnableRecording = !mCharacter.HasNoVoice;                                
+                VoiceRecorderControlViewModel.EnableRecording = !mCharacter.HasNoVoice;
                 RaisePropertyChanged();
             }
         }
@@ -981,11 +992,11 @@ namespace DialogGenerator.UI.ViewModels
                 //{
                 //    _generateSpeech(mDialogStr);
                 //}
-                
+
                 RaisePropertyChanged();
             }
         }
-        
+
         public MediaPlayerControlViewModel MediaPlayerControlViewModel
         {
             get { return mMediaPlayerControlViewModel; }
@@ -1047,15 +1058,16 @@ namespace DialogGenerator.UI.ViewModels
                 {
                     _rdr.CopyTo(_wtr);
                 }
-                    
+
                 VoiceRecorderControlViewModel.StartPlayingCommand.RaiseCanExecuteChanged();
                 PlayInContext.RaiseCanExecuteChanged();
-            } catch (Exception exp)
+            }
+            catch (Exception exp)
             {
                 mLogger.Info(exp.Message);
                 mLogger.Error(exp.Message);
             }
-            
+
 
         }
 
@@ -1091,12 +1103,13 @@ namespace DialogGenerator.UI.ViewModels
 
                 VoiceRecorderControlViewModel.StartPlayingCommand.RaiseCanExecuteChanged();
                 PlayInContext.RaiseCanExecuteChanged();
-            } catch (Exception excep)
+            }
+            catch (Exception excep)
             {
                 mLogger.Error(excep.Message);
                 mLogger.Error(excep.Message);
             }
-            
+
         }
 
         public static byte[] ConvertWavToMp3(byte[] wavFile)
@@ -1117,7 +1130,7 @@ namespace DialogGenerator.UI.ViewModels
             if (!string.IsNullOrEmpty(mCurrentWizard.Commands) && mCurrentWizard.Commands.Contains("ContextualDialog"))
             {
                 mIsRunningCommandWizard = true;
-                SkipStep.RaiseCanExecuteChanged();                
+                SkipStep.RaiseCanExecuteChanged();
 
                 // We have to clone the wizard because we are going 
                 // to change it's phraseweights collections.
@@ -1133,29 +1146,29 @@ namespace DialogGenerator.UI.ViewModels
                 string[] _items = _commands.Split(' ');
 
                 // Check for the command name.
-                if(_items.Count() == 0 || !_items[0].Equals("ContextualDialog"))
+                if (_items.Count() == 0 || !_items[0].Equals("ContextualDialog"))
                 {
                     return;
                 }
 
                 // Get popularity.
                 double _dialogPopularity = 0.0;
-                if(_items.Count() < 2 || !Double.TryParse(_items[1], out _dialogPopularity))
+                if (_items.Count() < 2 || !Double.TryParse(_items[1], out _dialogPopularity))
                 {
                     return;
                 }
-                
+
                 // Now, change the phrase weights of the wizard.
                 string _wizardName = mCurrentWizard.WizardName;
                 int _counter = 0;
                 List<string> _keys = new List<string>();
-                foreach(var _tutorialStep in mCurrentWizard.TutorialSteps)
+                foreach (var _tutorialStep in mCurrentWizard.TutorialSteps)
                 {
                     if (_tutorialStep.PhraseWeights.Count == 0)
                         continue;
 
-                    if(_tutorialStep.PhraseWeights.Keys.Contains(_wizardName))
-                    {                        
+                    if (_tutorialStep.PhraseWeights.Keys.Contains(_wizardName))
+                    {
                         _tutorialStep.PhraseWeights.Remove(_wizardName);
                         string _key = _wizardName + "_" + _counter++ + "_" + _identifier;
                         _keys.Add(_key);
@@ -1165,14 +1178,14 @@ namespace DialogGenerator.UI.ViewModels
 
                 // Check the dialog line
                 string[] _lines = _commands.Split(';');
-                for(int i = 0; i < _lines.Length; i++)
+                for (int i = 0; i < _lines.Length; i++)
                 {
                     // This is the list of phrases which fill be used later in the creation 
                     // of custom dialog.
                     List<string> _phrasesForDialog = new List<string>();
 
                     // Identifier used for the new phrases and the dialog.
-                    if(i > 0)
+                    if (i > 0)
                     {
                         _identifier = Guid.NewGuid().ToString();
                         _identifier = _identifier.Substring(0, 4);
@@ -1197,21 +1210,21 @@ namespace DialogGenerator.UI.ViewModels
                         {
                             rx = new Regex(@"\d+");
                             match = rx.Match(_token);
-                            if(!string.IsNullOrEmpty(match.Value))
+                            if (!string.IsNullOrEmpty(match.Value))
                             {
                                 var _idx = Int32.Parse(match.Value);
                                 if (_keys.Count > _idx)
                                 {
                                     _phrasesForDialog.Add(_keys[_idx]);
                                 }
-                            }                                                       
+                            }
                         }
                         else
                         {
                             if (!Int32.TryParse(_token, out _popularity))
                             {
                                 _phrasesForDialog.Add(_token);
-                            } 
+                            }
                         }
                     }
 
@@ -1249,9 +1262,10 @@ namespace DialogGenerator.UI.ViewModels
                     {
                         _dialogsCollection.ArrayOfDialogModels.Add(_modelDialog);
                     }
-                }                                        
+                }
 
-            } else
+            }
+            else
             {
                 mIsRunningCommandWizard = false;
                 SkipStep.RaiseCanExecuteChanged();

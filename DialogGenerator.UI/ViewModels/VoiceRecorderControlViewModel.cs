@@ -210,14 +210,14 @@ namespace DialogGenerator.UI.ViewModels
 
         private async void _timer_Elapsed(object state)
         {
-            if((DateTime.Now - mRecordingStartedTime)> mMaxTimeForRecording)
+            if ((DateTime.Now - mRecordingStartedTime) > mMaxTimeForRecording)
             {
                 mTimer.Change(Timeout.Infinite, Timeout.Infinite);
 
                 MessageDialogResult result = await mMessageDialogService
-                    .ShowExpirationDialogAsync(TimeSpan.FromSeconds(10),"Recording will be stopped in ","Warning","Continue recording");
+                    .ShowExpirationDialogAsync(TimeSpan.FromSeconds(10), "Recording will be stopped in ", "Warning", "Continue recording");
 
-                if(result == MessageDialogResult.Cancel)
+                if (result == MessageDialogResult.Cancel)
                 {
                     await Application.Current.Dispatcher.BeginInvoke((Action)(() =>
                     {
@@ -234,7 +234,7 @@ namespace DialogGenerator.UI.ViewModels
 
         public void Log(LoggingTypes type, string message)
         {
-            switch(type)
+            switch (type)
             {
                 case LoggingTypes.Error:
                     mLogger.Error(message);
@@ -244,10 +244,10 @@ namespace DialogGenerator.UI.ViewModels
                     break;
                 default:
                     mLogger.Debug(message);
-                    break;                        
+                    break;
             }
         }
-        
+
         #endregion
 
         #region - private functions -
@@ -260,19 +260,20 @@ namespace DialogGenerator.UI.ViewModels
                 mSoundRecognizer.LoadGrammar(new DictationGrammar());
                 mSoundRecognizer.SetInputToDefaultAudioDevice();
                 mSoundRecognizer.SpeechRecognized += MSoundRecognizer_SpeechRecognized;
-            } catch (Exception e)
+            }
+            catch (Exception e)
             {
                 string _msg = "Error during the sound recognizer initialization - ";
                 _msg += e.Message;
                 mLogger.Error(_msg);
                 mSoundRecognizer = null;
             }
-            
+
         }
 
         private void _unloadSoundEngine()
         {
-            if(mSoundRecognizer != null)
+            if (mSoundRecognizer != null)
                 mSoundRecognizer.SpeechRecognized -= MSoundRecognizer_SpeechRecognized;
         }
 
@@ -280,7 +281,7 @@ namespace DialogGenerator.UI.ViewModels
         {
             mEventAggregator.GetEvent<SpeechConvertedEvent>().Publish(e.Result.Text);
         }
-       
+
         private void _configureStateMachine()
         {
             StateMachine.Configure(States.Idle)
@@ -300,23 +301,23 @@ namespace DialogGenerator.UI.ViewModels
 
             StateMachine.Configure(States.Playing)
                 .OnActivate(() => _startPlaying())
-                .Permit(Triggers.On,States.Ready)
+                .Permit(Triggers.On, States.Ready)
                 .Permit(Triggers.Stop, States.Stopped);
         }
 
         private void _bindCommands()
         {
-            StartRecordingCommand = new DelegateCommand(_startRecording_Execute,_startRecording_CanExecute);
+            StartRecordingCommand = new DelegateCommand(_startRecording_Execute, _startRecording_CanExecute);
             StartPlayingCommand = new DelegateCommand(_startPlaying_Execute, _startPlaying_CanExecute);
             StopRecorderCommand = new DelegateCommand(_stopRecorder_Execute);
             PlayInContextCommand = new DelegateCommand(_playInContext_Execute, _playInContext_CanExecute);
-            StopPlayingInContextCommand = new DelegateCommand(_stopPlayingInContext_Execute,_stopPlayingInContext_CanExecute);
+            StopPlayingInContextCommand = new DelegateCommand(_stopPlayingInContext_Execute, _stopPlayingInContext_CanExecute);
             LoadedCommand = new DelegateCommand(_loaded_Execute);
             UnloadedCommand = new DelegateCommand(_unloaded_Execute);
         }
 
         private void _unloaded_Execute()
-        {            
+        {
             _unloadSoundEngine();
             mSoundPlayer.PropertyChanged -= _soundPlayer_PropertyChanged;
         }
@@ -329,7 +330,7 @@ namespace DialogGenerator.UI.ViewModels
 
         private bool _playInContext_CanExecute()
         {
-            return  StateMachine.State == States.Ready
+            return StateMachine.State == States.Ready
                     && !string.IsNullOrEmpty(CurrentFilePath)
                     && File.Exists(Path.Combine(ApplicationData.Instance.AudioDirectory, CurrentFilePath + ".mp3"));
         }
@@ -346,11 +347,12 @@ namespace DialogGenerator.UI.ViewModels
             {
                 mSoundPlayer.Stop();
                 mLogger.Debug($"Voice Recorder Control - Stops playing the current file.");
-            } else
+            }
+            else
             {
                 mLogger.Debug($"Voice Recorder Control - Can't stop playing the current file.");
             }
-                            
+
         }
 
         private void _playInContext_Execute()
@@ -366,12 +368,13 @@ namespace DialogGenerator.UI.ViewModels
                 mLogger.Debug($"Voice Recorder Control - Start playing of '{_fileName}'");
                 mSoundPlayer.OpenFile(_fileName);
                 mSoundPlayer.Play();
-            } catch(Exception e)
+            }
+            catch (Exception e)
             {
                 //MessageBox.Show(e.Message, "Playback Error", MessageBoxButton.OK, MessageBoxImage.Error);
                 mLogger.Error("Voice recorder exception - (m)_startPlaying " + e.Message);
             }
-            
+
         }
 
         private void _startRecording()
@@ -384,12 +387,13 @@ namespace DialogGenerator.UI.ViewModels
                 mSoundPlayer.StartRecording(_fileName);
                 mRecordingStartedTime = DateTime.Now;
                 mTimer.Change(0, 1000);
-            } catch (Exception e)
+            }
+            catch (Exception e)
             {
                 //MessageBox.Show(e.Message, "Recording Error", MessageBoxButton.OK, MessageBoxImage.Error);
                 mLogger.Error("Voice recorder exception - (m)_startRecording " + e.Message);
             }
-                   
+
         }
 
         private void _startPlaying_Execute()
@@ -403,11 +407,11 @@ namespace DialogGenerator.UI.ViewModels
                 //MessageBox.Show(e.Message, "Start Playing Error", MessageBoxButton.OK, MessageBoxImage.Error);
                 mLogger.Error("Voice recorder exception - (m)_startPlaying_Execute " + e.Message);
             }
-            
+
         }
 
         private bool _startPlaying_CanExecute()
-        {            
+        {
             return StateMachine.State == States.Ready
                    && mWizardWorkflow.State != WizardStates.PlayingInContext
                    && !string.IsNullOrEmpty(CurrentFilePath)
@@ -415,25 +419,26 @@ namespace DialogGenerator.UI.ViewModels
         }
 
         private void _startRecording_Execute()
-        { 
+        {
             try
             {
                 if (EnableRecording)
                 {
                     StateMachine.Fire(Triggers.Record);
-                    if(mSoundRecognizer != null)
+                    if (mSoundRecognizer != null)
                         mSoundRecognizer.RecognizeAsync(RecognizeMode.Multiple);
                 }
                 else
                 {
                     mEventAggregator.GetEvent<RequestTranslationEvent>().Publish(this.GetType().Name);
                 }
-            } catch (Exception e)
+            }
+            catch (Exception e)
             {
                 //MessageBox.Show(e.Message, "Start Recording Error", MessageBoxButton.OK, MessageBoxImage.Error);
                 mLogger.Error("Voice recorder exception - (m)_startRecording_Execute " + e.Message);
             }
-                        
+
         }
 
         private bool _startRecording_CanExecute()
@@ -450,39 +455,40 @@ namespace DialogGenerator.UI.ViewModels
                 switch (StateMachine.State)
                 {
                     case States.Recording:
-                    {
-                        mTimer.Change(Timeout.Infinite, Timeout.Infinite);
-                        mSoundPlayer.StopRecording();                                                    
-                        StateMachine.Fire(Triggers.On);
-                        if(mSoundRecognizer != null)
-                            mSoundRecognizer.RecognizeAsyncStop();
-                        
-                        mLogger.Debug($"Voice Recorder Control - Recording stopped!");
-                        break;
-                    }
-                    case States.Playing:
-                    {
-                        if (mSoundPlayer.CanStop)
                         {
-                            mSoundPlayer.Stop();
-                            mLogger.Debug($"Voice Recorder Control - Playing stopped!");
+                            mTimer.Change(Timeout.Infinite, Timeout.Infinite);
+                            mSoundPlayer.StopRecording();
+                            StateMachine.Fire(Triggers.On);
+                            if (mSoundRecognizer != null)
+                                mSoundRecognizer.RecognizeAsyncStop();
+
+                            mLogger.Debug($"Voice Recorder Control - Recording stopped!");
+                            break;
                         }
+                    case States.Playing:
+                        {
+                            if (mSoundPlayer.CanStop)
+                            {
+                                mSoundPlayer.Stop();
+                                mLogger.Debug($"Voice Recorder Control - Playing stopped!");
+                            }
 
-                        if (StateMachine.CanFire(Triggers.Stop))
-                            StateMachine.Fire(Triggers.Stop);
+                            if (StateMachine.CanFire(Triggers.Stop))
+                                StateMachine.Fire(Triggers.Stop);
 
-                        break;
-                    }
+                            break;
+                        }
                 }
-            } catch (Exception e)
+            }
+            catch (Exception e)
             {
                 mLogger.Error("Voice recorder exception - (m)_startRecording_Execute " + e.Message);
             }
-            
+
         }
 
         #endregion
 
-        
+
     }
 }

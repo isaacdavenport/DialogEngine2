@@ -7,7 +7,7 @@ using System.Threading.Tasks;
 
 namespace DialogGenerator.Events
 {
-    public class SpeechConvertedEvent:PubSubEvent<string>
+    public class SpeechConvertedEvent : PubSubEvent<string>
     {
     }
 }

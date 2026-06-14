@@ -22,7 +22,7 @@ namespace DialogGenerator.Tests.Utilities
             mPlayer = new MP3Player(mEventAggregatorMock.Object, mLoggerMock.Object);
         }
 
-                [Theory]
+        [Theory]
         [InlineData("")]
         [InlineData("invalid")]
         public void Play_ShouldReturn1_WhenInvalidPathProvided(string path)

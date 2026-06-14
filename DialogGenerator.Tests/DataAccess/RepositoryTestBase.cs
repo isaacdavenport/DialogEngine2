@@ -38,22 +38,23 @@ namespace DialogGenerator.Tests.DataAccess
             {
                 var _jsonObjectData = reader.ReadToEnd();
                 JSONObjectsTypesList _jsonObjectsTypesList = Serializer.Deserialize<JSONObjectsTypesList>(_jsonObjectData);
-                if(_jsonObjectsTypesList != null) {
-                    if(_jsonObjectsTypesList.Characters.Count > 0)
+                if (_jsonObjectsTypesList != null)
+                {
+                    if (_jsonObjectsTypesList.Characters.Count > 0)
                     {
                         foreach (var _character in _jsonObjectsTypesList.Characters)
                         {
                             _character.FileName = "test.json";
                         }
 
-                        Session.Set(Constants.CHARACTERS, _jsonObjectsTypesList.Characters);                                               
+                        Session.Set(Constants.CHARACTERS, _jsonObjectsTypesList.Characters);
                         characters.Clear();
-                        characters.AddRange(_jsonObjectsTypesList.Characters);                         
-                    } 
-                    
+                        characters.AddRange(_jsonObjectsTypesList.Characters);
+                    }
+
                     if (_jsonObjectsTypesList.DialogModels.Count > 0)
                     {
-                        foreach(var _dialog in _jsonObjectsTypesList.DialogModels)
+                        foreach (var _dialog in _jsonObjectsTypesList.DialogModels)
                         {
                             _dialog.FileName = "test.json";
                         }
@@ -62,7 +63,7 @@ namespace DialogGenerator.Tests.DataAccess
                         dialogModels.Clear();
                         dialogModels.AddRange(_jsonObjectsTypesList.DialogModels);
                     }
-                
+
                     if (_jsonObjectsTypesList.Wizards.Count > 0)
                     {
                         foreach (var _wizard in _jsonObjectsTypesList.Wizards)
@@ -75,9 +76,9 @@ namespace DialogGenerator.Tests.DataAccess
                         wizards.AddRange(_jsonObjectsTypesList.Wizards);
                     }
                 }
-                
+
             }
-                        
+
         }
 
         protected void testSetup()

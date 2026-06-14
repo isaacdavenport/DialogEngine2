@@ -8,7 +8,7 @@ using System.Threading.Tasks;
 
 namespace DialogGenerator.Events
 {
-    public class CharactersInConversationEvent:PubSubEvent<SelectedCharactersPairEventArgs>
+    public class CharactersInConversationEvent : PubSubEvent<SelectedCharactersPairEventArgs>
     {
     }
 }

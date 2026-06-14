@@ -13,7 +13,7 @@ namespace DialogGenerator.Handlers
         private IMessageDialogService mMessageDialogService;
         private readonly DispatcherTimer mcTimer;
 
-        public UpdatesHandler(ILogger logger,IMessageDialogService _messageDialogService)
+        public UpdatesHandler(ILogger logger, IMessageDialogService _messageDialogService)
         {
             mLogger = logger;
             mMessageDialogService = _messageDialogService;
@@ -48,7 +48,7 @@ namespace DialogGenerator.Handlers
                     else
                     {
                         _dialogResult = await mMessageDialogService.ShowOKCancelDialogAsync(
-                                $@"There is new version {args.CurrentVersion} available. You are using version { args.InstalledVersion}. Do you want to update the application now?"
+                                $@"There is new version {args.CurrentVersion} available. You are using version {args.InstalledVersion}. Do you want to update the application now?"
                                 , @"Update Available");
                     }
 

@@ -5,7 +5,7 @@ namespace DialogGenerator.DataAccess
 {
     public interface IDialogDataRepository
     {
-        JSONObjectsTypesList LoadFromFile(string _filePath,out IList<string> errors);
+        JSONObjectsTypesList LoadFromFile(string _filePath, out IList<string> errors);
         JSONObjectsTypesList LoadFromDirectory(string _directoryPath, out IList<string> _errorsList);
         void LogSessionJsonStatsAndErrors(string _directoryPath, JSONObjectsTypesList _JSONObjectTypesList, List<List<string>> _dialogModelListPreFilter);
 

@@ -27,7 +27,7 @@ namespace DialogGenerator.UI.ViewModels
         IEventAggregator mEventAggregator;
         IMessageDialogService mMessageDialogService;
         IRegionManager mRegionManager;
-        
+
         public CustomDialogCreatorViewModel(ICharacterDataProvider _CharacterDataProvider,
                                             IDialogModelRepository _DialogModelRepository,
                                             ILogger _Logger,
@@ -47,8 +47,8 @@ namespace DialogGenerator.UI.ViewModels
 
             _bindCommands();
             _subscribeEvents();
-        }        
-        
+        }
+
         public CharacterSlotViewModel RightCharacterModel { get; set; }
 
         public CharacterSlotViewModel LeftCharacterModel { get; set; }
@@ -117,7 +117,7 @@ namespace DialogGenerator.UI.ViewModels
                 await mMessageDialogService.ShowMessage("Success", string.Format("The dialog {0} successfully saved!", DialogModel.DialogName));
                 CloseCommand.Execute();
             }
-            
+
         }
     }
 }

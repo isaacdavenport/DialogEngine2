@@ -35,14 +35,15 @@ namespace DialogGenerator.UI.Views
 
         private void EditPhraseView_PropertyChanged(object sender, System.ComponentModel.PropertyChangedEventArgs e)
         {
-           if(this.Dispatcher.CheckAccess())
+            if (this.Dispatcher.CheckAccess())
             {
                 EditPhraseViewModel _model = (EditPhraseViewModel)DataContext;
                 if (e.PropertyName.Equals("FileName"))
                 {
                     _model.MediaRecorderControlViewModel.FilePath = ((EditPhraseViewModel)sender).FileName;
                 }
-            } else
+            }
+            else
             {
                 this.Dispatcher.Invoke(() =>
                 {
@@ -52,7 +53,7 @@ namespace DialogGenerator.UI.Views
                         _model.MediaRecorderControlViewModel.FilePath = ((EditPhraseViewModel)sender).FileName;
                     }
                 });
-            }            
+            }
 
         }
 
@@ -65,7 +66,7 @@ namespace DialogGenerator.UI.Views
 
         private void CancelDialogButton_Click(object sender, RoutedEventArgs e)
         {
-            DialogHost.CloseDialogCommand.Execute(null, CancelDialogButton);           
+            DialogHost.CloseDialogCommand.Execute(null, CancelDialogButton);
         }
 
     }

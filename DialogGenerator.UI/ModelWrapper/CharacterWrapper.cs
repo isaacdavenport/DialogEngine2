@@ -8,8 +8,8 @@ namespace DialogGenerator.UI.Wrapper
 {
     public class CharacterWrapper : ModelWrapper<Character>
     {
-        private ICharacterDataProvider mCharacterDataProvider; 
-        public CharacterWrapper(Character character,ICharacterDataProvider _characterDataProvider)
+        private ICharacterDataProvider mCharacterDataProvider;
+        public CharacterWrapper(Character character, ICharacterDataProvider _characterDataProvider)
             : base(character)
         {
             mCharacterDataProvider = _characterDataProvider;
@@ -27,14 +27,14 @@ namespace DialogGenerator.UI.Wrapper
 
             //switch (_propertyName)
             //{
-                //case nameof(CharacterPrefix):
-                //    {
-                //        var character = mCharacterDataProvider.GetByInitials(CharacterPrefix);
+            //case nameof(CharacterPrefix):
+            //    {
+            //        var character = mCharacterDataProvider.GetByInitials(CharacterPrefix);
 
-                //        if (character != null)
-                //            errors.Add("Character initials must be unique.");
-                //        break;
-                //    }                    
+            //        if (character != null)
+            //            errors.Add("Character initials must be unique.");
+            //        break;
+            //    }                    
             //}
 
             return errors;
@@ -79,7 +79,7 @@ namespace DialogGenerator.UI.Wrapper
                 validateProperty(nameof(CharacterGender));
             }
         }
-        
+
         public string CharacterImage
         {
             get { return getValue<string>(); }
@@ -140,7 +140,7 @@ namespace DialogGenerator.UI.Wrapper
             {
                 setValue(value);
                 validateProperty(nameof(HasNoVoice));
-            }            
+            }
         }
 
         public string Voice
@@ -162,6 +162,6 @@ namespace DialogGenerator.UI.Wrapper
                 validateProperty(nameof(SpeechRate));
             }
         }
-        
+
     }
 }

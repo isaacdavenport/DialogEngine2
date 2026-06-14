@@ -24,9 +24,9 @@ namespace DialogGenerator.DataAccess
         private IEventAggregator mEventAggregator;
 
         public CharacterRepository(ILogger logger
-            ,IWizardRepository _wizardRepository
-            ,IDialogModelRepository _dialogModelRepository
-            ,IEventAggregator _EventAggregator)
+            , IWizardRepository _wizardRepository
+            , IDialogModelRepository _dialogModelRepository
+            , IEventAggregator _EventAggregator)
         {
             mLogger = logger;
             mWizardRepository = _wizardRepository;
@@ -65,7 +65,7 @@ namespace DialogGenerator.DataAccess
             {
                 mLogger.Error("Save character exception - " + e.Message);
             }
-            
+
         }
 
         private JSONObjectsTypesList _findDataForFile(string _fileName)
@@ -74,7 +74,7 @@ namespace DialogGenerator.DataAccess
             {
                 Wizards = mWizardRepository.GetAll(_fileName) ?? new WizardRepository().GetAll(),
                 DialogModels = mDialogModelRepository.GetAll(_fileName) ?? new DialogModelRepository().GetAll(),
-                Characters = _getAll(_fileName), 
+                Characters = _getAll(_fileName),
                 Editable = true
             };
 
@@ -160,7 +160,7 @@ namespace DialogGenerator.DataAccess
             mLogger.Info("saving character: " + character.CharacterName);
         }
 
-        public void Export(Character character,string _directoryPath)
+        public void Export(Character character, string _directoryPath)
         {
             var _fileName = character.CharacterName.Replace(" ", string.Empty) + ".json";
             var characters = new ObservableCollection<Character>();
@@ -168,13 +168,13 @@ namespace DialogGenerator.DataAccess
 
             // Collection phrase weights keys from character phrases.
             List<string> _phraseWeights = new List<string>();
-            if(character.Phrases.Count > 0)
+            if (character.Phrases.Count > 0)
             {
-                foreach(var _phraseEntry in character.Phrases)
+                foreach (var _phraseEntry in character.Phrases)
                 {
-                    foreach(KeyValuePair<string, double> _entry in _phraseEntry.PhraseWeights)
+                    foreach (KeyValuePair<string, double> _entry in _phraseEntry.PhraseWeights)
                     {
-                        if(!_phraseWeights.Contains(_entry.Key))
+                        if (!_phraseWeights.Contains(_entry.Key))
                         {
                             _phraseWeights.Add(_entry.Key);
                         }
@@ -185,7 +185,7 @@ namespace DialogGenerator.DataAccess
             // Find dialog models collections that match the above selected phrase weights.            
             List<ModelDialogInfo> _matchedDialogInfos = new List<ModelDialogInfo>();
 
-            if(_phraseWeights.Count > 0)
+            if (_phraseWeights.Count > 0)
             {
                 ObservableCollection<ModelDialogInfo> _dlgModels = Session.Get(Constants.DIALOG_MODELS) as ObservableCollection<ModelDialogInfo>;
 
@@ -193,14 +193,14 @@ namespace DialogGenerator.DataAccess
 
                 if (_dlgModels != null && _dlgModels.Count > 0)
                 {
-                    foreach(var _dlginfo in _dlgModels)
+                    foreach (var _dlginfo in _dlgModels)
                     {
                         List<ModelDialog> _dialogModels = _dlginfo.ArrayOfDialogModels;
-                        foreach(var _dialogModel in _dialogModels)
+                        foreach (var _dialogModel in _dialogModels)
                         {
                             foreach (var _phraseType in _dialogModel.PhraseTypeSequence)
                             {
-                                if(_phraseWeights.Contains(_phraseType))
+                                if (_phraseWeights.Contains(_phraseType))
                                 {
                                     if (!_matchedDialogInfos.Contains(_dlginfo))
                                     {
@@ -222,14 +222,14 @@ namespace DialogGenerator.DataAccess
                     }
                 }
             }
-            
+
             var _jsonObjectsTypesList = new JSONObjectsTypesList
             {
-                Characters = characters,         
+                Characters = characters,
                 Editable = true,
             };
 
-            if(_matchedDialogInfos.Count > 0)
+            if (_matchedDialogInfos.Count > 0)
             {
                 _jsonObjectsTypesList.DialogModels.AddRange(_matchedDialogInfos);
             }
@@ -254,7 +254,7 @@ namespace DialogGenerator.DataAccess
                 string _imageFilePath = Path.Combine(ApplicationData.Instance.ImagesDirectory, character.CharacterImage);
                 if (File.Exists(_imageFilePath))
                 {
-                    File.Copy(_imageFilePath,Path.Combine(ApplicationData.Instance.TempDirectory, character.CharacterImage));
+                    File.Copy(_imageFilePath, Path.Combine(ApplicationData.Instance.TempDirectory, character.CharacterImage));
                 }
             }
         }
@@ -276,14 +276,14 @@ namespace DialogGenerator.DataAccess
                 // Copy file
                 var _destFileName = ApplicationData.Instance.AudioDirectory + "\\" + character.CharacterPrefix + "_" + _phrase.FileName + ".mp3";
                 var _sourceFileName = ApplicationData.Instance.AudioDirectory + "\\XX_HalfSecSilence.mp3";
-                File.Copy(_sourceFileName,_destFileName);
-                
+                File.Copy(_sourceFileName, _destFileName);
+
                 character.Phrases.Add(_phrase);
 
             }
 
             // add character to list of characters, so we can grab its data to serialize to file
-            GetAll().Add(character);            
+            GetAll().Add(character);
 
             await Task.Run(() =>
             {
@@ -320,10 +320,10 @@ namespace DialogGenerator.DataAccess
 
             return character;
         }
-        
 
 
-        public  Task Remove(Character character,string _imageFileName)
+
+        public Task Remove(Character character, string _imageFileName)
         {
             return Task.Run(() =>
             {

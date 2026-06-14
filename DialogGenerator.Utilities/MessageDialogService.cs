@@ -20,47 +20,47 @@ namespace DialogGenerator.Utilities
         public async Task<MessageDialogResult> ShowOKCancelDialogAsync(string message, string tittle
             , string _OKBtnContent = "OK"
             , string _cancelBtnContent = "Cancel"
-            ,string _dialogHostName = "MainDialogHost")
+            , string _dialogHostName = "MainDialogHost")
         {
             MessageDialogResult result = MessageDialogResult.Cancel;
 
             if (Application.Current.Dispatcher.CheckAccess())
             {
                 result = (MessageDialogResult)await DialogHost.
-                    Show(new OKCancelDialog(message, tittle, _OKBtnContent, _cancelBtnContent),_dialogHostName);
+                    Show(new OKCancelDialog(message, tittle, _OKBtnContent, _cancelBtnContent), _dialogHostName);
             }
             else
             {
                 await Application.Current.Dispatcher.Invoke(async () =>
                 {
                     result = (MessageDialogResult)await DialogHost.
-                        Show(new OKCancelDialog(message, tittle, _OKBtnContent, _cancelBtnContent),_dialogHostName);
+                        Show(new OKCancelDialog(message, tittle, _OKBtnContent, _cancelBtnContent), _dialogHostName);
                 });
             }
 
             return result;
         }
 
-        public async Task<T> ShowDedicatedDialogAsync<T>(object content,string _dialogHostName = "MainDialogHost")
+        public async Task<T> ShowDedicatedDialogAsync<T>(object content, string _dialogHostName = "MainDialogHost")
         {
             T result = Activator.CreateInstance<T>();
 
             if (Application.Current.Dispatcher.CheckAccess())
             {
-                result = (T)await DialogHost.Show(content,_dialogHostName);
+                result = (T)await DialogHost.Show(content, _dialogHostName);
             }
             else
             {
                 await Application.Current.Dispatcher.Invoke(async () =>
                 {
-                    result = (T)await DialogHost.Show(content,_dialogHostName);
+                    result = (T)await DialogHost.Show(content, _dialogHostName);
                 });
             }
 
             return result;
         }
 
-        public async Task<MessageDialogResult> ShowMessage(string tittle, string message,string _dialogHostName = "MainDialogHost")
+        public async Task<MessageDialogResult> ShowMessage(string tittle, string message, string _dialogHostName = "MainDialogHost")
         {
             if (Application.Current.Dispatcher.CheckAccess())
             {
@@ -77,7 +77,7 @@ namespace DialogGenerator.Utilities
             return MessageDialogResult.OK;
         }
 
-        public async Task<MessageDialogResult> ShowBusyDialog(string message= "Working ...", string _dialogHostName = "MainDialogHost")
+        public async Task<MessageDialogResult> ShowBusyDialog(string message = "Working ...", string _dialogHostName = "MainDialogHost")
         {
 
             if (Application.Current.Dispatcher.CheckAccess())
@@ -97,7 +97,7 @@ namespace DialogGenerator.Utilities
             return MessageDialogResult.OK;
         }
 
-        public  void CloseBusyDialog()
+        public void CloseBusyDialog()
         {
             if (Application.Current.Dispatcher.CheckAccess())
             {
@@ -125,14 +125,14 @@ namespace DialogGenerator.Utilities
             if (Application.Current.Dispatcher.CheckAccess())
             {
                 result = (MessageDialogResult)await DialogHost
-                    .Show(new MessagesDialog(tittle,message,messages,_OkBtnContent,_isOKCancel,_cancelBtnContent),_dialogHostName);
+                    .Show(new MessagesDialog(tittle, message, messages, _OkBtnContent, _isOKCancel, _cancelBtnContent), _dialogHostName);
             }
             else
             {
-                await Application.Current.Dispatcher.Invoke(async() =>
+                await Application.Current.Dispatcher.Invoke(async () =>
                 {
-                   result = (MessageDialogResult)await DialogHost
-                    .Show(new MessagesDialog(tittle, message, messages, _OkBtnContent,_isOKCancel, _cancelBtnContent), _dialogHostName);
+                    result = (MessageDialogResult)await DialogHost
+                     .Show(new MessagesDialog(tittle, message, messages, _OkBtnContent, _isOKCancel, _cancelBtnContent), _dialogHostName);
                 });
             }
 
@@ -150,7 +150,7 @@ namespace DialogGenerator.Utilities
             if (Application.Current.Dispatcher.CheckAccess())
             {
                 result = (MessageDialogResult)await DialogHost
-                    .Show(new ExpirationDialog(_exprationTime, message, tittle,_okBtnContent, _cancelBtnContent), _dialogHostName);
+                    .Show(new ExpirationDialog(_exprationTime, message, tittle, _okBtnContent, _cancelBtnContent), _dialogHostName);
             }
             else
             {

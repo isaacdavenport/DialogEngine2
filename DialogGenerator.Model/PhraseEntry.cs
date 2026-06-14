@@ -3,7 +3,7 @@ using System.Collections.Generic;
 
 namespace DialogGenerator.Model
 {
-    public class PhraseEntry:IEquatable<PhraseEntry>
+    public class PhraseEntry : IEquatable<PhraseEntry>
     {
         /// <summary>
         /// Represents content which charachter will say

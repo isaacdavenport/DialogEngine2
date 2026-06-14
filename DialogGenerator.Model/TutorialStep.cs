@@ -43,16 +43,16 @@ namespace DialogGenerator.Model
             };
 
             _step.PhraseWeights = new Dictionary<string, double>();
-            foreach(KeyValuePair<string,double> _phraseWeight in PhraseWeights)
+            foreach (KeyValuePair<string, double> _phraseWeight in PhraseWeights)
             {
                 _step.PhraseWeights.Add(_phraseWeight.Key, _phraseWeight.Value);
             }
 
             _step.PlayUserRecordedAudioInContext = new List<List<string>>();
-            foreach(var _dialog in PlayUserRecordedAudioInContext)
+            foreach (var _dialog in PlayUserRecordedAudioInContext)
             {
                 var _dialogPhrases = new List<string>();
-                foreach(var _dialogPhrase in _dialog)
+                foreach (var _dialogPhrase in _dialog)
                 {
                     _dialogPhrases.Add(_dialogPhrase);
                 }

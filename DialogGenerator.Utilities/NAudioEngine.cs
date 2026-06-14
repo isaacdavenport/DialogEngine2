@@ -79,7 +79,7 @@ namespace DialogGenerator.Utilities
             mcPositionTimer.Tick += _positionTimer_Tick;
             MediaFoundationApi.Startup();
         }
-        
+
         #endregion
 
         #region - IDisposable -
@@ -89,15 +89,15 @@ namespace DialogGenerator.Utilities
         /// </summary>
         public void Dispose()
         {
-            dispose(true);            
+            dispose(true);
             GC.SuppressFinalize(this);
         }
 
         protected virtual void dispose(bool disposing)
         {
-            if(!mDisposed)
+            if (!mDisposed)
             {
-                if(disposing)
+                if (disposing)
                 {
                     _stopAndCloseStream();
                 }
@@ -122,7 +122,7 @@ namespace DialogGenerator.Utilities
         }
 
         public int GetFFTFrequencyIndex(int frequency)
-        {         
+        {
             double _maxFrequency;
 
             if (IsRecording)
@@ -178,7 +178,7 @@ namespace DialogGenerator.Utilities
                     mInRepeatSet = false;
                 }
             }
-        }        
+        }
 
 
         public double ChannelLength
@@ -245,7 +245,7 @@ namespace DialogGenerator.Utilities
         {
             if (!IsRecording)
             {
-                if(ActiveStream == null)
+                if (ActiveStream == null)
                 {
                     Stop();
                     return;
@@ -262,7 +262,7 @@ namespace DialogGenerator.Utilities
             }
         }
 
-        private  void _trimWavFile(WaveFileReader reader, WaveFileWriter writer, int _startPos, int _endPos)
+        private void _trimWavFile(WaveFileReader reader, WaveFileWriter writer, int _startPos, int _endPos)
         {
             reader.Position = _startPos;
             byte[] buffer = new byte[1024];
@@ -361,7 +361,7 @@ namespace DialogGenerator.Utilities
                     _normalizeMP3File(_outputPathMP3);
                     File.Copy(_outputPathMP3, mCurrentFilePath, true);
                 }
-                catch(Exception)
+                catch (Exception)
                 {
 
                 }
@@ -370,13 +370,13 @@ namespace DialogGenerator.Utilities
                     _cleanDirectory(ApplicationData.Instance.TempDirectory);
                     IsRecording = false;
                 }
-        });
+            });
         }
 
         #endregion
 
         #region - private functions -
-        
+
         private void _stopAndCloseStream()
         {
             if (mWaveOutDevice != null)
@@ -395,7 +395,7 @@ namespace DialogGenerator.Utilities
                 mWaveOutDevice.Dispose();
                 mWaveOutDevice = null;
             }
-        }        
+        }
 
         #endregion
 
@@ -408,7 +408,7 @@ namespace DialogGenerator.Utilities
         {
             Stop();
             mWaveInDevice = new WaveIn();
-            mWaveInDevice.WaveFormat = WaveFormat.CreateIeeeFloatWaveFormat(44100,1);  
+            mWaveInDevice.WaveFormat = WaveFormat.CreateIeeeFloatWaveFormat(44100, 1);
             mWaveInDevice.DataAvailable += _waveIn_DataAvailable;
             mWaveInDevice.RecordingStopped += _waveIn_RecordingStopped;
 
@@ -417,7 +417,7 @@ namespace DialogGenerator.Utilities
 
             mCurrentFilePath = path;
             mWaveInDevice.StartRecording();
-            IsRecording = true;    
+            IsRecording = true;
         }
 
         /// <summary>
@@ -437,7 +437,7 @@ namespace DialogGenerator.Utilities
                 mWaveFileWriter.Dispose();
                 mWaveFileWriter = null;
             }
-            
+
         }
 
         /// <summary>
@@ -521,8 +521,8 @@ namespace DialogGenerator.Utilities
                 SelectionEnd = TimeSpan.Zero;
                 ChannelPosition = 0;
             }
-            
-            _stopAndCloseStream();            
+
+            _stopAndCloseStream();
 
             if (File.Exists(path))
             {
@@ -532,7 +532,7 @@ namespace DialogGenerator.Utilities
                     {
                         DesiredLatency = 100
                     };
-                    ActiveStream = new Mp3FileReader(path); 
+                    ActiveStream = new Mp3FileReader(path);
                     mInputStream = new WaveChannel32(ActiveStream);
                     mSampleAggregator = new SampleAggregator(mcfftDataSize);
                     mInputStream.Sample += _inputStream_Sample;
@@ -540,7 +540,7 @@ namespace DialogGenerator.Utilities
                     ChannelLength = mInputStream.TotalTime.TotalSeconds;
                     CanPlay = true;
                 }
-                catch(Exception)
+                catch (Exception)
                 {
                     ActiveStream = null;
                     CanPlay = false;
@@ -626,7 +626,7 @@ namespace DialogGenerator.Utilities
                 mcPositionTimer.IsEnabled = value;
             }
         }
-        
+
         /// <summary>
         /// Is player recording sound
         /// </summary>

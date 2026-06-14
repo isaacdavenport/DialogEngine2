@@ -31,7 +31,7 @@ namespace DialogGenerator.UI.ViewModels
         private bool mCharactersHaveNoDialogs = false;
         private string mBackgroundImage;
         private bool mHasBackgroundImage = false;
-        
+
         public ArenaViewModel(ILogger _Logger
             , IEventAggregator _EventAggregator
             , ICharacterRepository _CharacterRepository
@@ -51,7 +51,7 @@ namespace DialogGenerator.UI.ViewModels
             PlaygroundAvatars.CollectionChanged += PlaygroundAvatars_CollectionChanged;
 
             BackgroundImage = ApplicationData.Instance.BackgroundImage;
-                        
+
         }
 
         private void _onArenaBackgroundChanged()
@@ -71,7 +71,7 @@ namespace DialogGenerator.UI.ViewModels
                 foreach (var _item in e.NewItems)
                 {
                     ArenaAvatarViewModel _model = (ArenaAvatarViewModel)_item;
-                    if(_model != null)
+                    if (_model != null)
                     {
                         _model.PropertyChanged += _model_PropertyChanged;
                     }
@@ -94,9 +94,9 @@ namespace DialogGenerator.UI.ViewModels
         private void _model_PropertyChanged(object sender, System.ComponentModel.PropertyChangedEventArgs e)
         {
             ArenaAvatarViewModel _model = (ArenaAvatarViewModel)sender;
-            if(_model != null)
+            if (_model != null)
             {
-                if(e.PropertyName.Equals("AboutToRemove"))
+                if (e.PropertyName.Equals("AboutToRemove"))
                 {
                     if (_model.AboutToRemove)
                     {
@@ -113,9 +113,9 @@ namespace DialogGenerator.UI.ViewModels
                         }
 
                     }
-                    
+
                 }
-                
+
             }
         }
 
@@ -146,7 +146,8 @@ namespace DialogGenerator.UI.ViewModels
                 if (!string.IsNullOrEmpty(mBackgroundImage) && File.Exists(mBackgroundImage))
                 {
                     HasBackgroundImage = true;
-                } else
+                }
+                else
                 {
                     HasBackgroundImage = false;
                 }
@@ -172,7 +173,7 @@ namespace DialogGenerator.UI.ViewModels
         public ObservableCollection<ArenaAvatarViewModel> AvatarGalleryItems { get; } = new ObservableCollection<ArenaAvatarViewModel>();
 
         public ObservableCollection<ArenaAvatarViewModel> PlaygroundAvatars { get; } = new ObservableCollection<ArenaAvatarViewModel>();
-        
+
         public ArenaAvatarViewModel SelectedAvatar
         {
             get
@@ -196,7 +197,7 @@ namespace DialogGenerator.UI.ViewModels
             PlaygroundAvatars.Add(_Avatar);
             _createAvatarPairs();
             AvatarPair _closestPair = FindClosestAvatarPair();
-            if(_closestPair != null)
+            if (_closestPair != null)
             {
                 // Send event.
             }
@@ -207,7 +208,7 @@ namespace DialogGenerator.UI.ViewModels
             double _distance = Double.MaxValue;
             AvatarPair _closestPair = null;
 
-            if(_Create)
+            if (_Create)
             {
                 _createAvatarPairs();
             }
@@ -227,10 +228,10 @@ namespace DialogGenerator.UI.ViewModels
                 int _characterIndex2 = -1;
 
                 List<Character> _characters = mCharacterRepository.GetAll().ToList();
-                for(int i = 0; i < _characters.Count; i++)
+                for (int i = 0; i < _characters.Count; i++)
                 {
                     Character _c = _characters[i];
-                    if(_c.CharacterName.Equals(_closestPair.FirstAvatar.Character.CharacterName))
+                    if (_c.CharacterName.Equals(_closestPair.FirstAvatar.Character.CharacterName))
                     {
                         _characterIndex1 = i;
                     }
@@ -241,7 +242,7 @@ namespace DialogGenerator.UI.ViewModels
                     }
                 }
 
-                if(_characterIndex1 != -1 && _characterIndex2 != -1)
+                if (_characterIndex1 != -1 && _characterIndex2 != -1)
                 {
                     //int _choice = mRandom.Next();
                     //_choice = _choice % 2;                    
@@ -251,7 +252,7 @@ namespace DialogGenerator.UI.ViewModels
                     // S. Ristic 2021-03-30 - DLGEN-479
                     // The code above is commented because it produces the sequential emission of SelectedCharacterPairChangedEvent 
                     // even when the characters stay the same.
-                    if(_characterIndex1 != Session.Get<int>(Constants.NEXT_CH_1) || _characterIndex2 != Session.Get<int>(Constants.NEXT_CH_2))
+                    if (_characterIndex1 != Session.Get<int>(Constants.NEXT_CH_1) || _characterIndex2 != Session.Get<int>(Constants.NEXT_CH_2))
                     {
                         Session.Set(Constants.NEXT_CH_1, _characterIndex1);
                         Session.Set(Constants.NEXT_CH_2, _characterIndex2);
@@ -281,8 +282,8 @@ namespace DialogGenerator.UI.ViewModels
 
         private void _onCharacterCollectionLoaded()
         {
-            ObservableCollection<Character> _characters = mCharacterRepository.GetAll();             
-            if(_characters.Count == 0)
+            ObservableCollection<Character> _characters = mCharacterRepository.GetAll();
+            if (_characters.Count == 0)
             {
                 mLogger.Error("No characters! The data folder is probably empty!");
                 return;
@@ -294,16 +295,16 @@ namespace DialogGenerator.UI.ViewModels
             foreach (Character _c in _characters)
             {
                 ArenaAvatarViewModel _am = new ArenaAvatarViewModel
-                {                   
+                {
                     Character = _c,
                     Active = false,
                     InPlayground = false,
                     Left = 0,
-                    Top = 0, 
+                    Top = 0,
                     Random = mRandom
                 };
 
-                AvatarGalleryItems.Add(_am);                
+                AvatarGalleryItems.Add(_am);
             }
 
             int _selIndex1 = Session.Get<int>(Constants.NEXT_CH_1);
@@ -311,15 +312,18 @@ namespace DialogGenerator.UI.ViewModels
 
             if (PlaygroundAvatars.Count == 0 /* S.Ristic - and actually it always is */)
             {
-                Character _c = null;                                
+                Character _c = null;
                 if (_selIndex1 >= 0 && _selIndex1 < mCharacterRepository.GetAll().Count)
                 {
-                    _c = mCharacterRepository.GetAll()[_selIndex1];                    
-                } else
+                    _c = mCharacterRepository.GetAll()[_selIndex1];
+                }
+                else
                 {
-                    if (_selIndex2 != -1) {
+                    if (_selIndex2 != -1)
+                    {
                         _selIndex1 = _firstIndexNotInList(new List<int> { _selIndex2 });
-                    } else
+                    }
+                    else
                     {
                         _selIndex1 = /* 0 */ _firstIndexNotInList(new List<int>());
                     }
@@ -327,7 +331,7 @@ namespace DialogGenerator.UI.ViewModels
                     _c = mCharacterRepository.GetAll()[_selIndex1];
                 }
 
-                if(_c != null)
+                if (_c != null)
                 {
                     ArenaAvatarViewModel _aavm = AvatarGalleryItems.Where(_am => _am.Character.CharacterPrefix.Equals(_c.CharacterPrefix)).First();
                     ArenaAvatarViewModel _pgvm = _aavm.Clone();
@@ -340,13 +344,14 @@ namespace DialogGenerator.UI.ViewModels
 
                 if (_selIndex2 >= 0 && _selIndex2 < mCharacterRepository.GetAll().Count)
                 {
-                    if(_selIndex2 == _selIndex1)
+                    if (_selIndex2 == _selIndex1)
                     {
                         _c = mCharacterRepository.GetAll()[_firstIndexNotInList(new List<int> { _selIndex1 })];
-                    } else
+                    }
+                    else
                     {
                         _c = mCharacterRepository.GetAll()[_selIndex2];
-                    }                    
+                    }
                 }
                 else
                 {
@@ -374,7 +379,7 @@ namespace DialogGenerator.UI.ViewModels
                 // DLGEN-498 - Insert the third character
                 int _thirdIndex = _firstIndexNotInList(new List<int> { _selIndex1, _selIndex2 });
                 _c = mCharacterRepository.GetAll()[_thirdIndex];
-                if(_c != null)
+                if (_c != null)
                 {
                     ArenaAvatarViewModel _aavm = AvatarGalleryItems.Where(_am => _am.Character.CharacterPrefix.Equals(_c.CharacterPrefix)).First();
                     ArenaAvatarViewModel _pgvm = _aavm.Clone();
@@ -382,13 +387,14 @@ namespace DialogGenerator.UI.ViewModels
                     _pgvm.Top = 150;
                     PlaygroundAvatars.Add(_pgvm);
                 }
-            } 
+            }
 
             // If the indices have changed send the event.
-            if((_selIndex1 != Session.Get<int>(Constants.NEXT_CH_1) || 
+            if ((_selIndex1 != Session.Get<int>(Constants.NEXT_CH_1) ||
                 _selIndex2 != Session.Get<int>(Constants.NEXT_CH_2)) &&
-               (_selIndex1 != Session.Get<int>(Constants.NEXT_CH_2) || 
-                _selIndex2 != Session.Get<int>(Constants.NEXT_CH_1))) {
+               (_selIndex1 != Session.Get<int>(Constants.NEXT_CH_2) ||
+                _selIndex2 != Session.Get<int>(Constants.NEXT_CH_1)))
+            {
                 int _choice = mRandom.Next();
                 _choice = _choice % 2;
                 mEventAggregator.GetEvent<SelectedCharactersPairChangedEvent>().Publish(new SelectedCharactersPairEventArgs
@@ -397,14 +403,15 @@ namespace DialogGenerator.UI.ViewModels
                     Character2Index = _choice == 0 ? _selIndex2 : _selIndex1
                 }); ;
             }
-            
+
         }
 
         private int _firstIndexNotInList(List<int> _Lista)
-        {           
+        {
             int i = mRandom.Next(mCharacterRepository.GetAll().Count());
 
-            while (_Lista.Contains(i)) {
+            while (_Lista.Contains(i))
+            {
                 i = mRandom.Next(mCharacterRepository.GetAll().Count());
             }
 
@@ -418,9 +425,9 @@ namespace DialogGenerator.UI.ViewModels
             if (PlaygroundAvatars.Count < 2)
                 return;
 
-            for(int i = 0; i < PlaygroundAvatars.Count - 1;i++)
+            for (int i = 0; i < PlaygroundAvatars.Count - 1; i++)
             {
-                for(int j = i + 1; j < PlaygroundAvatars.Count;j++)
+                for (int j = i + 1; j < PlaygroundAvatars.Count; j++)
                 {
                     mAvatarPairs.Add(new AvatarPair
                     {
@@ -453,7 +460,7 @@ namespace DialogGenerator.UI.ViewModels
 
         public enum AvatarRectRelativePosition
         {
-            Left, 
+            Left,
             TopLeft,
             Top,
             TopRight,
@@ -470,7 +477,7 @@ namespace DialogGenerator.UI.ViewModels
                 Rect _rc1 = new Rect(new Point(FirstAvatar.Left, FirstAvatar.Top), new Size(FirstAvatar.Width, FirstAvatar.Height));
                 Rect _rc2 = new Rect(new Point(SecondAvatar.Left, SecondAvatar.Top), new Size(SecondAvatar.Width, SecondAvatar.Height));
 
-                if(_rc2.IntersectsWith(_rc1))
+                if (_rc2.IntersectsWith(_rc1))
                 {
                     Point _rcCenter1 = new Point(_rc1.Left + _rc1.Width / 2, _rc1.Top + _rc1.Height / 2);
                     Point _rcCenter2 = new Point(_rc2.Left + _rc2.Width / 2, _rc2.Top + _rc2.Height / 2);
@@ -479,19 +486,22 @@ namespace DialogGenerator.UI.ViewModels
 
                 // Find position now. 
                 AvatarRectRelativePosition _relativePosition;
-                if(_rc2.Bottom < _rc1.Top)
+                if (_rc2.Bottom < _rc1.Top)
                 {
-                    if(_rc2.Left + _rc2.Width < _rc1.Left)
+                    if (_rc2.Left + _rc2.Width < _rc1.Left)
                     {
                         _relativePosition = AvatarRectRelativePosition.TopLeft;
-                    } else if(_rc2.Left > _rc1.Left + _rc1.Width)
+                    }
+                    else if (_rc2.Left > _rc1.Left + _rc1.Width)
                     {
                         _relativePosition = AvatarRectRelativePosition.TopRight;
-                    } else
+                    }
+                    else
                     {
                         _relativePosition = AvatarRectRelativePosition.Top;
                     }
-                } else if(_rc2.Top > _rc1.Bottom)
+                }
+                else if (_rc2.Top > _rc1.Bottom)
                 {
                     if (_rc2.Left + _rc2.Width < _rc1.Left)
                     {
@@ -505,20 +515,21 @@ namespace DialogGenerator.UI.ViewModels
                     {
                         _relativePosition = AvatarRectRelativePosition.Bottom;
                     }
-                } else
+                }
+                else
                 {
                     if (_rc2.Left + _rc2.Width < _rc1.Left)
                     {
                         _relativePosition = AvatarRectRelativePosition.Left;
                     }
-                    else 
+                    else
                     {
                         _relativePosition = AvatarRectRelativePosition.Right;
                     }
                 }
 
                 double _distance;
-                switch(_relativePosition)
+                switch (_relativePosition)
                 {
                     case AvatarRectRelativePosition.Top:
                         _distance = _rc1.Top - _rc2.Bottom;

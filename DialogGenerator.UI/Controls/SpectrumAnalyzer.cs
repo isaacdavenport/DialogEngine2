@@ -59,7 +59,7 @@ namespace DialogGenerator.UI.Controls
         /// Identifies the <see cref="SoundPlayer" /> dependency property. 
         /// </summary>
         public static readonly DependencyProperty SoundPlayerProperty =
-            DependencyProperty.Register("SoundPlayer", typeof(ISoundPlayer), typeof(SpectrumAnalyzer),new PropertyMetadata(null,_onSoundPlayerChanged));
+            DependencyProperty.Register("SoundPlayer", typeof(ISoundPlayer), typeof(SpectrumAnalyzer), new PropertyMetadata(null, _onSoundPlayerChanged));
 
         private static void _onSoundPlayerChanged(DependencyObject d, DependencyPropertyChangedEventArgs e)
         {
@@ -91,7 +91,7 @@ namespace DialogGenerator.UI.Controls
         /// <summary>
         /// Identifies the <see cref="MaximumFrequency" /> dependency property. 
         /// </summary>
-        public static readonly DependencyProperty MaximumFrequencyProperty = 
+        public static readonly DependencyProperty MaximumFrequencyProperty =
             DependencyProperty.Register("MaximumFrequency", typeof(int), typeof(SpectrumAnalyzer), new UIPropertyMetadata(20000, _onMaximumFrequencyChanged, _onCoerceMaximumFrequency));
 
         private static object _onCoerceMaximumFrequency(DependencyObject o, object value)
@@ -155,7 +155,7 @@ namespace DialogGenerator.UI.Controls
         /// <summary>
         /// Identifies the <see cref="MinimumFrequency" /> dependency property. 
         /// </summary>
-        public static readonly DependencyProperty MinimumFrequencyProperty = 
+        public static readonly DependencyProperty MinimumFrequencyProperty =
             DependencyProperty.Register("MinimumFrequency", typeof(int), typeof(SpectrumAnalyzer), new UIPropertyMetadata(20, _onMinimumFrequencyChanged, _onCoerceMinimumFrequency));
 
         private static object _onCoerceMinimumFrequency(DependencyObject o, object value)
@@ -283,7 +283,7 @@ namespace DialogGenerator.UI.Controls
         /// <summary>
         /// Identifies the <see cref="BarSpacing" /> dependency property. 
         /// </summary>
-        public static readonly DependencyProperty BarSpacingProperty = 
+        public static readonly DependencyProperty BarSpacingProperty =
             DependencyProperty.Register("BarSpacing", typeof(double), typeof(SpectrumAnalyzer), new UIPropertyMetadata(5.0d, _onBarSpacingChanged, _onCoerceBarSpacing));
 
         private static object _onCoerceBarSpacing(DependencyObject o, object value)
@@ -345,7 +345,7 @@ namespace DialogGenerator.UI.Controls
         /// <summary>
         /// Identifies the <see cref="PeakFallDelay" /> dependency property. 
         /// </summary>
-        public static readonly DependencyProperty PeakFallDelayProperty = 
+        public static readonly DependencyProperty PeakFallDelayProperty =
             DependencyProperty.Register("PeakFallDelay", typeof(int), typeof(SpectrumAnalyzer), new UIPropertyMetadata(10, _onPeakFallDelayChanged, _onCoercePeakFallDelay));
 
         private static object _onCoercePeakFallDelay(DependencyObject o, object value)
@@ -410,7 +410,7 @@ namespace DialogGenerator.UI.Controls
         /// <summary>
         /// Identifies the <see cref="IsFrequencyScaleLinear" /> dependency property. 
         /// </summary>
-        public static readonly DependencyProperty IsFrequencyScaleLinearProperty = 
+        public static readonly DependencyProperty IsFrequencyScaleLinearProperty =
             DependencyProperty.Register("IsFrequencyScaleLinear", typeof(bool), typeof(SpectrumAnalyzer), new UIPropertyMetadata(false, _onIsFrequencyScaleLinearChanged, _onCoerceIsFrequencyScaleLinear));
 
         private static object _onCoerceIsFrequencyScaleLinear(DependencyObject o, object value)
@@ -476,7 +476,7 @@ namespace DialogGenerator.UI.Controls
         /// <summary>
         /// Identifies the <see cref="BarHeightScaling" /> dependency property. 
         /// </summary>
-        public static readonly DependencyProperty BarHeightScalingProperty = 
+        public static readonly DependencyProperty BarHeightScalingProperty =
             DependencyProperty.Register("BarHeightScaling", typeof(BarHeightScalingStyles), typeof(SpectrumAnalyzer), new UIPropertyMetadata(BarHeightScalingStyles.Decibel, _onBarHeightScalingChanged, _onCoerceBarHeightScaling));
 
         private static object _onCoerceBarHeightScaling(DependencyObject o, object value)
@@ -537,7 +537,7 @@ namespace DialogGenerator.UI.Controls
         /// <summary>
         /// Identifies the <see cref="AveragePeaks" /> dependency property. 
         /// </summary>
-        public static readonly DependencyProperty AveragePeaksProperty = 
+        public static readonly DependencyProperty AveragePeaksProperty =
             DependencyProperty.Register("AveragePeaks", typeof(bool), typeof(SpectrumAnalyzer), new UIPropertyMetadata(false, _onAveragePeaksChanged, _onCoerceAveragePeaks));
 
         private static object _onCoerceAveragePeaks(DependencyObject o, object value)
@@ -600,7 +600,7 @@ namespace DialogGenerator.UI.Controls
         /// <summary>
         /// Identifies the <see cref="BarStyle" /> dependency property. 
         /// </summary>
-        public static readonly DependencyProperty BarStyleProperty = 
+        public static readonly DependencyProperty BarStyleProperty =
             DependencyProperty.Register("BarStyle", typeof(Style), typeof(SpectrumAnalyzer), new UIPropertyMetadata(null, _onBarStyleChanged, _onCoerceBarStyle));
 
         private static object _onCoerceBarStyle(DependencyObject o, object value)
@@ -721,7 +721,7 @@ namespace DialogGenerator.UI.Controls
         /// <summary>
         /// Identifies the <see cref="ActualBarWidth" /> dependency property. 
         /// </summary>
-        public static readonly DependencyProperty ActualBarWidthProperty = 
+        public static readonly DependencyProperty ActualBarWidthProperty =
             DependencyProperty.Register("ActualBarWidth", typeof(double), typeof(SpectrumAnalyzer), new UIPropertyMetadata(0.0d, _onActualBarWidthChanged, _onCoerceActualBarWidth));
 
         private static object _onCoerceActualBarWidth(DependencyObject o, object value)
@@ -781,7 +781,7 @@ namespace DialogGenerator.UI.Controls
         /// <summary>
         /// Identifies the <see cref="RefreshInterval" /> dependency property. 
         /// </summary>
-        public static readonly DependencyProperty RefreshIntervalProperty = 
+        public static readonly DependencyProperty RefreshIntervalProperty =
             DependencyProperty.Register("RefreshInterval", typeof(int), typeof(SpectrumAnalyzer), new UIPropertyMetadata(mcDefaultUpdateInterval, _onRefreshIntervalChanged, _onCoerceRefreshInterval));
 
         private static object _onCoerceRefreshInterval(DependencyObject o, object value)
@@ -846,7 +846,7 @@ namespace DialogGenerator.UI.Controls
         /// <summary>
         /// Identifies the <see cref="FFTComplexity" /> dependency property. 
         /// </summary>
-        public static readonly DependencyProperty FFTComplexityProperty = 
+        public static readonly DependencyProperty FFTComplexityProperty =
             DependencyProperty.Register("FFTComplexity", typeof(FFTDataSize), typeof(SpectrumAnalyzer), new UIPropertyMetadata(FFTDataSize.FFT2048, _onFFTComplexityChanged, _onCoerceFFTComplexity));
 
         private static object _onCoerceFFTComplexity(DependencyObject o, object value)
@@ -1013,7 +1013,7 @@ namespace DialogGenerator.UI.Controls
             if (mSoundPlayer == null || mSpectrumCanvas == null || mSpectrumCanvas.RenderSize.Width < 1 || mSpectrumCanvas.RenderSize.Height < 1)
                 return;
 
-            if (((mSoundPlayer.IsPlaying || mSoundPlayer.IsRecording) &&  !mSoundPlayer.GetFFTData(mChannelData)))
+            if (((mSoundPlayer.IsPlaying || mSoundPlayer.IsRecording) && !mSoundPlayer.GetFFTData(mChannelData)))
                 return;
 
             UpdateSpectrumShapes();

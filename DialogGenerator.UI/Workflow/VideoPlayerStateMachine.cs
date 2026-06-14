@@ -18,7 +18,7 @@ namespace DialogGenerator.UI.Workflow.VideoPlayerStateMachine
         Play
     }
 
-    public class VideoPlayerStateMachine: Stateless.StateMachine<States, Triggers>, INotifyPropertyChanged
+    public class VideoPlayerStateMachine : Stateless.StateMachine<States, Triggers>, INotifyPropertyChanged
     {
         public event PropertyChangedEventHandler PropertyChanged;
 

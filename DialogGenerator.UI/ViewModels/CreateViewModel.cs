@@ -2,9 +2,7 @@
 using DialogGenerator.DataAccess;
 using DialogGenerator.Events;
 using DialogGenerator.Model;
-using DialogGenerator.Model.Enum;
 using DialogGenerator.UI.Data;
-using DialogGenerator.UI.Helpers;
 using DialogGenerator.Utilities;
 using Prism.Commands;
 using Prism.Events;
@@ -43,13 +41,13 @@ namespace DialogGenerator.UI.ViewModels
 
         #region - constructor -
 
-        public CreateViewModel(ILogger logger,IEventAggregator _eventAggregator
-            ,IDialogDataRepository _dialogDataRepository
-            ,IWizardDataProvider _wizardDataProvider
-            ,IDialogModelDataProvider _dialogModelDataProvider
-            ,ICharacterDataProvider _characterDataProvider
-            ,IMessageDialogService _messageDialogService
-            ,IRegionManager _RegionManager)
+        public CreateViewModel(ILogger logger, IEventAggregator _eventAggregator
+            , IDialogDataRepository _dialogDataRepository
+            , IWizardDataProvider _wizardDataProvider
+            , IDialogModelDataProvider _dialogModelDataProvider
+            , ICharacterDataProvider _characterDataProvider
+            , IMessageDialogService _messageDialogService
+            , IRegionManager _RegionManager)
         {
             mRegionManager = _RegionManager;
             mEventAggregator = _eventAggregator;
@@ -65,7 +63,7 @@ namespace DialogGenerator.UI.ViewModels
 
             mCharactersCollectionViewSource.Filter += _mCharacterViewSource_Filter;
 
-            _bindCommands();            
+            _bindCommands();
         }
 
 
@@ -77,7 +75,7 @@ namespace DialogGenerator.UI.ViewModels
         public DelegateCommand ImportCharacterCommand { get; set; }
         public DelegateCommand OnlineCharactersCommand { get; set; }
         public DelegateCommand CreateCustomDialogCommand { get; set; }
-        
+
         public DelegateCommand ViewLoadedCommand { get; set; }
         public DelegateCommand ViewUnloadedCommand { get; set; }
 
@@ -112,7 +110,7 @@ namespace DialogGenerator.UI.ViewModels
         private void _bindCommands()
         {
             CreateNewCharacterCommand = new DelegateCommand(_createNewCharacterCommand_Execute);
-            ImportCharacterCommand = new DelegateCommand(_importCharacterCommand_Execute);
+            //ImportCharacterCommand = new DelegateCommand(_importCharacterCommand_Execute);
             OnlineCharactersCommand = new DelegateCommand(_onOnlineCharacters_Execute);
             CreateCustomDialogCommand = new DelegateCommand(_onCreateCustomDialog_Execute);
             ViewLoadedCommand = new DelegateCommand(_onViewLoaded_execute);
@@ -128,161 +126,161 @@ namespace DialogGenerator.UI.ViewModels
         {
             mLogger.Debug($"Expert View - Loaded");
         }
-        
+
         private void _onCreateCustomDialog_Execute()
         {
             mRegionManager.Regions[Constants.ContentRegion].NavigationService.RequestNavigate("CustomDialogCreatorView");
         }
 
-        private  void _onOnlineCharacters_Execute()
+        private void _onOnlineCharacters_Execute()
         {
             //await mMessageDialogService.ShowDedicatedDialogAsync<bool>(mOnlineCharactersDialog);
         }
 
 
 
-        private async void _importCharacterCommand_Execute()
-        {
-            try
-            {
-                System.Windows.Forms.OpenFileDialog _openFileDialog = new System.Windows.Forms.OpenFileDialog();
-                _openFileDialog.Filter = "T2lf file(*.t2lf)|*.t2lf";
+        /* private async void _importCharacterCommand_Execute()
+         {
+             try
+             {
+                 System.Windows.Forms.OpenFileDialog _openFileDialog = new System.Windows.Forms.OpenFileDialog();
+                 _openFileDialog.Filter = "T2lf file(*.t2lf)|*.t2lf";
 
-                if (_openFileDialog.ShowDialog() != System.Windows.Forms.DialogResult.OK)
-                    return;
+                 if (_openFileDialog.ShowDialog() != System.Windows.Forms.DialogResult.OK)
+                     return;
 
-                mMessageDialogService.ShowBusyDialog();
+                 mMessageDialogService.ShowBusyDialog();
 
-                // extract data to temp directory
-                await Task.Run(() =>
-                {
-                    FileHelper.ClearDirectory(ApplicationData.Instance.TempDirectory);
-                    try
-                    {
-                        FileHelper.LoadCharacter(ApplicationData.Instance.TempDirectory, _openFileDialog.FileName);
-                    } catch (Exception e)
-                    {
-                        MessageBox.Show(e.Message, "Error", MessageBoxButton.OK, MessageBoxImage.Error);
-                    }
-                    
-                });
+                 // extract data to temp directory
+                 await Task.Run(() =>
+                 {
+                     FileHelper.ClearDirectory(ApplicationData.Instance.TempDirectory);
+                     try
+                     {
+                         FileHelper.LoadCharacter(ApplicationData.Instance.TempDirectory, _openFileDialog.FileName);
+                     } catch (Exception e)
+                     {
+                         MessageBox.Show(e.Message, "Error", MessageBoxButton.OK, MessageBoxImage.Error);
+                     }
 
-                DirectoryInfo _directoryInfo = new DirectoryInfo(ApplicationData.Instance.TempDirectory);
+                 });
 
-                // If the there was the exception while loading of the file, this directory will be empty.
-                // If it is, go out.
-                if (_directoryInfo.GetFiles().Length == 0)
-                    return;
+                 DirectoryInfo _directoryInfo = new DirectoryInfo(ApplicationData.Instance.TempDirectory);
 
-                foreach(FileInfo file in _directoryInfo.EnumerateFiles("*.json"))
-                {
-                    IList<string> errors;
-                    var _JSONObjectsTypesList = mDialogDataRepository.LoadFromFile(file.FullName, out errors);
-                    // validate against json schema
-                    if (errors.Count > 0)
-                    {
-                        mMessageDialogService.CloseBusyDialog();
-                        await mMessageDialogService.ShowMessagesDialogAsync("Error", "Imported file has errors: ", errors, "Close message", false);
-                        continue;
-                    }
+                 // If the there was the exception while loading of the file, this directory will be empty.
+                 // If it is, go out.
+                 if (_directoryInfo.GetFiles().Length == 0)
+                     return;
 
-                    foreach (var _importedCharacter in  _JSONObjectsTypesList.Characters.ToList()?? Enumerable.Empty<Character>())
-                    {
-                        if (mCharacterDataProvider.GetByInitials(_importedCharacter.CharacterPrefix) != null)
-                        {
-                            MessageDialogResult result = MessageDialogResult.Cancel;
-                            mMessageDialogService.CloseBusyDialog();
-                            result = await mMessageDialogService.ShowOKCancelDialogAsync($"Character '{_importedCharacter.CharacterName}' already exists." +
-                                    $" Do you want to overwrite this characters?", "Warning", "Yes", "No");
+                 foreach(FileInfo file in _directoryInfo.EnumerateFiles("*.json"))
+                 {
+                     IList<string> errors;
+                     var _JSONObjectsTypesList = mDialogDataRepository.LoadFromFile(file.FullName, out errors);
+                     // validate against json schema
+                     if (errors.Count > 0)
+                     {
+                         mMessageDialogService.CloseBusyDialog();
+                         await mMessageDialogService.ShowMessagesDialogAsync("Error", "Imported file has errors: ", errors, "Close message", false);
+                         continue;
+                     }
 
-                            if (result == MessageDialogResult.Cancel)
-                            {
-                                _JSONObjectsTypesList.Characters.Remove(_importedCharacter);
-                                mMessageDialogService.ShowBusyDialog();
-                                continue;
-                            }
+                     foreach (var _importedCharacter in  _JSONObjectsTypesList.Characters.ToList()?? Enumerable.Empty<Character>())
+                     {
+                         if (mCharacterDataProvider.GetByInitials(_importedCharacter.CharacterPrefix) != null)
+                         {
+                             MessageDialogResult result = MessageDialogResult.Cancel;
+                             mMessageDialogService.CloseBusyDialog();
+                             result = await mMessageDialogService.ShowOKCancelDialogAsync($"Character '{_importedCharacter.CharacterName}' already exists." +
+                                     $" Do you want to overwrite this characters?", "Warning", "Yes", "No");
 
-                            mMessageDialogService.ShowBusyDialog();
+                             if (result == MessageDialogResult.Cancel)
+                             {
+                                 _JSONObjectsTypesList.Characters.Remove(_importedCharacter);
+                                 mMessageDialogService.ShowBusyDialog();
+                                 continue;
+                             }
 
-                            var _oldCharacter = mCharacterDataProvider.GetByInitials(_importedCharacter.CharacterPrefix);
-                            string _imageFileName = _oldCharacter.CharacterImage;
-                            _oldCharacter.CharacterImage = ApplicationData.Instance.DefaultImage;
+                             mMessageDialogService.ShowBusyDialog();
 
-                            await mCharacterDataProvider.Remove(_oldCharacter, _imageFileName);
-                        }
+                             var _oldCharacter = mCharacterDataProvider.GetByInitials(_importedCharacter.CharacterPrefix);
+                             string _imageFileName = _oldCharacter.CharacterImage;
+                             _oldCharacter.CharacterImage = ApplicationData.Instance.DefaultImage;
 
-                        _importedCharacter.Editable = true;
-                        mCharacterDataProvider.GetAll().Add(_importedCharacter);
-                    }
+                             await mCharacterDataProvider.Remove(_oldCharacter, _imageFileName);
+                         }
 
-                    foreach (var _importedDialogModelInfo in _JSONObjectsTypesList.DialogModels.ToList()?? Enumerable.Empty<ModelDialogInfo>())
-                    {
-                        var _containedCollection = mDialogModelDataProvider.GetByName(_importedDialogModelInfo.ModelsCollectionName);
-                        if (_containedCollection == null)
-                        {
-                            mDialogModelDataProvider.GetAll().Add(_importedDialogModelInfo);
-                        }
-                        else
-                        {
-                            _importedDialogModelInfo.ArrayOfDialogModels.RemoveAll(dlg => _containedCollection.ArrayOfDialogModels.Contains(dlg));
+                         _importedCharacter.Editable = true;
+                         mCharacterDataProvider.GetAll().Add(_importedCharacter);
+                     }
 
-                            if(_importedDialogModelInfo.ArrayOfDialogModels.Count == 0)
-                            {
-                                _JSONObjectsTypesList.DialogModels.Remove(_importedDialogModelInfo);
-                            } else
-                            {
-                                _containedCollection.ArrayOfDialogModels.AddRange(_importedDialogModelInfo.ArrayOfDialogModels);
-                            }
-                            
-                        }
-                    }
+                     foreach (var _importedDialogModelInfo in _JSONObjectsTypesList.DialogModels.ToList()?? Enumerable.Empty<ModelDialogInfo>())
+                     {
+                         var _containedCollection = mDialogModelDataProvider.GetByName(_importedDialogModelInfo.ModelsCollectionName);
+                         if (_containedCollection == null)
+                         {
+                             mDialogModelDataProvider.GetAll().Add(_importedDialogModelInfo);
+                         }
+                         else
+                         {
+                             _importedDialogModelInfo.ArrayOfDialogModels.RemoveAll(dlg => _containedCollection.ArrayOfDialogModels.Contains(dlg));
 
-                    foreach (var _importedWizard in _JSONObjectsTypesList.Wizards.ToList()?? Enumerable.Empty<Wizard>())
-                    {
-                        if (mWizardDataProvider.GetByName(_importedWizard.WizardName) == null)
-                        {
-                            mWizardDataProvider.GetAll().Add(_importedWizard);
-                        }
-                        else
-                        {
-                            _JSONObjectsTypesList.Wizards.Remove(_importedWizard);
-                        }
-                    }
-                    
-                    if(_JSONObjectsTypesList.Characters.Count > 0 
-                       || _JSONObjectsTypesList.Wizards.Count > 0 
-                       || _JSONObjectsTypesList.DialogModels.Count > 0)
-                    {
-                        await _processImportedData(_JSONObjectsTypesList, Path.Combine(ApplicationData.Instance.DataDirectory, file.Name));
-                    }
-                }
+                             if(_importedDialogModelInfo.ArrayOfDialogModels.Count == 0)
+                             {
+                                 _JSONObjectsTypesList.DialogModels.Remove(_importedDialogModelInfo);
+                             } else
+                             {
+                                 _containedCollection.ArrayOfDialogModels.AddRange(_importedDialogModelInfo.ArrayOfDialogModels);
+                             }
 
-                mEventAggregator.GetEvent<InitializeDialogModelEvent>().Publish();
+                         }
+                     }
 
-                Load();
+                     foreach (var _importedWizard in _JSONObjectsTypesList.Wizards.ToList()?? Enumerable.Empty<Wizard>())
+                     {
+                         if (mWizardDataProvider.GetByName(_importedWizard.WizardName) == null)
+                         {
+                             mWizardDataProvider.GetAll().Add(_importedWizard);
+                         }
+                         else
+                         {
+                             _JSONObjectsTypesList.Wizards.Remove(_importedWizard);
+                         }
+                     }
 
-                mEventAggregator.GetEvent<CharacterCollectionLoadedEvent>().Publish();
-            }
-            catch (Exception ex)
-            {
-                mLogger.Error("_import_Click " + ex.Message);
-                mMessageDialogService.CloseBusyDialog();
-                await mMessageDialogService.ShowMessage("Error", "Error during importing character.");                
-            }
-            finally
-            {
-                FileHelper.ClearDirectory(ApplicationData.Instance.TempDirectory);
-                mMessageDialogService.CloseBusyDialog();
-            }
-        }
+                     if(_JSONObjectsTypesList.Characters.Count > 0 
+                        || _JSONObjectsTypesList.Wizards.Count > 0 
+                        || _JSONObjectsTypesList.DialogModels.Count > 0)
+                     {
+                         await _processImportedData(_JSONObjectsTypesList, Path.Combine(ApplicationData.Instance.DataDirectory, file.Name));
+                     }
+                 }
 
-        private async Task _processImportedData(JSONObjectsTypesList _importedData,string path)
+                 mEventAggregator.GetEvent<InitializeDialogModelEvent>().Publish();
+
+                 Load();
+
+                 mEventAggregator.GetEvent<CharacterCollectionLoadedEvent>().Publish();
+             }
+             catch (Exception ex)
+             {
+                 mLogger.Error("_import_Click " + ex.Message);
+                 mMessageDialogService.CloseBusyDialog();
+                 await mMessageDialogService.ShowMessage("Error", "Error during importing character.");                
+             }
+             finally
+             {
+                 FileHelper.ClearDirectory(ApplicationData.Instance.TempDirectory);
+                 mMessageDialogService.CloseBusyDialog();
+             }
+         }
+         */
+        private async Task _processImportedData(JSONObjectsTypesList _importedData, string path)
         {
             await Task.Run(() =>
             {
                 var _supportedExtensions = new string[] { ".jpg", ".jpeg", ".jpe", ".png" };
 
-                foreach (var character in _importedData.Characters.ToList()?? Enumerable.Empty<Character>())
+                foreach (var character in _importedData.Characters.ToList() ?? Enumerable.Empty<Character>())
                 {
                     var _dirInfo = new DirectoryInfo(ApplicationData.Instance.TempDirectory);
                     FileInfo[] _mp3Files = _dirInfo.GetFiles($"{character.CharacterPrefix}*.mp3");
@@ -326,7 +324,7 @@ namespace DialogGenerator.UI.ViewModels
         {
             /* S.Ristic - This way we show only the editable characters */
             var characters = new ObservableCollection<Character>(mCharacterDataProvider.GetAll().Where(c => c.Editable == true));
-            mCharactersCollectionViewSource.Source =  characters;
+            mCharactersCollectionViewSource.Source = characters;
             RaisePropertyChanged(nameof(CharactersViewSource));
         }
 
@@ -358,7 +356,7 @@ namespace DialogGenerator.UI.ViewModels
             {
                 mSelectedCharacter = value;
                 RaisePropertyChanged();
-                if(mSelectedCharacter != null)
+                if (mSelectedCharacter != null)
                 {
                     mEventAggregator.GetEvent<OpenCharacterDetailViewEvent>().Publish(mSelectedCharacter.CharacterPrefix);
                 }

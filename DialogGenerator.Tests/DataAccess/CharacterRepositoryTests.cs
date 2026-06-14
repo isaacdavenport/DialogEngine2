@@ -9,7 +9,7 @@ using Xunit;
 
 namespace DialogGenerator.Tests.DataAccess
 {
-    public class CharacterRepositoryTests:RepositoryTestBase
+    public class CharacterRepositoryTests : RepositoryTestBase
     {
         private CharacterRepository mRepository;
 
@@ -69,7 +69,8 @@ namespace DialogGenerator.Tests.DataAccess
             mRepository.Export(_character, ApplicationDataHelper.DataDirectory);
             Assert.True(File.Exists(Path.Combine(ApplicationDataHelper.DataDirectory, _character.FileName)));
 
-            if( File.Exists(Path.Combine(ApplicationDataHelper.DataDirectory, _character.FileName))) {
+            if (File.Exists(Path.Combine(ApplicationDataHelper.DataDirectory, _character.FileName)))
+            {
                 File.Delete(Path.Combine(ApplicationDataHelper.DataDirectory, _character.FileName));
             }
         }

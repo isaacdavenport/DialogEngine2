@@ -7,7 +7,7 @@ namespace DialogGenerator.Utilities.Dialogs
     /// </summary>
     public partial class MessageDialog : UserControl
     {
-        public MessageDialog(string tittle,string message)
+        public MessageDialog(string tittle, string message)
         {
             InitializeComponent();
             this.DataContext = this;

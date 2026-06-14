@@ -9,7 +9,7 @@ using System.Windows.Input;
 
 namespace DialogGenerator.UI.ViewModels
 {
-    public class MediaPlayerControlViewModel:BindableBase
+    public class MediaPlayerControlViewModel : BindableBase
     {
 
         #region - fields -
@@ -42,10 +42,10 @@ namespace DialogGenerator.UI.ViewModels
         }
 
         #endregion
-        
+
         public void LogMessage(int _MessageType, string _Message)
         {
-            switch(_MessageType)
+            switch (_MessageType)
             {
                 case 0:
                     mLogger.Error(_Message);
@@ -103,7 +103,7 @@ namespace DialogGenerator.UI.ViewModels
             {
                 case nameof(CurrentVideoFilePath):
                     {
-                        ((DelegateCommand)StartVideoCommand).RaiseCanExecuteChanged();                        
+                        ((DelegateCommand)StartVideoCommand).RaiseCanExecuteChanged();
                         break;
                     }
             }
@@ -144,7 +144,7 @@ namespace DialogGenerator.UI.ViewModels
                 .Permit(Triggers.Play, States.Playing);
 
             StateMachine.Configure(States.Playing)
-                .Permit(Triggers.On,States.Ready);
+                .Permit(Triggers.On, States.Ready);
         }
 
         private void _stopPlaying()
@@ -154,8 +154,8 @@ namespace DialogGenerator.UI.ViewModels
 
         private void _bindCommands()
         {
-            StartVideoCommand = new DelegateCommand(_startMediaPlayer_Execute,_startMediaPlayer_CanExecute);
-            PauseVideoCommand = new DelegateCommand(_pauseMediaPlayer_Execute,_pauseMediaPlayer_CanExecute);
+            StartVideoCommand = new DelegateCommand(_startMediaPlayer_Execute, _startMediaPlayer_CanExecute);
+            PauseVideoCommand = new DelegateCommand(_pauseMediaPlayer_Execute, _pauseMediaPlayer_CanExecute);
             PlayInContextCommand = new DelegateCommand(_playInContext_Execute, _playInContext_CanExecute);
             StopPlayingInContextCommand = new DelegateCommand(_stopPlayingInContext_Execute, _stopPlayingInContext_CanExecute);
             ShiftForwardCommand = new DelegateCommand(_shiftForwardCommand_Execute, _shiftForwardCommand_CanExecute);
@@ -216,7 +216,7 @@ namespace DialogGenerator.UI.ViewModels
             return StateMachine.State == States.Ready
                    && mWizardWorkflow.State != WizardStates.PlayingInContext
                    && !string.IsNullOrEmpty(CurrentVideoFilePath)
-                   && File.Exists(Path.Combine(ApplicationData.Instance.VideoDirectory,CurrentVideoFilePath));
+                   && File.Exists(Path.Combine(ApplicationData.Instance.VideoDirectory, CurrentVideoFilePath));
         }
 
         private bool _pauseMediaPlayer_CanExecute()

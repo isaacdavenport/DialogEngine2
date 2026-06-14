@@ -11,7 +11,7 @@ namespace DialogGenerator
         private static object msLocker = new object();
         private static SplashScreenViewModel msVieModel;
 
-        public static SplashScreenViewModel  CreateSplashScreen()
+        public static SplashScreenViewModel CreateSplashScreen()
         {
             lock (msLocker)
             {
@@ -24,7 +24,8 @@ namespace DialogGenerator
                     msVieModel.Dispatcher = Dispatcher.CurrentDispatcher;
                     ev.Set();
 
-                    Dispatcher.CurrentDispatcher.BeginInvoke((Action)delegate () {
+                    Dispatcher.CurrentDispatcher.BeginInvoke((Action)delegate ()
+                    {
                         SplashScreenView _splashScreenWindow = new SplashScreenView
                         {
                             DataContext = msVieModel
@@ -54,7 +55,7 @@ namespace DialogGenerator
 
         public static void Close()
         {
-            if(msVieModel != null)
+            if (msVieModel != null)
             {
                 msVieModel.Dispose(true);
                 msVieModel = null;

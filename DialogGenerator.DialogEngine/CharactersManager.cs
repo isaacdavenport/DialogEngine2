@@ -20,7 +20,7 @@ namespace DialogGenerator.DialogEngine
 
         #region - ctor -
 
-        public CharactersManager(ILogger logger,DialogContext context,ICharacterRepository _characterRepository)
+        public CharactersManager(ILogger logger, DialogContext context, ICharacterRepository _characterRepository)
         {
             mLogger = logger;
             mContext = context;
@@ -91,7 +91,7 @@ namespace DialogGenerator.DialogEngine
             //        character.RecentPhrases.Enqueue(character.Phrases[0]); 
             //    }
             //}
-            
+
         }
 
         private void _removePhrasesOverParentalRating(Character _inCharacter)

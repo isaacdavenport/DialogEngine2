@@ -26,7 +26,7 @@ namespace DialogGenerator.Events.EventArgs
                 RaisePropertyChanged();
             }
         }
-        
+
 
         public DelegateCommand CopyCommand { get; set; }
 

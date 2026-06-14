@@ -81,7 +81,7 @@ namespace DialogGenerator.UI.ViewModels
             mWizardDataProvider = _WizardDataProvider;
 
             mWizard = new CreateCharacterWizard();
-            CurrentStep = mWizard.Steps[mCurrentStepIndex];            
+            CurrentStep = mWizard.Steps[mCurrentStepIndex];
 
             for (int i = 5; i < 100; i++)
             {
@@ -93,10 +93,10 @@ namespace DialogGenerator.UI.ViewModels
             Workflow.PropertyChanged += _workflow_PropertyChanged;
             _configureWorkflow();
 
-            Character = new Character();   
+            Character = new Character();
 
             _initDialogWizards();
-            _initVoiceCollection();            
+            _initVoiceCollection();
 
             _bindCommands();
         }
@@ -150,13 +150,13 @@ namespace DialogGenerator.UI.ViewModels
                 CharacterIdentifier = _getCharacterIdentifier();
                 NextStepCommand.RaiseCanExecuteChanged();
 
-                if (!string.IsNullOrEmpty(mCharacterName) 
-                    &&  (mCharacterName.Length <= 2 
-                    || mCharacterName.Length > 30 
-                    || char.IsDigit(mCharacterName.Substring(0,1).ToCharArray()[0]) 
+                if (!string.IsNullOrEmpty(mCharacterName)
+                    && (mCharacterName.Length <= 2
+                    || mCharacterName.Length > 30
+                    || char.IsDigit(mCharacterName.Substring(0, 1).ToCharArray()[0])
                     || !Regex.IsMatch(mCharacterName, Constants.FILENAME_CHECK_REGEX)))
                 {
-                    if(!Regex.IsMatch(mCharacterName, Constants.FILENAME_CHECK_REGEX))
+                    if (!Regex.IsMatch(mCharacterName, Constants.FILENAME_CHECK_REGEX))
                     {
                         CharacterNameValidationError = "The name contains the illegal characters!";
                         CharacterNameHasError = true;
@@ -165,21 +165,24 @@ namespace DialogGenerator.UI.ViewModels
                     {
                         CharacterNameValidationError = "The name must consist of at least 3 characters!";
                         CharacterNameHasError = true;
-                    } else if (mCharacterName.Length > 30 ) {
+                    }
+                    else if (mCharacterName.Length > 30)
+                    {
                         CharacterNameValidationError = "The name must not have more than 30 characters!";
                         CharacterNameHasError = true;
-                    }                    
+                    }
                     else
                     {
                         CharacterNameValidationError = "The first character of the name must be a letter!";
                         CharacterNameHasError = true;
                     }
-                    
-                } else
+
+                }
+                else
                 {
                     CharacterNameValidationError = string.Empty;
-                    CharacterNameHasError = false;                 
-                    
+                    CharacterNameHasError = false;
+
                 }
             }
         }
@@ -411,10 +414,10 @@ namespace DialogGenerator.UI.ViewModels
             {
                 mCurrentStepIndex = value;
                 RaisePropertyChanged("CurrentStepIndex");
-                if(mWizard.Steps.Count > mCurrentStepIndex)
+                if (mWizard.Steps.Count > mCurrentStepIndex)
                 {
-                    CurrentStep = mWizard.Steps[mCurrentStepIndex];                    
-                }                
+                    CurrentStep = mWizard.Steps[mCurrentStepIndex];
+                }
             }
         }
 
@@ -452,7 +455,7 @@ namespace DialogGenerator.UI.ViewModels
             get
             {
                 string _nextWizardName = "Finished";
-                if(mWizardPassthroughIndex < mDialogWizards.Count)
+                if (mWizardPassthroughIndex < mDialogWizards.Count)
                 {
                     _nextWizardName = mDialogWizards[mWizardPassthroughIndex];
                 }
@@ -472,7 +475,7 @@ namespace DialogGenerator.UI.ViewModels
         public ICommand ChooseImageCommand { get; set; }
         public ICommand HomeCommand { get; set; }
         public ICommand CreateCommand { get; set; }
-        public ICommand CancelCommand {get;set;}
+        public ICommand CancelCommand { get; set; }
         public ICommand ResetCommand { get; set; }
         public ICommand PlayCommand { get; set; }
         public ICommand ViewLoadedCommand { get; set; }
@@ -534,7 +537,7 @@ namespace DialogGenerator.UI.ViewModels
 
             if (mWizard.Steps.Count == nextIndex)
             {
-                mLogger.Debug($"Create character view - Saving the initial character info of '{ mCharacterName }'. Moving on to the 'Basic Wizard'.");
+                mLogger.Debug($"Create character view - Saving the initial character info of '{mCharacterName}'. Moving on to the 'Basic Wizard'.");
             }
             else if (nextIndex >= 0 && nextIndex < mWizard.Steps.Count)
             {
@@ -612,7 +615,7 @@ namespace DialogGenerator.UI.ViewModels
                             Workflow.Fire(permitted.First());
                         else
                         {
-                        mLogger.Debug($"Create character view - No permitted trigger to go back from step {current}.");
+                            mLogger.Debug($"Create character view - No permitted trigger to go back from step {current}.");
                             return;
                         }
                     }
@@ -627,9 +630,9 @@ namespace DialogGenerator.UI.ViewModels
         }
 
         private async void _processFinish()
-        {            
+        {
             int _idx = mCharacterDataProvider.IndexOf(Character);
-            if(_idx == -1)
+            if (_idx == -1)
             {
                 await mCharacterDataProvider.AddAsync(Character);
                 _idx = mCharacterDataProvider.IndexOf(Character);
@@ -646,7 +649,7 @@ namespace DialogGenerator.UI.ViewModels
             //});
             Character = new Character();
             Workflow.Fire(Triggers.SetName);
-                        
+
         }
 
         private void _initVoiceCollection()
@@ -679,17 +682,17 @@ namespace DialogGenerator.UI.ViewModels
             CharacterAuthor = string.Empty;
             CharacterDescription = string.Empty;
             CharacterHasNoVoice = false;
-            if(VoiceCollection.Count > 0)
+            if (VoiceCollection.Count > 0)
             {
                 CharacterVoice = VoiceCollection[0];
             }
-            
+
             CurrentStepIndex = 0;
             NextButtonText = "Next";
             WizardPassthroughIndex = 0;
 
             Character = new Character();
-            
+
             _closeCreateSession();
         }
 
@@ -701,7 +704,7 @@ namespace DialogGenerator.UI.ViewModels
             String[] _tokens = mCharacterName.Split(' ');
             List<string> _nonEmptyTokens = _tokens.Where(t => !string.IsNullOrEmpty(t)).ToList();
             String result = String.Empty;
-            switch(_nonEmptyTokens.Count)
+            switch (_nonEmptyTokens.Count)
             {
                 case 0:
                     return result;
@@ -720,7 +723,7 @@ namespace DialogGenerator.UI.ViewModels
                         _range = Math.Min(_leftover, _nonEmptyTokens[1].Length);
                         result += _nonEmptyTokens[1].Substring(0, _range);
                     }
-                    
+
                     break;
                 default:
                     {
@@ -734,16 +737,16 @@ namespace DialogGenerator.UI.ViewModels
                             _counter++;
                         }
                     }
-                    
+
                     break;
-            }           
+            }
 
             return result.ToUpper();
         }
 
         private string _getCharacterIdentifier()
         {
-            if(!String.IsNullOrEmpty(CharacterIdentifier))
+            if (!String.IsNullOrEmpty(CharacterIdentifier))
             {
                 return CharacterIdentifier;
             }
@@ -797,7 +800,7 @@ namespace DialogGenerator.UI.ViewModels
         {
             await _checkWizardConfiguration();
             Workflow.Fire(Triggers.Initialize);
-            
+
             mLogger.Debug($"Create Character View - Guided character creation loaded!");
         }
 
@@ -805,7 +808,7 @@ namespace DialogGenerator.UI.ViewModels
         {
             mLogger.Debug($"Create Character View - Guided character creation exited!");
         }
-        
+
         private void _configureWorkflow()
         {
             Workflow.Configure(States.EnteredInitialization)
@@ -826,7 +829,7 @@ namespace DialogGenerator.UI.ViewModels
                  .Permit(Triggers.SetAuthor, States.EnteredSetAuthor)
                  .Permit(Triggers.SetDescription, States.EnteredSetDescription)
                  .Permit(Triggers.SetNote, States.EnteredSetNote)
-                 
+
                  .Permit(Triggers.StartWizard, States.InWizard)
                  .Permit(Triggers.Finish, States.Finished)
                  .Permit(Triggers.Initialize, States.EnteredInitialization);
@@ -905,7 +908,7 @@ namespace DialogGenerator.UI.ViewModels
                  .Permit(Triggers.SetNote, States.EnteredSetNote)
                  .Permit(Triggers.CheckCounter, States.InCounter)
                  .Permit(Triggers.Finish, States.Finished);
-            
+
             Workflow.Configure(States.EnteredSetDescription)
                 .OnEntry(() => _stepEntered("Description"))
                 .OnExit(() => _stepExited("Description"))
@@ -938,7 +941,7 @@ namespace DialogGenerator.UI.ViewModels
                   .Permit(Triggers.StartWizard, States.InWizard)
                   .Permit(Triggers.Initialize, States.EnteredInitialization)
                   .Permit(Triggers.Finish, States.Finished);
-                    
+
 
             Workflow.Configure(States.InWizard)
                 .OnEntry(() => _stepEntered("Wizard"))
@@ -956,7 +959,7 @@ namespace DialogGenerator.UI.ViewModels
                 .Permit(Triggers.SetAvatar, States.EnteredSetAvatar)
                 .Permit(Triggers.SetName, States.EnteredSetName)
                 .Permit(Triggers.Initialize, States.EnteredInitialization);
-            
+
         }
 
         private void _stepExited(string stepName)
@@ -966,7 +969,7 @@ namespace DialogGenerator.UI.ViewModels
                 case "Name":
                     Character.CharacterName = CharacterName;
                     Character.HasNoVoice = CharacterHasNoVoice;
-                    if(CharacterHasNoVoice)
+                    if (CharacterHasNoVoice)
                     {
                         Character.Voice = CharacterVoice;
                     }
@@ -979,7 +982,7 @@ namespace DialogGenerator.UI.ViewModels
                 case "Age":
                     Character.CharacterAge = CharacterAge;
                     break;
-                case "Gender":                    
+                case "Gender":
                     Character.CharacterGender = CharacterGender.Substring(0, 1);
                     break;
                 case "Avatar":
@@ -997,42 +1000,43 @@ namespace DialogGenerator.UI.ViewModels
                     Character.InternalRemarks = CharacterNote;
                     break;
                 case "Wizard":
-                    
+
                     break;
                 default:
                     break;
             }
-        }        
+        }
 
         private async void _stepEntered(string stepName)
         {
-            switch(stepName)
+            switch (stepName)
             {
                 case "Initialize":
                     var _lastWizardState = Session.Get<CreateCharacterState>(Constants.LAST_WIZARD_STATE);
                     if (_lastWizardState != null && _lastWizardState.Wizard != null)
                     {
                         MessageDialogResult _result = await mMessageDialogService.ShowOKCancelDialogAsync("Resume previous session?", "Question", "Yes", "No");
-                        if(_result.Equals(MessageDialogResult.OK))
+                        if (_result.Equals(MessageDialogResult.OK))
                         {
                             mResumePreviousSession = true;
                             Character = mCharacterDataProvider.GetByInitials(_lastWizardState.CharacterPrefix);
                             Workflow.Fire(Triggers.CheckCounter);
                             break;
-                        } else
+                        }
+                        else
                         {
                             Session.Set(Constants.LAST_WIZARD_STATE, null);
-                        }                                                
+                        }
                     }
 
                     Workflow.Fire(Triggers.SetName);
 
                     break;
-                case "Name":                    
-                    CurrentStepIndex = 0;                    
+                case "Name":
+                    CurrentStepIndex = 0;
                     CharacterName = Character.CharacterName;
                     CharacterHasNoVoice = Character.HasNoVoice;
-                    if(!string.IsNullOrEmpty(Character.Voice))
+                    if (!string.IsNullOrEmpty(Character.Voice))
                     {
                         CharacterVoice = CharacterVoice;
                     }
@@ -1072,32 +1076,34 @@ namespace DialogGenerator.UI.ViewModels
                     break;
                 case "CheckCounter":
                     _lastWizardState = Session.Get<CreateCharacterState>(Constants.LAST_WIZARD_STATE);
-                    if(_lastWizardState != null && _lastWizardState.Wizard != null)                    
+                    if (_lastWizardState != null && _lastWizardState.Wizard != null)
                     {
                         MessageDialogResult _result;
                         if (!mResumePreviousSession)
-                        {                            
-                           _result = await mMessageDialogService.ShowOKCancelDialogAsync("Resume previous session?", "Question", "Yes", "No");
-                        } else
+                        {
+                            _result = await mMessageDialogService.ShowOKCancelDialogAsync("Resume previous session?", "Question", "Yes", "No");
+                        }
+                        else
                         {
                             mResumePreviousSession = false;
                             _result = MessageDialogResult.OK;
                         }
-                        
-                        if(_result.Equals(MessageDialogResult.OK))
+
+                        if (_result.Equals(MessageDialogResult.OK))
                         {
- 
+
                             CurrentDialogWizard = _lastWizardState.Wizard.WizardName;
-                            Workflow.Fire(Triggers.StartWizard);                            
-                        } else
+                            Workflow.Fire(Triggers.StartWizard);
+                        }
+                        else
                         {
                             Session.Set(Constants.LAST_WIZARD_STATE, null);
                             Workflow.Fire(Triggers.Finish);
                             mRegionManager.Regions[Constants.ContentRegion].NavigationService.RequestNavigate("CreateCharacterView");
-                            Workflow.Fire(Triggers.Initialize);                            
+                            Workflow.Fire(Triggers.Initialize);
                         }
 
-                        break;                        
+                        break;
                     }
 
                     if (mWizardPassthroughIndex < mDialogWizards.Count)
@@ -1108,15 +1114,15 @@ namespace DialogGenerator.UI.ViewModels
                     else
                     {
                         Workflow.Fire(Triggers.Finish);
-                    }                                       
-                    
+                    }
+
                     break;
                 case "Wizard":
                     // Prepare steps for starting of the dialog model wizard in 
                     // character creation mode.
-                    if(!_checkCharacterCreateMode())
+                    if (!_checkCharacterCreateMode())
                     {
-                        _openCreateSession(Character);                        
+                        _openCreateSession(Character);
                     }
 
                     mLogger.Debug($"Create character view - Entering wizard");
@@ -1138,7 +1144,7 @@ namespace DialogGenerator.UI.ViewModels
 
                         // Notify all interested parties that the collection has new element (has changed).
                         mEventAgregator.GetEvent<CharacterCollectionLoadedEvent>().Publish();
-                        
+
 
                         // Reset the conversation in the case of the new character.
                         //Session.Set(Constants.NEXT_CH_1, -1);
@@ -1161,16 +1167,16 @@ namespace DialogGenerator.UI.ViewModels
                     break;
                 case "Finished":
                     mLogger.Debug($"Create character view - Entering finish");
-                    _processFinish();                    
+                    _processFinish();
                     break;
                 default:
                     break;
             }
         }
-      
+
         private bool _checkCharacterCreateMode()
         {
-            if(Session.Contains(Constants.CHARACTER_EDIT_MODE) && (bool) Session.Get(Constants.CHARACTER_EDIT_MODE) == true)
+            if (Session.Contains(Constants.CHARACTER_EDIT_MODE) && (bool)Session.Get(Constants.CHARACTER_EDIT_MODE) == true)
             {
                 return true;
             }
@@ -1181,11 +1187,11 @@ namespace DialogGenerator.UI.ViewModels
         private void _initDialogWizards()
         {
             mDialogWizards.Clear();
-            if(!_loadWizardCollection())
+            if (!_loadWizardCollection())
             {
                 WizardCollection _wizardCollection = new WizardCollection
                 {
-                    Version = "1.1",                    
+                    Version = "1.1",
                 };
 
                 _wizardCollection.Version = "1.1";
@@ -1203,15 +1209,15 @@ namespace DialogGenerator.UI.ViewModels
                 mDialogWizards.Add("ActionStoryWizard");
                 _wizardCollection.Wizards.Add("ActionStoryWizard");
                 mDialogWizards.Add("SimpleStoryWizardB");
-                _wizardCollection.Wizards.Add("SimpleStoryWizardB");                                          
+                _wizardCollection.Wizards.Add("SimpleStoryWizardB");
                 mDialogWizards.Add("Advanced1Wizard");
                 _wizardCollection.Wizards.Add("Advanced1Wizard");
                 mDialogWizards.Add("Advanced2Wizard");
                 _wizardCollection.Wizards.Add("Advanced2Wizard");
 
                 Serializer.Serialize(_wizardCollection, ApplicationData.Instance.DataDirectory + "\\WizardCollection.cfg");
-            }            
-            
+            }
+
         }
 
         private async Task _checkWizardConfiguration()
@@ -1264,26 +1270,28 @@ namespace DialogGenerator.UI.ViewModels
 
                         return true;
                     }
-                                        
+
                 }
-            } catch (IOException)
+            }
+            catch (IOException)
             {
                 return false;
             }
-            
+
             return false;
         }
 
         private void _openCreateSession(Character _c = null)
         {
-            if(_c == null)
+            if (_c == null)
             {
                 Session.Set(Constants.NEW_CHARACTER, new Character());
-            } else
+            }
+            else
             {
                 Session.Set(Constants.NEW_CHARACTER, _c);
             }
-            
+
             Session.Set(Constants.CHARACTER_EDIT_MODE, true);
             Session.Set(Constants.CREATE_CHARACTER_VIEW_MODEL, this);
             mEventAgregator.GetEvent<GuidedCharacterCreationModeChangedEvent>().Publish(true);
@@ -1293,7 +1301,7 @@ namespace DialogGenerator.UI.ViewModels
         {
             Session.Set(Constants.NEW_CHARACTER, null);
             Session.Set(Constants.CHARACTER_EDIT_MODE, false);
-            Session.Set(Constants.CREATE_CHARACTER_VIEW_MODEL, null);            
+            Session.Set(Constants.CREATE_CHARACTER_VIEW_MODEL, null);
 
             mEventAgregator.GetEvent<GuidedCharacterCreationModeChangedEvent>().Publish(false);
         }
@@ -1340,7 +1348,7 @@ namespace DialogGenerator.UI.ViewModels
         }
 
         private async void _onChooseImage_execute()
-        {            
+        {
             try
             {
                 //if (!_chooseImage_CanExecute())
@@ -1364,7 +1372,7 @@ namespace DialogGenerator.UI.ViewModels
 
                     File.Copy(_filePath, Path.Combine(ApplicationData.Instance.ImagesDirectory, _newFileName), true);
 
-                    if ( !String.IsNullOrEmpty(_chCurrentImageFilePath) && !_chCurrentImageFilePath.Equals(ApplicationData.Instance.DefaultImage))
+                    if (!String.IsNullOrEmpty(_chCurrentImageFilePath) && !_chCurrentImageFilePath.Equals(ApplicationData.Instance.DefaultImage))
                     {
                         GC.Collect();
                         GC.WaitForPendingFinalizers();

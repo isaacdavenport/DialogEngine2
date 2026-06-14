@@ -14,7 +14,7 @@ namespace DialogGenerator.UI.Converters
         public object Convert(object value, Type targetType, object parameter, CultureInfo culture)
         {
             string _fullPath = value.ToString();
-            if(File.Exists(_fullPath))
+            if (File.Exists(_fullPath))
             {
                 FileInfo finfo = new FileInfo(_fullPath);
                 return finfo.Name;

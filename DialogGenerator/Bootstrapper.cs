@@ -16,7 +16,7 @@ using DialogGenerator.Handlers;
 
 namespace DialogGenerator
 {
-    public class Bootstrapper: UnityBootstrapper
+    public class Bootstrapper : UnityBootstrapper
     {
         protected override DependencyObject CreateShell()
         {
@@ -37,10 +37,10 @@ namespace DialogGenerator
             Container.RegisterType<AppInitializer>(new ContainerControlledLifetimeManager());
             Container.RegisterType<ShellViewModel>(new ContainerControlledLifetimeManager());
             Container.RegisterType<Shell>(new ContainerControlledLifetimeManager());
-            Container.RegisterType<FileChangesHandler>(new ContainerControlledLifetimeManager());
+            //Container.RegisterType<FileChangesHandler>(new ContainerControlledLifetimeManager());
             Container.RegisterType<UpdatesHandler>(new ContainerControlledLifetimeManager());
             Container.RegisterType<Random>(new ContainerControlledLifetimeManager());
-            
+
             Random _random = new Random();
             Container.RegisterInstance<Random>(_random);
         }
@@ -54,7 +54,7 @@ namespace DialogGenerator
             {
                 ModuleName = _coreModuleType.Name,
                 ModuleType = _coreModuleType.AssemblyQualifiedName,
-                InitializationMode = InitializationMode.WhenAvailable                
+                InitializationMode = InitializationMode.WhenAvailable
             });
 
             Type _utilitiesModuleType = typeof(UtilitiesModule);

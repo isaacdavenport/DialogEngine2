@@ -28,7 +28,7 @@ namespace DialogGenerator.Model
         #endregion
 
         #region - properties -
-        
+
         [JsonIgnore]
         public PhraseEntry PhraseTotals
         {
@@ -46,7 +46,7 @@ namespace DialogGenerator.Model
             }
         }
 
-        [JsonProperty("CharacterAge"),Required]
+        [JsonProperty("CharacterAge"), Required]
         public int CharacterAge { get; set; } = 10;
 
         [RegularExpression(@"^(?:M|F)$", ErrorMessage = "Alloed letters: 'M' (Male) and 'F' (Female).")]
@@ -54,8 +54,8 @@ namespace DialogGenerator.Model
         public string CharacterGender { get; set; } = "M";
 
         [RegularExpression(Constants.FILENAME_CHECK_REGEX)]
-        [StringLength(50,MinimumLength =3)]
-        [JsonProperty("CharacterName"),Required(ErrorMessage ="Character name is required.")]
+        [StringLength(50, MinimumLength = 3)]
+        [JsonProperty("CharacterName"), Required(ErrorMessage = "Character name is required.")]
         public string CharacterName
         {
             get { return mCharacterName; }
@@ -67,10 +67,10 @@ namespace DialogGenerator.Model
         }
 
         [ValidCharacterPrefix]
-        [JsonProperty("CharacterPrefix"),Required(ErrorMessage ="Character initials is required.")]
+        [JsonProperty("CharacterPrefix"), Required(ErrorMessage = "Character initials is required.")]
         public string CharacterPrefix { get; set; } = "";
 
-        [FileExtensions(Extensions ="jpg,jpe,jpeg,png,gif,jfif,tiff,apng,avif,webp",ErrorMessage ="Allowed image file extensions: jpg,jpe,jpeg,png,gif,jfif,tiff,apng,avif,webp.")]
+        [FileExtensions(Extensions = "jpg,jpe,jpeg,png,gif,jfif,tiff,apng,avif,webp", ErrorMessage = "Allowed image file extensions: jpg,jpe,jpeg,png,gif,jfif,tiff,apng,avif,webp.")]
         [JsonProperty("CharacterImage")]
         public string CharacterImage
         {
@@ -145,7 +145,8 @@ namespace DialogGenerator.Model
         }
 
         [JsonProperty("SpeechRate", NullValueHandling = NullValueHandling.Ignore)]
-        public int SpeechRate { 
+        public int SpeechRate
+        {
             get
             {
                 return mSpeechRate;
@@ -238,7 +239,7 @@ namespace DialogGenerator.Model
                 return;
 
             this.Phrases.Clear();
-            foreach(var phrase in other.Phrases)
+            foreach (var phrase in other.Phrases)
             {
                 this.Phrases.Add(phrase);
             }

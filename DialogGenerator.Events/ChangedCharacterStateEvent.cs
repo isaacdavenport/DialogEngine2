@@ -2,7 +2,7 @@
 
 namespace DialogGenerator.Events
 {
-    public class ChangedCharacterStateEvent:PubSubEvent
+    public class ChangedCharacterStateEvent : PubSubEvent
     {
     }
 }

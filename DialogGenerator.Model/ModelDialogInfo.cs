@@ -10,10 +10,10 @@ namespace DialogGenerator.Model
     /// This is subset of <see cref="ModelDialog" />
     /// It is used to store basic information about dialog models, which should be faster then parsing all json files 
     /// </summary>
-    public class ModelDialogInfo:INotifyPropertyChanged,IEquatable<ModelDialogInfo>
+    public class ModelDialogInfo : INotifyPropertyChanged, IEquatable<ModelDialogInfo>
     {
         private ModelDialogState mState;
-        private int mSelectedModelDialogIndex=-1;
+        private int mSelectedModelDialogIndex = -1;
 
         [JsonProperty("ArrayOfDialogModels")]
         public List<ModelDialog> ArrayOfDialogModels { get; set; }
@@ -87,10 +87,10 @@ namespace DialogGenerator.Model
                 State = this.State
             };
 
-            foreach(var _dialogModel in this.ArrayOfDialogModels)
+            foreach (var _dialogModel in this.ArrayOfDialogModels)
             {
                 _dlgInfo.ArrayOfDialogModels.Add(_dialogModel.Clone());
-            }            
+            }
 
             return _dlgInfo;
         }
