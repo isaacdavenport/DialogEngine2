@@ -576,7 +576,7 @@ namespace DialogGenerator.UI.ViewModels
                     Values.Add(i);
                 }
             }
-            catch (/* Newtonsoft.Json.JsonReaderException */ Exception e)
+            catch (Exception e)
             {
                 mLogger.Error($"PhraseWeight exception in _initLists function - {e.Message}");
             }

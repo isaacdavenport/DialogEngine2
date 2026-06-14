@@ -840,7 +840,7 @@ namespace DialogGenerator.UI.ViewModels
                 PhraseRating = CurrentTutorialStep.PhraseRating,
                 DialogStr = DialogStr,
                 PhraseWeights = new Dictionary<string, double>(),
-                FileName = /* $"{_fileNameParts[_fileNameParts.Length-2]}_{_fileNameParts.Last()}" */ _fileName
+                FileName = _fileName
             };
 
             foreach (KeyValuePair<string, double> entry in CurrentTutorialStep.PhraseWeights)

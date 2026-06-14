@@ -305,7 +305,7 @@ namespace DialogGenerator.UI.ViewModels
             int _selIndex1 = Session.Get<int>(Constants.NEXT_CH_1);
             int _selIndex2 = Session.Get<int>(Constants.NEXT_CH_2);
 
-            if (PlaygroundAvatars.Count == 0 /* S.Ristic - and actually it always is */)
+            if (PlaygroundAvatars.Count == 0)
             {
                 Character _c = null;
                 if (_selIndex1 >= 0 && _selIndex1 < mCharacterRepository.GetAll().Count)
@@ -320,7 +320,7 @@ namespace DialogGenerator.UI.ViewModels
                     }
                     else
                     {
-                        _selIndex1 = /* 0 */ _firstIndexNotInList(new List<int>());
+                        _selIndex1 = _firstIndexNotInList(new List<int>());
                     }
 
                     _c = mCharacterRepository.GetAll()[_selIndex1];
@@ -356,7 +356,7 @@ namespace DialogGenerator.UI.ViewModels
                     }
                     else
                     {
-                        _selIndex2 = /* 0 */ _firstIndexNotInList(new List<int>());
+                        _selIndex2 = _firstIndexNotInList(new List<int>());
                     }
 
                     _c = mCharacterRepository.GetAll()[_selIndex2];

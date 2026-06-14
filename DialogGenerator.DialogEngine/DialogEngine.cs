@@ -322,8 +322,7 @@ namespace DialogGenerator.DialogEngine
         {
             SelectedCharactersPairEventArgs args = mCharacterPairSelectionDataCached;
             if (args == null || args.Character1Index < 0 || args.Character1Index >= mContext.CharactersList.Count
-                || args.Character2Index < 0 || args.Character2Index >= mContext.CharactersList.Count /* ||
-                args.Character1Index == args.Character2Index *//* Sinisa 02/05/2020 - DLGEN-438 */)
+                || args.Character2Index < 0 || args.Character2Index >= mContext.CharactersList.Count)
             {
                 mLogger.Info($"_setNextCharacters could not set characters from cached values");
                 return false;
