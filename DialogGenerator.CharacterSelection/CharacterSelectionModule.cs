@@ -1,7 +1,5 @@
-﻿using DialogGenerator.Model.Enum;
-using Microsoft.Practices.Unity;
+﻿using Microsoft.Practices.Unity;
 using Prism.Modularity;
-using System;
 
 namespace DialogGenerator.CharacterSelection
 {
@@ -16,14 +14,9 @@ namespace DialogGenerator.CharacterSelection
 
         public void Initialize()
         {
-            mContainer.RegisterType<ICharacterSelection, ArenaCharacterSelection>(SelectionMode.ArenaModel.ToString());
-
-            Func<SelectionMode, ICharacterSelection> _selectionFactory = (_selectionType) =>
-            mContainer.Resolve<ICharacterSelection>(_selectionType.ToString());
-
-            var _selectionFactoryInstance = new CharacterSelectionFactory(_selectionFactory);
+            var _arenaCharacterSelection = mContainer.Resolve<ArenaCharacterSelection>();
+            var _selectionFactoryInstance = new CharacterSelectionFactory(_arenaCharacterSelection);
             mContainer.RegisterInstance<ICharacterSelectionFactory>(_selectionFactoryInstance);
-
         }
     }
 }

@@ -1,9 +1,7 @@
-﻿using DialogGenerator.Model.Enum;
-
-namespace DialogGenerator.CharacterSelection
+﻿namespace DialogGenerator.CharacterSelection
 {
     public interface ICharacterSelectionFactory
     {
-        ICharacterSelection Create(SelectionMode _selectionMode);
+        ICharacterSelection Create();
     }
 }

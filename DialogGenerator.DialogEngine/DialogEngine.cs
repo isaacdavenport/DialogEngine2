@@ -699,7 +699,7 @@ namespace DialogGenerator.DialogEngine
             mIsDialogCancelled = false;
             Task _characterSelectionTask;
 
-            mCharacterSelection = mCharacterSelectionFactory.Create(SelectionMode.ArenaModel);
+            mCharacterSelection = mCharacterSelectionFactory.Create();
 
             mEventAggregator.GetEvent<CharacterSelectionModelChangedEvent>().Publish();
 
@@ -724,7 +724,7 @@ namespace DialogGenerator.DialogEngine
                     {
                         await _characterSelectionTask;
 
-                        mCharacterSelectionFactory.Create(SelectionMode.ArenaModel);
+                        mCharacterSelection = mCharacterSelectionFactory.Create();
 
                         mEventAggregator.GetEvent<CharacterSelectionModelChangedEvent>().Publish();
                         _characterSelectionTask = mCharacterSelection.StartCharacterSelection();

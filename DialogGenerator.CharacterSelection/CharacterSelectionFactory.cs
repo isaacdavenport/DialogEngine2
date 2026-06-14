@@ -1,20 +1,17 @@
-﻿using DialogGenerator.Model.Enum;
-using System;
-
-namespace DialogGenerator.CharacterSelection
+﻿namespace DialogGenerator.CharacterSelection
 {
     public class CharacterSelectionFactory : ICharacterSelectionFactory
     {
-        private readonly Func<SelectionMode, ICharacterSelection> mfactoryFactory;
+        private readonly ICharacterSelection mArenaCharacterSelection;
 
-        public CharacterSelectionFactory(Func<SelectionMode, ICharacterSelection> _factoryFactory)
+        public CharacterSelectionFactory(ICharacterSelection arenaCharacterSelection)
         {
-            this.mfactoryFactory = _factoryFactory;
+            this.mArenaCharacterSelection = arenaCharacterSelection;
         }
 
-        public ICharacterSelection Create(SelectionMode _selectionMode)
+        public ICharacterSelection Create()
         {
-            return mfactoryFactory(_selectionMode);
+            return mArenaCharacterSelection;
         }
     }
 }
