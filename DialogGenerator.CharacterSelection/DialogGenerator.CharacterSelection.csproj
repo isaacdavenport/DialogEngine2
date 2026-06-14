@@ -94,6 +94,7 @@
     <Compile Include="CharacterSelectionModule.cs" />
     <Compile Include="ICharacterSelection.cs" />
     <Compile Include="ICharacterSelectionFactory.cs" />
+    <Compile Include="Model\BLEDataProviderType.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Workflow\SerialSelectionWorkflow.cs" />
   </ItemGroup>
@@ -125,7 +126,6 @@
   <ItemGroup>
     <Folder Include="Data\" />
     <Folder Include="Helper\" />
-    <Folder Include="Model\" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>
